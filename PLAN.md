@@ -1,6 +1,6 @@
 # JSX / md2pdf ロードマップ
 
-最終更新: 2026-05-09
+最終更新: 2026-05-11
 
 ## 目的
 
@@ -44,6 +44,13 @@ rich content の応用範囲を磨く。
 - `Document` root、margin-aware な `Header` / `Footer`、page 全体座標の `Static` は入った。Templates starter / docs
   を通じて repeated layer、margin area、`Absolute` origin が直感とズレないかを確認し、必要なら wording やサンプルを直す。
 - `Header` / `Footer` の実用パターンとして、page number、repeated title、watermark / stamp などを starter に残す。
+- React に慣れた人と AI authoring を主な利用者として意識する。`Text` / MVT は JSX render 時に高さを測れるため、
+  starter / docs では「通常は `height` を書かない」体験に寄せる。固定 field、画像、absolute overlay など
+  明示寸法が意味を持つ場所だけ `height` を書く。
+- POC playground (`react-pdfme-jsx`) の実用サンプルを参考に、invoice、form、report、research paper、Japanese business
+  document、header/footer/page number、watermark / badge などの starter を増やす。ただし POC 専用 API
+  (`autoHeight`, `staticHeader`, `For` など) はそのまま持ち込まず、現行の `Document` / `Header` / `Footer` /
+  通常の JS 配列処理へ寄せる。
 - 編集の正は generated `Template + inputs`。JSX source は初期生成 / regeneration 用の metadata として扱う。
   Designer で編集した template を JSX に自動逆変換することは当面目指さない。
 - JSX playground は source authoring と Viewer preview に寄せる。Form 入力確認は生成方法に依存しない共通 project 導線として
@@ -63,7 +70,8 @@ rich content の応用範囲を磨く。
 - Form 入力や dynamic layout reflow で `Text` / MVT が runtime に `overflow: "expand"` した場合、
   JSX の親 `Box` / container は自動では広がらない。生成後の `Box` は rectangle schema であり、
   子 schema の実描画高さと親 container を結び直す contract がまだないため。親子 container dynamic
-  layout は将来の設計課題として扱う。
+  layout は実装したい重要課題として扱う。まずは JSX から生成された visual `Box` と子 text/MVT の関係を
+  metadata として template に残すか、単一 text/MVT 子の decoration に畳むかを比較する。
 - `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
   直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 

@@ -15,10 +15,10 @@
         "content": "@pdfme/jsx beta",
         "position": {
           "x": 16,
-          "y": 3
+          "y": 0
         },
         "width": 80,
-        "height": 6,
+        "height": 3.273984,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -37,13 +37,13 @@
       {
         "name": "text_2",
         "type": "text",
-        "content": "Header / Footer / Absolute",
+        "content": "Header and Footer repeat on every page",
         "position": {
           "x": 96,
-          "y": 3
+          "y": 0
         },
         "width": 80,
-        "height": 6,
+        "height": 3.273984,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -79,10 +79,10 @@
         "content": "Generated from JSX",
         "position": {
           "x": 16,
-          "y": 281.8
+          "y": 279.3
         },
         "width": 80,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -104,10 +104,10 @@
         "content": "Page {currentPage} of {totalPages}",
         "position": {
           "x": 96,
-          "y": 281.8
+          "y": 279.3
         },
         "width": 54,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -175,10 +175,10 @@
         "content": "Invoice",
         "position": {
           "x": 16,
-          "y": 19
+          "y": 19.659807999999998
         },
         "width": 92,
-        "height": 12,
+        "height": 9.821952,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -200,10 +200,10 @@
         "content": "A compact authoring example using Stack, Row, Table and visual schemas.",
         "position": {
           "x": 16,
-          "y": 33
+          "y": 31.48176
         },
         "width": 92,
-        "height": 6,
+        "height": 6.8584320000000005,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -241,7 +241,7 @@
           "y": 47
         },
         "width": 82,
-        "height": 30,
+        "height": 26.800336,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -259,7 +259,7 @@
           "y": 51
         },
         "width": 74,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -281,10 +281,10 @@
         "content": "Kumo Coffee\nAki Tanaka\naki@example.com",
         "position": {
           "x": 20,
-          "y": 58
+          "y": 55.864736
         },
         "width": 74,
-        "height": 15,
+        "height": 13.9356,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -314,7 +314,7 @@
           "y": 47
         },
         "width": 90,
-        "height": 39,
+        "height": 26.864736,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -332,7 +332,7 @@
           "y": 51
         },
         "width": 82,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -351,13 +351,13 @@
       {
         "name": "list_1",
         "type": "list",
-        "content": "[\"Layout primitives create regular pdfme schemas.\",\"\\tNested rows and boxes stay readable.\",\"Download the generated template JSON.\"]",
+        "content": "[\"Text and MVT can omit height; JSX measures them while rendering.\",\"\\tBoxes without height grow around measured children.\",\"Download the generated template JSON.\"]",
         "position": {
           "x": 108,
-          "y": 58
+          "y": 55.864736
         },
         "width": 82,
-        "height": 24,
+        "height": 14,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -381,7 +381,7 @@
         "content": "[[\"Design system setup\",\"1\",\"$800\"],[\"PDF template automation\",\"2\",\"$1,200\"],[\"QA and playground review\",\"1\",\"$350\"]]",
         "position": {
           "x": 16,
-          "y": 93
+          "y": 80.864736
         },
         "width": 178,
         "height": 36,
@@ -458,10 +458,10 @@
         "type": "rectangle",
         "position": {
           "x": 16,
-          "y": 136
+          "y": 123.864736
         },
         "width": 130,
-        "height": 28,
+        "height": 12.4198784,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -476,10 +476,10 @@
         "content": "**Note:** read-only Text can use inline-markdown. Editable Text intentionally cannot.",
         "position": {
           "x": 20,
-          "y": 140
+          "y": 127.864736
         },
         "width": 122,
-        "height": 20,
+        "height": 4.4198784,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -500,7 +500,7 @@
         "type": "ellipse",
         "position": {
           "x": 152,
-          "y": 136
+          "y": 123.864736
         },
         "width": 22,
         "height": 22,
@@ -517,7 +517,7 @@
         "type": "rectangle",
         "position": {
           "x": 176,
-          "y": 136
+          "y": 123.864736
         },
         "width": 18,
         "height": 22,
@@ -540,7 +540,7 @@
           "y": 18
         },
         "width": 178,
-        "height": 10,
+        "height": 7.366464,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -562,10 +562,10 @@
         "content": "PageBreak creates another schemas array in the generated template. This page shows that JSX is only an authoring layer: the output remains a normal pdfme Template.",
         "position": {
           "x": 16,
-          "y": 34
+          "y": 31.366464
         },
         "width": 178,
-        "height": 22,
+        "height": 9.2588832,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -587,10 +587,10 @@
         "type": "rectangle",
         "position": {
           "x": 16,
-          "y": 62
+          "y": 46.6253472
         },
         "width": 178,
-        "height": 34,
+        "height": 14.9723632,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -605,10 +605,10 @@
         "content": "Try changing numbers, colors, Stack gaps, Row widths, or Table rows. The Viewer updates after a short debounce.",
         "position": {
           "x": 21,
-          "y": 67
+          "y": 51.6253472
         },
         "width": 168,
-        "height": 24,
+        "height": 4.9723632,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,

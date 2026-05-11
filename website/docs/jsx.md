@@ -37,10 +37,10 @@ const { template, inputs } = await renderToTemplate(
   <Document size="A4" margin={{ x: 16, y: 18 }}>
     <Page>
       <Stack gap={6}>
-        <Text height={12} size={24}>
+        <Text size={24}>
           Invoice
         </Text>
-        <Text height={8} color="#64748b">
+        <Text color="#64748b">
           Generated from JSX, rendered by pdfme.
         </Text>
         <Table
@@ -81,6 +81,11 @@ const pdf = await generate({
 The layout API intentionally borrows useful ideas from Flexbox without trying to be CSS-compatible.
 Use `gap`, `margin`, `alignItems`, `justifyContent`, and `flex` / `flexGrow` for compact templates.
 
+`Text`, `MultiVariableText`, `List`, and `Table` can usually omit `height`. JSX measures their initial
+content while rendering and advances the surrounding `Stack`, `Row`, or `Box`. Use explicit `height`
+when you want a fixed field, a fixed visual area, or predictable form input box. A `Box` without
+`height` grows around its children during JSX rendering.
+
 ## Schema Components
 
 `@pdfme/jsx` currently includes the main static and form-oriented schemas:
@@ -97,6 +102,10 @@ Use `gap`, `margin`, `alignItems`, `justifyContent`, and `flex` / `flexGrow` for
 
 If a component has a `name`, it becomes input-backed by default. If it has no `name`, it is rendered as
 read-only content. This mirrors the pdfme template data model.
+
+Because the output is a normal pdfme template, Designer edits apply to the generated `Template`. JSX is
+the seed authoring surface; it is not a lossless source format after the template has been edited in
+Designer.
 
 `Table` uses `columnWeights` for relative column sizing. The values are normalized to pdfme
 `headWidthPercentages`, so `columnWeights={[30, 70]}` means a 30/70 split, not `30mm` / `70mm`.
@@ -125,15 +134,15 @@ For repeated content, prefer `Document` with document-level `Header` / `Footer`:
 return (
   <Document size="A4" margin={{ x: 16, y: 18 }}>
     <Header>
-      <Text height={6}>Report</Text>
+      <Text>Report</Text>
     </Header>
     <Footer>
-      <Text height={6} align="right">
+      <Text align="right">
         {'Page {currentPage} of {totalPages}'}
       </Text>
     </Footer>
     <Page>
-      <Text height={12}>Body</Text>
+      <Text>Body</Text>
     </Page>
   </Document>
 );
@@ -141,6 +150,10 @@ return (
 
 To migrate from the earlier beta static API, move `Header` / `Footer` / `Static` out of `Page` and
 place them directly inside `Document`.
+
+`Header` and `Footer` are margin-aware. Their coordinate origin is the page margin area, so they are
+usually the right choice for titles, page numbers, and repeated document chrome. `Static` uses the full
+page coordinate system and is intended for advanced overlays such as watermarks, crop marks, or stamps.
 
 ## Current Limitations
 
@@ -153,3 +166,5 @@ place them directly inside `Document`.
   fonts, and generator/viewer options.
 - `Header`, `Footer`, and `Static` are supported only as direct children of `Document`. They generate
   blank `basePdf.staticSchema` and cannot be used with a custom PDF `basePdf`.
+- If a form input later expands at runtime, a parent `Box` rectangle is not dynamically resized yet.
+  Dynamic parent/child container reflow is a future layout feature.

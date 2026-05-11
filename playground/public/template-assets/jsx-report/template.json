@@ -15,10 +15,10 @@
         "content": "Quarterly product report",
         "position": {
           "x": 16,
-          "y": 280.5
+          "y": 279
         },
         "width": 80,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -40,10 +40,10 @@
         "content": "Page {currentPage} of {totalPages}",
         "position": {
           "x": 96,
-          "y": 280.5
+          "y": 279
         },
         "width": 50,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -72,7 +72,7 @@
           "y": 18
         },
         "width": 110,
-        "height": 10,
+        "height": 8.18496,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -94,10 +94,10 @@
         "content": "A layout-focused preset for reports and internal briefs.",
         "position": {
           "x": 16,
-          "y": 30
+          "y": 28.18496
         },
         "width": 110,
-        "height": 7,
+        "height": 3.683232,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -119,10 +119,10 @@
         "content": "Healthy",
         "position": {
           "x": 126,
-          "y": 29
+          "y": 28.594208000000002
         },
         "width": 42,
-        "height": 8,
+        "height": 3.273984,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -143,10 +143,10 @@
         "type": "rectangle",
         "position": {
           "x": 16,
-          "y": 44
+          "y": 38.868192
         },
         "width": 56,
-        "height": 24,
+        "height": 20.2312,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -161,10 +161,10 @@
         "content": "Activation",
         "position": {
           "x": 20,
-          "y": 48
+          "y": 42.868192
         },
         "width": 48,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -186,10 +186,10 @@
         "content": "74%",
         "position": {
           "x": 20,
-          "y": 55
+          "y": 47.732928
         },
         "width": 48,
-        "height": 9,
+        "height": 7.366464,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -210,10 +210,10 @@
         "type": "rectangle",
         "position": {
           "x": 77,
-          "y": 44
+          "y": 38.868192
         },
         "width": 56,
-        "height": 24,
+        "height": 20.2312,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -228,10 +228,10 @@
         "content": "Retention",
         "position": {
           "x": 81,
-          "y": 48
+          "y": 42.868192
         },
         "width": 48,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -253,10 +253,10 @@
         "content": "61%",
         "position": {
           "x": 81,
-          "y": 55
+          "y": 47.732928
         },
         "width": 48,
-        "height": 9,
+        "height": 7.366464,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -277,10 +277,10 @@
         "type": "rectangle",
         "position": {
           "x": 138,
-          "y": 44
+          "y": 38.868192
         },
         "width": 56,
-        "height": 24,
+        "height": 20.2312,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -295,10 +295,10 @@
         "content": "Expansion",
         "position": {
           "x": 142,
-          "y": 48
+          "y": 42.868192
         },
         "width": 48,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -320,10 +320,10 @@
         "content": "28%",
         "position": {
           "x": 142,
-          "y": 55
+          "y": 47.732928
         },
         "width": 48,
-        "height": 9,
+        "height": 7.366464,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -344,10 +344,10 @@
         "type": "rectangle",
         "position": {
           "x": 16,
-          "y": 75
+          "y": 66.099392
         },
         "width": 178,
-        "height": 77,
+        "height": 46.1698592,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -362,10 +362,10 @@
         "content": "Notes",
         "position": {
           "x": 21,
-          "y": 80
+          "y": 71.099392
         },
         "width": 168,
-        "height": 7,
+        "height": 4.910976,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -387,10 +387,10 @@
         "content": "The JSX authoring layer is useful when a document has repeated visual patterns but still needs to become a normal pdfme template. This example uses boxes, rows, static footer content, and simple visual bars.",
         "position": {
           "x": 21,
-          "y": 91
+          "y": 80.010368
         },
         "width": 168,
-        "height": 28,
+        "height": 9.2588832,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -410,13 +410,13 @@
       {
         "name": "list_1",
         "type": "list",
-        "content": "[\"Use Row and Stack for predictable layout.\",\"Use Box for padding, borders, and backgrounds.\",\"Use Static or Footer for repeated page content.\"]",
+        "content": "[\"Use Row and Stack for predictable layout.\",\"Use Box for padding, borders, and backgrounds.\",\"Use Footer for repeated page content.\"]",
         "position": {
           "x": 21,
-          "y": 123
+          "y": 93.26925119999999
         },
         "width": 168,
-        "height": 24,
+        "height": 14,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,

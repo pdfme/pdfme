@@ -13,23 +13,23 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     source: `return (
   <Document size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
     <Header>
-      <Row height={12} alignItems="center" justifyContent="space-between">
-        <Text width={80} height={6} size={8} color="#64748b">
+      <Row alignItems="center" justifyContent="space-between">
+        <Text width={80} size={8} color="#64748b">
           @pdfme/jsx beta
         </Text>
-        <Text width={80} height={6} size={8} align="right" color="#64748b">
-          Header / Footer / Absolute
+        <Text width={80} size={8} align="right" color="#64748b">
+          Header and Footer repeat on every page
         </Text>
       </Row>
     </Header>
 
     <Footer>
       <Line height={0.3} color="#cbd5e1" />
-      <Row height={10} alignItems="center" justifyContent="space-between">
-        <Text width={80} height={5} size={7} color="#64748b">
+      <Row alignItems="center" justifyContent="space-between">
+        <Text width={80} size={7} color="#64748b">
           Generated from JSX
         </Text>
-        <Text width={54} height={5} size={7} align="right" color="#64748b">
+        <Text width={54} size={7} align="right" color="#64748b">
           {'Page {currentPage} of {totalPages}'}
         </Text>
       </Row>
@@ -46,10 +46,10 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
       <Stack gap={7}>
         <Row alignItems="center" justifyContent="space-between">
           <Stack width={92} gap={2}>
-            <Text height={12} size={24} color="#0f172a">
+            <Text size={24} color="#0f172a">
               Invoice
             </Text>
-            <Text height={6} size={9} color="#475569">
+            <Text size={9} color="#475569">
               A compact authoring example using Stack, Row, Table and visual schemas.
             </Text>
           </Stack>
@@ -61,11 +61,10 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         <Row gap={6}>
           <Box width={82} padding={4} borderColor="#e2e8f0" borderWidth={0.4} background="#f8fafc">
             <Stack gap={2}>
-              <Text height={5} size={7} color="#64748b">
+              <Text size={7} color="#64748b">
                 Bill to
               </Text>
               <MultiVariableText
-                height={15}
                 size={10}
                 lineHeight={1.25}
                 text={'{company}\\n{name}\\n{email}'}
@@ -79,15 +78,14 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           </Box>
           <Box flex={1} padding={4} borderColor="#e2e8f0" borderWidth={0.4}>
             <Stack gap={2}>
-              <Text height={5} size={7} color="#64748b">
+              <Text size={7} color="#64748b">
                 Summary
               </Text>
               <List
-                height={24}
                 size={8}
                 items={[
-                  'Layout primitives create regular pdfme schemas.',
-                  { text: 'Nested rows and boxes stay readable.', level: 1 },
+                  'Text and MVT can omit height; JSX measures them while rendering.',
+                  { text: 'Boxes without height grow around measured children.', level: 1 },
                   'Download the generated template JSON.',
                 ]}
               />
@@ -113,7 +111,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
 
         <Row gap={6}>
           <Box flex={1} padding={4} background="#fefce8" borderColor="#facc15" borderWidth={0.4}>
-            <Text height={20} size={8} lineHeight={1.35} textFormat="inline-markdown">
+            <Text size={8} lineHeight={1.35} textFormat="inline-markdown">
               **Note:** read-only Text can use inline-markdown. Editable Text intentionally cannot.
             </Text>
           </Box>
@@ -129,14 +127,14 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
 
     <Page>
       <Stack gap={6}>
-        <Text height={10} size={18} color="#0f172a">
+        <Text size={18} color="#0f172a">
           Second page
         </Text>
-        <Text height={22} size={9} lineHeight={1.35} overflow="expand">
+        <Text size={9} lineHeight={1.35} overflow="expand">
           PageBreak creates another schemas array in the generated template. This page shows that JSX is only an authoring layer: the output remains a normal pdfme Template.
         </Text>
         <Box padding={5} borderColor="#cbd5e1" borderWidth={0.4} background="#f8fafc">
-          <Text height={24} size={9} lineHeight={1.35}>
+          <Text size={9} lineHeight={1.35}>
             Try changing numbers, colors, Stack gaps, Row widths, or Table rows. The Viewer updates after a short debounce.
           </Text>
         </Box>
@@ -152,30 +150,30 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     source: `return (
   <Document size="A4" margin={{ x: 18, y: 18 }} font="NotoSansJP">
     <Header>
-      <Text height={7} size={8} color="#64748b">
+      <Text size={8} color="#64748b">
         Editable fields example
       </Text>
     </Header>
 
     <Footer>
-      <Text height={6} size={7} align="right" color="#64748b">
+      <Text size={7} align="right" color="#64748b">
         {'Page {currentPage} of {totalPages}'}
       </Text>
     </Footer>
 
     <Page>
       <Stack gap={7}>
-        <Text height={12} size={22} color="#111827">
+        <Text size={22} color="#111827">
           Customer Intake Form
         </Text>
-        <Text height={8} size={9} color="#6b7280">
-          Switch the preview to Form and edit the fields directly.
+        <Text size={9} color="#6b7280">
+          Open this generated template in Form/Viewer to edit the fields.
         </Text>
 
         <Row gap={6}>
           <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
             <Stack gap={2}>
-              <Text height={5} size={7} color="#6b7280">
+              <Text size={7} color="#6b7280">
                 Customer name
               </Text>
               <Text name="customerName" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
@@ -185,7 +183,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           </Box>
           <Box flex={1} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
             <Stack gap={2}>
-              <Text height={5} size={7} color="#6b7280">
+              <Text size={7} color="#6b7280">
                 Email
               </Text>
               <Text name="email" height={9} size={11} padding={1.5} borderColor="#cbd5e1" borderWidth={0.3}>
@@ -197,7 +195,7 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
 
         <Box padding={4} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
           <Stack gap={2}>
-            <Text height={5} size={7} color="#64748b">
+            <Text size={7} color="#64748b">
               Message
             </Text>
             <MultiVariableText
@@ -217,15 +215,15 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
         <Row gap={6}>
           <Box width={56} padding={4} borderColor="#d1d5db" borderWidth={0.4}>
             <Stack gap={2}>
-              <Text height={5} size={7} color="#6b7280">
+              <Text size={7} color="#6b7280">
                 Logo upload
               </Text>
               <Image name="logo" width={48} height={28} />
             </Stack>
           </Box>
           <Box flex={1} padding={4} background="#ecfeff" borderColor="#06b6d4" borderWidth={0.4}>
-            <Text height={30} size={9} lineHeight={1.35}>
-              This preset keeps the generated template editable. The Form preview writes changed input values back into the playground state, so Generate PDF uses the latest edits.
+            <Text size={9} lineHeight={1.35}>
+              Editable fields usually keep explicit heights for predictable input boxes. Read-only text can usually omit height and let JSX measure it.
             </Text>
           </Box>
         </Row>
@@ -242,11 +240,11 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     source: `return (
   <Document size="A4" margin={{ x: 16, y: 18 }} font="NotoSansJP">
     <Footer>
-      <Row height={8} justifyContent="space-between" alignItems="center">
-        <Text width={80} height={5} size={7} color="#64748b">
+      <Row justifyContent="space-between" alignItems="center">
+        <Text width={80} size={7} color="#64748b">
           Quarterly product report
         </Text>
-        <Text width={50} height={5} size={7} align="right" color="#64748b">
+        <Text width={50} size={7} align="right" color="#64748b">
           {'Page {currentPage} of {totalPages}'}
         </Text>
       </Row>
@@ -256,14 +254,14 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
       <Stack gap={7}>
         <Row justifyContent="space-between" alignItems="end">
           <Stack width={110} gap={2}>
-            <Text height={10} size={20} color="#0f172a">
+            <Text size={20} color="#0f172a">
               Product Health Report
             </Text>
-            <Text height={7} size={9} color="#64748b">
+            <Text size={9} color="#64748b">
               A layout-focused preset for reports and internal briefs.
             </Text>
           </Stack>
-          <Text width={42} height={8} size={8} align="right" color="#16a34a">
+          <Text width={42} size={8} align="right" color="#16a34a">
             Healthy
           </Text>
         </Row>
@@ -276,8 +274,8 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           ].map(([label, value, background]) => (
             <Box flex={1} padding={4} background={background} borderColor="#d1d5db" borderWidth={0.3}>
               <Stack gap={2}>
-                <Text height={5} size={7} color="#64748b">{label}</Text>
-                <Text height={9} size={18} color="#0f172a">{value}</Text>
+                <Text size={7} color="#64748b">{label}</Text>
+                <Text size={18} color="#0f172a">{value}</Text>
               </Stack>
             </Box>
           ))}
@@ -285,19 +283,18 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
 
         <Box padding={5} borderColor="#cbd5e1" borderWidth={0.4}>
           <Stack gap={4}>
-            <Text height={7} size={12} color="#0f172a">
+            <Text size={12} color="#0f172a">
               Notes
             </Text>
-            <Text height={28} size={9} lineHeight={1.35} overflow="expand">
+            <Text size={9} lineHeight={1.35} overflow="expand">
               The JSX authoring layer is useful when a document has repeated visual patterns but still needs to become a normal pdfme template. This example uses boxes, rows, static footer content, and simple visual bars.
             </Text>
             <List
-              height={24}
               size={8}
               items={[
                 'Use Row and Stack for predictable layout.',
                 'Use Box for padding, borders, and backgrounds.',
-                'Use Static or Footer for repeated page content.',
+                'Use Footer for repeated page content.',
               ]}
             />
           </Stack>
@@ -314,22 +311,22 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
     source: `return (
   <Document size="A4" margin={{ x: 18, y: 20 }} font="NotoSansJP">
     <Footer>
-      <Text height={6} size={7} align="right" color="#64748b">
+      <Text size={7} align="right" color="#64748b">
         {'{currentPage} / {totalPages} ページ'}
       </Text>
     </Footer>
 
     <Page>
       <Stack gap={7}>
-        <Text height={12} size={22} color="#0f172a">
+        <Text size={22} color="#0f172a">
           お知らせ
         </Text>
-        <Text height={8} size={9} color="#64748b">
+        <Text size={9} color="#64748b">
           JSX から日本語を含むテンプレートを作成する例です。
         </Text>
 
         <Box padding={5} background="#f8fafc" borderColor="#cbd5e1" borderWidth={0.4}>
-          <Text height={36} size={10} lineHeight={1.45} overflow="expand">
+          <Text size={10} lineHeight={1.45} overflow="expand">
             pdfme の JSX authoring は、通常の pdfme Template と inputs を生成するための薄いレイヤーです。日本語を扱う場合は、Viewer や generator の options.font に NotoSansJP などのフォントを登録してください。
           </Text>
         </Box>
@@ -349,6 +346,68 @@ export const jsxPlaygroundPresets: JsxPlaygroundPreset[] = [
           headStyles={{ backgroundColor: '#0f766e', borderColor: '#0f766e', padding: 2 }}
           bodyStyles={{ borderColor: '#cbd5e1', borderWidth: 0.25, padding: 2 }}
         />
+      </Stack>
+    </Page>
+  </Document>
+);`,
+  },
+  {
+    id: 'research-paper',
+    label: 'Research paper',
+    description: 'A paper-style document that leans on measured text height and PageBreak.',
+    source: `const sections = [
+  {
+    title: '1. Introduction',
+    body: 'Since structured templates are easier to review than absolute-position JSON, JSX can act as a readable authoring surface for humans and AI. The generated output is still an ordinary pdfme Template, so it can be opened in Designer after generation.',
+  },
+  {
+    title: '2. Layout model',
+    body: 'Text and MultiVariableText can omit height. During JSX rendering, pdfme measures their content and advances the surrounding Stack or Box. Use explicit height only when you want a fixed field or a fixed visual area.',
+  },
+];
+
+return (
+  <Document size="A4" margin={{ x: 20, y: 18 }} font="NotoSansJP">
+    <Footer>
+      <Text size={7} align="right" color="#64748b">
+        {'Research brief — {currentPage} / {totalPages}'}
+      </Text>
+    </Footer>
+
+    <Page>
+      <Stack gap={5}>
+        <Text size={17} align="center" lineHeight={1.3} color="#111827">
+          Practical Notes on JSX Authoring for PDF Templates
+        </Text>
+
+        <Box background="#f3f4f6" borderColor="#9ca3af" borderWidth={0.2} padding={4}>
+          <Text size={9} lineHeight={1.5} color="#374151">
+            Abstract — This preset mirrors a paper-style document and intentionally omits height on
+            most Text nodes. JSX measures each block while rendering, and the parent Box grows around
+            the abstract without manual geometry.
+          </Text>
+        </Box>
+
+        {sections.map((section) => (
+          <Stack gap={1.5}>
+            <Text size={11} lineHeight={1.3} color="#111827">
+              {section.title}
+            </Text>
+            <Text size={9} lineHeight={1.5} color="#374151">
+              {section.body}
+            </Text>
+          </Stack>
+        ))}
+
+        <PageBreak />
+
+        <Text size={13} color="#111827">
+          Appendix
+        </Text>
+        <Text size={9} lineHeight={1.5} color="#374151">
+          Designer edits are applied to the generated Template. The JSX source remains a seed for
+          regeneration, not a lossless representation of later Designer changes.
+        </Text>
       </Stack>
     </Page>
   </Document>

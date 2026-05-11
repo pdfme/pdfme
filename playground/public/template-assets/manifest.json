@@ -738,6 +738,31 @@
       "title": "Report page"
     },
     {
+      "name": "jsx-research-paper",
+      "author": "pdfme",
+      "path": "jsx-research-paper/template.json",
+      "thumbnailPath": "jsx-research-paper/thumbnail.png",
+      "pageCount": 2,
+      "fieldCount": 9,
+      "schemaTypes": [
+        "rectangle",
+        "text"
+      ],
+      "fontNames": [
+        "NotoSansJP"
+      ],
+      "hasCJK": false,
+      "basePdfKind": "blank",
+      "description": "A paper-style document that leans on measured text height and PageBreak.",
+      "sourceKind": "jsx",
+      "tags": [
+        "Research",
+        "Article",
+        "Multi-page"
+      ],
+      "title": "Research paper"
+    },
+    {
       "name": "z-fold-brochure",
       "author": "hitomi-t260g",
       "path": "z-fold-brochure/template.json",

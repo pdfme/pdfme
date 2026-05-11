@@ -1,0 +1,263 @@
+{
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [
+      18,
+      20,
+      18,
+      20
+    ],
+    "staticSchema": [
+      {
+        "name": "text_1",
+        "type": "text",
+        "content": "Research brief — {currentPage} / {totalPages}",
+        "position": {
+          "x": 20,
+          "y": 279
+        },
+        "width": 170,
+        "height": 2.8647359999999997,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "right",
+        "verticalAlignment": "top",
+        "fontSize": 7,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#64748b",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  },
+  "schemas": [
+    [
+      {
+        "name": "text_2",
+        "type": "text",
+        "content": "Practical Notes on JSX Authoring for PDF Templates",
+        "position": {
+          "x": 20,
+          "y": 18
+        },
+        "width": 170,
+        "height": 9.044380799999999,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "center",
+        "verticalAlignment": "top",
+        "fontSize": 17,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "box_1",
+        "type": "rectangle",
+        "position": {
+          "x": 20,
+          "y": 32.0443808
+        },
+        "width": 170,
+        "height": 23.050448000000003,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "color": "#f3f4f6",
+        "borderColor": "#9ca3af",
+        "borderWidth": 0.2,
+        "radius": 0
+      },
+      {
+        "name": "text_3",
+        "type": "text",
+        "content": "Abstract — This preset mirrors a paper-style document and intentionally omits height on most Text nodes. JSX measures each block while rendering, and the parent Box grows around the abstract without manual geometry.",
+        "position": {
+          "x": 24,
+          "y": 36.0443808
+        },
+        "width": 162,
+        "height": 15.050448000000001,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.5,
+        "characterSpacing": 0,
+        "fontColor": "#374151",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_4",
+        "type": "text",
+        "content": "1. Introduction",
+        "position": {
+          "x": 20,
+          "y": 60.0948288
+        },
+        "width": 170,
+        "height": 5.8522464,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 11,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_5",
+        "type": "text",
+        "content": "Since structured templates are easier to review than absolute-position JSON, JSX can act as a readable authoring surface for humans and AI. The generated output is still an ordinary pdfme Template, so it can be opened in Designer after generation.",
+        "position": {
+          "x": 20,
+          "y": 67.4470752
+        },
+        "width": 170,
+        "height": 15.050448000000001,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.5,
+        "characterSpacing": 0,
+        "fontColor": "#374151",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_6",
+        "type": "text",
+        "content": "2. Layout model",
+        "position": {
+          "x": 20,
+          "y": 87.4975232
+        },
+        "width": 170,
+        "height": 5.8522464,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 11,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.3,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_7",
+        "type": "text",
+        "content": "Text and MultiVariableText can omit height. During JSX rendering, pdfme measures their content and advances the surrounding Stack or Box. Use explicit height only when you want a fixed field or a fixed visual area.",
+        "position": {
+          "x": 20,
+          "y": 94.8497696
+        },
+        "width": 170,
+        "height": 10.287648,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.5,
+        "characterSpacing": 0,
+        "fontColor": "#374151",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ],
+    [
+      {
+        "name": "text_8",
+        "type": "text",
+        "content": "Appendix",
+        "position": {
+          "x": 20,
+          "y": 18
+        },
+        "width": 170,
+        "height": 5.320224,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 13,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1,
+        "characterSpacing": 0,
+        "fontColor": "#111827",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      },
+      {
+        "name": "text_9",
+        "type": "text",
+        "content": "Designer edits are applied to the generated Template. The JSX source remains a seed for regeneration, not a lossless representation of later Designer changes.",
+        "position": {
+          "x": 20,
+          "y": 28.320224
+        },
+        "width": 170,
+        "height": 10.287648,
+        "rotate": 0,
+        "opacity": 1,
+        "readOnly": true,
+        "alignment": "left",
+        "verticalAlignment": "top",
+        "fontSize": 9,
+        "fontName": "NotoSansJP",
+        "lineHeight": 1.5,
+        "characterSpacing": 0,
+        "fontColor": "#374151",
+        "backgroundColor": "",
+        "textFormat": "plain",
+        "strikethrough": false,
+        "underline": false
+      }
+    ]
+  ],
+  "author": "pdfme"
+}

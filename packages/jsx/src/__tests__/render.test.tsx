@@ -359,6 +359,23 @@ describe('@pdfme/jsx renderToTemplate', () => {
     );
   });
 
+  it('advances Stack children by auto-measured Text height', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Stack gap={2}>
+          <Text width={24} lineHeight={1.2}>
+            This text wraps and does not specify height.
+          </Text>
+          <Text>After measured text</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [measured, after] = result.template.schemas[0] ?? [];
+    expect(measured?.height).toBeGreaterThan(0);
+    expect(after?.position.y).toBeCloseTo((measured?.height ?? 0) + 2);
+  });
+
   it('distributes Row width across flex children', async () => {
     const result = await renderToTemplate(
       <Page size={{ width: 100, height: 100 }} margin={0}>
@@ -553,6 +570,31 @@ describe('@pdfme/jsx renderToTemplate', () => {
       type: 'text',
       position: { x: 2, y: 2 },
     });
+  });
+
+  it('grows Box background around auto-measured child content', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Stack>
+          <Box background="#eeeeee" padding={{ x: 3, y: 2 }}>
+            <Text width={24} lineHeight={1.2}>
+              Auto measured text inside a visual Box.
+            </Text>
+          </Box>
+          <Text>After box</Text>
+        </Stack>
+      </Page>,
+    );
+
+    const [box, text, after] = result.template.schemas[0] ?? [];
+    expect(text?.height).toBeGreaterThan(0);
+    expect(box).toMatchObject({
+      type: 'rectangle',
+      color: '#eeeeee',
+      position: { x: 0, y: 0 },
+      height: (text?.height ?? 0) + 4,
+    });
+    expect(after?.position.y).toBeCloseTo(box?.height ?? 0);
   });
 
   it('does not render a rectangle schema for a Box without visual styles', async () => {

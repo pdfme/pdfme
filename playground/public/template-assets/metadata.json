@@ -84,6 +84,12 @@
     "sourceKind": "jsx",
     "tags": ["CJK", "Table"]
   },
+  "jsx-research-paper": {
+    "title": "Research paper",
+    "description": "A paper-style document that leans on measured text height and PageBreak.",
+    "sourceKind": "jsx",
+    "tags": ["Research", "Article", "Multi-page"]
+  },
   "jsx-report": {
     "title": "Report page",
     "description": "A dashboard-style report with cards, progress bars, list content, and page footer.",
