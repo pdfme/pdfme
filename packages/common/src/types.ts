@@ -265,6 +265,12 @@ export type DynamicLayoutPatchArgs = {
 export type DynamicLayoutResult = {
   heights: number[];
   avoidFirstUnitOnly?: boolean;
+  /**
+   * When false, the schema is emitted with its patched height but its height delta
+   * does not push later schemas. This is used for decoration schemas whose flow is
+   * driven by child schemas.
+   */
+  contributesToFlow?: boolean;
   patchSplitSchema?: (args: DynamicLayoutPatchArgs) => Partial<Schema>;
 };
 
@@ -275,6 +281,9 @@ export type DynamicLayoutArgs = {
   basePdf: BasePdf;
   options: CommonOptions;
   _cache: Map<string | number, unknown>;
+  input?: Record<string, string>;
+  schemas?: Schema[][];
+  pageSchemas?: Schema[];
 };
 
 export type GetDynamicLayout = (

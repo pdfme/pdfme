@@ -288,7 +288,14 @@
         "color": "#f8fafc",
         "borderColor": "#cbd5e1",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_7",
+            "message"
+          ],
+          "paddingBottom": 4
+        }
       },
       {
         "name": "text_7",
@@ -424,7 +431,7 @@
           "y": 112.509184
         },
         "width": 112,
-        "height": 17.2588832,
+        "height": 21.5454032,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -436,13 +443,13 @@
       {
         "name": "text_9",
         "type": "text",
-        "content": "Editable fields usually keep explicit heights for predictable input boxes. Read-only text can usually omit height and let JSX measure it.",
+        "content": "Auto-height Boxes follow expandable text fields in Form/Viewer and generated PDFs. Add explicit heights only when you want a fixed input area.",
         "position": {
           "x": 84,
           "y": 116.509184
         },
         "width": 104,
-        "height": 9.2588832,
+        "height": 13.545403199999999,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,

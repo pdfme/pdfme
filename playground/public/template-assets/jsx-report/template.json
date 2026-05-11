@@ -354,7 +354,15 @@
         "color": "",
         "borderColor": "#cbd5e1",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_12",
+            "text_13",
+            "list_1"
+          ],
+          "paddingBottom": 5
+        }
       },
       {
         "name": "text_12",

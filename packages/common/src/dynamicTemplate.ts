@@ -1,10 +1,10 @@
 import {
   Schema,
   Template,
-  BasePdf,
   BlankPdf,
   CommonOptions,
   DynamicLayoutCallbackResult,
+  DynamicLayoutArgs,
   DynamicLayoutResult,
 } from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
@@ -20,12 +20,7 @@ interface ModifyTemplateForDynamicTableArg {
   options: CommonOptions;
   getDynamicHeights: (
     value: string,
-    args: {
-      schema: Schema;
-      basePdf: BasePdf;
-      options: CommonOptions;
-      _cache: Map<string | number, unknown>;
-    },
+    args: DynamicLayoutArgs,
   ) => Promise<DynamicLayoutCallbackResult>;
 }
 
@@ -250,7 +245,9 @@ function processDynamicPage(
 
     // Update offset: difference between actual and original end position
     const originalGlobalEndY = item.baseY + item.height;
-    totalYOffset = actualGlobalEndY - originalGlobalEndY;
+    if (item.dynamicLayout.contributesToFlow !== false) {
+      totalYOffset = actualGlobalEndY - originalGlobalEndY;
+    }
   }
 
   sortPagesByOrder(pages, orderMap);
@@ -317,6 +314,9 @@ export const getDynamicTemplate = async (
             basePdf,
             options,
             _cache,
+            input,
+            schemas: template.schemas,
+            pageSchemas,
           }).then(normalizeDynamicLayoutResult);
         }),
       );

@@ -83,7 +83,8 @@ layout API は CSS/Flexbox 互換を目指していません。`gap`, `margin`, 
 `Text`, `MultiVariableText`, `List`, `Table` は通常 `height` を省略できます。JSX render 時に初期 content
 を測定し、周囲の `Stack`, `Row`, `Box` を進めます。固定 field、固定 visual area、Form の入力 box を
 明確にしたい場合だけ `height` を指定してください。`height` のない `Box` は、JSX render 時点では子要素の高さに
-合わせて伸びます。
+合わせて伸びます。その visual `Box` の中に runtime dynamic な text / MVT がある場合、Form/Viewer や
+generator が `overflow="expand"` を reflow するときも Box decoration の高さを追従させます。
 
 ## schema component
 
@@ -163,5 +164,6 @@ watermark、crop mark、stamp などの advanced overlay 向けです。
 - 出力は `Template + inputs` です。実際の描画は通常通り pdfme plugins, fonts, generator/viewer options に依存します。
 - `Header`, `Footer`, `Static` は `Document` の direct child としてのみ使えます。これらは blank
   `basePdf.staticSchema` を生成するため、custom PDF `basePdf` とは併用できません。
-- Form 入力によって runtime に text / MVT が expand した場合、親 `Box` の rectangle はまだ自動では
-  再計算されません。親子 container の dynamic reflow は今後の layout 機能として扱います。
+- Dynamic Box decoration reflow は同一ページ内の親子 visual container 向けです。child schema が page
+  break を跨いで split する場合、child は複数ページに分割できますが、親 Box decoration はまだ multi-page
+  container にはなりません。

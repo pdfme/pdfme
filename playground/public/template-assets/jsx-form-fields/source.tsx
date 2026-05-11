@@ -74,7 +74,7 @@ return (
           </Box>
           <Box flex={1} padding={4} background="#ecfeff" borderColor="#06b6d4" borderWidth={0.4}>
             <Text size={9} lineHeight={1.35}>
-              Editable fields usually keep explicit heights for predictable input boxes. Read-only text can usually omit height and let JSX measure it.
+              Auto-height Boxes follow expandable text fields in Form/Viewer and generated PDFs. Add explicit heights only when you want a fixed input area.
             </Text>
           </Box>
         </Row>

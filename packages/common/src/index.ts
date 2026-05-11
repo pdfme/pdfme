@@ -83,6 +83,12 @@ import {
 } from './helper.js';
 import { PAGE_SIZE_PRESETS, detectPaperSize, resolvePageSize } from './pageSize.js';
 import { getDynamicTemplate } from './dynamicTemplate.js';
+import {
+  DYNAMIC_CONTAINER_METADATA_KEY,
+  getDynamicContainerMetadata,
+  setDynamicContainerMetadata,
+} from './dynamicContainer.js';
+import type { DynamicContainerMetadata } from './dynamicContainer.js';
 import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './splitRange.js';
 import { replacePlaceholders } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
@@ -110,6 +116,9 @@ export {
   getInputFromTemplate,
   isBlankPdf,
   getDynamicTemplate,
+  DYNAMIC_CONTAINER_METADATA_KEY,
+  getDynamicContainerMetadata,
+  setDynamicContainerMetadata,
   replacePlaceholders,
   checkFont,
   checkInputs,
@@ -178,4 +187,5 @@ export type {
   PageOrientation,
   PageSize,
   PageSizePreset,
+  DynamicContainerMetadata,
 };

@@ -32,6 +32,9 @@ it provides its own `jsx-runtime` and `jsx-dev-runtime`.
 
 - `Text` and `MultiVariableText` heights are measured with pdfme's text/rich text wrapping helpers
   when `height` is omitted. Pass an explicit `height` when you need a fixed field box.
+- Auto-height visual `Box` decorations track child `overflow="expand"` reflow for normal same-page
+  parent/child containers. Children can still split across pages, but the parent Box decoration is
+  not a multi-page container yet.
 - `Text textFormat="inline-markdown"` is read-only only. Editable `Text` values use plain content.
 - `MultiVariableText` uses `text` or children as the template string and stores `values` as the
   JSON input. Variable names are inferred from `{name}` placeholders and can also be passed with
