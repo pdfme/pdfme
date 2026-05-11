@@ -1,9 +1,11 @@
 import { md2pdf } from '@pdfme/converter/md2pdf';
-import { md2PdfPresets } from '../src/routes/md2PdfPresets';
+import { readAuthoringStarterFixtures } from './authoringStarterFixtures';
+
+const md2PdfPresets = readAuthoringStarterFixtures('md2pdf');
 
 describe('md2pdf playground presets', () => {
-  it.each(md2PdfPresets)('converts the $label preset', async ({ markdown }) => {
-    const result = await md2pdf(markdown, {
+  it.each(md2PdfPresets)('converts the $label preset', async ({ source }) => {
+    const result = await md2pdf(source, {
       style: {
         fontName: 'NotoSansJP',
         lineHeight: 1.3,

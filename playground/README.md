@@ -34,17 +34,17 @@ Use this flow for normal pdfme templates:
    - Example: `playground/public/template-assets/invoice-blue`.
 2. Put `template.json` in that directory.
    - You can create it with the playground Designer and download the Template JSON.
-3. Add gallery metadata to `playground/public/template-assets/metadata.json`.
+3. Add gallery metadata.
+   - Prefer `playground/public/template-assets/<template-name>/metadata.json` for new templates.
+   - `playground/public/template-assets/metadata.json` is still supported for existing shared metadata.
 
 Example:
 
 ```json
 {
-  "invoice-blue": {
-    "order": 200,
-    "description": "A blue invoice variant for a more branded business document.",
-    "tags": ["Invoice", "Business", "Table"]
-  }
+  "order": 200,
+  "description": "A blue invoice variant for a more branded business document.",
+  "tags": ["Invoice", "Business", "Table"]
 }
 ```
 
@@ -58,21 +58,34 @@ Supported metadata fields:
 - `tags`: filter tags shown on the card and in the gallery filter.
 - `sourceKind`: optional generation kind. Use `"designer"`, `"jsx"`, or `"md2pdf"`. Normal `template.json` samples can omit this; they default to `"designer"`.
 
-`metadata.json` is validated during asset generation. Every template directory with a
+Template metadata is validated during asset generation. Every template directory with a
 `template.json` must have metadata, and metadata entries without a matching template directory fail
 the build.
 
 ### JSX and md2pdf starters
 
-JSX and md2pdf starters are generated from source presets, but they still end up in the same `template-assets` gallery.
+JSX and md2pdf starters live in the same `template-assets` gallery. Their source is stored beside
+the generated template so the source, metadata, thumbnail, and generated `template.json` move
+together.
 
-- JSX presets live in `playground/src/routes/jsxPlaygroundExamples.ts`.
-- md2pdf presets live in `playground/src/routes/md2PdfPresets.ts`.
-- Their generated template directories use `jsx-<preset-id>` or `md2pdf-<preset-id>`.
-- Add their gallery metadata to `metadata.json` with `sourceKind: "jsx"` or `sourceKind: "md2pdf"`.
+- JSX starters use `playground/public/template-assets/<starter-name>/source.tsx`.
+- md2pdf starters use `playground/public/template-assets/<starter-name>/source.md`.
+- Add `metadata.json` in the same directory with `sourceKind: "jsx"` or `sourceKind: "md2pdf"`.
+- Use names such as `jsx-invoice` or `md2pdf-overview` so the gallery type can also be inferred.
 - Give generated starters a human-readable `title`; otherwise the gallery falls back to the
-  generated directory name.
+  directory name.
 - Use `order` when a starter should appear in the first screen of the gallery.
+
+Example:
+
+```json
+{
+  "title": "Invoice layout",
+  "description": "A two-page invoice generated from JSX authoring source.",
+  "sourceKind": "jsx",
+  "tags": ["Invoice", "Business", "Table"]
+}
+```
 
 ### Regenerate assets
 
@@ -91,6 +104,6 @@ This command:
 
 `npm run dev` and `npm run build` also run this command automatically.
 
-Before committing, include the updated template directory, `metadata.json`, generated
+Before committing, include the updated template directory, metadata files, generated
 `manifest.json`, and versioned manifest. The generated `index.json`, thumbnail PNGs, and hash-map
 cache files are intentionally ignored.

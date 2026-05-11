@@ -18,7 +18,7 @@
           "y": 0
         },
         "width": 174,
-        "height": 7,
+        "height": 3.273984,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -43,7 +43,7 @@
           "y": 279
         },
         "width": 174,
-        "height": 6,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -72,7 +72,7 @@
           "y": 18
         },
         "width": 174,
-        "height": 12,
+        "height": 9.003456,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -91,13 +91,13 @@
       {
         "name": "text_4",
         "type": "text",
-        "content": "Switch the preview to Form and edit the fields directly.",
+        "content": "Open this generated template in Form/Viewer to edit the fields.",
         "position": {
           "x": 18,
-          "y": 37
+          "y": 34.003456
         },
         "width": 174,
-        "height": 8,
+        "height": 3.683232,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -118,10 +118,10 @@
         "type": "rectangle",
         "position": {
           "x": 18,
-          "y": 52
+          "y": 44.686688000000004
         },
         "width": 84,
-        "height": 24,
+        "height": 21.864736,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -136,10 +136,10 @@
         "content": "Customer name",
         "position": {
           "x": 22,
-          "y": 56
+          "y": 48.686688000000004
         },
         "width": 76,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -161,7 +161,7 @@
         "content": "Mina Carter",
         "position": {
           "x": 22,
-          "y": 63
+          "y": 53.551424000000004
         },
         "width": 76,
         "height": 9,
@@ -198,10 +198,10 @@
         "type": "rectangle",
         "position": {
           "x": 108,
-          "y": 52
+          "y": 44.686688000000004
         },
         "width": 84,
-        "height": 24,
+        "height": 21.864736,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -216,10 +216,10 @@
         "content": "Email",
         "position": {
           "x": 112,
-          "y": 56
+          "y": 48.686688000000004
         },
         "width": 76,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -241,7 +241,7 @@
         "content": "mina@example.com",
         "position": {
           "x": 112,
-          "y": 63
+          "y": 53.551424000000004
         },
         "width": 76,
         "height": 9,
@@ -278,10 +278,10 @@
         "type": "rectangle",
         "position": {
           "x": 18,
-          "y": 83
+          "y": 73.551424
         },
         "width": 174,
-        "height": 34.093024,
+        "height": 31.95776,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -296,10 +296,10 @@
         "content": "Message",
         "position": {
           "x": 22,
-          "y": 87
+          "y": 77.551424
         },
         "width": 166,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -321,7 +321,7 @@
         "content": "{\"firstName\":\"Mina\",\"plan\":\"Growth\",\"status\":\"Ready for review\"}",
         "position": {
           "x": 22,
-          "y": 94
+          "y": 82.41615999999999
         },
         "width": 166,
         "height": 19.093024,
@@ -365,10 +365,10 @@
         "type": "rectangle",
         "position": {
           "x": 18,
-          "y": 124.093024
+          "y": 112.509184
         },
         "width": 56,
-        "height": 43,
+        "height": 40.864736,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -383,10 +383,10 @@
         "content": "Logo upload",
         "position": {
           "x": 22,
-          "y": 128.093024
+          "y": 116.509184
         },
         "width": 48,
-        "height": 5,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -408,7 +408,7 @@
         "content": "",
         "position": {
           "x": 22,
-          "y": 135.093024
+          "y": 121.37392
         },
         "width": 48,
         "height": 28,
@@ -421,10 +421,10 @@
         "type": "rectangle",
         "position": {
           "x": 80,
-          "y": 124.093024
+          "y": 112.509184
         },
         "width": 112,
-        "height": 38,
+        "height": 17.2588832,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -436,13 +436,13 @@
       {
         "name": "text_9",
         "type": "text",
-        "content": "This preset keeps the generated template editable. The Form preview writes changed input values back into the playground state, so Generate PDF uses the latest edits.",
+        "content": "Editable fields usually keep explicit heights for predictable input boxes. Read-only text can usually omit height and let JSX measure it.",
         "position": {
           "x": 84,
-          "y": 128.093024
+          "y": 116.509184
         },
         "width": 104,
-        "height": 30,
+        "height": 9.2588832,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,

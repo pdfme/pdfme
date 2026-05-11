@@ -4,7 +4,7 @@ Add your template to pdfme's Example Templates!
 **The [playground template gallery](https://playground.pdfme.com/) is one of the most important entry points for pdfme, created to help new users find templates that match their requirements and save time.**
 
 By adding your template, you can contribute to the pdfme community.  
-We use GitHub pull requests for template additions - no builds or code changes required.  
+We use GitHub pull requests for template additions - usually this only requires template files and metadata.
 
 Even if you're new to OSS contributions, you can easily contribute by following this guide.
 
@@ -48,7 +48,29 @@ Design your template in the [playground Designer](https://playground.pdfme.com/d
    }
    ```
 
+3. **[Add Metadata]**
+   Add `metadata.json` in the same directory. This metadata is used by the template gallery filters and cards.
+   ```json
+   {
+     "description": "A short description of what this template is useful for.",
+     "tags": ["Invoice", "Business"]
+   }
+   ```
+
+   Optional fields:
+   - `title`: display title. If omitted, the directory name is converted from kebab-case.
+   - `order`: gallery sort order for featured templates. Most contributions can omit this.
+   - `tags`: short filter labels such as `Invoice`, `Business`, `CJK`, `Form`, or `Table`.
+
 Reference: https://github.com/pdfme/pdfme/tree/main/playground/public/template-assets/invoice
+
+4. **[Regenerate Gallery Metadata]**
+   Run:
+   ```bash
+   npm --prefix playground run generate-template-assets
+   ```
+
+   This updates the generated template manifest used by the playground and CLI.
 
 ### 4. Commit Changes
 1. **[Record Changes]**  

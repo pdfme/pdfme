@@ -1,0 +1,10 @@
+{
+  "title": "Release notes",
+  "description": "A product-note style document with task list syntax and tables.",
+  "sourceKind": "md2pdf",
+  "tags": [
+    "Markdown",
+    "Release Notes",
+    "Checklist"
+  ]
+}

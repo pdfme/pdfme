@@ -1,6 +1,6 @@
 import { DEFAULT_FONT_NAME, getDefaultFont } from '@pdfme/common';
 import { compileJsxFunctionBody, renderJsxSource } from '../src/routes/jsxPlaygroundRuntime';
-import { jsxPlaygroundPresets } from '../src/routes/jsxPlaygroundExamples';
+import { readAuthoringStarterFixtures } from './authoringStarterFixtures';
 
 const defaultFont = getDefaultFont();
 const testFont = {
@@ -10,6 +10,7 @@ const testFont = {
     fallback: false,
   },
 };
+const jsxPlaygroundPresets = readAuthoringStarterFixtures('jsx');
 
 describe('JSX playground runtime', () => {
   it('compiles JSX function bodies with pdfme component calls', () => {

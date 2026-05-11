@@ -30,6 +30,7 @@ interface ExampleManifestEntry {
   author: string;
   path: string;
   thumbnailPath: string;
+  sourcePath?: string;
   description?: string;
   order?: number;
   pageCount: number;
@@ -142,7 +143,20 @@ function inferSourceKind(name: string): string {
 
 function readTemplateMetadata(name: string): Record<string, unknown> {
   const metadata = readJson<Record<string, Record<string, unknown>>>(METADATA_PATH);
-  return metadata[name] ?? {};
+  const itemMetadataPath = join(ASSETS_DIR, name, 'metadata.json');
+  if (!existsSync(itemMetadataPath)) return metadata[name] ?? {};
+
+  return readJson<Record<string, unknown>>(itemMetadataPath);
+}
+
+function getSourcePath(name: string, sourceKind: string): string | undefined {
+  if (sourceKind === 'jsx' && existsSync(join(ASSETS_DIR, name, 'source.tsx'))) {
+    return `${name}/source.tsx`;
+  }
+  if (sourceKind === 'md2pdf' && existsSync(join(ASSETS_DIR, name, 'source.md'))) {
+    return `${name}/source.md`;
+  }
+  return undefined;
 }
 
 function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
@@ -150,12 +164,16 @@ function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
   const metadata = readTemplateMetadata(name);
   const schemas = normalizeSchemas(template.schemas);
   const flattenedSchemas = schemas.flat();
+  const sourceKind =
+    typeof metadata.sourceKind === 'string' ? metadata.sourceKind : inferSourceKind(name);
+  const sourcePath = getSourcePath(name, sourceKind);
 
   const entry: ExampleManifestEntry = {
     name,
     author: typeof template.author === 'string' && template.author.length > 0 ? template.author : 'pdfme',
     path: `${name}/template.json`,
     thumbnailPath: `${name}/thumbnail.png`,
+    ...(sourcePath ? { sourcePath } : {}),
     description: typeof metadata.description === 'string' ? metadata.description : undefined,
     ...(typeof metadata.order === 'number' && Number.isFinite(metadata.order)
       ? { order: metadata.order }
@@ -178,7 +196,7 @@ function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
     ].sort(),
     hasCJK: hasCjkContent(flattenedSchemas),
     basePdfKind: detectBasePdfKind(template.basePdf),
-    sourceKind: typeof metadata.sourceKind === 'string' ? metadata.sourceKind : inferSourceKind(name),
+    sourceKind,
     tags: Array.isArray(metadata.tags)
       ? metadata.tags.filter((tag): tag is string => typeof tag === 'string' && tag.length > 0)
       : [],

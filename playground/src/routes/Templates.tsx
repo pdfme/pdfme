@@ -16,8 +16,7 @@ import {
 import { toast } from 'react-toastify';
 import { downloadJsonFile, fromKebabCase, readFile } from '../helper';
 import PlaygroundButton from '../components/PlaygroundButton';
-import { jsxPlaygroundPresets } from './jsxPlaygroundExamples';
-import { md2PdfPresets } from './md2PdfPresets';
+import { getAuthoringStarterId, type AuthoringStarterKind } from '../lib/authoringStarters';
 import {
   deletePlaygroundProject,
   duplicatePlaygroundProject,
@@ -52,6 +51,7 @@ type TemplateData = {
   pageCount?: number;
   schemaTypes?: string[];
   sourceKind?: Exclude<GenerationFilter, 'all'>;
+  sourcePath?: string;
   tags?: string[];
   title?: string;
 };
@@ -62,28 +62,12 @@ type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf';
 type AuthoringPreset = {
   assetName: string;
   id: string;
-  kind: 'jsx' | 'md2pdf';
+  kind: AuthoringStarterKind;
 };
 
 // Constants
 const DEVIN_AI_AUTHOR = 'Devin AI';
 const DEVIN_INVITE_URL = 'https://app.devin.ai/invite/KyOTXVPrlFl2TjcT';
-const authoringPresets: AuthoringPreset[] = [
-  ...jsxPlaygroundPresets.map(({ id }) => ({
-    assetName: `jsx-${id}`,
-    id,
-    kind: 'jsx' as const,
-  })),
-  ...md2PdfPresets.map(({ id }) => ({
-    assetName: `md2pdf-${id}`,
-    id,
-    kind: 'md2pdf' as const,
-  })),
-];
-const authoringPresetByAssetName = new Map(
-  authoringPresets.map((preset) => [preset.assetName, preset]),
-);
-
 const tagSortOrder = [
   'Invoice',
   'Quote',
@@ -112,7 +96,17 @@ const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
 ];
 
 const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
-  template.sourceKind ?? authoringPresetByAssetName.get(template.name)?.kind ?? 'designer';
+  template.sourceKind ?? 'designer';
+
+const getAuthoringPreset = (template: TemplateData): AuthoringPreset | null => {
+  const kind = getTemplateGeneration(template);
+  if ((kind !== 'jsx' && kind !== 'md2pdf') || !template.sourcePath) return null;
+  return {
+    assetName: template.name,
+    id: getAuthoringStarterId(template.name, kind),
+    kind,
+  };
+};
 
 const getTemplateTags = (template: TemplateData) => {
   const tags = new Set(template.tags ?? []);
@@ -711,7 +705,7 @@ function TemplatesApp() {
           <div className="mt-8 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
             {filteredTemplates.map((template, index) => {
               const { name, author } = template;
-              const authoringPreset = authoringPresetByAssetName.get(name);
+              const authoringPreset = getAuthoringPreset(template);
               const title = template.title ?? fromKebabCase(name);
               const generation = getTemplateGeneration(template);
               const tag =

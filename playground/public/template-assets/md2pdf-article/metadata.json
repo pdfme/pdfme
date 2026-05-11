@@ -1,0 +1,9 @@
+{
+  "title": "Article",
+  "description": "A longer article-like sample for pagination and text wrapping checks.",
+  "sourceKind": "md2pdf",
+  "tags": [
+    "Markdown",
+    "Article"
+  ]
+}
