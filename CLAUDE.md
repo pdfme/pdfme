@@ -168,6 +168,12 @@ Implementation: `packages/common/src/expression.ts`
    - Run `npm run test` and ensure all tests pass
    - Run `npm run lint` and fix any linting issues
    - Update snapshots if UI changes are intentional: `npm run test -w packages/ui -- -u`
+4. **Claude Code Review After PR Creation**:
+   - After creating a PR, run `npm run claude:review`
+   - The command detects the PR for the current branch and runs Claude Code's built-in `/review`
+   - It defaults to the latest Opus alias with max effort: `claude -p --model opus --effort max --permission-mode auto "/review <PR>"`
+   - To review a specific PR or focus area: `npm run claude:review -- 1234 Focus on security and edge cases`
+   - Review output is saved under `tmp/claude-reviews/`
 
 ### Code Standards
 - **TypeScript**: All new code must be written in TypeScript
