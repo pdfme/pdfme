@@ -330,6 +330,64 @@ describe('generate integrate test', () => {
       expect(after?.position.y).toBeCloseTo(34 + (body?.height ?? 0) - 5);
     });
 
+    test('falls back safely when dynamic container metadata is circular', async () => {
+      const renderedSchemas: Schema[] = [];
+      const rectangleProbePlugin: Plugin = {
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: {
+            name: 'box',
+            type: 'rectangle',
+            content: '',
+            position: { x: 0, y: 0 },
+            width: 20,
+            height: 20,
+          },
+        },
+      };
+      const outerBox: Schema = {
+        name: 'outer',
+        type: 'rectangle',
+        content: '',
+        position: { x: 10, y: 10 },
+        width: 50,
+        height: 20,
+      };
+      const innerBox: Schema = {
+        name: 'inner',
+        type: 'rectangle',
+        content: '',
+        position: { x: 14, y: 14 },
+        width: 42,
+        height: 12,
+      };
+      setDynamicContainerMetadata(outerBox, { childNames: ['inner'], paddingBottom: 4 });
+      setDynamicContainerMetadata(innerBox, { childNames: ['outer'], paddingBottom: 3 });
+
+      await expect(
+        generate({
+          template: {
+            basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+            schemas: [[outerBox, innerBox]],
+          },
+          inputs: [{}],
+          plugins: { rectangle: rectangleProbePlugin },
+        }),
+      ).resolves.toBeInstanceOf(Uint8Array);
+
+      const outer = renderedSchemas.find((schema) => schema.name === 'outer');
+      const inner = renderedSchemas.find((schema) => schema.name === 'inner');
+      expect(outer?.height).toBeGreaterThanOrEqual(outerBox.height);
+      expect(inner?.height).toBeGreaterThanOrEqual(innerBox.height);
+    });
+
     test('splits expanded text schemas by line across blank PDF pages', async () => {
       const renderedSchemas: Schema[] = [];
       const textProbePlugin: Plugin = {

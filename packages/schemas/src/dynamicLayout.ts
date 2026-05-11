@@ -12,6 +12,12 @@ import { getDynamicLayoutForTable } from './tables/dynamicTemplate.js';
 import { TEXT_OVERFLOW_EXPAND } from './text/constants.js';
 import { getDynamicLayoutForText } from './text/dynamicTemplate.js';
 
+const EPSILON = 0.01;
+
+type DynamicContainerLayoutArgs = DynamicLayoutArgs & {
+  dynamicContainerVisited?: ReadonlySet<string>;
+};
+
 export {
   BUILT_IN_DYNAMIC_LAYOUT_SPLIT_UNITS,
   LIST_ITEM_SPLIT_UNIT,
@@ -63,11 +69,21 @@ const getSchemaValue = (schema: Schema, args: DynamicLayoutArgs): string => {
 const sumHeights = (layout: DynamicLayoutResult) =>
   layout.heights.reduce((total, height) => total + height, 0);
 
+const comparePosition = (a: number, b: number) => (Math.abs(a - b) > EPSILON ? a - b : 0);
+
 const getDynamicLayoutForContainer = async (
   args: DynamicLayoutArgs,
 ): Promise<DynamicLayoutResult | undefined> => {
   const metadata = getDynamicContainerMetadata(args.schema);
   if (!metadata || !args.pageSchemas) return undefined;
+
+  const containerArgs = args as DynamicContainerLayoutArgs;
+  const visitedContainers = containerArgs.dynamicContainerVisited ?? new Set<string>();
+  if (visitedContainers.has(args.schema.name)) {
+    return { heights: [args.schema.height], contributesToFlow: false };
+  }
+  const nextVisitedContainers = new Set(visitedContainers);
+  nextVisitedContainers.add(args.schema.name);
 
   const pageOrder = new Map(args.pageSchemas.map((schema, index) => [schema.name, index]));
   const pageSchemaMap = new Map(args.pageSchemas.map((schema) => [schema.name, schema]));
@@ -75,8 +91,10 @@ const getDynamicLayoutForContainer = async (
     .map((childName) => pageSchemaMap.get(childName))
     .filter((schema): schema is Schema => schema != null)
     .sort((a, b) => {
-      if (a.position.y !== b.position.y) return a.position.y - b.position.y;
-      if (a.position.x !== b.position.x) return a.position.x - b.position.x;
+      const yDiff = comparePosition(a.position.y, b.position.y);
+      if (yDiff !== 0) return yDiff;
+      const xDiff = comparePosition(a.position.x, b.position.x);
+      if (xDiff !== 0) return xDiff;
       return (pageOrder.get(a.name) ?? 0) - (pageOrder.get(b.name) ?? 0);
     });
   if (children.length === 0) return undefined;
@@ -85,8 +103,13 @@ const getDynamicLayoutForContainer = async (
   let contentBottom = 0;
   for (const child of children) {
     const value = getSchemaValue(child, args);
+    const childArgs: DynamicContainerLayoutArgs = {
+      ...args,
+      schema: child,
+      dynamicContainerVisited: nextVisitedContainers,
+    };
     const childLayout = normalizeDynamicLayoutResult(
-      await getDynamicLayoutForSchema(value, { ...args, schema: child }),
+      await getDynamicLayoutForSchema(value, childArgs),
     );
     const localY = Math.max(0, child.position.y - args.schema.position.y + localOffset);
     const dynamicHeight = sumHeights(childLayout);
@@ -98,6 +121,8 @@ const getDynamicLayoutForContainer = async (
     }
   }
 
+  // Top/left insets are represented by each child schema's absolute position. The metadata stores
+  // only the trailing inset needed to keep JSX Box decorations wrapped around reflowed content.
   const height = Math.max(args.schema.height, contentBottom + (metadata.paddingBottom ?? 0));
   return {
     heights: [height],
