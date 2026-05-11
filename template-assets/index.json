@@ -208,6 +208,7 @@
     "author": "pdfme",
     "path": "md2pdf-article/template.json",
     "thumbnailPath": "md2pdf-article/thumbnail.png",
+    "sourcePath": "md2pdf-article/source.md",
     "pageCount": 1,
     "fieldCount": 8,
     "schemaTypes": [
@@ -298,6 +299,7 @@
     "author": "pdfme",
     "path": "jsx-form-fields/template.json",
     "thumbnailPath": "jsx-form-fields/thumbnail.png",
+    "sourcePath": "jsx-form-fields/source.tsx",
     "pageCount": 1,
     "fieldCount": 16,
     "schemaTypes": [
@@ -372,6 +374,7 @@
     "author": "pdfme",
     "path": "jsx-invoice/template.json",
     "thumbnailPath": "jsx-invoice/thumbnail.png",
+    "sourcePath": "jsx-invoice/source.tsx",
     "pageCount": 2,
     "fieldCount": 20,
     "schemaTypes": [
@@ -521,6 +524,7 @@
     "author": "pdfme",
     "path": "jsx-japanese-notice/template.json",
     "thumbnailPath": "jsx-japanese-notice/thumbnail.png",
+    "sourcePath": "jsx-japanese-notice/source.tsx",
     "pageCount": 1,
     "fieldCount": 5,
     "schemaTypes": [
@@ -546,6 +550,7 @@
     "author": "pdfme",
     "path": "md2pdf-japanese-report/template.json",
     "thumbnailPath": "md2pdf-japanese-report/thumbnail.png",
+    "sourcePath": "md2pdf-japanese-report/source.md",
     "pageCount": 1,
     "fieldCount": 7,
     "schemaTypes": [
@@ -639,6 +644,7 @@
     "author": "pdfme",
     "path": "md2pdf-overview/template.json",
     "thumbnailPath": "md2pdf-overview/thumbnail.png",
+    "sourcePath": "md2pdf-overview/source.md",
     "pageCount": 1,
     "fieldCount": 8,
     "schemaTypes": [
@@ -687,6 +693,7 @@
     "author": "pdfme",
     "path": "md2pdf-release-notes/template.json",
     "thumbnailPath": "md2pdf-release-notes/thumbnail.png",
+    "sourcePath": "md2pdf-release-notes/source.md",
     "pageCount": 1,
     "fieldCount": 8,
     "schemaTypes": [
@@ -713,6 +720,7 @@
     "author": "pdfme",
     "path": "jsx-report/template.json",
     "thumbnailPath": "jsx-report/thumbnail.png",
+    "sourcePath": "jsx-report/source.tsx",
     "pageCount": 1,
     "fieldCount": 16,
     "schemaTypes": [
@@ -733,6 +741,32 @@
       "List"
     ],
     "title": "Report page"
+  },
+  {
+    "name": "jsx-research-paper",
+    "author": "pdfme",
+    "path": "jsx-research-paper/template.json",
+    "thumbnailPath": "jsx-research-paper/thumbnail.png",
+    "sourcePath": "jsx-research-paper/source.tsx",
+    "pageCount": 2,
+    "fieldCount": 9,
+    "schemaTypes": [
+      "rectangle",
+      "text"
+    ],
+    "fontNames": [
+      "NotoSansJP"
+    ],
+    "hasCJK": false,
+    "basePdfKind": "blank",
+    "description": "A paper-style document that leans on measured text height and PageBreak.",
+    "sourceKind": "jsx",
+    "tags": [
+      "Research",
+      "Article",
+      "Multi-page"
+    ],
+    "title": "Research paper"
   },
   {
     "name": "z-fold-brochure",

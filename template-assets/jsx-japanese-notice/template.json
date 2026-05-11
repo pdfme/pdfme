@@ -18,7 +18,7 @@
           "y": 277
         },
         "width": 174,
-        "height": 6,
+        "height": 2.8647359999999997,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -47,7 +47,7 @@
           "y": 20
         },
         "width": 174,
-        "height": 12,
+        "height": 9.003456,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -69,10 +69,10 @@
         "content": "JSX から日本語を含むテンプレートを作成する例です。",
         "position": {
           "x": 18,
-          "y": 39
+          "y": 36.003456
         },
         "width": 174,
-        "height": 8,
+        "height": 3.683232,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -93,10 +93,10 @@
         "type": "rectangle",
         "position": {
           "x": 18,
-          "y": 54
+          "y": 46.686688000000004
         },
         "width": 174,
-        "height": 46,
+        "height": 26.165296,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -111,10 +111,10 @@
         "content": "pdfme の JSX authoring は、通常の pdfme Template と inputs を生成するための薄いレイヤーです。日本語を扱う場合は、Viewer や generator の options.font に NotoSansJP などのフォントを登録してください。",
         "position": {
           "x": 23,
-          "y": 59
+          "y": 51.686688000000004
         },
         "width": 164,
-        "height": 36,
+        "height": 16.165296,
         "rotate": 0,
         "opacity": 1,
         "readOnly": true,
@@ -137,7 +137,7 @@
         "content": "[[\"フォント\",\"NotoSansJP\"],[\"出力\",\"Template + inputs\"],[\"プレビュー\",\"Viewer / Form\"]]",
         "position": {
           "x": 18,
-          "y": 107
+          "y": 79.851984
         },
         "width": 174,
         "height": 36,
