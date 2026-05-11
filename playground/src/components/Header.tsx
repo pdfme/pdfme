@@ -124,9 +124,18 @@ export default function Navigation() {
     );
 
   return (
-    <div className="border-b border-gray-200 my-1 overflow-x-auto">
-      <nav aria-label="Tabs" className="-mb-px flex items-center space-x-3 px-4">
-        <span className="text-xs text-gray-500 select-none">Version: {PDFME_VERSION}</span>
+    <div className="sticky top-0 z-30 overflow-x-auto overflow-y-hidden border-b border-gray-200 bg-white/95 shadow-sm backdrop-blur">
+      <nav aria-label="Tabs" className="-mb-px flex w-max min-w-full items-center gap-3 px-4">
+        <NavLink
+          to="/"
+          className="flex items-center gap-2 py-2 pr-2 text-sm font-semibold text-gray-900 hover:text-green-700"
+        >
+          <span className="size-2 rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.16)]" />
+          pdfme playground
+        </NavLink>
+        <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 select-none">
+          Version: {PDFME_VERSION}
+        </span>
 
         {navLinks.map((item) => (
           <NavLink id={item.id} key={item.to} to={item.to} end className={linkClass}>

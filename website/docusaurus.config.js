@@ -118,13 +118,7 @@ const config = {
         {
           href: playgroundUrl,
           position: 'right',
-          label: 'Examples',
-          target: '_blank',
-        },
-        {
-          href: `${playgroundUrl}/designer`,
-          position: 'right',
-          label: 'Template Design',
+          label: 'Demo',
           target: '_blank',
         },
         {

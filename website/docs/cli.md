@@ -1,4 +1,4 @@
-# CLI
+# CLI (beta)
 
 `@pdfme/cli` is the command-line interface for JSON-first pdfme workflows.
 

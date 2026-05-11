@@ -7,13 +7,9 @@
     "message": "ドキュメント",
     "description": "Navbar item with label Docs"
   },
-  "item.label.Examples": {
-    "message": "サンプル",
-    "description": "Navbar item with label Examples"
-  },
-  "item.label.Template Design": {
-    "message": "テンプレート設計",
-    "description": "Navbar item with label Template Design"
+  "item.label.Demo": {
+    "message": "デモ",
+    "description": "Navbar item with label Demo"
   },
   "item.label.GitHub": {
     "message": "GitHub",
