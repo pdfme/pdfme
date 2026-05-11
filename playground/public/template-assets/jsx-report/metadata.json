@@ -1,0 +1,10 @@
+{
+  "title": "Report page",
+  "description": "A dashboard-style report with cards, progress bars, list content, and page footer.",
+  "sourceKind": "jsx",
+  "tags": [
+    "Report",
+    "Dashboard",
+    "List"
+  ]
+}

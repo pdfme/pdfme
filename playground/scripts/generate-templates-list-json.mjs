@@ -67,8 +67,9 @@ function generateTemplatesListJson() {
 }
 
 function loadTemplateMetadata() {
+  const metadataByTemplate = {};
   if (!fs.existsSync(metadataFilePath)) {
-    return {};
+    return loadPerTemplateMetadata(metadataByTemplate);
   }
 
   const parsed = JSON.parse(fs.readFileSync(metadataFilePath, 'utf8'));
@@ -76,7 +77,26 @@ function loadTemplateMetadata() {
     throw new Error('template-assets/metadata.json must be an object keyed by template name.');
   }
 
-  return parsed;
+  Object.assign(metadataByTemplate, parsed);
+  return loadPerTemplateMetadata(metadataByTemplate);
+}
+
+function loadPerTemplateMetadata(metadataByTemplate) {
+  const items = fs.readdirSync(templatesDir, { withFileTypes: true });
+  for (const item of items) {
+    if (!item.isDirectory() || item.name.startsWith('.')) continue;
+
+    const itemMetadataPath = path.join(templatesDir, item.name, 'metadata.json');
+    if (!fs.existsSync(itemMetadataPath)) continue;
+
+    const parsed = JSON.parse(fs.readFileSync(itemMetadataPath, 'utf8'));
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error(`template-assets/${item.name}/metadata.json must be an object.`);
+    }
+    metadataByTemplate[item.name] = parsed;
+  }
+
+  return metadataByTemplate;
 }
 
 function normalizeMetadata(rawMetadata) {
@@ -110,29 +130,29 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
 
   if (missingMetadata.length > 0) {
     throw new Error(
-      `template-assets/metadata.json is missing entries for templates: ${missingMetadata.join(', ')}`,
+      `template asset metadata is missing entries for templates: ${missingMetadata.join(', ')}`,
     );
   }
 
   if (orphanMetadata.length > 0) {
     throw new Error(
-      `template-assets/metadata.json contains entries without template.json: ${orphanMetadata.join(', ')}`,
+      `template asset metadata contains entries without template.json: ${orphanMetadata.join(', ')}`,
     );
   }
 
   for (const [name, rawMetadata] of Object.entries(metadataByTemplate)) {
     const metadata = normalizeMetadata(rawMetadata);
     if (!metadata.description) {
-      throw new Error(`template-assets/metadata.json entry "${name}" must include description.`);
+      throw new Error(`template asset metadata entry "${name}" must include description.`);
     }
     if (!metadata.tags || metadata.tags.length === 0) {
-      throw new Error(`template-assets/metadata.json entry "${name}" must include tags.`);
+      throw new Error(`template asset metadata entry "${name}" must include tags.`);
     }
 
     const inferredSourceKind = inferSourceKind(name);
     if (metadata.sourceKind && metadata.sourceKind !== inferredSourceKind) {
       throw new Error(
-        `template-assets/metadata.json entry "${name}" has sourceKind "${metadata.sourceKind}", expected "${inferredSourceKind}".`,
+        `template asset metadata entry "${name}" has sourceKind "${metadata.sourceKind}", expected "${inferredSourceKind}".`,
       );
     }
   }
@@ -145,7 +165,7 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
     const existingName = seenOrders.get(metadata.order);
     if (existingName) {
       throw new Error(
-        `template-assets/metadata.json entries "${existingName}" and "${name}" both use order ${metadata.order}.`,
+        `template asset metadata entries "${existingName}" and "${name}" both use order ${metadata.order}.`,
       );
     }
     seenOrders.set(metadata.order, name);
@@ -175,6 +195,7 @@ function buildTemplateEntry(name, templateJson, rawMetadata) {
     author: templateJson.author || 'pdfme',
     path: `${name}/template.json`,
     thumbnailPath: `${name}/thumbnail.png`,
+    sourcePath: getSourcePath(name, sourceKind),
     pageCount: schemas.length,
     fieldCount: flattenedSchemas.length,
     schemaTypes,
@@ -187,6 +208,18 @@ function buildTemplateEntry(name, templateJson, rawMetadata) {
     tags: metadata.tags ?? [],
     title: metadata.title,
   };
+}
+
+function getSourcePath(name, sourceKind) {
+  if (sourceKind === 'jsx') {
+    const sourcePath = path.join(templatesDir, name, 'source.tsx');
+    return fs.existsSync(sourcePath) ? `${name}/source.tsx` : undefined;
+  }
+  if (sourceKind === 'md2pdf') {
+    const sourcePath = path.join(templatesDir, name, 'source.md');
+    return fs.existsSync(sourcePath) ? `${name}/source.md` : undefined;
+  }
+  return undefined;
 }
 
 function compareTemplateEntries(a, b) {

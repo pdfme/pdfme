@@ -5,6 +5,7 @@ export interface ExampleManifestEntry {
   author: string;
   path: string;
   thumbnailPath: string;
+  sourcePath?: string;
   description?: string;
   order?: number;
   pageCount: number;
@@ -160,6 +161,9 @@ function normalizeEntries(rawTemplates: unknown[]): ExampleManifestEntry[] {
           typeof entry.thumbnailPath === 'string' && entry.thumbnailPath.length > 0
             ? entry.thumbnailPath
             : `${name}/thumbnail.png`,
+        ...(typeof entry.sourcePath === 'string' && entry.sourcePath.length > 0
+          ? { sourcePath: entry.sourcePath }
+          : {}),
         ...(typeof entry.description === 'string' ? { description: entry.description } : {}),
         ...(typeof entry.order === 'number' && Number.isFinite(entry.order)
           ? { order: entry.order }

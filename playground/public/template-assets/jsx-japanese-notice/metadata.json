@@ -1,0 +1,9 @@
+{
+  "title": "Japanese notice",
+  "description": "A Japanese preset that uses NotoSansJP and static footer page numbers.",
+  "sourceKind": "jsx",
+  "tags": [
+    "CJK",
+    "Table"
+  ]
+}

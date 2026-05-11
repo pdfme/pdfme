@@ -66,36 +66,6 @@
     "description": "A restrained white invoice layout with a clean printable style.",
     "tags": ["Invoice", "Business", "Table"]
   },
-  "jsx-form-fields": {
-    "title": "Form fields",
-    "description": "Input-backed Text, MultiVariableText, and Image fields for testing Form preview.",
-    "sourceKind": "jsx",
-    "tags": ["Form", "MVT", "Image"]
-  },
-  "jsx-invoice": {
-    "title": "Invoice layout",
-    "description": "A two-page invoice with Header, Footer, Absolute, Table, and visual schemas.",
-    "sourceKind": "jsx",
-    "tags": ["Invoice", "Business", "Table", "Visual", "Multi-page"]
-  },
-  "jsx-japanese-notice": {
-    "title": "Japanese notice",
-    "description": "A Japanese preset that uses NotoSansJP and static footer page numbers.",
-    "sourceKind": "jsx",
-    "tags": ["CJK", "Table"]
-  },
-  "jsx-research-paper": {
-    "title": "Research paper",
-    "description": "A paper-style document that leans on measured text height and PageBreak.",
-    "sourceKind": "jsx",
-    "tags": ["Research", "Article", "Multi-page"]
-  },
-  "jsx-report": {
-    "title": "Report page",
-    "description": "A dashboard-style report with cards, progress bars, list content, and page footer.",
-    "sourceKind": "jsx",
-    "tags": ["Report", "Dashboard", "List"]
-  },
   "location-arrow": {
     "description": "A location marker template that highlights points with arrow indicators.",
     "tags": ["Map", "Visual"]
@@ -103,30 +73,6 @@
   "location-number": {
     "description": "A location marker template that labels points with numbered badges.",
     "tags": ["Map", "Visual"]
-  },
-  "md2pdf-article": {
-    "title": "Article",
-    "description": "A longer article-like sample for pagination and text wrapping checks.",
-    "sourceKind": "md2pdf",
-    "tags": ["Markdown", "Article"]
-  },
-  "md2pdf-japanese-report": {
-    "title": "Japanese report",
-    "description": "A Japanese Markdown sample for CJK font and table rendering checks.",
-    "sourceKind": "md2pdf",
-    "tags": ["Markdown", "CJK", "Report"]
-  },
-  "md2pdf-overview": {
-    "title": "Overview",
-    "description": "Basic GFM blocks, inline formatting, horizontal rule, blockquote, code, and table.",
-    "sourceKind": "md2pdf",
-    "tags": ["Markdown", "Table", "Code"]
-  },
-  "md2pdf-release-notes": {
-    "title": "Release notes",
-    "description": "A product-note style document with task list syntax and tables.",
-    "sourceKind": "md2pdf",
-    "tags": ["Markdown", "Release Notes", "Checklist"]
   },
   "new-sale-quotation": {
     "description": "A sales quotation template with product rows and business summary fields.",

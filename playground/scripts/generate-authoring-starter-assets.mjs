@@ -1,7 +1,6 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
-import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 import pLimit from 'p-limit';
 import { checkTemplate } from '@pdfme/common';
@@ -67,21 +66,6 @@ function calcHash(content) {
   return crypto.createHash('md5').update(content, 'utf8').digest('hex');
 }
 
-function loadTsExports(filePath) {
-  const source = fs.readFileSync(filePath, 'utf-8');
-  const { code } = transform(source, {
-    filePath,
-    transforms: ['typescript', 'imports'],
-  });
-  const exports = {};
-  const context = {
-    exports,
-    module: { exports },
-  };
-  vm.runInNewContext(code, context, { filename: filePath });
-  return context.module.exports;
-}
-
 const createElement = (type, props, ...children) => {
   const nextProps = { ...props };
   if (children.length > 0) {
@@ -119,25 +103,40 @@ async function renderMd2PdfTemplate(markdown) {
   return result.template;
 }
 
+function readAuthoringStarters() {
+  const entries = fs.readdirSync(templateAssetsPath, { withFileTypes: true });
+  return entries.flatMap((entry) => {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) return [];
+
+    const assetPath = path.join(templateAssetsPath, entry.name);
+    const jsxSourcePath = path.join(assetPath, 'source.tsx');
+    const markdownSourcePath = path.join(assetPath, 'source.md');
+
+    if (fs.existsSync(jsxSourcePath)) {
+      return [
+        {
+          content: fs.readFileSync(jsxSourcePath, 'utf-8'),
+          id: entry.name,
+          kind: 'jsx',
+        },
+      ];
+    }
+    if (fs.existsSync(markdownSourcePath)) {
+      return [
+        {
+          content: fs.readFileSync(markdownSourcePath, 'utf-8'),
+          id: entry.name,
+          kind: 'md2pdf',
+        },
+      ];
+    }
+
+    return [];
+  });
+}
+
 async function main() {
-  const { jsxPlaygroundPresets } = loadTsExports(
-    path.join(playgroundPath, 'src', 'routes', 'jsxPlaygroundExamples.ts'),
-  );
-  const { md2PdfPresets } = loadTsExports(
-    path.join(playgroundPath, 'src', 'routes', 'md2PdfPresets.ts'),
-  );
-  const starters = [
-    ...jsxPlaygroundPresets.map((preset) => ({
-      content: preset.source,
-      id: preset.id,
-      kind: 'jsx',
-    })),
-    ...md2PdfPresets.map((preset) => ({
-      content: preset.markdown,
-      id: preset.id,
-      kind: 'md2pdf',
-    })),
-  ];
+  const starters = readAuthoringStarters();
 
   let hashMap = {};
   if (fs.existsSync(hashMapPath)) {
@@ -153,7 +152,7 @@ async function main() {
   await Promise.all(
     starters.map((starter) =>
       limit(async () => {
-        const assetId = `${starter.kind}-${starter.id}`;
+        const assetId = starter.id;
         const currentHash = calcHash(`${starter.kind}:${starter.content}`);
         const assetPath = path.join(templateAssetsPath, assetId);
         const templateJsonPath = path.join(assetPath, 'template.json');

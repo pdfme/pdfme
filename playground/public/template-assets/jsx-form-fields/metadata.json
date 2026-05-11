@@ -1,0 +1,10 @@
+{
+  "title": "Form fields",
+  "description": "Input-backed Text, MultiVariableText, and Image fields for testing Form preview.",
+  "sourceKind": "jsx",
+  "tags": [
+    "Form",
+    "MVT",
+    "Image"
+  ]
+}

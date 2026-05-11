@@ -10,8 +10,12 @@ import { getPlugins } from '../plugins';
 import CodeEditor from '../components/CodeEditor';
 import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
-import { initialMarkdown, md2PdfPresets } from './md2PdfPresets';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
+import {
+  loadAuthoringStarters,
+  loadAuthoringStarterSource,
+  type AuthoringStarter,
+} from '../lib/authoringStarters';
 import {
   getPlaygroundProject,
   savePlaygroundProject,
@@ -20,6 +24,7 @@ import {
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 
 const MD2PDF_DOCS_URL = 'https://pdfme.com/docs/converter#md2pdf-beta';
+const FALLBACK_MARKDOWN = '# md2pdf playground\n\nWrite Markdown on the left to preview a PDF.';
 
 export default function Md2Pdf() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -27,8 +32,10 @@ export default function Md2Pdf() {
   const viewerRootRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const projectRef = useRef<PlaygroundProject | null>(null);
-  const [selectedPresetId, setSelectedPresetId] = useState(md2PdfPresets[0]?.id ?? '');
-  const [markdown, setMarkdown] = useState(initialMarkdown);
+  const didLoadInitialStarterRef = useRef(false);
+  const [presets, setPresets] = useState<AuthoringStarter[]>([]);
+  const [selectedPresetId, setSelectedPresetId] = useState('');
+  const [markdown, setMarkdown] = useState(FALLBACK_MARKDOWN);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
   const [error, setError] = useState<string | null>(null);
@@ -36,19 +43,51 @@ export default function Md2Pdf() {
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [viewerRefreshKey, setViewerRefreshKey] = useState(0);
-  const selectedPreset = md2PdfPresets.find((preset) => preset.id === selectedPresetId);
+  const selectedPreset = presets.find((preset) => preset.id === selectedPresetId);
   const sourceTitle = projectRef.current?.title ?? selectedPreset?.label ?? 'Custom Markdown';
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadAuthoringStarters('md2pdf')
+      .then((starters) => {
+        if (cancelled) return;
+        setPresets(starters);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        toast.error(err instanceof Error ? err.message : String(err));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const projectId = searchParams.get('project');
     const presetId = searchParams.get('preset');
-    if (!projectId && !presetId) return;
+    if (!projectId && !presetId && didLoadInitialStarterRef.current) return;
+    if (presets.length === 0 && !projectId) return;
+
+    let cancelled = false;
 
     const consumeQuery = () => {
       const nextSearchParams = new URLSearchParams(searchParams);
       nextSearchParams.delete('project');
       nextSearchParams.delete('preset');
       setSearchParams(nextSearchParams, { replace: true });
+    };
+
+    const loadPreset = async (preset: AuthoringStarter) => {
+      const nextMarkdown = await loadAuthoringStarterSource(preset);
+      if (cancelled) return;
+
+      consumeQuery();
+      projectRef.current = null;
+      setSelectedPresetId(preset.id);
+      setMarkdown(nextMarkdown);
+      setError(null);
+      setPdfDuration(null);
     };
 
     if (projectId) {
@@ -64,22 +103,28 @@ export default function Md2Pdf() {
       setMarkdown(project.source.content);
       setTemplate(project.template);
       setInputs(project.inputs);
+      didLoadInitialStarterRef.current = true;
       return;
     }
 
-    const preset = md2PdfPresets.find((item) => item.id === presetId);
+    const preset = presetId
+      ? presets.find((item) => item.id === presetId || item.assetName === presetId)
+      : presets[0];
     if (!preset) {
-      toast.error('md2pdf starter not found');
+      if (presetId) toast.error('md2pdf starter not found');
       return;
     }
 
-    consumeQuery();
-    projectRef.current = null;
-    setSelectedPresetId(preset.id);
-    setMarkdown(preset.markdown);
-    setError(null);
-    setPdfDuration(null);
-  }, [searchParams, setSearchParams]);
+    didLoadInitialStarterRef.current = true;
+    void loadPreset(preset).catch((err) => {
+      if (cancelled) return;
+      toast.error(err instanceof Error ? err.message : String(err));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [presets, searchParams, setSearchParams]);
 
   useEffect(() => {
     let cancelled = false;

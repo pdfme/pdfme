@@ -10,9 +10,13 @@ import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
 import { downloadJsonFile, generatePDF, getFontsData } from '../helper';
 import { getPlugins } from '../plugins';
-import { initialJsx, jsxPlaygroundPresets } from './jsxPlaygroundExamples';
 import JsxPlaygroundWorker from './jsxPlaygroundWorker?worker';
 import { useRefreshCollapsedPreview } from './useRefreshCollapsedPreview';
+import {
+  loadAuthoringStarters,
+  loadAuthoringStarterSource,
+  type AuthoringStarter,
+} from '../lib/authoringStarters';
 import {
   getPlaygroundProject,
   savePlaygroundProject,
@@ -23,6 +27,11 @@ import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 const JSX_DOCS_URL = 'https://pdfme.com/docs/jsx#jsx-playground-beta';
 const JSX_EDITOR_PATH = 'file:///jsx-playground.tsx';
 const RENDER_TIMEOUT_MS = 15_000;
+const FALLBACK_JSX_SOURCE = `return (
+  <Page>
+    <Text>Hello from JSX</Text>
+  </Page>
+);`;
 
 type WorkerResponse =
   | {
@@ -99,11 +108,13 @@ export default function JsxPlayground() {
     inputs: Record<string, string>[];
     source: string;
   } | null>(null);
+  const didLoadInitialStarterRef = useRef(false);
   const renderWorkerRef = useRef<Worker | null>(null);
   const pendingRenderRef = useRef<PendingRender | null>(null);
   const nextRenderRequestIdRef = useRef(0);
-  const [selectedPresetId, setSelectedPresetId] = useState(jsxPlaygroundPresets[0]?.id ?? '');
-  const [source, setSource] = useState(initialJsx);
+  const [presets, setPresets] = useState<AuthoringStarter[]>([]);
+  const [selectedPresetId, setSelectedPresetId] = useState('');
+  const [source, setSource] = useState(FALLBACK_JSX_SOURCE);
   const [template, setTemplate] = useState<Template | null>(null);
   const [inputs, setInputs] = useState<Record<string, string>[]>([{}]);
   const [error, setError] = useState<string | null>(null);
@@ -111,19 +122,52 @@ export default function JsxPlayground() {
   const [pdfDuration, setPdfDuration] = useState<number | null>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [previewRefreshKey, setPreviewRefreshKey] = useState(0);
-  const selectedPreset = jsxPlaygroundPresets.find((preset) => preset.id === selectedPresetId);
+  const selectedPreset = presets.find((preset) => preset.id === selectedPresetId);
   const sourceTitle = projectRef.current?.title ?? selectedPreset?.label ?? 'Custom JSX';
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadAuthoringStarters('jsx')
+      .then((starters) => {
+        if (cancelled) return;
+        setPresets(starters);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        toast.error(getErrorMessage(err));
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const projectId = searchParams.get('project');
     const presetId = searchParams.get('preset');
-    if (!projectId && !presetId) return;
+    if (!projectId && !presetId && didLoadInitialStarterRef.current) return;
+    if (presets.length === 0 && !projectId) return;
+
+    let cancelled = false;
 
     const consumeQuery = () => {
       const nextSearchParams = new URLSearchParams(searchParams);
       nextSearchParams.delete('project');
       nextSearchParams.delete('preset');
       setSearchParams(nextSearchParams, { replace: true });
+    };
+
+    const loadPreset = async (preset: AuthoringStarter) => {
+      const nextSource = await loadAuthoringStarterSource(preset);
+      if (cancelled) return;
+
+      consumeQuery();
+      projectRef.current = null;
+      savedInputsForSourceRef.current = null;
+      setSelectedPresetId(preset.id);
+      setSource(nextSource);
+      setError(null);
+      setPdfDuration(null);
     };
 
     if (projectId) {
@@ -144,23 +188,28 @@ export default function JsxPlayground() {
       setTemplate(project.template);
       setInputs(project.inputs);
       inputsRef.current = project.inputs;
+      didLoadInitialStarterRef.current = true;
       return;
     }
 
-    const preset = jsxPlaygroundPresets.find((item) => item.id === presetId);
+    const preset = presetId
+      ? presets.find((item) => item.id === presetId || item.assetName === presetId)
+      : presets[0];
     if (!preset) {
-      toast.error('JSX starter not found');
+      if (presetId) toast.error('JSX starter not found');
       return;
     }
 
-    consumeQuery();
-    projectRef.current = null;
-    savedInputsForSourceRef.current = null;
-    setSelectedPresetId(preset.id);
-    setSource(preset.source);
-    setError(null);
-    setPdfDuration(null);
-  }, [searchParams, setSearchParams]);
+    didLoadInitialStarterRef.current = true;
+    void loadPreset(preset).catch((err) => {
+      if (cancelled) return;
+      toast.error(getErrorMessage(err));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [presets, searchParams, setSearchParams]);
 
   const terminateRenderWorker = useCallback(() => {
     renderWorkerRef.current?.terminate();

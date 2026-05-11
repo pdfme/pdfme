@@ -1,0 +1,10 @@
+{
+  "title": "Japanese report",
+  "description": "A Japanese Markdown sample for CJK font and table rendering checks.",
+  "sourceKind": "md2pdf",
+  "tags": [
+    "Markdown",
+    "CJK",
+    "Report"
+  ]
+}

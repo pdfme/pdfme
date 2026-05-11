@@ -1,0 +1,12 @@
+{
+  "title": "Invoice layout",
+  "description": "A two-page invoice with Header, Footer, Absolute, Table, and visual schemas.",
+  "sourceKind": "jsx",
+  "tags": [
+    "Invoice",
+    "Business",
+    "Table",
+    "Visual",
+    "Multi-page"
+  ]
+}
