@@ -36,6 +36,7 @@
     "link-workspaces": "./scripts/link-workspaces.sh",
     "clean": "vp run --filter '@pdfme/*' clean",
     "build": "npm run clean && npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && npm run build -w packages/jsx && ./scripts/build-workspaces-in-parallel.sh packages/generator packages/ui packages/manipulator && npm run build -w packages/cli",
+    "build:cli": "npm run build -w packages/pdf-lib && npm run build -w packages/common && npm run build -w packages/converter && npm run build -w packages/schemas && npm run build -w packages/generator && npm run build -w packages/cli",
     "check": "npm run fmt:check && npm run lint && npm run typecheck && npm run test && npm --prefix playground run test",
     "claude:review": "./scripts/claude-review-pr.sh",
     "fmt": "vp run --filter '@pdfme/*' fmt && npm --prefix playground run fmt && npm run fmt:meta",
@@ -44,6 +45,8 @@
     "ci": "npm run check && npm run build && npm --prefix playground run build",
     "typecheck": "node packages/common/set-version.js && tsc -b",
     "test": "vp run --filter '@pdfme/*' test",
+    "test:packages": "vp run --filter '@pdfme/*' --filter '!@pdfme/cli' test",
+    "test:cli": "npm run test:run -w packages/cli --",
     "lint": "vp run --filter '@pdfme/*' lint && npm --prefix playground run lint",
     "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/jsx/src packages/manipulator/src packages/pdf-lib/src packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"
   },

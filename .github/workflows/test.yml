@@ -6,8 +6,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  pdfme-test:
+  pdfme-core:
+    name: pdfme-test / packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,9 +27,58 @@ jobs:
       - run: npm run typecheck
       - run: ./node_modules/.bin/vp run --filter '@pdfme/*' lint
       - run: npm run build
-      - run: npm run test
+      - run: npm run test:packages
         env:
           CI: true
+
+  pdfme-cli:
+    name: pdfme-test / cli (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: validate
+            test_files: __tests__/validate.test.ts
+          - suite: generate
+            test_files: __tests__/generate.test.ts
+          - suite: doctor
+            test_files: __tests__/doctor.test.ts
+          - suite: examples-integration
+            test_files: __tests__/examples.integration.test.ts
+          - suite: rest
+            test_files: __tests__ --exclude __tests__/validate.test.ts --exclude __tests__/generate.test.ts --exclude __tests__/doctor.test.ts --exclude __tests__/examples.integration.test.ts
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            playground/package-lock.json
+      - run: npm ci
+      - run: npm run build:cli
+      - run: npm run test:cli -- ${{ matrix.test_files }}
+        env:
+          CI: true
+
+  pdfme-test:
+    name: pdfme-test
+    runs-on: ubuntu-latest
+    needs:
+      - pdfme-core
+      - pdfme-cli
+    if: always()
+    steps:
+      - name: Check pdfme test suites
+        run: |
+          if [ "${{ needs.pdfme-core.result }}" != "success" ] || [ "${{ needs.pdfme-cli.result }}" != "success" ]; then
+            echo "pdfme-core: ${{ needs.pdfme-core.result }}"
+            echo "pdfme-cli: ${{ needs.pdfme-cli.result }}"
+            exit 1
+          fi
 
   playground-test:
     runs-on: ubuntu-latest
