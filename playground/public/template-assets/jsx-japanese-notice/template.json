@@ -31,6 +31,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       }
@@ -60,6 +61,7 @@
         "fontColor": "#0f172a",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -85,6 +87,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },

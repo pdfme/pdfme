@@ -54,7 +54,7 @@ return (
             <Text size={12} color="#0f172a">
               Notes
             </Text>
-            <Text size={9} lineHeight={1.35} overflow="expand">
+            <Text size={9} lineHeight={1.35}>
               The JSX authoring layer is useful when a document has repeated visual patterns but still needs to become a normal pdfme template. This example uses boxes, rows, static footer content, and simple visual bars.
             </Text>
             <List

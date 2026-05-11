@@ -93,6 +93,7 @@ const DEFAULT_VISUAL_HEIGHT = 40;
 const DEFAULT_LINE_THICKNESS = 0.5;
 const DEFAULT_LINE_COLOR = '#000000';
 const DEFAULT_SHAPE_BORDER_COLOR = '#000000';
+const DEFAULT_TEXT_OVERFLOW = 'expand' as const satisfies TextSchema['overflow'];
 const DEFAULT_DYNAMIC_FONT_SIZE = {
   min: 4,
   max: 72,
@@ -868,7 +869,7 @@ const renderText = async (
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
     textFormat,
-    overflow: props.overflow,
+    overflow: props.overflow ?? DEFAULT_TEXT_OVERFLOW,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
   };
@@ -930,7 +931,7 @@ const renderMultiVariableText = async (
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
     textFormat,
-    overflow: props.overflow,
+    overflow: props.overflow ?? DEFAULT_TEXT_OVERFLOW,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
     text: templateText,

@@ -82,9 +82,11 @@ layout API は CSS/Flexbox 互換を目指していません。`gap`, `margin`, 
 
 `Text`, `MultiVariableText`, `List`, `Table` は通常 `height` を省略できます。JSX render 時に初期 content
 を測定し、周囲の `Stack`, `Row`, `Box` を進めます。固定 field、固定 visual area、Form の入力 box を
-明確にしたい場合だけ `height` を指定してください。`height` のない `Box` は、JSX render 時点では子要素の高さに
-合わせて伸びます。その visual `Box` の中に runtime dynamic な text / MVT がある場合、Form/Viewer や
-generator が `overflow="expand"` を reflow するときも Box decoration の高さを追従させます。
+明確にしたい場合は、`height` と `overflow="visible"` を指定してください。JSX では `Text` と
+`MultiVariableText` の default は `overflow="expand"` です。そのため input-backed text は Form/Viewer
+や generator output で標準的に reflow します。`height` のない `Box` は、JSX render 時点では子要素の
+高さに合わせて伸びます。その visual `Box` の中に runtime dynamic な text / MVT がある場合、reflow 時も
+Box decoration の高さを追従させます。
 
 ## schema component
 

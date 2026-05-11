@@ -31,6 +31,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -56,6 +57,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -95,6 +97,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -120,6 +123,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       }
@@ -166,6 +170,7 @@
         "fontColor": "#166534",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -191,6 +196,7 @@
         "fontColor": "#0f172a",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -216,6 +222,7 @@
         "fontColor": "#475569",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -248,7 +255,14 @@
         "color": "#f8fafc",
         "borderColor": "#e2e8f0",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_8",
+            "multiVariableText_1"
+          ],
+          "paddingBottom": 4
+        }
       },
       {
         "name": "text_8",
@@ -272,6 +286,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -297,6 +312,7 @@
         "fontColor": "#000000",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false,
         "text": "{company}\n{name}\n{email}",
@@ -352,6 +368,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -475,7 +492,13 @@
         "color": "#fefce8",
         "borderColor": "#facc15",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_10"
+          ],
+          "paddingBottom": 4
+        }
       },
       {
         "name": "text_10",
@@ -499,6 +522,7 @@
         "fontColor": "#000000",
         "backgroundColor": "",
         "textFormat": "inline-markdown",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -560,6 +584,7 @@
         "fontColor": "#0f172a",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -604,7 +629,13 @@
         "color": "#f8fafc",
         "borderColor": "#cbd5e1",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_13"
+          ],
+          "paddingBottom": 5
+        }
       },
       {
         "name": "text_13",
@@ -628,6 +659,7 @@
         "fontColor": "#000000",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       }

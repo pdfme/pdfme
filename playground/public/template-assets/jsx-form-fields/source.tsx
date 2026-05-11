@@ -57,7 +57,6 @@ return (
               borderColor="#cbd5e1"
               borderWidth={0.3}
               text={'Hello {firstName},\nYour plan is {plan}.\nStatus: {status}'}
-              overflow="expand"
               values={{ firstName: 'Mina', plan: 'Growth', status: 'Ready for review' }}
             />
           </Stack>
