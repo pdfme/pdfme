@@ -16,6 +16,7 @@ import {
   loadAuthoringStarterSource,
   type AuthoringStarter,
 } from '../lib/authoringStarters';
+import { getErrorMessage } from '../lib/errors';
 import {
   getPlaygroundProject,
   savePlaygroundProject,
@@ -55,7 +56,7 @@ export default function Md2Pdf() {
       })
       .catch((err) => {
         if (cancelled) return;
-        toast.error(err instanceof Error ? err.message : String(err));
+        toast.error(getErrorMessage(err));
       });
 
     return () => {
@@ -84,6 +85,7 @@ export default function Md2Pdf() {
 
       consumeQuery();
       projectRef.current = null;
+      didLoadInitialStarterRef.current = true;
       setSelectedPresetId(preset.id);
       setMarkdown(nextMarkdown);
       setError(null);
@@ -115,10 +117,9 @@ export default function Md2Pdf() {
       return;
     }
 
-    didLoadInitialStarterRef.current = true;
     void loadPreset(preset).catch((err) => {
       if (cancelled) return;
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(getErrorMessage(err));
     });
 
     return () => {
@@ -144,7 +145,7 @@ export default function Md2Pdf() {
         setError(null);
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : String(err));
+        setError(getErrorMessage(err));
         setRenderDuration(null);
       }
     }, 250);
@@ -248,7 +249,7 @@ export default function Md2Pdf() {
       projectRef.current = savedProject;
       toast.success(<ProjectSavedToast title={savedProject.title} />);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : String(err));
+      toast.error(getErrorMessage(err));
     }
   };
 

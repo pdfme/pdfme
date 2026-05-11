@@ -17,6 +17,7 @@ import {
   loadAuthoringStarterSource,
   type AuthoringStarter,
 } from '../lib/authoringStarters';
+import { getErrorMessage } from '../lib/errors';
 import {
   getPlaygroundProject,
   savePlaygroundProject,
@@ -51,9 +52,6 @@ type PendingRender = {
   resolve: (result: RenderResult) => void;
   timeoutId: number;
 };
-
-const getErrorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : String(error);
 
 const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
   const typeScriptLanguage = monaco.languages.typescript;
@@ -164,6 +162,7 @@ export default function JsxPlayground() {
       consumeQuery();
       projectRef.current = null;
       savedInputsForSourceRef.current = null;
+      didLoadInitialStarterRef.current = true;
       setSelectedPresetId(preset.id);
       setSource(nextSource);
       setError(null);
@@ -200,7 +199,6 @@ export default function JsxPlayground() {
       return;
     }
 
-    didLoadInitialStarterRef.current = true;
     void loadPreset(preset).catch((err) => {
       if (cancelled) return;
       toast.error(getErrorMessage(err));

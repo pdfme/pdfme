@@ -68,10 +68,13 @@ function calcHash(content) {
 
 const createElement = (type, props, ...children) => {
   const nextProps = { ...props };
+  const key =
+    typeof nextProps.key === 'string' || typeof nextProps.key === 'number' ? nextProps.key : null;
+  delete nextProps.key;
   if (children.length > 0) {
     nextProps.children = children.length === 1 ? children[0] : children;
   }
-  return jsx(type, nextProps);
+  return jsx(type, nextProps, key);
 };
 
 async function renderJsxTemplate(source) {

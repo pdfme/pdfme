@@ -33,7 +33,14 @@ return (
             ['Retention', '61%', '#e0f2fe'],
             ['Expansion', '28%', '#fef3c7'],
           ].map(([label, value, background]) => (
-            <Box flex={1} padding={4} background={background} borderColor="#d1d5db" borderWidth={0.3}>
+            <Box
+              key={label}
+              flex={1}
+              padding={4}
+              background={background}
+              borderColor="#d1d5db"
+              borderWidth={0.3}
+            >
               <Stack gap={2}>
                 <Text size={7} color="#64748b">{label}</Text>
                 <Text size={18} color="#0f172a">{value}</Text>

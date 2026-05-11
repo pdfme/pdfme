@@ -32,7 +32,7 @@ return (
         </Box>
 
         {sections.map((section) => (
-          <Stack gap={1.5}>
+          <Stack key={section.title} gap={1.5}>
             <Text size={11} lineHeight={1.3} color="#111827">
               {section.title}
             </Text>
