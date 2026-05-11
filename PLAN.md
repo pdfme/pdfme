@@ -6,9 +6,9 @@
 
 `@pdfme/jsx` で stacking layout を使った template authoring を整備し、その考え方を
 `converter` package の `md2pdf` に応用する。`md2pdf` / `@pdfme/jsx` ともに beta playground と
-docs が入り、Templates gallery / local project workspace から試せる状態になった。次は実際に
-保存・再編集・Designer / FormViewer 遷移を使いながら、workspace 体験、authoring UX、layout 品質、
-rich content の応用範囲を磨く。
+docs が入り、Templates gallery / local project workspace から試せる状態になった。JSX / md2pdf の
+starter source も `template-assets` に寄せたため、次は実際の authoring で詰まりやすい dynamic
+container、md2pdf pagination / block layout、workspace 運用の順で磨く。
 
 ## 基本方針
 
@@ -26,18 +26,19 @@ rich content の応用範囲を磨く。
 
 ## 次に進めること
 
-### 1. Playground project workspace polish
+### 1. `@pdfme/jsx` layout / dynamic container フォローアップ
 
-- Templates gallery / local project workspace は入り、rename / duplicate / Save As も追加済み。
-  次は「保存した project が増えても軽く、壊れず、見つけやすいか」を見る。
-- Local project metadata edit は現時点では入れない。sample / starter の metadata は
-  `playground/public/template-assets/metadata.json` で repo 管理し、local project の title は Rename で扱う。
-- My Workspace の thumbnail 生成は、初回生成コスト、失敗時 fallback、再生成タイミング、localStorage 容量上限を確認する。
-  必要なら IndexedDB や thumbnail cache TTL を検討する。
-- Project import / export は Template JSON download だけで足りるか、inputs / source / metadata を含む
-  workspace project export が必要かを見極める。
-- Designer / FormViewer / JSX / md2pdf 間の active project 読み込みと reset の E2E を増やす。特に blank template、
-  schema なし template、project deleted 後の URL、mobile viewport を固定する。
+- Form 入力や dynamic layout reflow で `Text` / MVT が runtime に `overflow: "expand"` した場合、
+  JSX の親 `Box` / container は自動では広がらない。生成後の `Box` は rectangle schema であり、
+  子 schema の実描画高さと親 container を結び直す contract がまだないため。親子 container dynamic
+  layout は実装したい重要課題として扱う。
+- まずは JSX から生成された visual `Box` と子 text/MVT の関係を metadata として template に残す案と、
+  単一 text/MVT 子の decoration に畳む案を比較する。
+- CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
+- `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
+- `%` width は将来検討でよい。まずは `flex` / `flexGrow` で比率指定を表現する。
+- `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
+  直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
 
 ### 2. `@pdfme/jsx` authoring UX フォローアップ
 
@@ -47,10 +48,11 @@ rich content の応用範囲を磨く。
 - React に慣れた人と AI authoring を主な利用者として意識する。`Text` / MVT は JSX render 時に高さを測れるため、
   starter / docs では「通常は `height` を書かない」体験に寄せる。固定 field、画像、absolute overlay など
   明示寸法が意味を持つ場所だけ `height` を書く。
-- POC playground (`react-pdfme-jsx`) の実用サンプルを参考に、invoice、form、report、research paper、Japanese business
-  document、header/footer/page number、watermark / badge などの starter を増やす。ただし POC 専用 API
-  (`autoHeight`, `staticHeader`, `For` など) はそのまま持ち込まず、現行の `Document` / `Header` / `Footer` /
-  通常の JS 配列処理へ寄せる。
+- Starter source は `playground/public/template-assets/<name>/source.tsx` に置き、generated
+  `template.json` / `metadata.json` と同じ単位で管理する。
+- invoice、form、report、research paper、Japanese notice の starter は追加済み。次に増やすなら、
+  Japanese business document、header/footer/page number 専用、watermark / badge 専用など、1 つの概念を
+  小さく見せる starter を優先する。
 - 編集の正は generated `Template + inputs`。JSX source は初期生成 / regeneration 用の metadata として扱う。
   Designer で編集した template を JSX に自動逆変換することは当面目指さない。
 - JSX playground は source authoring と Viewer preview に寄せる。Form 入力確認は生成方法に依存しない共通 project 導線として
@@ -62,18 +64,18 @@ rich content の応用範囲を磨く。
 - 長い paragraph / list / table は generator dynamic layout に任せる方針を維持する。
 - blockquote / code block / complex list item が既存 schema split で足りるかを検証する。
 
-### 4. `@pdfme/jsx` layout / dynamic container フォローアップ
+### 4. Playground project workspace polish
 
-- CSS/Flexbox 互換を目指さず、flexbox の使いやすさだけを `Stack` / `Row` に取り込む。
-- `flexWrap`, `flexShrink`, media query, full `style` prop, CSS parser は当面対象外。
-- `%` width は将来検討でよい。まずは `flex` / `flexGrow` で比率指定を表現する。
-- Form 入力や dynamic layout reflow で `Text` / MVT が runtime に `overflow: "expand"` した場合、
-  JSX の親 `Box` / container は自動では広がらない。生成後の `Box` は rectangle schema であり、
-  子 schema の実描画高さと親 container を結び直す contract がまだないため。親子 container dynamic
-  layout は実装したい重要課題として扱う。まずは JSX から生成された visual `Box` と子 text/MVT の関係を
-  metadata として template に残すか、単一 text/MVT 子の decoration に畳むかを比較する。
-- `Absolute` は `Page`, top `Static`, `Box` 内の小さな escape hatch として扱う。`Stack` / `Row`
-  直下対応、anchor / top-right / bottom-right shorthand、z-index 的な描画順制御は必要性が出てから検討する。
+- Templates gallery / local project workspace、rename / duplicate / Save As は追加済み。しばらく実運用し、
+  「保存した project が増えても軽く、壊れず、見つけやすいか」を見る。
+- Local project metadata edit は現時点では入れない。sample / starter の metadata は
+  `playground/public/template-assets/<name>/metadata.json` で repo 管理し、local project の title は Rename で扱う。
+- My Workspace の thumbnail 生成は、初回生成コスト、失敗時 fallback、再生成タイミング、localStorage 容量上限を確認する。
+  問題が見えてから IndexedDB や thumbnail cache TTL を検討する。
+- Workspace E2E 強化は今すぐはやらない。Designer / FormViewer / JSX / md2pdf 間の active project 読み込み、
+  reset、blank template、schema なし template、mobile viewport は、仕様がもう少し固まってから固定する。
+- Project import / export は Template JSON download だけで足りるか、inputs / source / metadata を含む
+  workspace project export が必要かを見極める。
 
 ### 5. `md2pdf` assets / rich content 方針
 
@@ -202,6 +204,9 @@ rich content の応用範囲を磨く。
   project kind に応じて遷移できるようにした。template metadata / thumbnail 生成 / website redirect も整理。
 - PR #1496: My Workspace project の Rename / Duplicate、Designer / FormViewer / JSX / md2pdf の
   Save As、project card の More menu、Designer toolbar の重なり修正を追加。
+- PR #1503: JSX authoring starter を height-less authoring 方針に更新し、`jsx-research-paper` を追加。
+  JSX / md2pdf starter source と metadata を `playground/public/template-assets/<name>/` に移し、
+  generated `template.json` と同じ単位で管理できるようにした。
 
 ## 参考
 
