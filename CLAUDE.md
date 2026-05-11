@@ -172,8 +172,9 @@ Implementation: `packages/common/src/expression.ts`
    - After creating a PR, run `npm run claude:review`
    - The command detects the PR for the current branch and runs Claude Code's built-in `/review`
    - It defaults to the latest Opus alias with max effort: `claude -p --model opus --effort max --permission-mode auto "/review <PR>"`
+   - This is intentionally high-cost/deep review; do not wire it into CI or run it casually on every local save
    - To review a specific PR or focus area: `npm run claude:review -- 1234 Focus on security and edge cases`
-   - Review output is saved under `tmp/claude-reviews/`
+   - Review output is saved under `tmp/claude-reviews/`; local `memories/` notes and review outputs are gitignored so they do not leak into public PRs
 
 ### Code Standards
 - **TypeScript**: All new code must be written in TypeScript
