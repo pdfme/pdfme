@@ -8,12 +8,13 @@ import {
   CUSTOM_A4_PDF,
   getDefaultFont,
   pluginRegistry,
+  setDynamicContainerMetadata,
   type Plugin,
   type Template,
 } from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import { setupUIMock, getSampleTemplate } from '../assets/helper';
-import { text, image } from '@pdfme/schemas';
+import { text, image, rectangle } from '@pdfme/schemas';
 
 const plugins = pluginRegistry({ text, image });
 
@@ -70,6 +71,93 @@ const getTop = (element: Element | null) => {
   if (!(element instanceof HTMLElement)) throw new Error('Element was not found');
   return Number.parseFloat(element.style.top);
 };
+
+const getHeight = (element: Element | null) => {
+  if (!(element instanceof HTMLElement)) throw new Error('Element was not found');
+  return Number.parseFloat(element.style.height);
+};
+
+const getDynamicContainerFormTemplate = (): Template => {
+  const box = {
+    name: 'box',
+    type: 'rectangle',
+    position: { x: 10, y: 20 },
+    width: 60,
+    height: 12,
+    readOnly: true,
+    color: '#f8fafc',
+  };
+
+  setDynamicContainerMetadata(box, { childNames: ['notes'], paddingBottom: 2 });
+
+  return {
+    basePdf: {
+      width: 100,
+      height: 200,
+      padding: [10, 10, 10, 10],
+    },
+    schemas: [
+      [
+        box,
+        {
+          name: 'notes',
+          type: 'text',
+          content: '',
+          position: { x: 12, y: 22 },
+          width: 26,
+          height: 6,
+          fontSize: 10,
+          lineHeight: 1,
+          overflow: 'expand',
+        },
+        {
+          name: 'footer',
+          type: 'text',
+          content: 'Footer',
+          position: { x: 10, y: 36 },
+          width: 60,
+          height: 6,
+          fontSize: 10,
+        },
+      ],
+    ],
+  };
+};
+
+const dynamicContainerTextPlugin: Plugin = {
+  pdf: vi.fn(),
+  ui: ({ rootElement, schema, value, onChange }) => {
+    rootElement.textContent = value;
+    if (schema.name !== 'notes') return;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.textContent = 'grow notes';
+    button.addEventListener('click', () =>
+      onChange?.({
+        key: 'content',
+        value: 'This is a much longer note that should wrap across several lines. '.repeat(3),
+      }),
+    );
+    rootElement.appendChild(button);
+  },
+  propPanel: {
+    schema: {},
+    defaultSchema: {
+      name: 'notes',
+      type: 'text',
+      content: '',
+      position: { x: 0, y: 0 },
+      width: 60,
+      height: 10,
+    },
+  },
+};
+
+const dynamicContainerFormPlugins = pluginRegistry({
+  text: dynamicContainerTextPlugin,
+  rectangle,
+});
 
 test('Preview(as Viewer) snapshot', async () => {
   setupUIMock();
@@ -201,6 +289,48 @@ test('Preview(as Form) does not push lower schemas after list height changes for
 
   await waitFor(() => {
     expect(getTop(footer)).toBe(topBefore);
+  });
+});
+
+test('Preview(as Form) grows dynamic container decorations after text input changes', async () => {
+  setupUIMock();
+  const onChangeInput = vi.fn();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={dynamicContainerFormPlugins}>
+          <Preview
+            template={getDynamicContainerFormTemplate()}
+            inputs={[{ notes: 'Short note', footer: 'Footer' }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={onChangeInput}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBe(3);
+  });
+
+  const box = container.querySelector('[title="box"]');
+  const footer = container.querySelector('[title="footer"]');
+  const boxHeightBefore = getHeight(box);
+  const footerTopBefore = getTop(footer);
+  const growButton = Array.from(container.querySelectorAll('button')).find(
+    (button) => button.textContent === 'grow notes',
+  );
+  if (!growButton) throw new Error('Grow notes button was not found');
+
+  fireEvent.click(growButton);
+
+  await waitFor(() => {
+    expect(onChangeInput).toHaveBeenCalledWith(
+      expect.objectContaining({ index: 0, name: 'notes' }),
+    );
+    expect(getHeight(container.querySelector('[title="box"]'))).toBeGreaterThan(boxHeightBefore);
+    expect(getTop(container.querySelector('[title="footer"]'))).toBeGreaterThan(footerTopBefore);
   });
 });
 
