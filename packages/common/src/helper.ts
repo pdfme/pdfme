@@ -30,10 +30,6 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
-// Wrap rather than alias so the call site preserves `this === window`.
-// In some bundler setups (e.g. farmfe/Vite under #1120) assigning the
-// global `structuredClone` to a free variable strips the binding and
-// invoking it raises `TypeError: Illegal invocation`.
 export const cloneDeep = <T>(value: T): T => structuredClone(value);
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
