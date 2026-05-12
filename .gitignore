@@ -18,3 +18,6 @@ coverage/
 # Local agent output and memory files should stay out of public PRs.
 /tmp/claude-reviews/
 /memories/
+
+# test-tmp
+.test*
