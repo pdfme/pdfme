@@ -56,27 +56,63 @@
 - JSX / md2pdf の `source.tsx` / `source.md` は初期実装では対象外。
 - `base.pdf` や画像などの相対 path asset は読まない。現状どおり data URL / URL / base64 保存前提。
 - 前回開いた workspace は IndexedDB に handle を保存し、次回アクセス時に復元候補として出す。
+- File System Access API 対応は一旦 Chromium 系だけで考える。Safari / Firefox は fallback のままでよい。
+
+## UX 方針
+
+- `Open Folder` は Templates 画面の `My Workspace` 内に置く。
+- Mounted collection は existing local projects と混ぜず、`Mounted Folder` のような別セクションにする。
+- Local projects と Mounted Folder は切り替えられる感じにする。local projects から Mounted Folder への
+  migration / export は将来検討として残す。
+- Folder open 後は Templates 画面に留まり、mounted templates を一覧表示する。
+- Mounted collection は同時に 1 folder だけ。
+- `Disconnect Folder` / `Close Folder` を用意し、いつでも unmount できるようにする。
+- valid template が 0 件の folder を開いた場合は、まず blank template を作るか確認し、作成後に Designer を開く。
 
 ## MVP 方針
 
 - `Open Folder` / `Open Directory` を My Workspace 付近に追加する。
 - Directory workspace は「collection root directory handle + template entries」と定義する。
-- Template entry は `<template-name>/template.json` file handle と `<template-name>/thumbnail.png` file handle から作る。
+- Template entry は `<template-name>/template.json`, `<template-name>/metadata.json`,
+  `<template-name>/thumbnail.png` file handles から作る。
 - Open 時は root 直下の child directories を scan し、`template.json` の JSON parse と `checkTemplate`
   を通った directories を collection entries にする。
-- valid template directory がない場合は `getBlankTemplate()` を新規 directory に pretty JSON で作成し、その entry を開く。
+- Scan 対象は root 直下の child directory のみ。深い階層は無視する。
+- dot directory (`.git`, `.cache` など) は無視する。
+- invalid `template.json` の directory は一覧に出さず、toast または console warning に留める。
+- valid template directory がない場合は、ユーザー確認後に `getBlankTemplate()` を新規 directory に pretty JSON
+  で作成し、その entry を Designer で開く。
 - Open 成功時は mounted collection を Templates 画面の workspace section に表示し、選択した template を
   Designer または FormViewer に読み込む。
-- `metadata.json` は初期実装では考慮しない。将来、root `metadata.json` と per-template `metadata.json` を
-  読み取り、title / description / tags / order に反映する余地を残す。
+- `metadata.json` は mounted collection の一覧表示に使う。title / description / tags / order など、gallery
+  表示に必要な情報は metadata から読む。
+- 既存 `playground/public/template-assets` も per-template `metadata.json` へ統一したい。現状 root
+  `metadata.json` にしか metadata がないものがあるため、実装時に既存 templates 全てへ
+  `<template-name>/metadata.json` を作る migration task を含める。
 - `index.json`, `manifest.json`, `manifests/<version>.json` は mounted collection では read-only/generated-ish
   metadata として扱い、初期実装では更新しない。
 - Designer の save は file workspace active 時に prompt なしで selected template JSON file へ上書き保存する。
   localStorage project 保存は fallback / 別 mode として残す。
+- File workspace active 時、Designer の save button 文言は `Save <template-name>/template.json` のように
+  selected file が分かる形にする。
+- File workspace active 時の `Save As` は local project 複製ではなく、mounted folder 内に新しい
+  template directory を作る。
+- Designer で編集中の template が外部で削除された場合、`Save over disk` は同じ path に再作成する。
+- Mounted template を Designer で開いた場合、localStorage active project は切り替えない。
 - FormViewer は selected template JSON file の変更を検知して `updateTemplate()` する。
   inputs は `getInputFromTemplate(template)` で補完しつつ、既存入力を schema name ベースで保持する。
+- FormViewer の `Save` / `Save As` は local project inputs 保存として残す。
 - Collection root の directory changes も polling / observer で検知し、template directory の追加・削除・rename
   を Templates 画面に反映する。
+
+## Thumbnail 方針
+
+- Folder scan 時に既存 `thumbnail.png` があれば読む。
+- `thumbnail.png` がない場合は browser 側で作成する。
+- Designer save 時に thumbnail を再生成する。FormViewer の入力変更では再生成しない。
+- Thumbnail 生成に使う inputs は `getInputFromTemplate(template)` でよい。
+- Thumbnail write に失敗しても template save は成功扱いにし、toast warning を出す。
+- Thumbnail が読めない / 生成できない場合の fallback image を用意する。
 
 ## 同期・競合
 
@@ -85,10 +121,20 @@
   `Save over disk` を選べる conflict dialog を出す。
 - 保存時に disk version が最後に読んだ version から進んでいた場合も同じ conflict として扱う。
 - selected template JSON file が invalid JSON / invalid Template になった場合、現在の UI は維持しつつ
-  error toast を出す。AI が書きかけの瞬間を polling で拾う可能性があるため、次の valid change で
-  自動復帰できるようにする。
+  「invalid 中」状態を表示する。toast は連打しない。AI が書きかけの瞬間を polling で拾う可能性があるため、
+  次の valid change で自動復帰できるようにする。
 - Form 入力中に selected template JSON file が変わった場合、同名 field の入力値は保持し、新規 field は
   `getInputFromTemplate` の default を入れ、消えた field は捨てる。
+- Polling interval は 1500ms にする。
+
+## Persistence / Permission
+
+- IndexedDB には collection root handle と selected template directory name を保存する。
+- 次回起動時は勝手に permission prompt を出さない。
+- Permission が残っていれば自動 mount する。
+- Permission が必要な場合は `Reopen last folder` ボタンを表示する。
+- Permission denied の場合は mounted state を clear せず、再試行できる表示にする。
+- `Disconnect Folder` / `Close Folder` でいつでも unmount できるようにする。
 
 ## 実装候補
 
@@ -112,14 +158,18 @@
   - My Workspace toolbar に `Open Folder` を追加する。
   - Open 成功後に mounted collection templates を project card と同じ gallery UI で表示する。
   - mounted collection の card は Designer / FormViewer を開くときに selected template entry を active にする。
+  - Mounted Folder section に `Disconnect Folder` / `Close Folder` と `Reopen last folder` を配置する。
 - `playground/src/routes/Designer.tsx`
   - load request に active mounted template entry を追加する。
   - `onSaveTemplate` で file workspace active 時は selected template JSON file と thumbnail へ write。
+  - `Save As` で mounted folder 内に新しい template directory を作る。
   - 外部変更購読で `designer.current.updateTemplate(template)`。
   - dirty tracking と conflict UI。
 - `playground/src/routes/FormAndViewer.tsx`
   - active mounted template entry を読み込み対象に追加する。
   - 外部変更購読で `ui.current.updateTemplate(template)` と inputs reconcile。
+- `playground/public/template-assets`
+  - 既存 templates の metadata を per-template `metadata.json` へ統一する。
 - Tests
   - file workspace helper は fake file handles で unit test する。
   - UI E2E は native picker を mock し、open, save overwrite, thumbnail write, external change polling,
@@ -127,11 +177,6 @@
 
 ## 未確定要件
 
-- 保存時の thumbnail 再生成で使う inputs。Designer は `getInputFromTemplate(template)` でよいか、
-  直近 FormViewer inputs があれば使うか。
-- Designer の `Save Project` 文言は file workspace active 時に `Save JSON` / `Save <filename>` に変えるか。
-- `Save As` は localStorage project 複製のまま残すか、別 directory entry 作成にするか。
-- FormViewer での `Save` は inputs 保存のままか、file workspace mode では非表示にするか。
-- polling interval。AI との並走なら 1-2 秒が体感よさそう。
-- IndexedDB に保存した workspace handle の復元 UX。起動時に自動復元を試すか、`Reopen last folder` を出すか。
-- 対応ブラウザを Chromium 系に寄せるか。Safari / Firefox では fallback のままでよいか。
+- Mounted Folder と local projects の切り替え UI の具体デザイン。
+- local projects から Mounted Folder への migration / export を初期実装に含めるか、後回しにするか。
+- root `metadata.json` をどのタイミングで legacy 扱いにするか。
