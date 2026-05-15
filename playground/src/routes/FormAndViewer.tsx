@@ -295,9 +295,7 @@ function FormAndViewerApp() {
         const nextEntry = {
           ...currentEntry,
           diskVersion: readResult.diskVersion,
-          rawJson: readResult.rawJson,
           template: readResult.template,
-          templateFileHandle: readResult.templateFileHandle,
           updatedAt: readResult.templateFile.lastModified,
         };
         fileWorkspaceEntryRef.current = nextEntry;

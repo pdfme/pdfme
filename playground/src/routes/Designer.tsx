@@ -198,9 +198,7 @@ function DesignerApp() {
       const nextEntry: FileWorkspaceTemplateEntry = {
         ...entry,
         diskVersion: readResult.diskVersion,
-        rawJson: readResult.rawJson,
         template: readResult.template,
-        templateFileHandle: readResult.templateFileHandle,
         updatedAt: readResult.templateFile.lastModified,
       };
       fileWorkspaceEntryRef.current = nextEntry;
@@ -270,7 +268,6 @@ function DesignerApp() {
             nextEntry = {
               ...savedEntry,
               thumbnailDataUrl: thumbnail.thumbnailDataUrl,
-              thumbnailFileHandle: thumbnail.thumbnailFileHandle,
             };
           } catch (error) {
             console.warn(error);

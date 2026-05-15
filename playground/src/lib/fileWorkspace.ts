@@ -25,18 +25,14 @@ export type FileWorkspaceMetadata = {
 export type FileWorkspaceTemplateEntry = {
   description?: string;
   diskVersion: string;
-  metadataFileHandle?: FileSystemFileHandle;
   name: string;
   order?: number;
   path: string;
-  rawJson: string;
   sourceKind: SourceKind;
   tags: string[];
   template: Template;
   templateDirectoryHandle: FileSystemDirectoryHandle;
-  templateFileHandle: FileSystemFileHandle;
   thumbnailDataUrl?: string;
-  thumbnailFileHandle?: FileSystemFileHandle;
   title: string;
   updatedAt: number;
 };
@@ -51,16 +47,13 @@ export type FileWorkspaceCollection = {
   invalidEntries: FileWorkspaceInvalidEntry[];
   rootHandle: FileSystemDirectoryHandle;
   rootName: string;
-  scannedAt: number;
   selectedTemplateName?: string;
 };
 
 export type FileWorkspaceTemplateRead = {
   diskVersion: string;
-  rawJson: string;
   template: Template;
   templateFile: File;
-  templateFileHandle: FileSystemFileHandle;
 };
 
 type PersistedFileWorkspaceState = {
@@ -187,16 +180,16 @@ const getFileHandleIfExists = async (directoryHandle: FileSystemDirectoryHandle,
 const readMetadata = async (
   directoryHandle: FileSystemDirectoryHandle,
   name: string,
-): Promise<{ handle?: FileSystemFileHandle; metadata: FileWorkspaceMetadata }> => {
+): Promise<FileWorkspaceMetadata> => {
   const handle = await getFileHandleIfExists(directoryHandle, 'metadata.json');
-  if (!handle) return { metadata: normalizeMetadata(undefined, name) };
+  if (!handle) return normalizeMetadata(undefined, name);
 
   try {
     const { raw } = await readJsonFile(handle);
-    return { handle, metadata: normalizeMetadata(JSON.parse(raw), name) };
+    return normalizeMetadata(JSON.parse(raw), name);
   } catch (error) {
     console.warn(`Failed to read metadata for ${name}`, error);
-    return { handle, metadata: normalizeMetadata(undefined, name) };
+    return normalizeMetadata(undefined, name);
   }
 };
 
@@ -206,10 +199,10 @@ const readThumbnail = async (directoryHandle: FileSystemDirectoryHandle) => {
 
   try {
     const file = await handle.getFile();
-    return { handle, thumbnailDataUrl: await blobToDataUrl(file) };
+    return { thumbnailDataUrl: await blobToDataUrl(file) };
   } catch (error) {
     console.warn('Failed to read template thumbnail', error);
-    return { handle };
+    return {};
   }
 };
 
@@ -268,7 +261,7 @@ export const isFileWorkspaceSupported = () =>
   typeof window.showDirectoryPicker === 'function' &&
   typeof indexedDB !== 'undefined';
 
-export const queryFileWorkspacePermission = async (
+const queryFileWorkspacePermission = async (
   handle: FileSystemHandle,
   mode: 'read' | 'readwrite' = 'readwrite',
 ) => {
@@ -276,7 +269,7 @@ export const queryFileWorkspacePermission = async (
   return handle.queryPermission({ mode });
 };
 
-export const requestFileWorkspacePermission = async (
+const requestFileWorkspacePermission = async (
   handle: FileSystemHandle,
   mode: 'read' | 'readwrite' = 'readwrite',
 ) => {
@@ -335,7 +328,7 @@ const idbDelete = async (key: string) => {
   }
 };
 
-export const getPersistedFileWorkspaceState = () =>
+const getPersistedFileWorkspaceState = () =>
   idbGet<PersistedFileWorkspaceState>(ACTIVE_STATE_KEY).catch(() => undefined);
 
 export const persistFileWorkspaceState = async (
@@ -374,10 +367,8 @@ export const readTemplateEntry = async (
     checkTemplate(parsed);
     return {
       diskVersion: getDiskVersion(file, raw),
-      rawJson: raw,
       template: parsed,
       templateFile: file,
-      templateFileHandle,
     };
   } catch (error) {
     if (error instanceof FileWorkspaceTemplateDeletedError) throw error;
@@ -393,24 +384,20 @@ const buildTemplateEntry = async (
   directoryHandle: FileSystemDirectoryHandle,
 ): Promise<FileWorkspaceTemplateEntry> => {
   const readResult = await readTemplateEntry({ name, templateDirectoryHandle: directoryHandle });
-  const { handle: metadataFileHandle, metadata } = await readMetadata(directoryHandle, name);
-  const { handle: thumbnailFileHandle, thumbnailDataUrl } = await readThumbnail(directoryHandle);
+  const metadata = await readMetadata(directoryHandle, name);
+  const { thumbnailDataUrl } = await readThumbnail(directoryHandle);
 
   return {
     description: metadata.description,
     diskVersion: readResult.diskVersion,
-    metadataFileHandle,
     name,
     order: metadata.order,
     path: `${name}/template.json`,
-    rawJson: readResult.rawJson,
     sourceKind: metadata.sourceKind ?? inferSourceKind(name),
     tags: metadata.tags,
     template: readResult.template,
     templateDirectoryHandle: directoryHandle,
-    templateFileHandle: readResult.templateFileHandle,
     thumbnailDataUrl,
-    thumbnailFileHandle,
     title: metadata.title ?? titleFromDirectoryName(name),
     updatedAt: readResult.templateFile.lastModified,
   };
@@ -451,7 +438,6 @@ export const scanTemplateCollection = async (
     invalidEntries,
     rootHandle,
     rootName: rootHandle.name,
-    scannedAt: Date.now(),
     selectedTemplateName,
   };
 };
@@ -567,17 +553,20 @@ export const subscribeTemplateEntryChanges = (
   let disposed = false;
   let checking = false;
   let lastDiskVersion = entry.diskVersion;
+  let hadError = false;
   const check = async () => {
     if (disposed || checking || options.shouldSkip?.()) return;
 
     checking = true;
     try {
       const readResult = await readTemplateEntry(entry);
-      if (readResult.diskVersion === lastDiskVersion) return;
+      if (readResult.diskVersion === lastDiskVersion && !hadError) return;
 
+      hadError = false;
       lastDiskVersion = readResult.diskVersion;
       listener(readResult);
     } catch (error) {
+      hadError = true;
       options.onError?.(error);
     } finally {
       checking = false;
@@ -674,9 +663,7 @@ export const writeTemplateEntry = async (
   return {
     ...entry,
     diskVersion: readResult.diskVersion,
-    rawJson: readResult.rawJson,
     template: readResult.template,
-    templateFileHandle,
     updatedAt: readResult.templateFile.lastModified,
   };
 };
@@ -693,7 +680,7 @@ export const writeTemplateThumbnail = async (
   });
   await writeBlob(thumbnailFileHandle, thumbnail);
 
-  return { thumbnailDataUrl, thumbnailFileHandle };
+  return { thumbnailDataUrl };
 };
 
 export const findTemplateEntry = (

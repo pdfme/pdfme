@@ -8,7 +8,6 @@ const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
-const metadataFilePath = path.join(templatesDir, 'metadata.json');
 const manifestFilePath = path.join(templatesDir, 'manifest.json');
 const versionedManifestDir = path.join(templatesDir, 'manifests');
 
@@ -68,20 +67,6 @@ function generateTemplatesListJson() {
 
 function loadTemplateMetadata() {
   const metadataByTemplate = {};
-  if (!fs.existsSync(metadataFilePath)) {
-    return loadPerTemplateMetadata(metadataByTemplate);
-  }
-
-  const parsed = JSON.parse(fs.readFileSync(metadataFilePath, 'utf8'));
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('template-assets/metadata.json must be an object keyed by template name.');
-  }
-
-  Object.assign(metadataByTemplate, parsed);
-  return loadPerTemplateMetadata(metadataByTemplate);
-}
-
-function loadPerTemplateMetadata(metadataByTemplate) {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
   for (const item of items) {
     if (!item.isDirectory() || item.name.startsWith('.')) continue;
