@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from '@pdfme/common';
@@ -24,6 +24,16 @@ import {
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+import {
+  FileWorkspaceTemplateDeletedError,
+  FileWorkspaceTemplateInvalidError,
+  findTemplateEntry,
+  readTemplateEntry,
+  restorePersistedTemplateCollection,
+  setSelectedFileWorkspaceTemplateName,
+  type FileWorkspaceTemplateEntry,
+} from '../lib/fileWorkspace';
+import { reconcileInputsWithTemplate } from '../lib/templateInputs';
 
 type Mode = 'form' | 'viewer';
 
@@ -32,12 +42,20 @@ function FormAndViewerApp() {
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
   const projectRef = useRef<PlaygroundProject | null>(null);
+  const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
+  const diskVersionRef = useRef<string | null>(null);
   const buildIdRef = useRef(0);
   const currentSourceKeyRef = useRef<string | null>(null);
   const currentTemplateRef = useRef<Template | null>(null);
   const currentInputsRef = useRef<Record<string, string>[] | null>(null);
 
   const [mode, setMode] = useState<Mode>((localStorage.getItem('mode') as Mode) ?? 'form');
+  const [fileWorkspaceEntry, setFileWorkspaceEntry] = useState<FileWorkspaceTemplateEntry | null>(
+    null,
+  );
+  const [fileWorkspaceStatus, setFileWorkspaceStatus] = useState<'deleted' | 'invalid' | null>(
+    null,
+  );
   const [projectTitle, setProjectTitle] = useState('Untitled Template');
 
   const snapshotCurrentUi = useCallback(() => {
@@ -66,27 +84,63 @@ function FormAndViewerApp() {
         let inputs: Record<string, string>[] | null = null;
         const templateIdFromQuery = searchParams.get('template');
         const projectIdFromQuery = searchParams.get('project');
+        const workspaceTemplateName = searchParams.get('workspace');
         const sourceKey = projectIdFromQuery
           ? `project:${projectIdFromQuery}`
-          : templateIdFromQuery
-            ? `template:${templateIdFromQuery}`
-            : 'current-or-default';
+          : workspaceTemplateName
+            ? `workspace:${workspaceTemplateName}`
+            : templateIdFromQuery
+              ? `template:${templateIdFromQuery}`
+              : 'current-or-default';
 
         if (currentSourceKeyRef.current === sourceKey && currentTemplateRef.current) {
           template = currentTemplateRef.current;
           inputs = ui.current?.getInputs() ?? currentInputsRef.current;
           project = projectRef.current;
+        } else if (workspaceTemplateName) {
+          const restored = await restorePersistedTemplateCollection();
+          if (restored.status !== 'mounted') {
+            throw new Error('Mounted folder is not available. Reopen it from Templates.');
+          }
+
+          const entry = findTemplateEntry(restored.collection, workspaceTemplateName);
+          if (!entry) {
+            throw new Error(
+              `Template "${workspaceTemplateName}" was not found in the mounted folder.`,
+            );
+          }
+
+          template = entry.template;
+          inputs = getInputFromTemplate(template);
+          fileWorkspaceEntryRef.current = entry;
+          diskVersionRef.current = entry.diskVersion;
+          setFileWorkspaceEntry(entry);
+          setFileWorkspaceStatus(null);
+          setProjectTitle(entry.title);
+          await setSelectedFileWorkspaceTemplateName(restored.collection.rootHandle, entry.name);
         } else if (projectIdFromQuery) {
+          fileWorkspaceEntryRef.current = null;
+          diskVersionRef.current = null;
+          setFileWorkspaceEntry(null);
+          setFileWorkspaceStatus(null);
           project = getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
           inputs = project.inputs;
         } else if (templateIdFromQuery) {
+          fileWorkspaceEntryRef.current = null;
+          diskVersionRef.current = null;
+          setFileWorkspaceEntry(null);
+          setFileWorkspaceStatus(null);
           const templateJson = await getTemplateById(templateIdFromQuery);
           checkTemplate(templateJson);
           template = templateJson;
           setProjectTitle(fromKebabCase(templateIdFromQuery));
         } else {
+          fileWorkspaceEntryRef.current = null;
+          diskVersionRef.current = null;
+          setFileWorkspaceEntry(null);
+          setFileWorkspaceStatus(null);
           project = getActivePlaygroundProject();
           if (project) {
             template = project.template;
@@ -126,6 +180,10 @@ function FormAndViewerApp() {
         });
       } catch (error) {
         projectRef.current = null;
+        fileWorkspaceEntryRef.current = null;
+        diskVersionRef.current = null;
+        setFileWorkspaceEntry(null);
+        setFileWorkspaceStatus(null);
         currentSourceKeyRef.current = null;
         currentTemplateRef.current = null;
         currentInputsRef.current = null;
@@ -208,6 +266,61 @@ function FormAndViewerApp() {
     };
   }, [mode, uiRef, buildUi, destroyCurrentUi]);
 
+  useEffect(() => {
+    if (!fileWorkspaceEntry) return;
+
+    const intervalId = window.setInterval(() => {
+      const currentEntry = fileWorkspaceEntryRef.current;
+      if (!currentEntry || !ui.current) return;
+
+      void readTemplateEntry(currentEntry)
+        .then((readResult) => {
+          if (readResult.diskVersion === diskVersionRef.current) {
+            if (fileWorkspaceStatus) setFileWorkspaceStatus(null);
+            return;
+          }
+
+          const nextInputs = reconcileInputsWithTemplate(
+            readResult.template,
+            ui.current?.getInputs() ?? currentInputsRef.current,
+          );
+          ui.current?.updateTemplate(readResult.template);
+          ui.current?.setInputs(nextInputs);
+
+          const nextEntry = {
+            ...currentEntry,
+            diskVersion: readResult.diskVersion,
+            rawJson: readResult.rawJson,
+            template: readResult.template,
+            templateFileHandle: readResult.templateFileHandle,
+            updatedAt: readResult.templateFile.lastModified,
+          };
+          fileWorkspaceEntryRef.current = nextEntry;
+          diskVersionRef.current = readResult.diskVersion;
+          currentTemplateRef.current = readResult.template;
+          currentInputsRef.current = nextInputs;
+          setFileWorkspaceEntry(nextEntry);
+          setFileWorkspaceStatus(null);
+          toast.info(`Reloaded ${currentEntry.path} from disk`);
+        })
+        .catch((error) => {
+          if (error instanceof FileWorkspaceTemplateDeletedError) {
+            setFileWorkspaceStatus('deleted');
+            return;
+          }
+
+          if (error instanceof FileWorkspaceTemplateInvalidError) {
+            setFileWorkspaceStatus('invalid');
+            return;
+          }
+
+          console.error(error);
+        });
+    }, 1500);
+
+    return () => window.clearInterval(intervalId);
+  }, [fileWorkspaceEntry, fileWorkspaceStatus]);
+
   const navItems: NavItem[] = [
     {
       label: 'Lang',
@@ -280,6 +393,14 @@ function FormAndViewerApp() {
   return (
     <>
       <NavBar items={navItems} />
+      {fileWorkspaceEntry && fileWorkspaceStatus && (
+        <div className="border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
+          {fileWorkspaceStatus === 'invalid' &&
+            `${fileWorkspaceEntry.path} is currently invalid on disk. The viewer is keeping the last valid template.`}
+          {fileWorkspaceStatus === 'deleted' &&
+            `${fileWorkspaceEntry.path} was deleted on disk. The viewer is keeping the last loaded template.`}
+        </div>
+      )}
       <div ref={uiRef} className="flex-1 w-full" />
     </>
   );

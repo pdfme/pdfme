@@ -28,6 +28,22 @@ import {
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+import {
+  FileWorkspaceTemplateDeletedError,
+  FileWorkspaceTemplateInvalidError,
+  createTemplateEntryFromTemplate,
+  findTemplateEntry,
+  readTemplateEntry,
+  refreshTemplateCollection,
+  restorePersistedTemplateCollection,
+  serializeTemplateForFileWorkspace,
+  setSelectedFileWorkspaceTemplateName,
+  writeTemplateEntry,
+  writeTemplateThumbnail,
+  type FileWorkspaceCollection,
+  type FileWorkspaceTemplateEntry,
+  type FileWorkspaceTemplateRead,
+} from '../lib/fileWorkspace';
 
 function destroyDesignerInstance(instance: Designer) {
   try {
@@ -48,6 +64,15 @@ type DesignerLoadRequest = {
   shouldCreateNewProject: boolean;
   shouldConsumeQuery: boolean;
   templateId: string | null;
+  workspaceTemplateName: string | null;
+};
+
+type FileWorkspaceStatus = 'deleted' | 'invalid' | null;
+
+type FileWorkspaceConflict = {
+  incoming?: FileWorkspaceTemplateRead;
+  message: string;
+  saveTemplate?: Template;
 };
 
 function getDesignerLoadRequest(): DesignerLoadRequest {
@@ -55,6 +80,7 @@ function getDesignerLoadRequest(): DesignerLoadRequest {
   const shouldCreateNewProject = searchParams.get('new') === '1';
   const templateId = searchParams.get('template');
   const projectId = searchParams.get('project');
+  const workspaceTemplateName = searchParams.get('workspace');
 
   return {
     projectId,
@@ -62,6 +88,7 @@ function getDesignerLoadRequest(): DesignerLoadRequest {
     shouldCreateNewProject,
     shouldConsumeQuery: shouldCreateNewProject || templateId != null || projectId != null,
     templateId,
+    workspaceTemplateName,
   };
 }
 
@@ -102,11 +129,25 @@ function DesignerApp() {
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
   const projectRef = useRef<PlaygroundProject | null>(null);
+  const fileWorkspaceCollectionRef = useRef<FileWorkspaceCollection | null>(null);
+  const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
+  const diskVersionRef = useRef<string | null>(null);
+  const lastCleanSerializedTemplateRef = useRef<string | null>(null);
+  const isApplyingTemplateRef = useRef(false);
+  const isSavingFileWorkspaceRef = useRef(false);
   const projectTitleRef = useRef('Untitled Template');
   const loadRequestRef = useRef<DesignerLoadRequest | null>(null);
   const didCleanLoadQueryRef = useRef(false);
 
   const [editingStaticSchemas, setEditingStaticSchemas] = useState(false);
+  const [fileWorkspaceEntry, setFileWorkspaceEntry] = useState<FileWorkspaceTemplateEntry | null>(
+    null,
+  );
+  const [fileWorkspaceStatus, setFileWorkspaceStatus] = useState<FileWorkspaceStatus>(null);
+  const [fileWorkspaceConflict, setFileWorkspaceConflict] = useState<FileWorkspaceConflict | null>(
+    null,
+  );
+  const [isFileWorkspaceDirty, setIsFileWorkspaceDirty] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
@@ -115,9 +156,150 @@ function DesignerApp() {
     projectTitleRef.current = title;
   }, []);
 
+  const setActiveFileWorkspaceEntry = useCallback(
+    (collection: FileWorkspaceCollection | null, entry: FileWorkspaceTemplateEntry | null) => {
+      fileWorkspaceCollectionRef.current = collection;
+      fileWorkspaceEntryRef.current = entry;
+      diskVersionRef.current = entry?.diskVersion ?? null;
+      lastCleanSerializedTemplateRef.current = entry
+        ? serializeTemplateForFileWorkspace(entry.template)
+        : null;
+      setFileWorkspaceEntry(entry);
+      setFileWorkspaceStatus(null);
+      setFileWorkspaceConflict(null);
+      setIsFileWorkspaceDirty(false);
+      if (entry) setCurrentProjectTitle(entry.title);
+    },
+    [setCurrentProjectTitle],
+  );
+
+  const updateFileWorkspaceDirtyState = useCallback((template: Template) => {
+    const cleanTemplate = lastCleanSerializedTemplateRef.current;
+    setIsFileWorkspaceDirty(
+      cleanTemplate != null && serializeTemplateForFileWorkspace(template) !== cleanTemplate,
+    );
+  }, []);
+
+  const applyTemplateFromDisk = useCallback(
+    (entry: FileWorkspaceTemplateEntry, readResult: FileWorkspaceTemplateRead) => {
+      if (!designer.current) return;
+
+      isApplyingTemplateRef.current = true;
+      try {
+        designer.current.updateTemplate(readResult.template);
+      } finally {
+        isApplyingTemplateRef.current = false;
+      }
+
+      const nextEntry: FileWorkspaceTemplateEntry = {
+        ...entry,
+        diskVersion: readResult.diskVersion,
+        rawJson: readResult.rawJson,
+        template: readResult.template,
+        templateFileHandle: readResult.templateFileHandle,
+        updatedAt: readResult.templateFile.lastModified,
+      };
+      fileWorkspaceEntryRef.current = nextEntry;
+      diskVersionRef.current = readResult.diskVersion;
+      lastCleanSerializedTemplateRef.current = serializeTemplateForFileWorkspace(
+        readResult.template,
+      );
+      setFileWorkspaceEntry(nextEntry);
+      setFileWorkspaceStatus(null);
+      setFileWorkspaceConflict(null);
+      setIsFileWorkspaceDirty(false);
+    },
+    [],
+  );
+
   const onSaveTemplate = useCallback(
     async (template?: Template, saveAs = false) => {
       if (!designer.current) return;
+
+      const currentFileEntry = fileWorkspaceEntryRef.current;
+      const currentFileCollection = fileWorkspaceCollectionRef.current;
+      if (currentFileEntry && currentFileCollection) {
+        const nextTemplate = template || designer.current.getTemplate();
+        let targetEntry = currentFileEntry;
+
+        if (saveAs) {
+          const title =
+            window.prompt('Save as', `${currentFileEntry.title || currentFileEntry.name} Copy`) ??
+            '';
+          if (!title.trim()) return;
+
+          targetEntry = await createTemplateEntryFromTemplate(
+            currentFileCollection,
+            nextTemplate,
+            title,
+          );
+          setSearchParams(new URLSearchParams([['workspace', targetEntry.name]]), {
+            replace: true,
+          });
+        } else if (diskVersionRef.current) {
+          try {
+            const diskRead = await readTemplateEntry(currentFileEntry);
+            if (diskRead.diskVersion !== diskVersionRef.current) {
+              setFileWorkspaceConflict({
+                incoming: diskRead,
+                message: `${currentFileEntry.path} changed on disk since it was loaded.`,
+                saveTemplate: nextTemplate,
+              });
+              return;
+            }
+          } catch (error) {
+            if (
+              !(error instanceof FileWorkspaceTemplateDeletedError) &&
+              !(error instanceof FileWorkspaceTemplateInvalidError)
+            ) {
+              throw error;
+            }
+          }
+        }
+
+        isSavingFileWorkspaceRef.current = true;
+        try {
+          const savedEntry = await writeTemplateEntry(targetEntry, nextTemplate);
+          let nextEntry = savedEntry;
+          try {
+            const thumbnail = await writeTemplateThumbnail(savedEntry, nextTemplate);
+            nextEntry = {
+              ...savedEntry,
+              thumbnailDataUrl: thumbnail.thumbnailDataUrl,
+              thumbnailFileHandle: thumbnail.thumbnailFileHandle,
+            };
+          } catch (error) {
+            console.warn(error);
+            toast.warn('Saved template, but thumbnail update failed');
+          }
+
+          const refreshedCollection = await refreshTemplateCollection({
+            ...currentFileCollection,
+            selectedTemplateName: nextEntry.name,
+          }).catch(() => currentFileCollection);
+          const refreshedEntry =
+            findTemplateEntry(refreshedCollection, nextEntry.name) ?? nextEntry;
+          fileWorkspaceCollectionRef.current = refreshedCollection;
+          fileWorkspaceEntryRef.current = refreshedEntry;
+          diskVersionRef.current = refreshedEntry.diskVersion;
+          lastCleanSerializedTemplateRef.current = serializeTemplateForFileWorkspace(
+            refreshedEntry.template,
+          );
+          setFileWorkspaceEntry(refreshedEntry);
+          setFileWorkspaceStatus(null);
+          setFileWorkspaceConflict(null);
+          setIsFileWorkspaceDirty(false);
+          setCurrentProjectTitle(refreshedEntry.title);
+          await setSelectedFileWorkspaceTemplateName(
+            refreshedCollection.rootHandle,
+            refreshedEntry.name,
+          );
+          toast.success(`Saved ${refreshedEntry.path}`);
+        } finally {
+          isSavingFileWorkspaceRef.current = false;
+        }
+        return;
+      }
 
       const currentProject = projectRef.current;
       const nextTemplate = template || designer.current.getTemplate();
@@ -145,7 +327,7 @@ function DesignerApp() {
       setCurrentProjectTitle(savedProject.title);
       toast.success(<ProjectSavedToast title={savedProject.title} />);
     },
-    [setCurrentProjectTitle],
+    [setCurrentProjectTitle, setSearchParams],
   );
 
   const buildDesigner = useCallback(
@@ -161,21 +343,45 @@ function DesignerApp() {
           shouldConsumeQuery,
           shouldCreateNewProject,
           templateId: templateIdFromQuery,
+          workspaceTemplateName,
         } = loadRequestRef.current;
 
-        if (shouldCreateNewProject) {
+        if (workspaceTemplateName) {
+          const restored = await restorePersistedTemplateCollection();
+          if (restored.status !== 'mounted') {
+            throw new Error('Mounted folder is not available. Reopen it from Templates.');
+          }
+
+          const entry = findTemplateEntry(restored.collection, workspaceTemplateName);
+          if (!entry) {
+            throw new Error(
+              `Template "${workspaceTemplateName}" was not found in the mounted folder.`,
+            );
+          }
+
+          template = entry.template;
+          await setSelectedFileWorkspaceTemplateName(restored.collection.rootHandle, entry.name);
+          setActiveFileWorkspaceEntry(
+            { ...restored.collection, selectedTemplateName: entry.name },
+            entry,
+          );
+        } else if (shouldCreateNewProject) {
+          setActiveFileWorkspaceEntry(null, null);
           clearActivePlaygroundProject();
           setCurrentProjectTitle('Untitled Template');
         } else if (projectIdFromQuery) {
+          setActiveFileWorkspaceEntry(null, null);
           project = getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
         } else if (templateIdFromQuery) {
+          setActiveFileWorkspaceEntry(null, null);
           const templateJson = await getTemplateById(templateIdFromQuery);
           checkTemplate(templateJson);
           template = templateJson;
           setCurrentProjectTitle(fromKebabCase(templateIdFromQuery));
         } else {
+          setActiveFileWorkspaceEntry(null, null);
           project = getActivePlaygroundProject();
           if (project) {
             template = project.template;
@@ -221,15 +427,26 @@ function DesignerApp() {
         });
         designer.current = nextDesigner;
         nextDesigner.onSaveTemplate(onSaveTemplate);
+        nextDesigner.onChangeTemplate((nextTemplate) => {
+          if (!fileWorkspaceEntryRef.current || isApplyingTemplateRef.current) return;
+          updateFileWorkspaceDirtyState(nextTemplate);
+        });
         return nextDesigner;
       } catch (error) {
         if (isCancelled()) return null;
         projectRef.current = null;
+        setActiveFileWorkspaceEntry(null, null);
         console.error(error);
         return null;
       }
     },
-    [onSaveTemplate, setCurrentProjectTitle, setSearchParams],
+    [
+      onSaveTemplate,
+      setActiveFileWorkspaceEntry,
+      setCurrentProjectTitle,
+      setSearchParams,
+      updateFileWorkspaceDirtyState,
+    ],
   );
 
   const onChangeBasePDF = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +469,19 @@ function DesignerApp() {
   };
 
   const onResetTemplate = () => {
+    if (fileWorkspaceEntryRef.current && designer.current) {
+      const entry = fileWorkspaceEntryRef.current;
+      isApplyingTemplateRef.current = true;
+      try {
+        designer.current.updateTemplate(entry.template);
+      } finally {
+        isApplyingTemplateRef.current = false;
+      }
+      lastCleanSerializedTemplateRef.current = serializeTemplateForFileWorkspace(entry.template);
+      setIsFileWorkspaceDirty(false);
+      return;
+    }
+
     projectRef.current = null;
     setCurrentProjectTitle('Untitled Template');
     clearActivePlaygroundProject();
@@ -272,6 +502,36 @@ function DesignerApp() {
 
     designer.current.updateTemplate(template);
     toast.success('Template JSON committed');
+  };
+
+  const onReloadConflictFromDisk = () => {
+    const currentEntry = fileWorkspaceEntryRef.current;
+    const incoming = fileWorkspaceConflict?.incoming;
+    if (!currentEntry || !incoming) {
+      setFileWorkspaceConflict(null);
+      return;
+    }
+
+    applyTemplateFromDisk(currentEntry, incoming);
+  };
+
+  const onKeepConflictEditing = () => {
+    const incoming = fileWorkspaceConflict?.incoming;
+    if (incoming) {
+      diskVersionRef.current = incoming.diskVersion;
+    }
+    setFileWorkspaceConflict(null);
+  };
+
+  const onSaveOverConflict = async () => {
+    if (!designer.current) return;
+
+    const template = fileWorkspaceConflict?.saveTemplate ?? designer.current.getTemplate();
+    if (fileWorkspaceConflict?.incoming) {
+      diskVersionRef.current = fileWorkspaceConflict.incoming.diskVersion;
+    }
+    setFileWorkspaceConflict(null);
+    await onSaveTemplate(template);
   };
 
   const toggleEditingStaticSchemas = () => {
@@ -349,6 +609,50 @@ function DesignerApp() {
     };
   }, [buildDesigner]);
 
+  useEffect(() => {
+    if (!fileWorkspaceEntry) return;
+
+    const intervalId = window.setInterval(() => {
+      const currentEntry = fileWorkspaceEntryRef.current;
+      if (!currentEntry || isSavingFileWorkspaceRef.current) return;
+
+      void readTemplateEntry(currentEntry)
+        .then((readResult) => {
+          if (readResult.diskVersion === diskVersionRef.current) {
+            if (fileWorkspaceStatus) setFileWorkspaceStatus(null);
+            return;
+          }
+
+          if (isFileWorkspaceDirty) {
+            setFileWorkspaceConflict({
+              incoming: readResult,
+              message: `${currentEntry.path} changed on disk while you were editing.`,
+            });
+            diskVersionRef.current = readResult.diskVersion;
+            return;
+          }
+
+          applyTemplateFromDisk(currentEntry, readResult);
+          toast.info(`Reloaded ${currentEntry.path} from disk`);
+        })
+        .catch((error) => {
+          if (error instanceof FileWorkspaceTemplateDeletedError) {
+            setFileWorkspaceStatus('deleted');
+            return;
+          }
+
+          if (error instanceof FileWorkspaceTemplateInvalidError) {
+            setFileWorkspaceStatus('invalid');
+            return;
+          }
+
+          console.error(error);
+        });
+    }, 1500);
+
+    return () => window.clearInterval(intervalId);
+  }, [applyTemplateFromDisk, fileWorkspaceEntry, fileWorkspaceStatus, isFileWorkspaceDirty]);
+
   const navItems: NavItem[] = [
     {
       label: 'Lang',
@@ -398,7 +702,7 @@ function DesignerApp() {
       ),
     },
     {
-      label: 'Project',
+      label: fileWorkspaceEntry ? 'Workspace' : 'Project',
       content: (
         <div className="flex gap-1">
           <PlaygroundButton
@@ -407,7 +711,7 @@ function DesignerApp() {
             onClick={() => void onSaveTemplate()}
           >
             <Save className="size-3.5" />
-            Save Project
+            {fileWorkspaceEntry ? `Save ${fileWorkspaceEntry.path}` : 'Save Project'}
           </PlaygroundButton>
           <PlaygroundButton
             id="save-as"
@@ -460,7 +764,41 @@ function DesignerApp() {
   return (
     <>
       <NavBar items={navItems} />
+      {fileWorkspaceEntry && (fileWorkspaceStatus || isFileWorkspaceDirty) && (
+        <div className="border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
+          {fileWorkspaceStatus === 'invalid' &&
+            `${fileWorkspaceEntry.path} is currently invalid on disk. The editor is keeping the last valid template.`}
+          {fileWorkspaceStatus === 'deleted' &&
+            `${fileWorkspaceEntry.path} was deleted on disk. Saving will recreate it.`}
+          {!fileWorkspaceStatus &&
+            isFileWorkspaceDirty &&
+            `${fileWorkspaceEntry.path} has unsaved changes.`}
+        </div>
+      )}
       <div ref={designerRef} className="flex-1 w-full" />
+      {fileWorkspaceConflict && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-lg bg-white p-5 shadow-xl">
+            <h2 className="text-lg font-bold text-gray-900">Template changed on disk</h2>
+            <p className="mt-2 text-sm text-gray-600">{fileWorkspaceConflict.message}</p>
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <PlaygroundButton
+                disabled={!fileWorkspaceConflict.incoming}
+                onClick={onReloadConflictFromDisk}
+                variant="secondary"
+              >
+                Reload from disk
+              </PlaygroundButton>
+              <PlaygroundButton onClick={onKeepConflictEditing} variant="secondary">
+                Keep editing
+              </PlaygroundButton>
+              <PlaygroundButton onClick={() => void onSaveOverConflict()} variant="primary">
+                Save over disk
+              </PlaygroundButton>
+            </div>
+          </div>
+        </div>
+      )}
       <TemplateJsonDialog
         isOpen={jsonDialogOpen}
         template={templateJsonSource}

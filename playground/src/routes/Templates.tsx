@@ -7,9 +7,12 @@ import {
   Download,
   Eye,
   FileText,
+  FolderOpen,
+  FolderX,
   MoreHorizontal,
   Pencil,
   PencilRuler,
+  RefreshCw,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -30,6 +33,20 @@ import {
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+import {
+  clearPersistedFileWorkspace,
+  createBlankTemplateEntry,
+  findTemplateEntry,
+  isFileWorkspaceSupported,
+  openTemplateCollectionDirectory,
+  persistFileWorkspaceState,
+  refreshTemplateCollection,
+  restorePersistedTemplateCollection,
+  setSelectedFileWorkspaceTemplateName,
+  writeTemplateThumbnail,
+  type FileWorkspaceCollection,
+  type FileWorkspaceTemplateEntry,
+} from '../lib/fileWorkspace';
 
 declare global {
   interface Window {
@@ -172,6 +189,49 @@ const ProjectThumbnailImage = ({
   }
 
   return <ThumbnailImage alt={project.title} src={src} />;
+};
+
+const MountedThumbnailImage = ({
+  entry,
+  onCreated,
+}: {
+  entry: FileWorkspaceTemplateEntry;
+  onCreated: () => void;
+}) => {
+  const [src, setSrc] = useState(entry.thumbnailDataUrl);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSrc(entry.thumbnailDataUrl);
+    setError(null);
+    if (entry.thumbnailDataUrl) return;
+
+    let cancelled = false;
+    void writeTemplateThumbnail(entry, entry.template)
+      .then(({ thumbnailDataUrl }) => {
+        if (cancelled) return;
+        setSrc(thumbnailDataUrl);
+        onCreated();
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to create thumbnail');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [entry, onCreated]);
+
+  if (error) {
+    return (
+      <div className="flex h-72 w-full items-center justify-center bg-yellow-50 p-4 text-center text-xs text-yellow-800">
+        Thumbnail unavailable
+      </div>
+    );
+  }
+
+  return <ThumbnailImage alt={entry.title} src={src} />;
 };
 
 const GalleryCard = ({
@@ -372,14 +432,34 @@ const AuthorLink = ({ author }: { author: string }) => {
 function TemplatesApp() {
   const navigate = useNavigate();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
+  const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
+  const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
+  const [lastFolderName, setLastFolderName] = useState<string | null>(null);
+  const [isOpeningFolder, setIsOpeningFolder] = useState(false);
+  const [isRefreshingFolder, setIsRefreshingFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const [tagFilter, setTagFilter] = useState('all');
 
   const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+  const refreshMountedCollection = useCallback(() => {
+    if (!mountedCollection) return;
+
+    setIsRefreshingFolder(true);
+    void refreshTemplateCollection(mountedCollection)
+      .then((collection) => {
+        setMountedCollection(collection);
+        setLastFolderName(collection.rootName);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : 'Failed to refresh folder');
+      })
+      .finally(() => setIsRefreshingFolder(false));
+  }, [mountedCollection]);
 
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
@@ -420,6 +500,45 @@ function TemplatesApp() {
     window.addEventListener('focus', refreshProjects);
     return () => window.removeEventListener('focus', refreshProjects);
   }, [refreshProjects]);
+
+  useEffect(() => {
+    if (!fileWorkspaceSupported) return;
+
+    let cancelled = false;
+    void restorePersistedTemplateCollection().then((result) => {
+      if (cancelled) return;
+      if (result.status === 'mounted') {
+        setMountedCollection(result.collection);
+        setLastFolderName(result.collection.rootName);
+      } else if (result.status === 'permission-needed') {
+        setLastFolderName(result.rootName);
+      } else if (result.status === 'error') {
+        setLastFolderName(result.rootName ?? null);
+        console.error(result.error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fileWorkspaceSupported]);
+
+  useEffect(() => {
+    if (!mountedCollection) return;
+
+    const intervalId = window.setInterval(() => {
+      void refreshTemplateCollection(mountedCollection)
+        .then((collection) => {
+          setMountedCollection(collection);
+          setLastFolderName(collection.rootName);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }, 1500);
+
+    return () => window.clearInterval(intervalId);
+  }, [mountedCollection]);
 
   // Fetch templates and author avatars
   useEffect(() => {
@@ -476,9 +595,87 @@ function TemplatesApp() {
     navigate(`${path}?project=${encodeURIComponent(project.id)}`);
   };
 
+  const navigateToMountedTemplate = async (
+    collection: FileWorkspaceCollection,
+    entry: FileWorkspaceTemplateEntry,
+    ui: UIType,
+  ) => {
+    await setSelectedFileWorkspaceTemplateName(collection.rootHandle, entry.name);
+    const path = ui === 'designer' ? '/designer' : '/form-viewer';
+    navigate(`${path}?workspace=${encodeURIComponent(entry.name)}`);
+  };
+
   const navigateToAuthoringPreset = (preset: AuthoringPreset) => {
     const route = preset.kind === 'jsx' ? '/jsx' : '/md2pdf';
     navigate(`${route}?preset=${encodeURIComponent(preset.id)}`);
+  };
+
+  const mountCollection = async (collection: FileWorkspaceCollection) => {
+    setMountedCollection(collection);
+    setLastFolderName(collection.rootName);
+
+    if (collection.entries.length > 0) {
+      await persistFileWorkspaceState(
+        collection.rootHandle,
+        collection.selectedTemplateName ?? collection.entries[0]?.name,
+      );
+      return;
+    }
+
+    const shouldCreate = window.confirm(
+      `"${collection.rootName}" has no valid template directories. Create a blank template now?`,
+    );
+    if (!shouldCreate) return;
+
+    const entry = await createBlankTemplateEntry(collection.rootHandle);
+    const nextCollection = await refreshTemplateCollection({
+      ...collection,
+      selectedTemplateName: entry.name,
+    });
+    const nextEntry = findTemplateEntry(nextCollection, entry.name) ?? entry;
+    setMountedCollection(nextCollection);
+    await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
+  };
+
+  const onOpenFolder = async () => {
+    setIsOpeningFolder(true);
+    try {
+      await mountCollection(await openTemplateCollectionDirectory());
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to open folder');
+    } finally {
+      setIsOpeningFolder(false);
+    }
+  };
+
+  const onReopenFolder = async () => {
+    setIsOpeningFolder(true);
+    try {
+      const result = await restorePersistedTemplateCollection({ requestPermission: true });
+      if (result.status === 'mounted') {
+        await mountCollection(result.collection);
+      } else if (result.status === 'permission-needed') {
+        setLastFolderName(result.rootName);
+        toast.error('Folder permission was not granted');
+      } else if (result.status === 'none') {
+        setLastFolderName(null);
+        toast.info('No previous folder was found');
+      } else {
+        console.error(result.error);
+        toast.error('Failed to reopen folder');
+      }
+    } finally {
+      setIsOpeningFolder(false);
+    }
+  };
+
+  const onDisconnectFolder = async () => {
+    await clearPersistedFileWorkspace();
+    setMountedCollection(null);
+    setLastFolderName(null);
+    toast.info('Disconnected mounted folder');
   };
 
   const onImportTemplateJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -565,6 +762,14 @@ function TemplatesApp() {
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
               <PlaygroundButton
+                disabled={!fileWorkspaceSupported || isOpeningFolder}
+                onClick={() => void onOpenFolder()}
+                variant="secondary"
+              >
+                <FolderOpen className="size-4" />
+                {isOpeningFolder ? 'Opening...' : 'Open Folder'}
+              </PlaygroundButton>
+              <PlaygroundButton
                 onClick={() => importTemplateInputRef.current?.click()}
                 variant="secondary"
               >
@@ -640,6 +845,131 @@ function TemplatesApp() {
               No local projects yet. Start from a sample, JSX, md2pdf, or a blank Designer template.
             </div>
           )}
+          <div className="mt-6 border-t border-green-200 pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Mounted Folder</h3>
+                <p className="mt-1 text-sm text-green-900">
+                  Edit a template-assets style folder directly on disk.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {mountedCollection && (
+                  <PlaygroundButton
+                    disabled={isRefreshingFolder}
+                    onClick={() => void refreshMountedCollection()}
+                    variant="secondary"
+                  >
+                    <RefreshCw className="size-4" />
+                    Refresh
+                  </PlaygroundButton>
+                )}
+                {!mountedCollection && lastFolderName && (
+                  <PlaygroundButton
+                    disabled={!fileWorkspaceSupported || isOpeningFolder}
+                    onClick={() => void onReopenFolder()}
+                    variant="secondary"
+                  >
+                    <FolderOpen className="size-4" />
+                    Reopen last folder
+                  </PlaygroundButton>
+                )}
+                {mountedCollection && (
+                  <PlaygroundButton onClick={() => void onDisconnectFolder()} variant="secondary">
+                    <FolderX className="size-4" />
+                    Disconnect
+                  </PlaygroundButton>
+                )}
+              </div>
+            </div>
+            {!fileWorkspaceSupported && (
+              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                Folder workspaces need a Chromium browser in a secure context. Template JSON import
+                and download are still available.
+              </div>
+            )}
+            {mountedCollection && (
+              <>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-green-900">
+                  <span className="font-semibold">{mountedCollection.rootName}</span>
+                  <span className="text-green-700">
+                    {mountedCollection.entries.length} template
+                    {mountedCollection.entries.length === 1 ? '' : 's'}
+                  </span>
+                  {mountedCollection.invalidEntries.length > 0 && (
+                    <span className="rounded border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      {mountedCollection.invalidEntries.length} invalid skipped
+                    </span>
+                  )}
+                </div>
+                {mountedCollection.entries.length > 0 ? (
+                  <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                    {mountedCollection.entries.map((entry) => (
+                      <GalleryCard
+                        key={entry.name}
+                        tag="Mounted"
+                        title={entry.title}
+                        tags={entry.tags}
+                        description={
+                          <div className="space-y-2">
+                            <p>
+                              {entry.description ??
+                                `${entry.name}/template.json from the mounted folder.`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Updated {new Date(entry.updatedAt).toLocaleString()}
+                            </p>
+                          </div>
+                        }
+                        thumbnail={
+                          <MountedThumbnailImage
+                            entry={entry}
+                            onCreated={refreshMountedCollection}
+                          />
+                        }
+                        actions={
+                          <div className="space-y-2">
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() =>
+                                void navigateToMountedTemplate(mountedCollection, entry, 'designer')
+                              }
+                            >
+                              <PencilRuler className="size-4" />
+                              Designer
+                            </PlaygroundButton>
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() =>
+                                void navigateToMountedTemplate(
+                                  mountedCollection,
+                                  entry,
+                                  'form-viewer',
+                                )
+                              }
+                            >
+                              <Eye className="size-4" />
+                              Form/Viewer
+                            </PlaygroundButton>
+                          </div>
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                    No valid template directories are mounted.
+                  </div>
+                )}
+              </>
+            )}
+            {!mountedCollection && fileWorkspaceSupported && !lastFolderName && (
+              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                Open a folder that contains directories like{' '}
+                <code className="rounded bg-green-100 px-1">invoice/template.json</code>.
+              </div>
+            )}
+          </div>
         </div>
         <section>
           <div className="border-b border-dashed border-gray-200 pb-2">

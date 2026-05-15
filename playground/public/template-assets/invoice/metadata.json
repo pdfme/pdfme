@@ -1,0 +1,10 @@
+{
+  "order": 90,
+  "description": "A practical invoice with customer details, line items, totals, and payment notes.",
+  "tags": [
+    "Invoice",
+    "Business",
+    "Table",
+    "Visual"
+  ]
+}
