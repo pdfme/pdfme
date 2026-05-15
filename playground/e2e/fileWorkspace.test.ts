@@ -1,6 +1,9 @@
 import type { Template } from '@pdfme/common';
 import {
+  FileWorkspaceTemplateDeletedError,
+  FileWorkspaceTemplateInvalidError,
   createBlankTemplateEntry,
+  readTemplateEntry,
   scanTemplateCollection,
   serializeTemplateForFileWorkspace,
   writeTemplateEntry,
@@ -45,6 +48,11 @@ class MemoryFileHandle {
   get text() {
     return this.content;
   }
+
+  set text(content: string) {
+    this.content = content;
+    this.lastModified += 1;
+  }
 }
 
 class MemoryDirectoryHandle {
@@ -83,6 +91,10 @@ class MemoryDirectoryHandle {
     if (child instanceof MemoryFileHandle) return child;
     if (!child && options.create) return this.addFile(name, '');
     throw new Error(`File not found: ${name}`);
+  }
+
+  async removeEntry(name: string) {
+    if (!this.children.delete(name)) throw new Error(`Entry not found: ${name}`);
   }
 }
 
@@ -132,6 +144,49 @@ describe('file workspace helpers', () => {
 
     expect(saved.template.pdfmeVersion).toBe('test');
     expect(templateFile.text).toBe(serializeTemplateForFileWorkspace(nextTemplate));
+  });
+
+  it('reports disk version changes when template JSON changes externally', async () => {
+    const root = new MemoryDirectoryHandle('templates');
+    const invoice = root.addDirectory('invoice');
+    const templateFile = invoice.addFile(
+      'template.json',
+      serializeTemplateForFileWorkspace(blankTemplate),
+    );
+    const collection = await scanTemplateCollection(root as unknown as FileSystemDirectoryHandle);
+    const entry = collection.entries[0];
+    if (!entry) throw new Error('Missing test entry');
+
+    templateFile.text = serializeTemplateForFileWorkspace({
+      ...blankTemplate,
+      pdfmeVersion: 'external',
+    });
+    const readResult = await readTemplateEntry(entry);
+
+    expect(readResult.diskVersion).not.toBe(entry.diskVersion);
+    expect(readResult.template.pdfmeVersion).toBe('external');
+  });
+
+  it('throws typed errors for deleted or invalid template JSON', async () => {
+    const root = new MemoryDirectoryHandle('templates');
+    const invoice = root.addDirectory('invoice');
+    const templateFile = invoice.addFile(
+      'template.json',
+      serializeTemplateForFileWorkspace(blankTemplate),
+    );
+    const collection = await scanTemplateCollection(root as unknown as FileSystemDirectoryHandle);
+    const entry = collection.entries[0];
+    if (!entry) throw new Error('Missing test entry');
+
+    templateFile.text = '{';
+    await expect(readTemplateEntry(entry)).rejects.toBeInstanceOf(
+      FileWorkspaceTemplateInvalidError,
+    );
+
+    await invoice.removeEntry('template.json');
+    await expect(readTemplateEntry(entry)).rejects.toBeInstanceOf(
+      FileWorkspaceTemplateDeletedError,
+    );
   });
 
   it('creates an untitled blank template when a collection is empty', async () => {

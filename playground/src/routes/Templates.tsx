@@ -43,6 +43,7 @@ import {
   refreshTemplateCollection,
   restorePersistedTemplateCollection,
   setSelectedFileWorkspaceTemplateName,
+  subscribeTemplateCollectionChanges,
   writeTemplateThumbnail,
   type FileWorkspaceCollection,
   type FileWorkspaceTemplateEntry,
@@ -432,6 +433,7 @@ const AuthorLink = ({ author }: { author: string }) => {
 function TemplatesApp() {
   const navigate = useNavigate();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
+  const mountedCollectionRef = React.useRef<FileWorkspaceCollection | null>(null);
   const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
@@ -524,21 +526,26 @@ function TemplatesApp() {
   }, [fileWorkspaceSupported]);
 
   useEffect(() => {
-    if (!mountedCollection) return;
-
-    const intervalId = window.setInterval(() => {
-      void refreshTemplateCollection(mountedCollection)
-        .then((collection) => {
-          setMountedCollection(collection);
-          setLastFolderName(collection.rootName);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }, 1500);
-
-    return () => window.clearInterval(intervalId);
+    mountedCollectionRef.current = mountedCollection;
   }, [mountedCollection]);
+
+  useEffect(() => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
+
+    return subscribeTemplateCollectionChanges(
+      collection,
+      (collection) => {
+        setMountedCollection(collection);
+        setLastFolderName(collection.rootName);
+      },
+      {
+        onError: (error) => {
+          console.error(error);
+        },
+      },
+    );
+  }, [mountedCollection?.rootHandle, mountedCollection?.selectedTemplateName]);
 
   // Fetch templates and author avatars
   useEffect(() => {

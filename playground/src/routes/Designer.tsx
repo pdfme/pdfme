@@ -38,6 +38,7 @@ import {
   restorePersistedTemplateCollection,
   serializeTemplateForFileWorkspace,
   setSelectedFileWorkspaceTemplateName,
+  subscribeTemplateEntryChanges,
   writeTemplateEntry,
   writeTemplateThumbnail,
   type FileWorkspaceCollection,
@@ -135,6 +136,8 @@ function DesignerApp() {
   const lastCleanSerializedTemplateRef = useRef<string | null>(null);
   const isApplyingTemplateRef = useRef(false);
   const isSavingFileWorkspaceRef = useRef(false);
+  const isFileWorkspaceDirtyRef = useRef(false);
+  const fileWorkspaceStatusRef = useRef<FileWorkspaceStatus>(null);
   const projectTitleRef = useRef('Untitled Template');
   const loadRequestRef = useRef<DesignerLoadRequest | null>(null);
   const didCleanLoadQueryRef = useRef(false);
@@ -175,9 +178,10 @@ function DesignerApp() {
 
   const updateFileWorkspaceDirtyState = useCallback((template: Template) => {
     const cleanTemplate = lastCleanSerializedTemplateRef.current;
-    setIsFileWorkspaceDirty(
-      cleanTemplate != null && serializeTemplateForFileWorkspace(template) !== cleanTemplate,
-    );
+    const dirty =
+      cleanTemplate != null && serializeTemplateForFileWorkspace(template) !== cleanTemplate;
+    isFileWorkspaceDirtyRef.current = dirty;
+    setIsFileWorkspaceDirty(dirty);
   }, []);
 
   const applyTemplateFromDisk = useCallback(
@@ -526,12 +530,19 @@ function DesignerApp() {
   const onSaveOverConflict = async () => {
     if (!designer.current) return;
 
+    const currentConflict = fileWorkspaceConflict;
     const template = fileWorkspaceConflict?.saveTemplate ?? designer.current.getTemplate();
     if (fileWorkspaceConflict?.incoming) {
       diskVersionRef.current = fileWorkspaceConflict.incoming.diskVersion;
     }
-    setFileWorkspaceConflict(null);
-    await onSaveTemplate(template);
+    try {
+      await onSaveTemplate(template);
+      setFileWorkspaceConflict(null);
+    } catch (error) {
+      console.error(error);
+      setFileWorkspaceConflict(currentConflict);
+      toast.error(error instanceof Error ? error.message : 'Failed to save over disk');
+    }
   };
 
   const toggleEditingStaticSchemas = () => {
@@ -610,32 +621,43 @@ function DesignerApp() {
   }, [buildDesigner]);
 
   useEffect(() => {
+    fileWorkspaceStatusRef.current = fileWorkspaceStatus;
+  }, [fileWorkspaceStatus]);
+
+  useEffect(() => {
+    isFileWorkspaceDirtyRef.current = isFileWorkspaceDirty;
+  }, [isFileWorkspaceDirty]);
+
+  useEffect(() => {
     if (!fileWorkspaceEntry) return;
 
-    const intervalId = window.setInterval(() => {
-      const currentEntry = fileWorkspaceEntryRef.current;
-      if (!currentEntry || isSavingFileWorkspaceRef.current) return;
+    return subscribeTemplateEntryChanges(
+      fileWorkspaceEntry,
+      (readResult) => {
+        const currentEntry = fileWorkspaceEntryRef.current;
+        if (!currentEntry) return;
 
-      void readTemplateEntry(currentEntry)
-        .then((readResult) => {
-          if (readResult.diskVersion === diskVersionRef.current) {
-            if (fileWorkspaceStatus) setFileWorkspaceStatus(null);
-            return;
-          }
+        if (readResult.diskVersion === diskVersionRef.current) {
+          if (fileWorkspaceStatusRef.current) setFileWorkspaceStatus(null);
+          return;
+        }
 
-          if (isFileWorkspaceDirty) {
-            setFileWorkspaceConflict({
-              incoming: readResult,
-              message: `${currentEntry.path} changed on disk while you were editing.`,
-            });
-            diskVersionRef.current = readResult.diskVersion;
-            return;
-          }
+        if (isFileWorkspaceDirtyRef.current) {
+          setFileWorkspaceConflict({
+            incoming: readResult,
+            message: `${currentEntry.path} changed on disk while you were editing.`,
+          });
+          diskVersionRef.current = readResult.diskVersion;
+          return;
+        }
 
-          applyTemplateFromDisk(currentEntry, readResult);
-          toast.info(`Reloaded ${currentEntry.path} from disk`);
-        })
-        .catch((error) => {
+        applyTemplateFromDisk(currentEntry, readResult);
+        toast.info(`Reloaded ${currentEntry.path} from disk`, {
+          toastId: `file-workspace-reload:${currentEntry.path}`,
+        });
+      },
+      {
+        onError: (error) => {
           if (error instanceof FileWorkspaceTemplateDeletedError) {
             setFileWorkspaceStatus('deleted');
             return;
@@ -647,11 +669,11 @@ function DesignerApp() {
           }
 
           console.error(error);
-        });
-    }, 1500);
-
-    return () => window.clearInterval(intervalId);
-  }, [applyTemplateFromDisk, fileWorkspaceEntry, fileWorkspaceStatus, isFileWorkspaceDirty]);
+        },
+        shouldSkip: () => isSavingFileWorkspaceRef.current,
+      },
+    );
+  }, [applyTemplateFromDisk, fileWorkspaceEntry]);
 
   const navItems: NavItem[] = [
     {

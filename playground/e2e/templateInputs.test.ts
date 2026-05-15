@@ -38,4 +38,12 @@ describe('template input reconciliation', () => {
 
     expect(reconcileInputsWithTemplate(template, null)).toEqual([{ message: 'Hello' }]);
   });
+
+  it('drops extra previous input rows during template reload', () => {
+    const template = templateWithFields([{ content: 'Hello', name: 'message' }]);
+
+    expect(
+      reconcileInputsWithTemplate(template, [{ message: 'Ada' }, { message: 'Grace' }]),
+    ).toEqual([{ message: 'Ada' }]);
+  });
 });

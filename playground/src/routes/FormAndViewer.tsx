@@ -28,9 +28,9 @@ import {
   FileWorkspaceTemplateDeletedError,
   FileWorkspaceTemplateInvalidError,
   findTemplateEntry,
-  readTemplateEntry,
   restorePersistedTemplateCollection,
   setSelectedFileWorkspaceTemplateName,
+  subscribeTemplateEntryChanges,
   type FileWorkspaceTemplateEntry,
 } from '../lib/fileWorkspace';
 import { reconcileInputsWithTemplate } from '../lib/templateInputs';
@@ -44,6 +44,7 @@ function FormAndViewerApp() {
   const projectRef = useRef<PlaygroundProject | null>(null);
   const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
   const diskVersionRef = useRef<string | null>(null);
+  const fileWorkspaceStatusRef = useRef<'deleted' | 'invalid' | null>(null);
   const buildIdRef = useRef(0);
   const currentSourceKeyRef = useRef<string | null>(null);
   const currentTemplateRef = useRef<Template | null>(null);
@@ -267,43 +268,50 @@ function FormAndViewerApp() {
   }, [mode, uiRef, buildUi, destroyCurrentUi]);
 
   useEffect(() => {
+    fileWorkspaceStatusRef.current = fileWorkspaceStatus;
+  }, [fileWorkspaceStatus]);
+
+  useEffect(() => {
     if (!fileWorkspaceEntry) return;
 
-    const intervalId = window.setInterval(() => {
-      const currentEntry = fileWorkspaceEntryRef.current;
-      if (!currentEntry || !ui.current) return;
+    return subscribeTemplateEntryChanges(
+      fileWorkspaceEntry,
+      (readResult) => {
+        const currentEntry = fileWorkspaceEntryRef.current;
+        if (!currentEntry || !ui.current) return;
 
-      void readTemplateEntry(currentEntry)
-        .then((readResult) => {
-          if (readResult.diskVersion === diskVersionRef.current) {
-            if (fileWorkspaceStatus) setFileWorkspaceStatus(null);
-            return;
-          }
+        if (readResult.diskVersion === diskVersionRef.current) {
+          if (fileWorkspaceStatusRef.current) setFileWorkspaceStatus(null);
+          return;
+        }
 
-          const nextInputs = reconcileInputsWithTemplate(
-            readResult.template,
-            ui.current?.getInputs() ?? currentInputsRef.current,
-          );
-          ui.current?.updateTemplate(readResult.template);
-          ui.current?.setInputs(nextInputs);
+        const nextInputs = reconcileInputsWithTemplate(
+          readResult.template,
+          ui.current.getInputs() ?? currentInputsRef.current,
+        );
+        ui.current.updateTemplate(readResult.template);
+        ui.current.setInputs(nextInputs);
 
-          const nextEntry = {
-            ...currentEntry,
-            diskVersion: readResult.diskVersion,
-            rawJson: readResult.rawJson,
-            template: readResult.template,
-            templateFileHandle: readResult.templateFileHandle,
-            updatedAt: readResult.templateFile.lastModified,
-          };
-          fileWorkspaceEntryRef.current = nextEntry;
-          diskVersionRef.current = readResult.diskVersion;
-          currentTemplateRef.current = readResult.template;
-          currentInputsRef.current = nextInputs;
-          setFileWorkspaceEntry(nextEntry);
-          setFileWorkspaceStatus(null);
-          toast.info(`Reloaded ${currentEntry.path} from disk`);
-        })
-        .catch((error) => {
+        const nextEntry = {
+          ...currentEntry,
+          diskVersion: readResult.diskVersion,
+          rawJson: readResult.rawJson,
+          template: readResult.template,
+          templateFileHandle: readResult.templateFileHandle,
+          updatedAt: readResult.templateFile.lastModified,
+        };
+        fileWorkspaceEntryRef.current = nextEntry;
+        diskVersionRef.current = readResult.diskVersion;
+        currentTemplateRef.current = readResult.template;
+        currentInputsRef.current = nextInputs;
+        setFileWorkspaceEntry(nextEntry);
+        setFileWorkspaceStatus(null);
+        toast.info(`Reloaded ${currentEntry.path} from disk`, {
+          toastId: `file-workspace-reload:${currentEntry.path}`,
+        });
+      },
+      {
+        onError: (error) => {
           if (error instanceof FileWorkspaceTemplateDeletedError) {
             setFileWorkspaceStatus('deleted');
             return;
@@ -315,11 +323,10 @@ function FormAndViewerApp() {
           }
 
           console.error(error);
-        });
-    }, 1500);
-
-    return () => window.clearInterval(intervalId);
-  }, [fileWorkspaceEntry, fileWorkspaceStatus]);
+        },
+      },
+    );
+  }, [fileWorkspaceEntry]);
 
   const navItems: NavItem[] = [
     {

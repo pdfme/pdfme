@@ -10,6 +10,7 @@ const DB_NAME = 'pdfme-playground-file-workspace';
 const DB_VERSION = 1;
 const STORE_NAME = 'workspace';
 const ACTIVE_STATE_KEY = 'active';
+const DEFAULT_POLLING_INTERVAL_MS = 1500;
 
 type SourceKind = 'designer' | 'jsx' | 'md2pdf';
 
@@ -73,6 +74,12 @@ type RestoreResult =
   | { status: 'none' }
   | { rootName: string; selectedTemplateName?: string; status: 'permission-needed' }
   | { error: unknown; rootName?: string; status: 'error' };
+
+type FileWorkspaceSubscriptionOptions = {
+  intervalMs?: number;
+  onError?: (error: unknown) => void;
+  shouldSkip?: () => boolean;
+};
 
 export class FileWorkspaceTemplateDeletedError extends Error {
   constructor(name: string) {
@@ -502,6 +509,90 @@ export const restorePersistedTemplateCollection = async ({
 
 export const refreshTemplateCollection = (collection: FileWorkspaceCollection) =>
   scanTemplateCollection(collection.rootHandle, collection.selectedTemplateName);
+
+const subscribeFileSystemObserver = (
+  handle: FileSystemHandle,
+  callback: () => void | Promise<void>,
+) => {
+  if (typeof window === 'undefined' || !window.FileSystemObserver) return undefined;
+
+  const observer = new window.FileSystemObserver(() => {
+    void callback();
+  });
+  void observer.observe(handle).catch((error) => {
+    console.warn('Failed to observe file workspace changes', error);
+  });
+  return () => observer.disconnect();
+};
+
+export const subscribeTemplateCollectionChanges = (
+  collection: FileWorkspaceCollection,
+  listener: (collection: FileWorkspaceCollection) => void,
+  options: FileWorkspaceSubscriptionOptions = {},
+) => {
+  if (typeof window === 'undefined') return () => undefined;
+
+  let disposed = false;
+  let checking = false;
+  const check = async () => {
+    if (disposed || checking || options.shouldSkip?.()) return;
+
+    checking = true;
+    try {
+      listener(await refreshTemplateCollection(collection));
+    } catch (error) {
+      options.onError?.(error);
+    } finally {
+      checking = false;
+    }
+  };
+
+  const intervalId = window.setInterval(check, options.intervalMs ?? DEFAULT_POLLING_INTERVAL_MS);
+  const disconnectObserver = subscribeFileSystemObserver(collection.rootHandle, check);
+
+  return () => {
+    disposed = true;
+    window.clearInterval(intervalId);
+    disconnectObserver?.();
+  };
+};
+
+export const subscribeTemplateEntryChanges = (
+  entry: FileWorkspaceTemplateEntry,
+  listener: (readResult: FileWorkspaceTemplateRead) => void,
+  options: FileWorkspaceSubscriptionOptions = {},
+) => {
+  if (typeof window === 'undefined') return () => undefined;
+
+  let disposed = false;
+  let checking = false;
+  let lastDiskVersion = entry.diskVersion;
+  const check = async () => {
+    if (disposed || checking || options.shouldSkip?.()) return;
+
+    checking = true;
+    try {
+      const readResult = await readTemplateEntry(entry);
+      if (readResult.diskVersion === lastDiskVersion) return;
+
+      lastDiskVersion = readResult.diskVersion;
+      listener(readResult);
+    } catch (error) {
+      options.onError?.(error);
+    } finally {
+      checking = false;
+    }
+  };
+
+  const intervalId = window.setInterval(check, options.intervalMs ?? DEFAULT_POLLING_INTERVAL_MS);
+  const disconnectObserver = subscribeFileSystemObserver(entry.templateDirectoryHandle, check);
+
+  return () => {
+    disposed = true;
+    window.clearInterval(intervalId);
+    disconnectObserver?.();
+  };
+};
 
 export const createBlankTemplateEntry = async (
   rootHandle: FileSystemDirectoryHandle,

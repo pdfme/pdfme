@@ -10,7 +10,7 @@ export const reconcileInputsWithTemplate = (
   if (!previousInputs || previousInputs.length === 0) return defaultInputs;
 
   return defaultInputs.map((defaultInput, index) => {
-    const previousInput = previousInputs[index] ?? previousInputs[0] ?? {};
+    const previousInput = previousInputs[index] ?? {};
     const nextInput: TemplateInput = { ...defaultInput };
 
     for (const name of Object.keys(nextInput)) {
