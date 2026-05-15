@@ -30,7 +30,7 @@ import {
   DEFAULT_FONT_VALUE,
 } from './constants.js';
 
-export const cloneDeep = structuredClone;
+export const cloneDeep = <T>(value: T): T => structuredClone(value);
 
 const uniq = <T>(array: Array<T>) => Array.from(new Set(array));
 
