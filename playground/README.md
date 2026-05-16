@@ -34,9 +34,7 @@ Use this flow for normal pdfme templates:
    - Example: `playground/public/template-assets/invoice-blue`.
 2. Put `template.json` in that directory.
    - You can create it with the playground Designer and download the Template JSON.
-3. Add gallery metadata.
-   - Prefer `playground/public/template-assets/<template-name>/metadata.json` for new templates.
-   - `playground/public/template-assets/metadata.json` is still supported for existing shared metadata.
+3. Add gallery metadata in `playground/public/template-assets/<template-name>/metadata.json`.
 
 Example:
 
