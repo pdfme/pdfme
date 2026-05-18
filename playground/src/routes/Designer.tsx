@@ -326,7 +326,12 @@ function DesignerApp() {
       });
       projectRef.current = savedProject;
       setCurrentProjectTitle(savedProject.title);
-      toast.success(<ProjectSavedToast title={savedProject.title} />);
+      toast.success(
+        <ProjectSavedToast
+          formPath={`/form-viewer?project=${encodeURIComponent(savedProject.id)}`}
+          title={savedProject.title}
+        />,
+      );
     },
     [setCurrentProjectTitle, setSearchParams],
   );
