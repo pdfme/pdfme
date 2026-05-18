@@ -82,6 +82,11 @@ interface GuidesInterface {
   resize(): void;
 }
 
+export interface GuidesController {
+  getGuides: () => { horizontal: number[][]; vertical: number[][] };
+  setGuides: (guides: { horizontal: number[][]; vertical: number[][] }) => void;
+}
+
 interface Props {
   basePdf: BasePdf;
   height: number;
@@ -99,6 +104,7 @@ interface Props {
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   sidebarOpen: boolean;
+  onMountGuidesController?: (controller: GuidesController) => void;
 }
 
 const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
@@ -118,11 +124,34 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     onChangeHoveringSchemaId,
     paperRefs,
     sidebarOpen,
+    onMountGuidesController,
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
+
+  useEffect(() => {
+    if (!onMountGuidesController) return;
+    onMountGuidesController({
+      getGuides: () => ({
+        horizontal: horizontalGuides.current.map((g) => (g ? g.getGuides() : [])),
+        vertical: verticalGuides.current.map((g) => (g ? g.getGuides() : [])),
+      }),
+      setGuides: (guides) => {
+        guides.horizontal.forEach((pageGuides, i) => {
+          if (horizontalGuides.current[i]) {
+            horizontalGuides.current[i].loadGuides(pageGuides);
+          }
+        });
+        guides.vertical.forEach((pageGuides, i) => {
+          if (verticalGuides.current[i]) {
+            verticalGuides.current[i].loadGuides(pageGuides);
+          }
+        });
+      },
+    });
+  }, [onMountGuidesController]);
   const moveable = useRef<MoveableComponent>(null);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
