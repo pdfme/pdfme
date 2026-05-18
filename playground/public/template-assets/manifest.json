@@ -27,7 +27,8 @@
         "Business",
         "Table",
         "Visual"
-      ]
+      ],
+      "title": "Invoice"
     },
     {
       "name": "quotes",
@@ -54,7 +55,8 @@
         "Business",
         "Table",
         "Visual"
-      ]
+      ],
+      "title": "Quotes"
     },
     {
       "name": "pedigree",
@@ -80,7 +82,8 @@
         "QR",
         "Image",
         "Visual"
-      ]
+      ],
+      "title": "Pedigree"
     },
     {
       "name": "certificate-black",
@@ -103,7 +106,8 @@
       "tags": [
         "Certificate",
         "Award"
-      ]
+      ],
+      "title": "Certificate Black"
     },
     {
       "name": "a4-blank",
@@ -122,7 +126,8 @@
       "tags": [
         "Blank",
         "Starter"
-      ]
+      ],
+      "title": "A4 Blank"
     },
     {
       "name": "qr-lines",
@@ -144,7 +149,8 @@
       "tags": [
         "QR",
         "Label"
-      ]
+      ],
+      "title": "QR Lines"
     },
     {
       "name": "address-label-10",
@@ -164,7 +170,8 @@
       "tags": [
         "Labels",
         "Shipping"
-      ]
+      ],
+      "title": "Address Label 10"
     },
     {
       "name": "address-label-30",
@@ -184,7 +191,8 @@
       "tags": [
         "Labels",
         "Shipping"
-      ]
+      ],
+      "title": "Address Label 30"
     },
     {
       "name": "address-label-6",
@@ -204,7 +212,8 @@
       "tags": [
         "Labels",
         "Shipping"
-      ]
+      ],
+      "title": "Address Label 6"
     },
     {
       "name": "md2pdf-article",
@@ -251,7 +260,8 @@
       "tags": [
         "Certificate",
         "Award"
-      ]
+      ],
+      "title": "Certificate Blue"
     },
     {
       "name": "certificate-gold",
@@ -273,7 +283,8 @@
       "tags": [
         "Certificate",
         "Award"
-      ]
+      ],
+      "title": "Certificate Gold"
     },
     {
       "name": "certificate-white",
@@ -295,7 +306,8 @@
       "tags": [
         "Certificate",
         "Award"
-      ]
+      ],
+      "title": "Certificate White"
     },
     {
       "name": "jsx-form-fields",
@@ -326,29 +338,6 @@
       "title": "Form fields"
     },
     {
-      "name": "hihokensha-shikaku-shutoku-todoke",
-      "author": "EedgeY",
-      "path": "hihokensha-shikaku-shutoku-todoke/template.json",
-      "thumbnailPath": "hihokensha-shikaku-shutoku-todoke/thumbnail.png",
-      "pageCount": 1,
-      "fieldCount": 104,
-      "schemaTypes": [
-        "text"
-      ],
-      "fontNames": [
-        "NotoSansJP"
-      ],
-      "hasCJK": true,
-      "basePdfKind": "dataUri",
-      "description": "A Japanese social insurance form template for structured government-style documents.",
-      "sourceKind": "designer",
-      "tags": [
-        "Government",
-        "CJK",
-        "Form"
-      ]
-    },
-    {
       "name": "inline-markdown-mvt",
       "author": "pdfme",
       "path": "inline-markdown-mvt/template.json",
@@ -370,7 +359,52 @@
         "Markdown",
         "MVT",
         "Form"
-      ]
+      ],
+      "title": "Inline Markdown MVT"
+    },
+    {
+      "name": "invoice-blue",
+      "author": "pdfme",
+      "path": "invoice-blue/template.json",
+      "thumbnailPath": "invoice-blue/thumbnail.png",
+      "pageCount": 1,
+      "fieldCount": 35,
+      "schemaTypes": [
+        "text"
+      ],
+      "fontNames": [],
+      "hasCJK": false,
+      "basePdfKind": "dataUri",
+      "description": "A blue invoice variant for a more branded business document.",
+      "sourceKind": "designer",
+      "tags": [
+        "Invoice",
+        "Business",
+        "Table"
+      ],
+      "title": "Invoice Blue"
+    },
+    {
+      "name": "invoice-green",
+      "author": "pdfme",
+      "path": "invoice-green/template.json",
+      "thumbnailPath": "invoice-green/thumbnail.png",
+      "pageCount": 1,
+      "fieldCount": 25,
+      "schemaTypes": [
+        "text"
+      ],
+      "fontNames": [],
+      "hasCJK": false,
+      "basePdfKind": "dataUri",
+      "description": "A green invoice variant with a calm accounting-oriented look.",
+      "sourceKind": "designer",
+      "tags": [
+        "Invoice",
+        "Business",
+        "Table"
+      ],
+      "title": "Invoice Green"
     },
     {
       "name": "jsx-invoice",
@@ -406,10 +440,10 @@
       "title": "Invoice layout"
     },
     {
-      "name": "invoice-blue",
+      "name": "invoice-white",
       "author": "pdfme",
-      "path": "invoice-blue/template.json",
-      "thumbnailPath": "invoice-blue/thumbnail.png",
+      "path": "invoice-white/template.json",
+      "thumbnailPath": "invoice-white/thumbnail.png",
       "pageCount": 1,
       "fieldCount": 35,
       "schemaTypes": [
@@ -418,34 +452,14 @@
       "fontNames": [],
       "hasCJK": false,
       "basePdfKind": "dataUri",
-      "description": "A blue invoice variant for a more branded business document.",
+      "description": "A restrained white invoice layout with a clean printable style.",
       "sourceKind": "designer",
       "tags": [
         "Invoice",
         "Business",
         "Table"
-      ]
-    },
-    {
-      "name": "invoice-green",
-      "author": "pdfme",
-      "path": "invoice-green/template.json",
-      "thumbnailPath": "invoice-green/thumbnail.png",
-      "pageCount": 1,
-      "fieldCount": 25,
-      "schemaTypes": [
-        "text"
       ],
-      "fontNames": [],
-      "hasCJK": false,
-      "basePdfKind": "dataUri",
-      "description": "A green invoice variant with a calm accounting-oriented look.",
-      "sourceKind": "designer",
-      "tags": [
-        "Invoice",
-        "Business",
-        "Table"
-      ]
+      "title": "Invoice White"
     },
     {
       "name": "invoice-ja-simple",
@@ -472,7 +486,8 @@
         "Invoice",
         "Business",
         "CJK"
-      ]
+      ],
+      "title": "Japanese Invoice"
     },
     {
       "name": "invoice-ja-simple-landscape",
@@ -499,28 +514,8 @@
         "Invoice",
         "Business",
         "CJK"
-      ]
-    },
-    {
-      "name": "invoice-white",
-      "author": "pdfme",
-      "path": "invoice-white/template.json",
-      "thumbnailPath": "invoice-white/thumbnail.png",
-      "pageCount": 1,
-      "fieldCount": 35,
-      "schemaTypes": [
-        "text"
       ],
-      "fontNames": [],
-      "hasCJK": false,
-      "basePdfKind": "dataUri",
-      "description": "A restrained white invoice layout with a clean printable style.",
-      "sourceKind": "designer",
-      "tags": [
-        "Invoice",
-        "Business",
-        "Table"
-      ]
+      "title": "Japanese Invoice Landscape"
     },
     {
       "name": "jsx-japanese-notice",
@@ -594,7 +589,8 @@
       "tags": [
         "Map",
         "Visual"
-      ]
+      ],
+      "title": "Location Arrow"
     },
     {
       "name": "location-number",
@@ -615,32 +611,8 @@
       "tags": [
         "Map",
         "Visual"
-      ]
-    },
-    {
-      "name": "new-sale-quotation",
-      "author": "pdfme",
-      "path": "new-sale-quotation/template.json",
-      "thumbnailPath": "new-sale-quotation/thumbnail.png",
-      "pageCount": 3,
-      "fieldCount": 49,
-      "schemaTypes": [
-        "image",
-        "line",
-        "rectangle",
-        "table",
-        "text"
       ],
-      "fontNames": [],
-      "hasCJK": false,
-      "basePdfKind": "blank",
-      "description": "A sales quotation template with product rows and business summary fields.",
-      "sourceKind": "designer",
-      "tags": [
-        "Quote",
-        "Business",
-        "Table"
-      ]
+      "title": "Location Number"
     },
     {
       "name": "md2pdf-overview",
@@ -689,7 +661,8 @@
       "tags": [
         "QR",
         "Label"
-      ]
+      ],
+      "title": "QR Title"
     },
     {
       "name": "md2pdf-release-notes",
@@ -772,6 +745,56 @@
       "title": "Research paper"
     },
     {
+      "name": "new-sale-quotation",
+      "author": "pdfme",
+      "path": "new-sale-quotation/template.json",
+      "thumbnailPath": "new-sale-quotation/thumbnail.png",
+      "pageCount": 3,
+      "fieldCount": 49,
+      "schemaTypes": [
+        "image",
+        "line",
+        "rectangle",
+        "table",
+        "text"
+      ],
+      "fontNames": [],
+      "hasCJK": false,
+      "basePdfKind": "blank",
+      "description": "A sales quotation template with product rows and business summary fields.",
+      "sourceKind": "designer",
+      "tags": [
+        "Quote",
+        "Business",
+        "Table"
+      ],
+      "title": "Sales Quotation"
+    },
+    {
+      "name": "hihokensha-shikaku-shutoku-todoke",
+      "author": "EedgeY",
+      "path": "hihokensha-shikaku-shutoku-todoke/template.json",
+      "thumbnailPath": "hihokensha-shikaku-shutoku-todoke/thumbnail.png",
+      "pageCount": 1,
+      "fieldCount": 104,
+      "schemaTypes": [
+        "text"
+      ],
+      "fontNames": [
+        "NotoSansJP"
+      ],
+      "hasCJK": true,
+      "basePdfKind": "dataUri",
+      "description": "A Japanese social insurance form template for structured government-style documents.",
+      "sourceKind": "designer",
+      "tags": [
+        "Government",
+        "CJK",
+        "Form"
+      ],
+      "title": "Social Insurance Enrollment Form"
+    },
+    {
       "name": "z-fold-brochure",
       "author": "hitomi-t260g",
       "path": "z-fold-brochure/template.json",
@@ -796,7 +819,8 @@
       "tags": [
         "Brochure",
         "Print"
-      ]
+      ],
+      "title": "Z-Fold Brochure"
     }
   ]
 }

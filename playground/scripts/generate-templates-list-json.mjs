@@ -8,7 +8,6 @@ const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
-const metadataFilePath = path.join(templatesDir, 'metadata.json');
 const manifestFilePath = path.join(templatesDir, 'manifest.json');
 const versionedManifestDir = path.join(templatesDir, 'manifests');
 
@@ -68,20 +67,6 @@ function generateTemplatesListJson() {
 
 function loadTemplateMetadata() {
   const metadataByTemplate = {};
-  if (!fs.existsSync(metadataFilePath)) {
-    return loadPerTemplateMetadata(metadataByTemplate);
-  }
-
-  const parsed = JSON.parse(fs.readFileSync(metadataFilePath, 'utf8'));
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error('template-assets/metadata.json must be an object keyed by template name.');
-  }
-
-  Object.assign(metadataByTemplate, parsed);
-  return loadPerTemplateMetadata(metadataByTemplate);
-}
-
-function loadPerTemplateMetadata(metadataByTemplate) {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
   for (const item of items) {
     if (!item.isDirectory() || item.name.startsWith('.')) continue;
@@ -105,7 +90,9 @@ function normalizeMetadata(rawMetadata) {
   }
 
   const metadata = {};
-  if (typeof rawMetadata.title === 'string') metadata.title = rawMetadata.title;
+  if (typeof rawMetadata.title === 'string' && rawMetadata.title.trim()) {
+    metadata.title = rawMetadata.title.trim();
+  }
   if (typeof rawMetadata.description === 'string') metadata.description = rawMetadata.description;
   if (typeof rawMetadata.order === 'number' && Number.isFinite(rawMetadata.order)) {
     metadata.order = rawMetadata.order;
@@ -142,15 +129,21 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
 
   for (const [name, rawMetadata] of Object.entries(metadataByTemplate)) {
     const metadata = normalizeMetadata(rawMetadata);
+    if (!metadata.title) {
+      throw new Error(`template asset metadata entry "${name}" must include title.`);
+    }
     if (!metadata.description) {
       throw new Error(`template asset metadata entry "${name}" must include description.`);
+    }
+    if (!metadata.sourceKind) {
+      throw new Error(`template asset metadata entry "${name}" must include sourceKind.`);
     }
     if (!metadata.tags || metadata.tags.length === 0) {
       throw new Error(`template asset metadata entry "${name}" must include tags.`);
     }
 
     const inferredSourceKind = inferSourceKind(name);
-    if (metadata.sourceKind && metadata.sourceKind !== inferredSourceKind) {
+    if (metadata.sourceKind !== inferredSourceKind) {
       throw new Error(
         `template asset metadata entry "${name}" has sourceKind "${metadata.sourceKind}", expected "${inferredSourceKind}".`,
       );
@@ -182,7 +175,13 @@ function buildTemplateEntry(name, templateJson, rawMetadata) {
   const schemas = normalizeSchemas(templateJson.schemas);
   const flattenedSchemas = schemas.flat();
   const metadata = normalizeMetadata(rawMetadata);
-  const sourceKind = metadata.sourceKind ?? inferSourceKind(name);
+  if (!metadata.title) {
+    throw new Error(`template asset metadata entry "${name}" must include title.`);
+  }
+  if (!metadata.sourceKind) {
+    throw new Error(`template asset metadata entry "${name}" must include sourceKind.`);
+  }
+  const sourceKind = metadata.sourceKind;
   const schemaTypes = [
     ...new Set(flattenedSchemas.map((schema) => schema.type).filter(Boolean)),
   ].sort();
@@ -205,7 +204,7 @@ function buildTemplateEntry(name, templateJson, rawMetadata) {
     description: metadata.description,
     order: metadata.order,
     sourceKind,
-    tags: metadata.tags ?? [],
+    tags: metadata.tags,
     title: metadata.title,
   };
 }
@@ -227,9 +226,7 @@ function compareTemplateEntries(a, b) {
   if (a.order != null) return -1;
   if (b.order != null) return 1;
 
-  const aTitle = a.title ?? a.name;
-  const bTitle = b.title ?? b.name;
-  const titleResult = aTitle.localeCompare(bTitle);
+  const titleResult = a.title.localeCompare(b.title);
   if (titleResult !== 0) return titleResult;
 
   return a.name.localeCompare(b.name);

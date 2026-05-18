@@ -1,0 +1,10 @@
+{
+  "title": "Sales Quotation",
+  "description": "A sales quotation template with product rows and business summary fields.",
+  "sourceKind": "designer",
+  "tags": [
+    "Quote",
+    "Business",
+    "Table"
+  ]
+}

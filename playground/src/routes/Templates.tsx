@@ -7,6 +7,8 @@ import {
   Download,
   Eye,
   FileText,
+  FolderOpen,
+  FolderX,
   MoreHorizontal,
   Pencil,
   PencilRuler,
@@ -14,7 +16,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { downloadJsonFile, fromKebabCase, readFile } from '../helper';
+import { downloadJsonFile, readFile } from '../helper';
 import PlaygroundButton from '../components/PlaygroundButton';
 import { getAuthoringStarterId, type AuthoringStarterKind } from '../lib/authoringStarters';
 import {
@@ -30,6 +32,26 @@ import {
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+import {
+  clearPersistedFileWorkspace,
+  createBlankTemplateEntry,
+  createTemplateEntryFromTemplate,
+  findTemplateEntry,
+  isFileWorkspaceSupported,
+  openTemplateCollectionDirectory,
+  persistFileWorkspaceState,
+  refreshTemplateCollection,
+  restorePersistedTemplateCollection,
+  setSelectedFileWorkspaceTemplateName,
+  subscribeTemplateCollectionChanges,
+  writeTemplateMetadata,
+  writeTemplateThumbnail,
+  type EditableFileWorkspaceMetadata,
+  type FileWorkspaceCollection,
+  type FileWorkspaceSourceInput,
+  type FileWorkspaceTemplateEntry,
+  type SourceKind,
+} from '../lib/fileWorkspace';
 
 declare global {
   interface Window {
@@ -44,20 +66,21 @@ type TemplateData = {
   name: string;
   author: string;
   basePdfKind?: string;
-  description?: string;
+  description: string;
   fieldCount?: number;
   fontNames?: string[];
   hasCJK?: boolean;
   pageCount?: number;
   schemaTypes?: string[];
-  sourceKind?: Exclude<GenerationFilter, 'all'>;
+  sourceKind: Exclude<GenerationFilter, 'all'>;
   sourcePath?: string;
-  tags?: string[];
-  title?: string;
+  tags: string[];
+  title: string;
 };
 
 type UIType = 'designer' | 'form-viewer';
 type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf';
+type MountedCollectionWriteRunner = <T>(write: () => Promise<T>) => Promise<T>;
 
 type AuthoringPreset = {
   assetName: string;
@@ -96,7 +119,13 @@ const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
 ];
 
 const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
-  template.sourceKind ?? 'designer';
+  template.sourceKind;
+
+const getGenerationLabel = (generation: Exclude<GenerationFilter, 'all'>) => {
+  if (generation === 'jsx') return 'JSX';
+  if (generation === 'md2pdf') return 'md2pdf';
+  return 'Designer';
+};
 
 const getAuthoringPreset = (template: TemplateData): AuthoringPreset | null => {
   const kind = getTemplateGeneration(template);
@@ -109,7 +138,7 @@ const getAuthoringPreset = (template: TemplateData): AuthoringPreset | null => {
 };
 
 const getTemplateTags = (template: TemplateData) => {
-  const tags = new Set(template.tags ?? []);
+  const tags = new Set(template.tags);
 
   return [...tags].sort((a, b) => {
     const aIndex = tagSortOrder.indexOf(a);
@@ -174,6 +203,51 @@ const ProjectThumbnailImage = ({
   return <ThumbnailImage alt={project.title} src={src} />;
 };
 
+const MountedThumbnailImage = ({
+  entry,
+  onCreated,
+  runWrite,
+}: {
+  entry: FileWorkspaceTemplateEntry;
+  onCreated: () => void;
+  runWrite: MountedCollectionWriteRunner;
+}) => {
+  const [src, setSrc] = useState(entry.thumbnailDataUrl);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSrc(entry.thumbnailDataUrl);
+    setError(null);
+    if (entry.thumbnailDataUrl) return;
+
+    let cancelled = false;
+    void runWrite(() => writeTemplateThumbnail(entry, entry.template))
+      .then(({ thumbnailDataUrl }) => {
+        if (cancelled) return;
+        setSrc(thumbnailDataUrl);
+        onCreated();
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : 'Failed to create thumbnail');
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [entry, onCreated, runWrite]);
+
+  if (error) {
+    return (
+      <div className="flex h-72 w-full items-center justify-center bg-yellow-50 p-4 text-center text-xs text-yellow-800">
+        Thumbnail unavailable
+      </div>
+    );
+  }
+
+  return <ThumbnailImage alt={entry.title} src={src} />;
+};
+
 const GalleryCard = ({
   actions,
   description,
@@ -216,13 +290,14 @@ const GalleryCard = ({
   </div>
 );
 
-type ProjectActionHandler = (project: PlaygroundProject) => void;
+type ProjectActionHandler = (project: PlaygroundProject) => Promise<void> | void;
 
 type ProjectMoreActionsProps = {
   onDeleteProject: ProjectActionHandler;
   onDownloadProjectTemplate: ProjectActionHandler;
   onDuplicateProject: ProjectActionHandler;
   onOpenDesigner: ProjectActionHandler;
+  onCopyToMountedFolder?: ProjectActionHandler;
   onRenameProject: ProjectActionHandler;
   project: PlaygroundProject;
 };
@@ -256,6 +331,7 @@ function ProjectMoreActions({
   onDownloadProjectTemplate,
   onDuplicateProject,
   onOpenDesigner,
+  onCopyToMountedFolder,
   onRenameProject,
   project,
 }: ProjectMoreActionsProps) {
@@ -264,7 +340,7 @@ function ProjectMoreActions({
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const runAction = (handler: ProjectActionHandler) => {
     setOpen(false);
-    handler(project);
+    void handler(project);
   };
 
   useEffect(() => {
@@ -327,6 +403,12 @@ function ProjectMoreActions({
               <Copy className="size-4" />
               Duplicate
             </ProjectMenuItem>
+            {onCopyToMountedFolder && (
+              <ProjectMenuItem onClick={() => runAction(onCopyToMountedFolder)}>
+                <FolderOpen className="size-4" />
+                Copy to Mounted Folder
+              </ProjectMenuItem>
+            )}
             <ProjectMenuItem onClick={() => runAction(onDownloadProjectTemplate)}>
               <Download className="size-4" />
               Template JSON
@@ -341,6 +423,163 @@ function ProjectMoreActions({
     </div>
   );
 }
+
+const parseTagInput = (value: string) => [
+  ...new Set(
+    value
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+  ),
+];
+
+const getProjectSourceKind = (project: PlaygroundProject): SourceKind => {
+  if (project.kind === 'jsx') return 'jsx';
+  if (project.kind === 'md2pdf') return 'md2pdf';
+  return 'designer';
+};
+
+const getProjectSourceInput = (project: PlaygroundProject): FileWorkspaceSourceInput | undefined =>
+  project.source
+    ? {
+        content: project.source.content,
+        language: project.source.language,
+      }
+    : undefined;
+
+const MountedMetadataDialog = ({
+  entry,
+  onClose,
+  onSave,
+}: {
+  entry: FileWorkspaceTemplateEntry;
+  onClose: () => void;
+  onSave: (
+    entry: FileWorkspaceTemplateEntry,
+    metadata: EditableFileWorkspaceMetadata,
+  ) => Promise<void>;
+}) => {
+  const [title, setTitle] = useState(entry.title);
+  const [description, setDescription] = useState(entry.description ?? '');
+  const [tags, setTags] = useState(entry.tags.join(', '));
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const titleInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    titleInputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || isSaving) return;
+      event.preventDefault();
+      onClose();
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isSaving, onClose]);
+
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!title.trim()) {
+      setError('Title is required.');
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      await onSave(entry, {
+        description,
+        tags: parseTagInput(tags),
+        title,
+      });
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : 'Failed to save metadata.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <button
+        type="button"
+        aria-label="Close metadata editor"
+        className="absolute inset-0 cursor-default"
+        onClick={isSaving ? undefined : onClose}
+      />
+      <form
+        aria-labelledby="mounted-metadata-dialog-title"
+        aria-modal="true"
+        className="relative z-10 w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+        onSubmit={(event) => void onSubmit(event)}
+        role="dialog"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 id="mounted-metadata-dialog-title" className="text-lg font-bold text-gray-900">
+              Edit Metadata
+            </h3>
+            <p className="mt-1 text-xs text-gray-500">{entry.name}/metadata.json</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Changing the title also renames the template folder.
+            </p>
+          </div>
+          <PlaygroundButton disabled={isSaving} onClick={onClose} type="button" variant="ghost">
+            Close
+          </PlaygroundButton>
+        </div>
+
+        <div className="mt-4 space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Title
+            <input
+              ref={titleInputRef}
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+            <textarea
+              className="mt-1 min-h-24 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Tags
+            <input
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={tags}
+              onChange={(event) => setTags(event.target.value)}
+            />
+          </label>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-5 flex justify-end gap-2">
+          <PlaygroundButton disabled={isSaving} onClick={onClose} type="button" variant="secondary">
+            Cancel
+          </PlaygroundButton>
+          <PlaygroundButton disabled={isSaving} type="submit" variant="primary">
+            {isSaving ? 'Saving...' : 'Save Metadata'}
+          </PlaygroundButton>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 // Author link component to avoid duplication
 const AuthorLink = ({ author }: { author: string }) => {
@@ -372,14 +611,52 @@ const AuthorLink = ({ author }: { author: string }) => {
 function TemplatesApp() {
   const navigate = useNavigate();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
+  const mountedCollectionRef = React.useRef<FileWorkspaceCollection | null>(null);
+  const mountedCollectionWriteCountRef = React.useRef(0);
+  const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
+  const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
+  const [editingMountedEntry, setEditingMountedEntry] = useState<FileWorkspaceTemplateEntry | null>(
+    null,
+  );
+  const [lastFolderName, setLastFolderName] = useState<string | null>(null);
+  const [isOpeningFolder, setIsOpeningFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const [tagFilter, setTagFilter] = useState('all');
 
   const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+  const runMountedCollectionWrite = useCallback(async <T,>(write: () => Promise<T>) => {
+    mountedCollectionWriteCountRef.current += 1;
+    try {
+      return await write();
+    } finally {
+      mountedCollectionWriteCountRef.current = Math.max(
+        0,
+        mountedCollectionWriteCountRef.current - 1,
+      );
+    }
+  }, []);
+  const shouldSkipMountedCollectionRefresh = useCallback(
+    () => mountedCollectionWriteCountRef.current > 0,
+    [],
+  );
+  const refreshMountedCollection = useCallback(() => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
+
+    void refreshTemplateCollection(collection)
+      .then((collection) => {
+        setMountedCollection(collection);
+        setLastFolderName(collection.rootName);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : 'Failed to refresh folder');
+      });
+  }, []);
 
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
@@ -420,6 +697,52 @@ function TemplatesApp() {
     window.addEventListener('focus', refreshProjects);
     return () => window.removeEventListener('focus', refreshProjects);
   }, [refreshProjects]);
+
+  useEffect(() => {
+    if (!fileWorkspaceSupported) return;
+
+    let cancelled = false;
+    void restorePersistedTemplateCollection().then((result) => {
+      if (cancelled) return;
+      if (result.status === 'mounted') {
+        setMountedCollection(result.collection);
+        setLastFolderName(result.collection.rootName);
+      } else if (result.status === 'permission-needed') {
+        setLastFolderName(result.rootName);
+      } else if (result.status === 'error') {
+        setLastFolderName(result.rootName ?? null);
+        console.error(result.error);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fileWorkspaceSupported]);
+
+  useEffect(() => {
+    mountedCollectionRef.current = mountedCollection;
+  }, [mountedCollection]);
+
+  useEffect(() => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
+
+    return subscribeTemplateCollectionChanges(
+      collection,
+      (collection) => {
+        setMountedCollection(collection);
+        setLastFolderName(collection.rootName);
+      },
+      {
+        onError: (error) => {
+          console.error(error);
+        },
+        getCollection: () => mountedCollectionRef.current,
+        shouldSkip: shouldSkipMountedCollectionRefresh,
+      },
+    );
+  }, [mountedCollection?.rootHandle, shouldSkipMountedCollectionRefresh]);
 
   // Fetch templates and author avatars
   useEffect(() => {
@@ -476,9 +799,182 @@ function TemplatesApp() {
     navigate(`${path}?project=${encodeURIComponent(project.id)}`);
   };
 
+  const navigateToMountedTemplate = async (
+    collection: FileWorkspaceCollection,
+    entry: FileWorkspaceTemplateEntry,
+    ui: UIType,
+  ) => {
+    await setSelectedFileWorkspaceTemplateName(collection.rootHandle, entry.name);
+    const path = ui === 'designer' ? '/designer' : '/form-viewer';
+    navigate(`${path}?workspace=${encodeURIComponent(entry.name)}`);
+  };
+
   const navigateToAuthoringPreset = (preset: AuthoringPreset) => {
     const route = preset.kind === 'jsx' ? '/jsx' : '/md2pdf';
     navigate(`${route}?preset=${encodeURIComponent(preset.id)}`);
+  };
+
+  const mountCollection = async (collection: FileWorkspaceCollection) => {
+    setMountedCollection(collection);
+    setLastFolderName(collection.rootName);
+
+    if (collection.entries.length > 0) {
+      await persistFileWorkspaceState(
+        collection.rootHandle,
+        collection.selectedTemplateName ?? collection.entries[0]?.name,
+      );
+      return;
+    }
+
+    const shouldCreate = window.confirm(
+      `"${collection.rootName}" has no valid template directories. Create a blank template now?`,
+    );
+    if (!shouldCreate) return;
+
+    const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
+      const entry = await createBlankTemplateEntry(collection.rootHandle);
+      const collectionAfterCreate = await refreshTemplateCollection({
+        ...collection,
+        selectedTemplateName: entry.name,
+      });
+
+      return {
+        nextCollection: collectionAfterCreate,
+        nextEntry: findTemplateEntry(collectionAfterCreate, entry.name) ?? entry,
+      };
+    });
+    setMountedCollection(nextCollection);
+    await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
+  };
+
+  const onOpenFolder = async () => {
+    setIsOpeningFolder(true);
+    try {
+      await mountCollection(await openTemplateCollectionDirectory());
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to open folder');
+    } finally {
+      setIsOpeningFolder(false);
+    }
+  };
+
+  const onReopenFolder = async () => {
+    setIsOpeningFolder(true);
+    try {
+      const result = await restorePersistedTemplateCollection({ requestPermission: true });
+      if (result.status === 'mounted') {
+        await mountCollection(result.collection);
+      } else if (result.status === 'permission-needed') {
+        setLastFolderName(result.rootName);
+        toast.error('Folder permission was not granted');
+      } else if (result.status === 'none') {
+        setLastFolderName(null);
+        toast.info('No previous folder was found');
+      } else {
+        console.error(result.error);
+        toast.error('Failed to reopen folder');
+      }
+    } finally {
+      setIsOpeningFolder(false);
+    }
+  };
+
+  const onDisconnectFolder = async () => {
+    await clearPersistedFileWorkspace();
+    setMountedCollection(null);
+    setLastFolderName(null);
+    toast.info('Disconnected mounted folder');
+  };
+
+  const onCreateMountedTemplate = async () => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
+
+    const title = window.prompt('Template name', 'Untitled Template') ?? '';
+    if (!title.trim()) return;
+
+    try {
+      const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
+        const entry = await createBlankTemplateEntry(collection.rootHandle, title);
+        const collectionAfterCreate = await refreshTemplateCollection({
+          ...collection,
+          selectedTemplateName: entry.name,
+        });
+
+        return {
+          nextCollection: collectionAfterCreate,
+          nextEntry: findTemplateEntry(collectionAfterCreate, entry.name) ?? entry,
+        };
+      });
+      setMountedCollection(nextCollection);
+      setLastFolderName(nextCollection.rootName);
+      await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create template');
+    }
+  };
+
+  const onSaveMountedMetadata = async (
+    entry: FileWorkspaceTemplateEntry,
+    metadata: EditableFileWorkspaceMetadata,
+  ) => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) throw new Error('Mounted folder is not available.');
+
+    const { nextCollection, updatedEntry } = await runMountedCollectionWrite(async () => {
+      const updatedEntry = await writeTemplateMetadata(collection, entry, metadata);
+      const collectionAfterSave = await refreshTemplateCollection({
+        ...collection,
+        selectedTemplateName: updatedEntry.name,
+      });
+
+      return { nextCollection: collectionAfterSave, updatedEntry };
+    });
+    setMountedCollection(nextCollection);
+    setLastFolderName(nextCollection.rootName);
+    setEditingMountedEntry(null);
+    toast.success(`Updated "${updatedEntry.title}" metadata`);
+  };
+
+  const onCopyProjectToMountedFolder = async (project: PlaygroundProject) => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) {
+      toast.error('Open a mounted folder first');
+      return;
+    }
+
+    try {
+      const { nextCollection } = await runMountedCollectionWrite(async () => {
+        const sourceKind = getProjectSourceKind(project);
+        const entry = await createTemplateEntryFromTemplate(
+          collection,
+          project.template,
+          project.title,
+          {
+            description: 'A template copied from Browser Projects.',
+            source: getProjectSourceInput(project),
+            sourceKind,
+            tags: [getGenerationLabel(sourceKind)],
+            thumbnailDataUrl: project.thumbnail,
+          },
+        );
+        const collectionAfterCopy = await refreshTemplateCollection({
+          ...collection,
+          selectedTemplateName: entry.name,
+        });
+
+        return { nextCollection: collectionAfterCopy };
+      });
+      setMountedCollection(nextCollection);
+      setLastFolderName(nextCollection.rootName);
+      toast.success(`Copied "${project.title}" to ${nextCollection.rootName}`);
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to copy project');
+    }
   };
 
   const onImportTemplateJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -555,91 +1051,250 @@ function TemplatesApp() {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
         <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
-              <p className="mt-2 max-w-3xl text-sm text-green-900">
-                Save templates from Designer, JSX, or md2pdf as local projects. A project keeps the
-                generated template, inputs, and source when available.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <PlaygroundButton
-                onClick={() => importTemplateInputRef.current?.click()}
-                variant="secondary"
-              >
-                <Upload className="size-4" />
-                Import Template JSON
-              </PlaygroundButton>
-              <input
-                ref={importTemplateInputRef}
-                type="file"
-                accept="application/json"
-                className="sr-only"
-                onChange={onImportTemplateJson}
-              />
-              <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
-                <PencilRuler className="size-4" />
-                New Template
-              </PlaygroundButton>
-            </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
+            <p className="mt-2 max-w-3xl text-sm text-green-900">
+              Work with templates saved in this browser, or mount a folder to edit template files
+              directly on disk.
+            </p>
           </div>
-          {projects.length > 0 ? (
-            <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-              {projects.map((project) => (
-                <GalleryCard
-                  key={project.id}
-                  tag={getProjectKindLabel(project.kind)}
-                  title={project.title}
-                  description={
-                    <p className="text-xs text-gray-500">
-                      Updated {new Date(project.updatedAt).toLocaleString()}
-                    </p>
-                  }
-                  thumbnail={
-                    <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
-                  }
-                  actions={
-                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
-                      <PlaygroundButton
-                        onClick={() =>
-                          navigateToProject(project, project.source ? 'source' : 'designer')
-                        }
-                      >
-                        {project.source ? (
-                          <>
-                            <Code2 className="size-4" />
-                            Source
-                          </>
-                        ) : (
-                          <>
-                            <PencilRuler className="size-4" />
-                            Designer
-                          </>
-                        )}
-                      </PlaygroundButton>
-                      <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
-                        <Eye className="size-4" />
-                        Preview
-                      </PlaygroundButton>
-                      <ProjectMoreActions
-                        project={project}
-                        onOpenDesigner={(item) => navigateToProject(item, 'designer')}
-                        onRenameProject={onRenameProject}
-                        onDuplicateProject={onDuplicateProject}
-                        onDownloadProjectTemplate={onDownloadProjectTemplate}
-                        onDeleteProject={onDeleteProject}
-                      />
-                    </div>
-                  }
+
+          <div className="mt-5 border-t border-green-200 pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Browser Projects</h3>
+                <p className="mt-1 text-sm text-green-900">
+                  Drafts stored in this browser. They include template JSON, form inputs, and source
+                  code when available.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <PlaygroundButton
+                  onClick={() => importTemplateInputRef.current?.click()}
+                  variant="secondary"
+                >
+                  <Upload className="size-4" />
+                  Import Template JSON
+                </PlaygroundButton>
+                <input
+                  ref={importTemplateInputRef}
+                  type="file"
+                  accept="application/json"
+                  className="sr-only"
+                  onChange={onImportTemplateJson}
                 />
-              ))}
+                <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
+                  <PencilRuler className="size-4" />
+                  New Local Template
+                </PlaygroundButton>
+              </div>
             </div>
-          ) : (
-            <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
-              No local projects yet. Start from a sample, JSX, md2pdf, or a blank Designer template.
+
+            {projects.length > 0 ? (
+              <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                {projects.map((project) => (
+                  <GalleryCard
+                    key={project.id}
+                    tag={`Local ${getProjectKindLabel(project.kind)}`}
+                    title={project.title}
+                    description={
+                      <p className="text-xs text-gray-500">
+                        Updated {new Date(project.updatedAt).toLocaleString()}
+                      </p>
+                    }
+                    thumbnail={
+                      <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
+                    }
+                    actions={
+                      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
+                        <PlaygroundButton
+                          onClick={() =>
+                            navigateToProject(project, project.source ? 'source' : 'designer')
+                          }
+                        >
+                          {project.source ? (
+                            <>
+                              <Code2 className="size-4" />
+                              Source
+                            </>
+                          ) : (
+                            <>
+                              <PencilRuler className="size-4" />
+                              Designer
+                            </>
+                          )}
+                        </PlaygroundButton>
+                        <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
+                          Preview
+                        </PlaygroundButton>
+                        <ProjectMoreActions
+                          project={project}
+                          onOpenDesigner={(item) => navigateToProject(item, 'designer')}
+                          onRenameProject={onRenameProject}
+                          onDuplicateProject={onDuplicateProject}
+                          onCopyToMountedFolder={
+                            mountedCollection ? onCopyProjectToMountedFolder : undefined
+                          }
+                          onDownloadProjectTemplate={onDownloadProjectTemplate}
+                          onDeleteProject={onDeleteProject}
+                        />
+                      </div>
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+                No browser projects yet. Create a local template, import JSON, or save from
+                Designer, JSX, or md2pdf.
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 border-t border-green-200 pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Mounted Folder</h3>
+                <p className="mt-1 text-sm text-green-900">
+                  Templates in this section are read from and saved back to template files on disk.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                {!mountedCollection && (
+                  <PlaygroundButton
+                    disabled={!fileWorkspaceSupported || isOpeningFolder}
+                    onClick={() => void onOpenFolder()}
+                    variant="primary"
+                  >
+                    <FolderOpen className="size-4" />
+                    {isOpeningFolder ? 'Opening...' : 'Open Folder'}
+                  </PlaygroundButton>
+                )}
+                {!mountedCollection && lastFolderName && (
+                  <PlaygroundButton
+                    disabled={!fileWorkspaceSupported || isOpeningFolder}
+                    onClick={() => void onReopenFolder()}
+                    title={lastFolderName}
+                    variant="secondary"
+                  >
+                    <FolderOpen className="size-4" />
+                    Reopen Folder
+                  </PlaygroundButton>
+                )}
+                {mountedCollection && (
+                  <PlaygroundButton onClick={() => void onDisconnectFolder()} variant="secondary">
+                    <FolderX className="size-4" />
+                    Disconnect
+                  </PlaygroundButton>
+                )}
+                {mountedCollection && (
+                  <PlaygroundButton
+                    onClick={() => void onCreateMountedTemplate()}
+                    variant="primary"
+                  >
+                    <PencilRuler className="size-4" />
+                    New Mounted Template
+                  </PlaygroundButton>
+                )}
+              </div>
             </div>
-          )}
+            {!fileWorkspaceSupported && (
+              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                Folder workspaces need a Chromium browser in a secure context. Browser projects,
+                JSON import, and JSON download are still available.
+              </div>
+            )}
+            {mountedCollection && (
+              <>
+                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-green-900">
+                  <span className="font-semibold">{mountedCollection.rootName}</span>
+                  <span className="text-green-700">
+                    {mountedCollection.entries.length} template
+                    {mountedCollection.entries.length === 1 ? '' : 's'}
+                  </span>
+                  {mountedCollection.invalidEntries.length > 0 && (
+                    <span className="rounded border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                      {mountedCollection.invalidEntries.length} invalid skipped
+                    </span>
+                  )}
+                </div>
+                {mountedCollection.entries.length > 0 ? (
+                  <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                    {mountedCollection.entries.map((entry) => (
+                      <GalleryCard
+                        key={entry.name}
+                        tag={`Disk ${getGenerationLabel(entry.sourceKind)}`}
+                        title={entry.title}
+                        tags={entry.tags}
+                        description={
+                          <div className="space-y-2">
+                            <p>
+                              {entry.description ??
+                                `${entry.name}/template.json from the mounted folder.`}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Updated {new Date(entry.updatedAt).toLocaleString()}
+                            </p>
+                          </div>
+                        }
+                        thumbnail={
+                          <MountedThumbnailImage
+                            entry={entry}
+                            onCreated={refreshMountedCollection}
+                            runWrite={runMountedCollectionWrite}
+                          />
+                        }
+                        actions={
+                          <div className="space-y-2">
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() =>
+                                void navigateToMountedTemplate(mountedCollection, entry, 'designer')
+                              }
+                            >
+                              <PencilRuler className="size-4" />
+                              Designer
+                            </PlaygroundButton>
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() =>
+                                void navigateToMountedTemplate(
+                                  mountedCollection,
+                                  entry,
+                                  'form-viewer',
+                                )
+                              }
+                            >
+                              Form/Viewer
+                            </PlaygroundButton>
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() => setEditingMountedEntry(entry)}
+                              variant="secondary"
+                            >
+                              <Pencil className="size-4" />
+                              Metadata
+                            </PlaygroundButton>
+                          </div>
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                    No valid template directories are mounted. Create a mounted template to write a
+                    new folder with template.json.
+                  </div>
+                )}
+              </>
+            )}
+            {!mountedCollection && fileWorkspaceSupported && !lastFolderName && (
+              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                Open a folder that contains directories like{' '}
+                <code className="rounded bg-green-100 px-1">invoice/template.json</code>.
+              </div>
+            )}
+          </div>
         </div>
         <section>
           <div className="border-b border-dashed border-gray-200 pb-2">
@@ -706,7 +1361,7 @@ function TemplatesApp() {
             {filteredTemplates.map((template, index) => {
               const { name, author } = template;
               const authoringPreset = getAuthoringPreset(template);
-              const title = template.title ?? fromKebabCase(name);
+              const title = template.title;
               const generation = getTemplateGeneration(template);
               const tag =
                 generation === 'jsx' ? 'JSX' : generation === 'md2pdf' ? 'md2pdf' : 'Designer';
@@ -728,7 +1383,7 @@ function TemplatesApp() {
                     tags={tags}
                     description={
                       <div className="space-y-3">
-                        <p>{template.description ?? 'A ready-to-edit pdfme sample template.'}</p>
+                        <p>{template.description}</p>
                         <p className="flex items-center gap-2 text-xs text-gray-500">
                           by{' '}
                           {avatarUrlMap[author] && (
@@ -792,6 +1447,13 @@ function TemplatesApp() {
           </div>
         </section>
       </div>
+      {editingMountedEntry && (
+        <MountedMetadataDialog
+          entry={editingMountedEntry}
+          onClose={() => setEditingMountedEntry(null)}
+          onSave={onSaveMountedMetadata}
+        />
+      )}
     </div>
   );
 }

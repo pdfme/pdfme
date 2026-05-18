@@ -11,7 +11,6 @@ const PRELOAD = pathToFileURL(join(__dirname, 'fixtures', 'fetch-fixture-loader.
 const TMP = join(__dirname, '..', '.test-tmp-examples-integration');
 const ASSETS_DIR = resolve(__dirname, '..', '..', '..', 'playground', 'public', 'template-assets');
 const MANIFEST_PATH = join(ASSETS_DIR, 'manifest.json');
-const METADATA_PATH = join(ASSETS_DIR, 'metadata.json');
 const VERSIONED_MANIFEST_DIR = join(ASSETS_DIR, 'manifests');
 const FONT_FIXTURES_DIR = resolve(
   __dirname,
@@ -87,7 +86,9 @@ function readJson<T>(filePath: string): T {
 
 function listPlaygroundTemplateNames(): string[] {
   return readdirSync(ASSETS_DIR, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && existsSync(join(ASSETS_DIR, entry.name, 'template.json')))
+    .filter(
+      (entry) => entry.isDirectory() && existsSync(join(ASSETS_DIR, entry.name, 'template.json')),
+    )
     .map((entry) => entry.name)
     .sort();
 }
@@ -99,12 +100,16 @@ function normalizeSchemas(rawSchemas: unknown): Array<Array<Record<string, unkno
 
   return rawSchemas.map((page) => {
     if (Array.isArray(page)) {
-      return page.filter((schema): schema is Record<string, unknown> => typeof schema === 'object' && schema !== null);
+      return page.filter(
+        (schema): schema is Record<string, unknown> =>
+          typeof schema === 'object' && schema !== null,
+      );
     }
 
     if (typeof page === 'object' && page !== null) {
       return Object.values(page).filter(
-        (schema): schema is Record<string, unknown> => typeof schema === 'object' && schema !== null,
+        (schema): schema is Record<string, unknown> =>
+          typeof schema === 'object' && schema !== null,
       );
     }
 
@@ -115,7 +120,9 @@ function normalizeSchemas(rawSchemas: unknown): Array<Array<Record<string, unkno
 function hasCjkContent(schemas: Array<Record<string, unknown>>): boolean {
   return schemas.some((schema) =>
     ['content', 'title', 'placeholder'].some(
-      (key) => typeof schema[key] === 'string' && /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/.test(schema[key]),
+      (key) =>
+        typeof schema[key] === 'string' &&
+        /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/.test(schema[key]),
     ),
   );
 }
@@ -142,9 +149,8 @@ function inferSourceKind(name: string): string {
 }
 
 function readTemplateMetadata(name: string): Record<string, unknown> {
-  const metadata = readJson<Record<string, Record<string, unknown>>>(METADATA_PATH);
   const itemMetadataPath = join(ASSETS_DIR, name, 'metadata.json');
-  if (!existsSync(itemMetadataPath)) return metadata[name] ?? {};
+  if (!existsSync(itemMetadataPath)) return {};
 
   return readJson<Record<string, unknown>>(itemMetadataPath);
 }
@@ -170,7 +176,8 @@ function buildExpectedManifestEntry(name: string): ExampleManifestEntry {
 
   const entry: ExampleManifestEntry = {
     name,
-    author: typeof template.author === 'string' && template.author.length > 0 ? template.author : 'pdfme',
+    author:
+      typeof template.author === 'string' && template.author.length > 0 ? template.author : 'pdfme',
     path: `${name}/template.json`,
     thumbnailPath: `${name}/thumbnail.png`,
     ...(sourcePath ? { sourcePath } : {}),
@@ -220,9 +227,12 @@ describe('examples integration smoke', () => {
     const jobPath = join(TMP, 'invoice-job.json');
     const pdfPath = join(TMP, 'invoice.pdf');
 
-    const examplesResult = runCli(['examples', 'invoice', '--withInputs', '-o', jobPath, '--json'], {
-      env,
-    });
+    const examplesResult = runCli(
+      ['examples', 'invoice', '--withInputs', '-o', jobPath, '--json'],
+      {
+        env,
+      },
+    );
     expect(examplesResult.exitCode).toBe(0);
 
     const examplesPayload = JSON.parse(examplesResult.stdout);
@@ -289,7 +299,18 @@ describe('examples integration smoke', () => {
 
     const result = spawnSync(
       'node',
-      ['--import', PRELOAD, CLI, 'examples', 'invoice', '--withInputs', '-o', jobPath, '-v', '--json'],
+      [
+        '--import',
+        PRELOAD,
+        CLI,
+        'examples',
+        'invoice',
+        '--withInputs',
+        '-o',
+        jobPath,
+        '-v',
+        '--json',
+      ],
       {
         encoding: 'utf8',
         timeout: 60000,
@@ -308,67 +329,63 @@ describe('examples integration smoke', () => {
     expect(result.stderr).toContain(`Output: ${jobPath}`);
   });
 
-  it(
-    'exports every playground example through examples -w and generates authoring starters',
-    () => {
-      mkdirSync(TMP, { recursive: true });
-      const env = createFixtureEnv(TMP);
-      const manifest = readJson<ExampleManifest>(MANIFEST_PATH);
-      const generatedTemplateNames: string[] = [];
+  it('exports every playground example through examples -w and generates authoring starters', () => {
+    mkdirSync(TMP, { recursive: true });
+    const env = createFixtureEnv(TMP);
+    const manifest = readJson<ExampleManifest>(MANIFEST_PATH);
+    const generatedTemplateNames: string[] = [];
 
-      for (const { name, sourceKind } of manifest.templates) {
-        const jobPath = join(TMP, `${name}.job.json`);
-        const pdfPath = join(TMP, `${name}.pdf`);
+    for (const { name, sourceKind } of manifest.templates) {
+      const jobPath = join(TMP, `${name}.job.json`);
+      const pdfPath = join(TMP, `${name}.pdf`);
 
-        const examplesResult = runCli(['examples', name, '--withInputs', '-o', jobPath, '--json'], {
-          env,
-        });
-        if (examplesResult.exitCode !== 0) {
-          throw new Error(
-            `Example "${name}" failed to export.\nstdout:\n${examplesResult.stdout}\nstderr:\n${examplesResult.stderr}`,
-          );
-        }
-
-        const examplePayload = JSON.parse(examplesResult.stdout);
-        expect(examplePayload.ok).toBe(true);
-        expect(examplePayload.command).toBe('examples');
-        expect(examplePayload.outputPath).toBe(jobPath);
-
-        const job = JSON.parse(readFileSync(jobPath, 'utf8'));
-        expect(job).toHaveProperty('template');
-        expect(Array.isArray(job.inputs)).toBe(true);
-        expect(existsSync(jobPath)).toBe(true);
-
-        // Full PDF rendering for every playground template is covered by the generator
-        // integration snapshots. Keep this CLI test focused on exported job validity for
-        // all examples, then run PDF generation for the generated authoring starters where
-        // sample input shape regressions are most likely.
-        if (sourceKind === 'designer') {
-          continue;
-        }
-
-        const generateResult = runCli(['generate', jobPath, '-o', pdfPath, '--json'], { env });
-        if (generateResult.exitCode !== 0) {
-          throw new Error(
-            `Example "${name}" failed to generate via CLI.\nJob:\n${JSON.stringify(job, null, 2)}\nstdout:\n${generateResult.stdout}\nstderr:\n${generateResult.stderr}`,
-          );
-        }
-
-        const payload = JSON.parse(generateResult.stdout);
-        expect(payload.ok).toBe(true);
-        expect(payload.command).toBe('generate');
-        expect(payload.outputPath).toBe(pdfPath);
-        expect(existsSync(pdfPath)).toBe(true);
-        generatedTemplateNames.push(name);
+      const examplesResult = runCli(['examples', name, '--withInputs', '-o', jobPath, '--json'], {
+        env,
+      });
+      if (examplesResult.exitCode !== 0) {
+        throw new Error(
+          `Example "${name}" failed to export.\nstdout:\n${examplesResult.stdout}\nstderr:\n${examplesResult.stderr}`,
+        );
       }
 
-      expect(generatedTemplateNames.sort()).toEqual(
-        manifest.templates
-          .filter((entry) => entry.sourceKind !== 'designer')
-          .map((entry) => entry.name)
-          .sort(),
-      );
-    },
-    180000,
-  );
+      const examplePayload = JSON.parse(examplesResult.stdout);
+      expect(examplePayload.ok).toBe(true);
+      expect(examplePayload.command).toBe('examples');
+      expect(examplePayload.outputPath).toBe(jobPath);
+
+      const job = JSON.parse(readFileSync(jobPath, 'utf8'));
+      expect(job).toHaveProperty('template');
+      expect(Array.isArray(job.inputs)).toBe(true);
+      expect(existsSync(jobPath)).toBe(true);
+
+      // Full PDF rendering for every playground template is covered by the generator
+      // integration snapshots. Keep this CLI test focused on exported job validity for
+      // all examples, then run PDF generation for the generated authoring starters where
+      // sample input shape regressions are most likely.
+      if (sourceKind === 'designer') {
+        continue;
+      }
+
+      const generateResult = runCli(['generate', jobPath, '-o', pdfPath, '--json'], { env });
+      if (generateResult.exitCode !== 0) {
+        throw new Error(
+          `Example "${name}" failed to generate via CLI.\nJob:\n${JSON.stringify(job, null, 2)}\nstdout:\n${generateResult.stdout}\nstderr:\n${generateResult.stderr}`,
+        );
+      }
+
+      const payload = JSON.parse(generateResult.stdout);
+      expect(payload.ok).toBe(true);
+      expect(payload.command).toBe('generate');
+      expect(payload.outputPath).toBe(pdfPath);
+      expect(existsSync(pdfPath)).toBe(true);
+      generatedTemplateNames.push(name);
+    }
+
+    expect(generatedTemplateNames.sort()).toEqual(
+      manifest.templates
+        .filter((entry) => entry.sourceKind !== 'designer')
+        .map((entry) => entry.name)
+        .sort(),
+    );
+  }, 180000);
 });

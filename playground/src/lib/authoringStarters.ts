@@ -2,7 +2,7 @@ export type AuthoringStarterKind = 'jsx' | 'md2pdf';
 
 export type AuthoringStarter = {
   assetName: string;
-  description?: string;
+  description: string;
   id: string;
   kind: AuthoringStarterKind;
   label: string;
@@ -10,11 +10,11 @@ export type AuthoringStarter = {
 };
 
 type TemplateAssetEntry = {
-  description?: string;
+  description: string;
   name: string;
-  sourceKind?: string;
+  sourceKind: string;
   sourcePath?: string;
-  title?: string;
+  title: string;
 };
 
 const TEMPLATE_ASSETS_BASE_PATH = '/template-assets';
@@ -40,7 +40,7 @@ export const loadAuthoringStarters = async (
       description: entry.description,
       id: getAuthoringStarterId(entry.name, kind),
       kind,
-      label: entry.title ?? entry.name,
+      label: entry.title,
       sourcePath: entry.sourcePath!,
     }));
 };
