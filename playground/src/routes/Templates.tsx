@@ -80,6 +80,7 @@ type TemplateData = {
 
 type UIType = 'designer' | 'form-viewer';
 type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf';
+type MountedCollectionWriteRunner = <T>(write: () => Promise<T>) => Promise<T>;
 
 type AuthoringPreset = {
   assetName: string;
@@ -205,9 +206,11 @@ const ProjectThumbnailImage = ({
 const MountedThumbnailImage = ({
   entry,
   onCreated,
+  runWrite,
 }: {
   entry: FileWorkspaceTemplateEntry;
   onCreated: () => void;
+  runWrite: MountedCollectionWriteRunner;
 }) => {
   const [src, setSrc] = useState(entry.thumbnailDataUrl);
   const [error, setError] = useState<string | null>(null);
@@ -218,7 +221,7 @@ const MountedThumbnailImage = ({
     if (entry.thumbnailDataUrl) return;
 
     let cancelled = false;
-    void writeTemplateThumbnail(entry, entry.template)
+    void runWrite(() => writeTemplateThumbnail(entry, entry.template))
       .then(({ thumbnailDataUrl }) => {
         if (cancelled) return;
         setSrc(thumbnailDataUrl);
@@ -232,7 +235,7 @@ const MountedThumbnailImage = ({
     return () => {
       cancelled = true;
     };
-  }, [entry, onCreated]);
+  }, [entry, onCreated, runWrite]);
 
   if (error) {
     return (
@@ -467,6 +470,17 @@ const MountedMetadataDialog = ({
     titleInputRef.current?.focus();
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || isSaving) return;
+      event.preventDefault();
+      onClose();
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isSaving, onClose]);
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!title.trim()) {
@@ -499,12 +513,17 @@ const MountedMetadataDialog = ({
         onClick={isSaving ? undefined : onClose}
       />
       <form
-        onSubmit={(event) => void onSubmit(event)}
+        aria-labelledby="mounted-metadata-dialog-title"
+        aria-modal="true"
         className="relative z-10 w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+        onSubmit={(event) => void onSubmit(event)}
+        role="dialog"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Edit Metadata</h3>
+            <h3 id="mounted-metadata-dialog-title" className="text-lg font-bold text-gray-900">
+              Edit Metadata
+            </h3>
             <p className="mt-1 text-xs text-gray-500">{entry.name}/metadata.json</p>
             <p className="mt-1 text-xs text-gray-500">
               Changing the title also renames the template folder.
@@ -593,24 +612,42 @@ function TemplatesApp() {
   const navigate = useNavigate();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
   const mountedCollectionRef = React.useRef<FileWorkspaceCollection | null>(null);
+  const mountedCollectionWriteCountRef = React.useRef(0);
   const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
   const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
-  const [editingMountedEntry, setEditingMountedEntry] =
-    useState<FileWorkspaceTemplateEntry | null>(null);
+  const [editingMountedEntry, setEditingMountedEntry] = useState<FileWorkspaceTemplateEntry | null>(
+    null,
+  );
   const [lastFolderName, setLastFolderName] = useState<string | null>(null);
   const [isOpeningFolder, setIsOpeningFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const [tagFilter, setTagFilter] = useState('all');
 
   const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+  const runMountedCollectionWrite = useCallback(async <T,>(write: () => Promise<T>) => {
+    mountedCollectionWriteCountRef.current += 1;
+    try {
+      return await write();
+    } finally {
+      mountedCollectionWriteCountRef.current = Math.max(
+        0,
+        mountedCollectionWriteCountRef.current - 1,
+      );
+    }
+  }, []);
+  const shouldSkipMountedCollectionRefresh = useCallback(
+    () => mountedCollectionWriteCountRef.current > 0,
+    [],
+  );
   const refreshMountedCollection = useCallback(() => {
-    if (!mountedCollection) return;
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
 
-    void refreshTemplateCollection(mountedCollection)
+    void refreshTemplateCollection(collection)
       .then((collection) => {
         setMountedCollection(collection);
         setLastFolderName(collection.rootName);
@@ -619,7 +656,7 @@ function TemplatesApp() {
         console.error(error);
         toast.error(error instanceof Error ? error.message : 'Failed to refresh folder');
       });
-  }, [mountedCollection]);
+  }, []);
 
   const tagOptions = useMemo(() => {
     const tags = new Set<string>();
@@ -701,9 +738,11 @@ function TemplatesApp() {
         onError: (error) => {
           console.error(error);
         },
+        getCollection: () => mountedCollectionRef.current,
+        shouldSkip: shouldSkipMountedCollectionRefresh,
       },
     );
-  }, [mountedCollection?.rootHandle, mountedCollection?.selectedTemplateName]);
+  }, [mountedCollection?.rootHandle, shouldSkipMountedCollectionRefresh]);
 
   // Fetch templates and author avatars
   useEffect(() => {
@@ -792,12 +831,18 @@ function TemplatesApp() {
     );
     if (!shouldCreate) return;
 
-    const entry = await createBlankTemplateEntry(collection.rootHandle);
-    const nextCollection = await refreshTemplateCollection({
-      ...collection,
-      selectedTemplateName: entry.name,
+    const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
+      const entry = await createBlankTemplateEntry(collection.rootHandle);
+      const collectionAfterCreate = await refreshTemplateCollection({
+        ...collection,
+        selectedTemplateName: entry.name,
+      });
+
+      return {
+        nextCollection: collectionAfterCreate,
+        nextEntry: findTemplateEntry(collectionAfterCreate, entry.name) ?? entry,
+      };
     });
-    const nextEntry = findTemplateEntry(nextCollection, entry.name) ?? entry;
     setMountedCollection(nextCollection);
     await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
   };
@@ -844,18 +889,25 @@ function TemplatesApp() {
   };
 
   const onCreateMountedTemplate = async () => {
-    if (!mountedCollection) return;
+    const collection = mountedCollectionRef.current;
+    if (!collection) return;
 
     const title = window.prompt('Template name', 'Untitled Template') ?? '';
     if (!title.trim()) return;
 
     try {
-      const entry = await createBlankTemplateEntry(mountedCollection.rootHandle, title);
-      const nextCollection = await refreshTemplateCollection({
-        ...mountedCollection,
-        selectedTemplateName: entry.name,
+      const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
+        const entry = await createBlankTemplateEntry(collection.rootHandle, title);
+        const collectionAfterCreate = await refreshTemplateCollection({
+          ...collection,
+          selectedTemplateName: entry.name,
+        });
+
+        return {
+          nextCollection: collectionAfterCreate,
+          nextEntry: findTemplateEntry(collectionAfterCreate, entry.name) ?? entry,
+        };
       });
-      const nextEntry = findTemplateEntry(nextCollection, entry.name) ?? entry;
       setMountedCollection(nextCollection);
       setLastFolderName(nextCollection.rootName);
       await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
@@ -872,10 +924,14 @@ function TemplatesApp() {
     const collection = mountedCollectionRef.current;
     if (!collection) throw new Error('Mounted folder is not available.');
 
-    const updatedEntry = await writeTemplateMetadata(collection, entry, metadata);
-    const nextCollection = await refreshTemplateCollection({
-      ...collection,
-      selectedTemplateName: updatedEntry.name,
+    const { nextCollection, updatedEntry } = await runMountedCollectionWrite(async () => {
+      const updatedEntry = await writeTemplateMetadata(collection, entry, metadata);
+      const collectionAfterSave = await refreshTemplateCollection({
+        ...collection,
+        selectedTemplateName: updatedEntry.name,
+      });
+
+      return { nextCollection: collectionAfterSave, updatedEntry };
     });
     setMountedCollection(nextCollection);
     setLastFolderName(nextCollection.rootName);
@@ -891,17 +947,26 @@ function TemplatesApp() {
     }
 
     try {
-      const sourceKind = getProjectSourceKind(project);
-      const entry = await createTemplateEntryFromTemplate(collection, project.template, project.title, {
-        description: 'A template copied from Browser Projects.',
-        source: getProjectSourceInput(project),
-        sourceKind,
-        tags: [getGenerationLabel(sourceKind)],
-        thumbnailDataUrl: project.thumbnail,
-      });
-      const nextCollection = await refreshTemplateCollection({
-        ...collection,
-        selectedTemplateName: entry.name,
+      const { nextCollection } = await runMountedCollectionWrite(async () => {
+        const sourceKind = getProjectSourceKind(project);
+        const entry = await createTemplateEntryFromTemplate(
+          collection,
+          project.template,
+          project.title,
+          {
+            description: 'A template copied from Browser Projects.',
+            source: getProjectSourceInput(project),
+            sourceKind,
+            tags: [getGenerationLabel(sourceKind)],
+            thumbnailDataUrl: project.thumbnail,
+          },
+        );
+        const collectionAfterCopy = await refreshTemplateCollection({
+          ...collection,
+          selectedTemplateName: entry.name,
+        });
+
+        return { nextCollection: collectionAfterCopy };
       });
       setMountedCollection(nextCollection);
       setLastFolderName(nextCollection.rootName);
@@ -1123,7 +1188,10 @@ function TemplatesApp() {
                   </PlaygroundButton>
                 )}
                 {mountedCollection && (
-                  <PlaygroundButton onClick={() => void onCreateMountedTemplate()} variant="primary">
+                  <PlaygroundButton
+                    onClick={() => void onCreateMountedTemplate()}
+                    variant="primary"
+                  >
                     <PencilRuler className="size-4" />
                     New Mounted Template
                   </PlaygroundButton>
@@ -1173,6 +1241,7 @@ function TemplatesApp() {
                           <MountedThumbnailImage
                             entry={entry}
                             onCreated={refreshMountedCollection}
+                            runWrite={runMountedCollectionWrite}
                           />
                         }
                         actions={

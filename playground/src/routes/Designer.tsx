@@ -127,9 +127,10 @@ function DesignerFileButton({
 }
 
 function DesignerApp() {
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
+  const searchParamsRef = useRef(searchParams);
   const projectRef = useRef<PlaygroundProject | null>(null);
   const fileWorkspaceCollectionRef = useRef<FileWorkspaceCollection | null>(null);
   const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
@@ -155,6 +156,10 @@ function DesignerApp() {
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
+
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
 
   const setCurrentProjectTitle = useCallback((title: string) => {
     projectTitleRef.current = title;
@@ -236,9 +241,12 @@ function DesignerApp() {
             nextTemplate,
             title,
           );
-          setSearchParams(new URLSearchParams([['workspace', targetEntry.name]]), {
-            replace: true,
-          });
+          const nextSearchParams = new URLSearchParams(searchParamsRef.current);
+          nextSearchParams.set('workspace', targetEntry.name);
+          nextSearchParams.delete('new');
+          nextSearchParams.delete('template');
+          nextSearchParams.delete('project');
+          setSearchParams(nextSearchParams, { replace: true });
         } else if (diskVersionRef.current) {
           try {
             const diskRead = await readTemplateEntry(currentFileEntry);
@@ -534,13 +542,13 @@ function DesignerApp() {
     applyTemplateFromDisk(currentEntry, incoming);
   };
 
-  const onKeepConflictEditing = () => {
+  const onKeepConflictEditing = useCallback(() => {
     const incoming = fileWorkspaceConflict?.incoming;
     if (incoming) {
       diskVersionRef.current = incoming.diskVersion;
     }
     setFileWorkspaceConflict(null);
-  };
+  }, [fileWorkspaceConflict]);
 
   const onSaveOverConflict = async () => {
     if (!designer.current) return;
@@ -559,6 +567,19 @@ function DesignerApp() {
       toast.error(error instanceof Error ? error.message : 'Failed to save over disk');
     }
   };
+
+  useEffect(() => {
+    if (!fileWorkspaceConflict) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      onKeepConflictEditing();
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [fileWorkspaceConflict, onKeepConflictEditing]);
 
   const toggleEditingStaticSchemas = () => {
     if (!designer.current) return;
@@ -815,9 +836,23 @@ function DesignerApp() {
       <div ref={designerRef} className="flex-1 w-full" />
       {fileWorkspaceConflict && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-lg bg-white p-5 shadow-xl">
-            <h2 className="text-lg font-bold text-gray-900">Template changed on disk</h2>
-            <p className="mt-2 text-sm text-gray-600">{fileWorkspaceConflict.message}</p>
+          <div
+            aria-describedby="file-workspace-conflict-description"
+            aria-labelledby="file-workspace-conflict-title"
+            aria-modal="true"
+            className="w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+            role="dialog"
+          >
+            <h2 id="file-workspace-conflict-title" className="text-lg font-bold text-gray-900">
+              Template changed on disk
+            </h2>
+            <div
+              id="file-workspace-conflict-description"
+              className="mt-2 space-y-2 text-sm text-gray-600"
+            >
+              <p>{fileWorkspaceConflict.message}</p>
+              <p>Keeping your edits means the next save will overwrite the current disk version.</p>
+            </div>
             <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
               <PlaygroundButton
                 disabled={!fileWorkspaceConflict.incoming}

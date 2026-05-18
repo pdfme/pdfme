@@ -10,7 +10,8 @@ const DB_NAME = 'pdfme-playground-file-workspace';
 const DB_VERSION = 1;
 const STORE_NAME = 'workspace';
 const ACTIVE_STATE_KEY = 'active';
-const DEFAULT_POLLING_INTERVAL_MS = 1500;
+const DEFAULT_COLLECTION_POLLING_INTERVAL_MS = 4000;
+const DEFAULT_ENTRY_POLLING_INTERVAL_MS = 1500;
 
 export type SourceKind = 'designer' | 'jsx' | 'md2pdf';
 
@@ -77,6 +78,10 @@ type FileWorkspaceSubscriptionOptions = {
   intervalMs?: number;
   onError?: (error: unknown) => void;
   shouldSkip?: () => boolean;
+};
+
+type FileWorkspaceCollectionSubscriptionOptions = FileWorkspaceSubscriptionOptions & {
+  getCollection?: () => FileWorkspaceCollection | null | undefined;
 };
 
 type CreateTemplateEntryOptions = {
@@ -583,7 +588,7 @@ const subscribeFileSystemObserver = (
 export const subscribeTemplateCollectionChanges = (
   collection: FileWorkspaceCollection,
   listener: (collection: FileWorkspaceCollection) => void,
-  options: FileWorkspaceSubscriptionOptions = {},
+  options: FileWorkspaceCollectionSubscriptionOptions = {},
 ) => {
   if (typeof window === 'undefined') return () => undefined;
 
@@ -594,7 +599,10 @@ export const subscribeTemplateCollectionChanges = (
 
     checking = true;
     try {
-      listener(await refreshTemplateCollection(collection));
+      const currentCollection = options.getCollection ? options.getCollection() : collection;
+      if (!currentCollection) return;
+
+      listener(await refreshTemplateCollection(currentCollection));
     } catch (error) {
       options.onError?.(error);
     } finally {
@@ -602,7 +610,10 @@ export const subscribeTemplateCollectionChanges = (
     }
   };
 
-  const intervalId = window.setInterval(check, options.intervalMs ?? DEFAULT_POLLING_INTERVAL_MS);
+  const intervalId = window.setInterval(
+    check,
+    options.intervalMs ?? DEFAULT_COLLECTION_POLLING_INTERVAL_MS,
+  );
   const disconnectObserver = subscribeFileSystemObserver(collection.rootHandle, check);
 
   return () => {
@@ -642,7 +653,10 @@ export const subscribeTemplateEntryChanges = (
     }
   };
 
-  const intervalId = window.setInterval(check, options.intervalMs ?? DEFAULT_POLLING_INTERVAL_MS);
+  const intervalId = window.setInterval(
+    check,
+    options.intervalMs ?? DEFAULT_ENTRY_POLLING_INTERVAL_MS,
+  );
   const disconnectObserver = subscribeFileSystemObserver(entry.templateDirectoryHandle, check);
 
   return () => {

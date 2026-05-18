@@ -160,6 +160,7 @@ describe('file workspace helpers', () => {
     invoice.addFile(
       'metadata.json',
       JSON.stringify({
+        customField: 'keep me',
         description: 'Old description',
         order: 7,
         sourceKind: 'designer',
@@ -190,6 +191,7 @@ describe('file workspace helpers', () => {
       sourceKind: 'designer',
       tags: ['Invoice', 'Business'],
       order: 7,
+      customField: 'keep me',
     });
   });
 
