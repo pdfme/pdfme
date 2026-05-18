@@ -134,6 +134,13 @@ describe('validateVariables', () => {
     );
   });
 
+  it('should throw an error for null required variable values', () => {
+    const value = JSON.stringify({ var1: null, var2: '' });
+    expect(() => validateVariables(value, schema)).toThrow(
+      '[@pdfme/generator] variable var1 is missing for field test'
+    );
+  });
+
   it('should return false for missing non-required variables', () => {
     // @ts-ignore
     const nonRequiredSchema: MultiVariableTextSchema = {
@@ -154,6 +161,17 @@ describe('validateVariables', () => {
     };
     const value = JSON.stringify({ var1: '', var2: '' });
     expect(validateVariables(value, nonRequiredSchema)).toBe(true);
+  });
+
+  it('should return false for null non-required variable values', () => {
+    // @ts-ignore
+    const nonRequiredSchema: MultiVariableTextSchema = {
+      name: 'test',
+      variables: ['var1', 'var2'],
+      required: false,
+    };
+    const value = JSON.stringify({ var1: null, var2: '' });
+    expect(validateVariables(value, nonRequiredSchema)).toBe(false);
   });
 
   it('should throw an error for invalid JSON input', () => {
