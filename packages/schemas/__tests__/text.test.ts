@@ -580,6 +580,27 @@ describe('text dynamic layout', () => {
     expect(result.heights[0]).toBeGreaterThan(5);
   });
 
+  it('expands multiVariableText when optional variables are empty strings', async () => {
+    const schema = {
+      ...getTextSchema(),
+      name: 'message',
+      type: 'multiVariableText',
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      text: 'Title\n{name}\nFooter\nDone',
+      variables: ['name'],
+      required: false,
+    } as MultiVariableTextSchema;
+
+    const result = await getDynamicLayoutForMultiVariableText(JSON.stringify({ name: '' }), {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights[0]).toBeGreaterThan(5);
+  });
+
   it('expands read-only multiVariableText as resolved text', async () => {
     const schema = {
       ...getTextSchema(),
