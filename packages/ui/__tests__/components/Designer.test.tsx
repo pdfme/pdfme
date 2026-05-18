@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, act, fireEvent, waitFor } from '@testing-library/react';
-import Designer from '../../src/components/Designer/index.js';
+import Designer, { type DesignerEditorApi } from '../../src/components/Designer/index.js';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
@@ -101,5 +101,61 @@ test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only
 
   await waitFor(() => {
     expect(sidebar.style.width).toBe('0px');
+  });
+});
+
+test('selectSchemas selects the matching schema element and deselects with empty array', async () => {
+  setupUIMock();
+  let editorApi: DesignerEditorApi | null = null;
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={getSampleTemplate()}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+            onMountEditorApi={(api) => {
+              editorApi = api;
+            }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  // Wait for schema elements to be mounted in the DOM.
+  await waitFor(() => {
+    expect(container.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
+  });
+
+  expect(editorApi).not.toBeNull();
+
+  // No selection initially – delete button should not be present.
+  expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
+
+  // Select field1 programmatically.
+  await act(async () => {
+    editorApi!.selectSchemas(['field1']);
+    // The internal selectSchemas uses setTimeout; flush it.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  // The delete button appears whenever one or more elements are active.
+  await waitFor(() => {
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
+  });
+
+  // Deselect by passing an empty array.
+  await act(async () => {
+    editorApi!.selectSchemas([]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+
+  await waitFor(() => {
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
   });
 });

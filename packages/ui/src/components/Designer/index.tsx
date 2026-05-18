@@ -49,12 +49,17 @@ const scaleDragPosAdjustment = (adjustment: number, scale: number): number => {
   return 0;
 };
 
+export type DesignerEditorApi = {
+  selectSchemas: (names: string[]) => void;
+};
+
 const TemplateEditor = ({
   template,
   size,
   onSaveTemplate,
   onChangeTemplate,
   onPageCursorChange,
+  onMountEditorApi,
 }: Omit<DesignerProps, 'domContainer'> & {
   size: Size;
   onSaveTemplate: (t: Template) => void;
@@ -62,6 +67,7 @@ const TemplateEditor = ({
 } & {
   onChangeTemplate: (t: Template) => void;
   onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
+  onMountEditorApi?: (api: DesignerEditorApi) => void;
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
@@ -100,6 +106,40 @@ const TemplateEditor = ({
     setActiveElements([]);
     setHoveringSchemaId(null);
   };
+
+  // Keep a ref to current schemasList so the editor API closure never becomes stale.
+  const schemasListRef = useRef(schemasList);
+  useEffect(() => {
+    schemasListRef.current = schemasList;
+  }, [schemasList]);
+
+  // Expose an imperative API to the Designer class once on mount.
+  useEffect(() => {
+    if (!onMountEditorApi) return;
+    onMountEditorApi({
+      selectSchemas: (names: string[]) => {
+        if (names.length === 0) {
+          onEditEnd();
+          return;
+        }
+        // Resolve schema ids from names, searching the current page first.
+        const allSchemas = schemasListRef.current.flat();
+        const matchedIds = names
+          .map((name) => allSchemas.find((s) => s.name === name)?.id)
+          .filter((id): id is string => id !== undefined);
+
+        // Use setTimeout so the DOM is guaranteed to be up-to-date (same pattern as addSchema).
+        setTimeout(() => {
+          const elements = matchedIds
+            .map((id) => document.getElementById(id))
+            .filter((el): el is HTMLElement => el !== null);
+          onEdit(elements);
+        });
+      },
+    });
+    // onMountEditorApi is intentionally excluded – we only want to call it once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (typeof options.zoomLevel === 'number') {

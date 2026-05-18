@@ -9,7 +9,7 @@ import {
 } from '@pdfme/common';
 import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
-import DesignerComponent from './components/Designer/index.js';
+import DesignerComponent, { type DesignerEditorApi } from './components/Designer/index.js';
 import AppContextProvider from './components/AppContextProvider.js';
 
 class Designer extends BaseUIClass {
@@ -17,6 +17,7 @@ class Designer extends BaseUIClass {
   private onChangeTemplateCallback?: (template: Template) => void;
   private onPageChangeCallback?: (pageInfo: { currentPage: number; totalPages: number }) => void;
   private pageCursor: number = 0;
+  private editorApi: DesignerEditorApi | null = null;
 
   constructor(props: DesignerProps) {
     super(props);
@@ -61,6 +62,25 @@ class Designer extends BaseUIClass {
     return this.template.schemas.length;
   }
 
+  /**
+   * Programmatically select one or more schema elements by name.
+   *
+   * This is equivalent to clicking the elements on the canvas. Pass an empty
+   * array to deselect everything. Names that do not match any schema on the
+   * current template are silently ignored.
+   *
+   * Note: only schemas on the currently-visible page can be selected because
+   * the canvas only renders DOM nodes for the active page. Call
+   * `onPageChange` / scroll to the target page first if the schema lives on a
+   * different page.
+   */
+  public selectSchemas(names: string[]) {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (this.editorApi) {
+      this.editorApi.selectSchemas(names);
+    }
+  }
+
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.mount(
@@ -94,6 +114,9 @@ class Designer extends BaseUIClass {
                 totalPages: totalPages,
               });
             }
+          }}
+          onMountEditorApi={(api) => {
+            this.editorApi = api;
           }}
           size={this.size}
         />
