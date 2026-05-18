@@ -110,7 +110,12 @@ describe('file workspace helpers', () => {
     invoice.addFile('template.json', serializeTemplateForFileWorkspace(blankTemplate));
     invoice.addFile(
       'metadata.json',
-      JSON.stringify({ description: 'Invoice template', tags: ['Invoice'], title: 'Invoice' }),
+      JSON.stringify({
+        description: 'Invoice template',
+        sourceKind: 'designer',
+        tags: ['Invoice'],
+        title: 'Invoice',
+      }),
     );
     root
       .addDirectory('.cache')
@@ -197,6 +202,8 @@ describe('file workspace helpers', () => {
     const templateFile = await directory.getFileHandle('template.json');
 
     expect(entry.name).toBe('untitled-template');
+    expect(entry.sourceKind).toBe('designer');
+    expect(entry.title).toBe('Untitled Template');
     expect(templateFile.text).toContain('"schemas": [');
   });
 });

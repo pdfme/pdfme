@@ -1,5 +1,7 @@
 {
+  "title": "Invoice Blue",
   "description": "A blue invoice variant for a more branded business document.",
+  "sourceKind": "designer",
   "tags": [
     "Invoice",
     "Business",

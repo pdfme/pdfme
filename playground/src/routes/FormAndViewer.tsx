@@ -4,11 +4,12 @@ import { toast } from 'react-toastify';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from '@pdfme/common';
 import { Form, Viewer } from '@pdfme/ui';
 import {
-  fromKebabCase,
   getFontsData,
   getTemplateById,
+  getTemplateMetadataById,
   getBlankTemplate,
   getDefaultPlaygroundTemplate,
+  getDefaultPlaygroundTemplateMetadata,
   generatePDF,
   isJsonString,
   translations,
@@ -133,10 +134,13 @@ function FormAndViewerApp() {
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          const templateJson = await getTemplateById(templateIdFromQuery);
+          const [templateJson, metadata] = await Promise.all([
+            getTemplateById(templateIdFromQuery),
+            getTemplateMetadataById(templateIdFromQuery),
+          ]);
           checkTemplate(templateJson);
           template = templateJson;
-          setProjectTitle(fromKebabCase(templateIdFromQuery));
+          setProjectTitle(metadata.title);
         } else {
           fileWorkspaceEntryRef.current = null;
           diskVersionRef.current = null;
@@ -147,8 +151,12 @@ function FormAndViewerApp() {
             template = project.template;
             inputs = project.inputs;
           } else {
-            template = await getDefaultPlaygroundTemplate();
-            setProjectTitle(fromKebabCase('invoice'));
+            const [defaultTemplate, metadata] = await Promise.all([
+              getDefaultPlaygroundTemplate(),
+              getDefaultPlaygroundTemplateMetadata(),
+            ]);
+            template = defaultTemplate;
+            setProjectTitle(metadata.title);
           }
         }
 
@@ -247,7 +255,12 @@ function FormAndViewerApp() {
     currentTemplateRef.current = nextTemplate;
     currentInputsRef.current = nextInputs;
     setProjectTitle(savedProject.title);
-    toast.success(<ProjectSavedToast title={savedProject.title} />);
+    toast.success(
+      <ProjectSavedToast
+        formPath={`/form-viewer?project=${encodeURIComponent(savedProject.id)}`}
+        title={savedProject.title}
+      />,
+    );
   };
 
   const onResetInputs = () => {
@@ -366,8 +379,12 @@ function FormAndViewerApp() {
         <div className="flex gap-1">
           <PlaygroundButton onClick={onGetInputs}>Get</PlaygroundButton>
           <PlaygroundButton onClick={onSetInputs}>Set</PlaygroundButton>
-          <PlaygroundButton onClick={() => void onSaveInputs()}>Save</PlaygroundButton>
-          <PlaygroundButton onClick={() => void onSaveInputs(true)}>Save As</PlaygroundButton>
+          <PlaygroundButton onClick={() => void onSaveInputs()}>
+            {fileWorkspaceEntry ? 'Save Local Copy' : 'Save'}
+          </PlaygroundButton>
+          <PlaygroundButton onClick={() => void onSaveInputs(true)}>
+            {fileWorkspaceEntry ? 'Save As Local Copy' : 'Save As'}
+          </PlaygroundButton>
           <PlaygroundButton onClick={onResetInputs}>Reset</PlaygroundButton>
         </div>
       ),

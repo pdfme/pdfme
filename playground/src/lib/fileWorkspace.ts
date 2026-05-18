@@ -17,7 +17,7 @@ type SourceKind = 'designer' | 'jsx' | 'md2pdf';
 export type FileWorkspaceMetadata = {
   description?: string;
   order?: number;
-  sourceKind?: SourceKind;
+  sourceKind: SourceKind;
   tags: string[];
   title?: string;
 };
@@ -393,7 +393,7 @@ const buildTemplateEntry = async (
     name,
     order: metadata.order,
     path: `${name}/template.json`,
-    sourceKind: metadata.sourceKind ?? inferSourceKind(name),
+    sourceKind: metadata.sourceKind,
     tags: metadata.tags,
     template: readResult.template,
     templateDirectoryHandle: directoryHandle,
@@ -585,7 +585,7 @@ export const subscribeTemplateEntryChanges = (
 
 export const createBlankTemplateEntry = async (
   rootHandle: FileSystemDirectoryHandle,
-  title = 'untitled-template',
+  title = 'Untitled Template',
 ) => {
   const name = await createUniqueDirectoryName(rootHandle, title);
   const directoryHandle = await rootHandle.getDirectoryHandle(name, { create: true });
@@ -603,7 +603,9 @@ export const createBlankTemplateEntry = async (
     `${JSON.stringify(
       {
         description: 'A blank template created from the pdfme Playground.',
+        sourceKind: 'designer',
         tags: ['Blank', 'Starter'],
+        title: title.trim() || titleFromDirectoryName(name),
       },
       null,
       2,
@@ -636,6 +638,7 @@ export const createTemplateEntryFromTemplate = async (
     `${JSON.stringify(
       {
         description: 'A template saved from the pdfme Playground.',
+        sourceKind: 'designer',
         tags: ['Designer'],
         title: title.trim() || titleFromDirectoryName(name),
       },

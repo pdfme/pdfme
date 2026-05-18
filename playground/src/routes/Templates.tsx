@@ -12,12 +12,11 @@ import {
   MoreHorizontal,
   Pencil,
   PencilRuler,
-  RefreshCw,
   Trash2,
   Upload,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { downloadJsonFile, fromKebabCase, readFile } from '../helper';
+import { downloadJsonFile, readFile } from '../helper';
 import PlaygroundButton from '../components/PlaygroundButton';
 import { getAuthoringStarterId, type AuthoringStarterKind } from '../lib/authoringStarters';
 import {
@@ -62,16 +61,16 @@ type TemplateData = {
   name: string;
   author: string;
   basePdfKind?: string;
-  description?: string;
+  description: string;
   fieldCount?: number;
   fontNames?: string[];
   hasCJK?: boolean;
   pageCount?: number;
   schemaTypes?: string[];
-  sourceKind?: Exclude<GenerationFilter, 'all'>;
+  sourceKind: Exclude<GenerationFilter, 'all'>;
   sourcePath?: string;
-  tags?: string[];
-  title?: string;
+  tags: string[];
+  title: string;
 };
 
 type UIType = 'designer' | 'form-viewer';
@@ -114,7 +113,13 @@ const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
 ];
 
 const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
-  template.sourceKind ?? 'designer';
+  template.sourceKind;
+
+const getGenerationLabel = (generation: Exclude<GenerationFilter, 'all'>) => {
+  if (generation === 'jsx') return 'JSX';
+  if (generation === 'md2pdf') return 'md2pdf';
+  return 'Designer';
+};
 
 const getAuthoringPreset = (template: TemplateData): AuthoringPreset | null => {
   const kind = getTemplateGeneration(template);
@@ -127,7 +132,7 @@ const getAuthoringPreset = (template: TemplateData): AuthoringPreset | null => {
 };
 
 const getTemplateTags = (template: TemplateData) => {
-  const tags = new Set(template.tags ?? []);
+  const tags = new Set(template.tags);
 
   return [...tags].sort((a, b) => {
     const aIndex = tagSortOrder.indexOf(a);
@@ -442,7 +447,6 @@ function TemplatesApp() {
   const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
   const [lastFolderName, setLastFolderName] = useState<string | null>(null);
   const [isOpeningFolder, setIsOpeningFolder] = useState(false);
-  const [isRefreshingFolder, setIsRefreshingFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const [tagFilter, setTagFilter] = useState('all');
 
@@ -450,7 +454,6 @@ function TemplatesApp() {
   const refreshMountedCollection = useCallback(() => {
     if (!mountedCollection) return;
 
-    setIsRefreshingFolder(true);
     void refreshTemplateCollection(mountedCollection)
       .then((collection) => {
         setMountedCollection(collection);
@@ -459,8 +462,7 @@ function TemplatesApp() {
       .catch((error) => {
         console.error(error);
         toast.error(error instanceof Error ? error.message : 'Failed to refresh folder');
-      })
-      .finally(() => setIsRefreshingFolder(false));
+      });
   }, [mountedCollection]);
 
   const tagOptions = useMemo(() => {
@@ -685,6 +687,28 @@ function TemplatesApp() {
     toast.info('Disconnected mounted folder');
   };
 
+  const onCreateMountedTemplate = async () => {
+    if (!mountedCollection) return;
+
+    const title = window.prompt('Template name', 'Untitled Template') ?? '';
+    if (!title.trim()) return;
+
+    try {
+      const entry = await createBlankTemplateEntry(mountedCollection.rootHandle, title);
+      const nextCollection = await refreshTemplateCollection({
+        ...mountedCollection,
+        selectedTemplateName: entry.name,
+      });
+      const nextEntry = findTemplateEntry(nextCollection, entry.name) ?? entry;
+      setMountedCollection(nextCollection);
+      setLastFolderName(nextCollection.rootName);
+      await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create template');
+    }
+  };
+
   const onImportTemplateJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -759,125 +783,131 @@ function TemplatesApp() {
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
         <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
-              <p className="mt-2 max-w-3xl text-sm text-green-900">
-                Save templates from Designer, JSX, or md2pdf as local projects. A project keeps the
-                generated template, inputs, and source when available.
-              </p>
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <PlaygroundButton
-                disabled={!fileWorkspaceSupported || isOpeningFolder}
-                onClick={() => void onOpenFolder()}
-                variant="secondary"
-              >
-                <FolderOpen className="size-4" />
-                {isOpeningFolder ? 'Opening...' : 'Open Folder'}
-              </PlaygroundButton>
-              <PlaygroundButton
-                onClick={() => importTemplateInputRef.current?.click()}
-                variant="secondary"
-              >
-                <Upload className="size-4" />
-                Import Template JSON
-              </PlaygroundButton>
-              <input
-                ref={importTemplateInputRef}
-                type="file"
-                accept="application/json"
-                className="sr-only"
-                onChange={onImportTemplateJson}
-              />
-              <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
-                <PencilRuler className="size-4" />
-                New Template
-              </PlaygroundButton>
-            </div>
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
+            <p className="mt-2 max-w-3xl text-sm text-green-900">
+              Work with templates saved in this browser, or mount a folder to edit template files
+              directly on disk.
+            </p>
           </div>
-          {projects.length > 0 ? (
-            <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-              {projects.map((project) => (
-                <GalleryCard
-                  key={project.id}
-                  tag={getProjectKindLabel(project.kind)}
-                  title={project.title}
-                  description={
-                    <p className="text-xs text-gray-500">
-                      Updated {new Date(project.updatedAt).toLocaleString()}
-                    </p>
-                  }
-                  thumbnail={
-                    <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
-                  }
-                  actions={
-                    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
-                      <PlaygroundButton
-                        onClick={() =>
-                          navigateToProject(project, project.source ? 'source' : 'designer')
-                        }
-                      >
-                        {project.source ? (
-                          <>
-                            <Code2 className="size-4" />
-                            Source
-                          </>
-                        ) : (
-                          <>
-                            <PencilRuler className="size-4" />
-                            Designer
-                          </>
-                        )}
-                      </PlaygroundButton>
-                      <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
-                        Preview
-                      </PlaygroundButton>
-                      <ProjectMoreActions
-                        project={project}
-                        onOpenDesigner={(item) => navigateToProject(item, 'designer')}
-                        onRenameProject={onRenameProject}
-                        onDuplicateProject={onDuplicateProject}
-                        onDownloadProjectTemplate={onDownloadProjectTemplate}
-                        onDeleteProject={onDeleteProject}
-                      />
-                    </div>
-                  }
+
+          <div className="mt-5 border-t border-green-200 pt-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Browser Projects</h3>
+                <p className="mt-1 text-sm text-green-900">
+                  Drafts stored in this browser. They include template JSON, form inputs, and source
+                  code when available.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <PlaygroundButton
+                  onClick={() => importTemplateInputRef.current?.click()}
+                  variant="secondary"
+                >
+                  <Upload className="size-4" />
+                  Import Template JSON
+                </PlaygroundButton>
+                <input
+                  ref={importTemplateInputRef}
+                  type="file"
+                  accept="application/json"
+                  className="sr-only"
+                  onChange={onImportTemplateJson}
                 />
-              ))}
+                <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
+                  <PencilRuler className="size-4" />
+                  New Local Template
+                </PlaygroundButton>
+              </div>
             </div>
-          ) : (
-            <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
-              No local projects yet. Start from a sample, JSX, md2pdf, or a blank Designer template.
-            </div>
-          )}
+
+            {projects.length > 0 ? (
+              <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                {projects.map((project) => (
+                  <GalleryCard
+                    key={project.id}
+                    tag={`Local ${getProjectKindLabel(project.kind)}`}
+                    title={project.title}
+                    description={
+                      <p className="text-xs text-gray-500">
+                        Updated {new Date(project.updatedAt).toLocaleString()}
+                      </p>
+                    }
+                    thumbnail={
+                      <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
+                    }
+                    actions={
+                      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
+                        <PlaygroundButton
+                          onClick={() =>
+                            navigateToProject(project, project.source ? 'source' : 'designer')
+                          }
+                        >
+                          {project.source ? (
+                            <>
+                              <Code2 className="size-4" />
+                              Source
+                            </>
+                          ) : (
+                            <>
+                              <PencilRuler className="size-4" />
+                              Designer
+                            </>
+                          )}
+                        </PlaygroundButton>
+                        <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
+                          Preview
+                        </PlaygroundButton>
+                        <ProjectMoreActions
+                          project={project}
+                          onOpenDesigner={(item) => navigateToProject(item, 'designer')}
+                          onRenameProject={onRenameProject}
+                          onDuplicateProject={onDuplicateProject}
+                          onDownloadProjectTemplate={onDownloadProjectTemplate}
+                          onDeleteProject={onDeleteProject}
+                        />
+                      </div>
+                    }
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+                No browser projects yet. Create a local template, import JSON, or save from
+                Designer, JSX, or md2pdf.
+              </div>
+            )}
+          </div>
+
           <div className="mt-6 border-t border-green-200 pt-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Mounted Folder</h3>
                 <p className="mt-1 text-sm text-green-900">
-                  Edit a template-assets style folder directly on disk.
+                  Templates in this section are read from and saved back to template files on disk.
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row">
-                {mountedCollection && (
+                {!mountedCollection && (
                   <PlaygroundButton
-                    disabled={isRefreshingFolder}
-                    onClick={() => void refreshMountedCollection()}
-                    variant="secondary"
+                    disabled={!fileWorkspaceSupported || isOpeningFolder}
+                    onClick={() => void onOpenFolder()}
+                    variant="primary"
                   >
-                    <RefreshCw className="size-4" />
-                    Refresh
+                    <FolderOpen className="size-4" />
+                    {isOpeningFolder ? 'Opening...' : 'Open Folder'}
                   </PlaygroundButton>
                 )}
                 {!mountedCollection && lastFolderName && (
                   <PlaygroundButton
                     disabled={!fileWorkspaceSupported || isOpeningFolder}
                     onClick={() => void onReopenFolder()}
+                    title={lastFolderName}
                     variant="secondary"
                   >
                     <FolderOpen className="size-4" />
-                    Reopen last folder
+                    Reopen Folder
                   </PlaygroundButton>
                 )}
                 {mountedCollection && (
@@ -886,12 +916,18 @@ function TemplatesApp() {
                     Disconnect
                   </PlaygroundButton>
                 )}
+                {mountedCollection && (
+                  <PlaygroundButton onClick={() => void onCreateMountedTemplate()} variant="primary">
+                    <PencilRuler className="size-4" />
+                    New Mounted Template
+                  </PlaygroundButton>
+                )}
               </div>
             </div>
             {!fileWorkspaceSupported && (
               <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                Folder workspaces need a Chromium browser in a secure context. Template JSON import
-                and download are still available.
+                Folder workspaces need a Chromium browser in a secure context. Browser projects,
+                JSON import, and JSON download are still available.
               </div>
             )}
             {mountedCollection && (
@@ -913,7 +949,7 @@ function TemplatesApp() {
                     {mountedCollection.entries.map((entry) => (
                       <GalleryCard
                         key={entry.name}
-                        tag="Mounted"
+                        tag={`Disk ${getGenerationLabel(entry.sourceKind)}`}
                         title={entry.title}
                         tags={entry.tags}
                         description={
@@ -954,7 +990,6 @@ function TemplatesApp() {
                                 )
                               }
                             >
-                              <Eye className="size-4" />
                               Form/Viewer
                             </PlaygroundButton>
                           </div>
@@ -964,7 +999,8 @@ function TemplatesApp() {
                   </div>
                 ) : (
                   <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                    No valid template directories are mounted.
+                    No valid template directories are mounted. Create a mounted template to write a
+                    new folder with template.json.
                   </div>
                 )}
               </>
@@ -1042,7 +1078,7 @@ function TemplatesApp() {
             {filteredTemplates.map((template, index) => {
               const { name, author } = template;
               const authoringPreset = getAuthoringPreset(template);
-              const title = template.title ?? fromKebabCase(name);
+              const title = template.title;
               const generation = getTemplateGeneration(template);
               const tag =
                 generation === 'jsx' ? 'JSX' : generation === 'md2pdf' ? 'md2pdf' : 'Designer';
@@ -1064,7 +1100,7 @@ function TemplatesApp() {
                     tags={tags}
                     description={
                       <div className="space-y-3">
-                        <p>{template.description ?? 'A ready-to-edit pdfme sample template.'}</p>
+                        <p>{template.description}</p>
                         <p className="flex items-center gap-2 text-xs text-gray-500">
                           by{' '}
                           {avatarUrlMap[author] && (

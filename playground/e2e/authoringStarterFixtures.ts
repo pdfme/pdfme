@@ -26,17 +26,17 @@ export const readAuthoringStarterFixtures = (kind: 'jsx' | 'md2pdf'): AuthoringS
       if (!fs.existsSync(sourcePath) || !fs.existsSync(metadataPath)) return [];
 
       const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8')) as {
-        description?: string;
-        sourceKind?: string;
-        title?: string;
+        description: string;
+        sourceKind: string;
+        title: string;
       };
       if (metadata.sourceKind !== kind) return [];
 
       return [
         {
           assetName: entry.name,
-          description: metadata.description ?? '',
-          label: metadata.title ?? entry.name,
+          description: metadata.description,
+          label: metadata.title,
           source: fs.readFileSync(sourcePath, 'utf-8'),
         },
       ];

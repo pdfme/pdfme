@@ -1,5 +1,7 @@
 {
+  "title": "Location Number",
   "description": "A location marker template that labels points with numbered badges.",
+  "sourceKind": "designer",
   "tags": [
     "Map",
     "Visual"

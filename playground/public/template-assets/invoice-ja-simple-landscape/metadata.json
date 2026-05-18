@@ -1,5 +1,7 @@
 {
+  "title": "Japanese Invoice Landscape",
   "description": "A landscape Japanese invoice layout for wider table content.",
+  "sourceKind": "designer",
   "tags": [
     "Invoice",
     "Business",

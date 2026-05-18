@@ -5,11 +5,12 @@ import { Code2, Copy, Download, Save } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
 import { Designer } from '@pdfme/ui';
 import {
-  fromKebabCase,
   getFontsData,
   getTemplateById,
+  getTemplateMetadataById,
   getBlankTemplate,
   getDefaultPlaygroundTemplate,
+  getDefaultPlaygroundTemplateMetadata,
   readFile,
   generatePDF,
   downloadJsonFile,
@@ -295,7 +296,12 @@ function DesignerApp() {
             refreshedCollection.rootHandle,
             refreshedEntry.name,
           );
-          toast.success(`Saved ${refreshedEntry.path}`);
+          toast.success(
+            <ProjectSavedToast
+              formPath={`/form-viewer?workspace=${encodeURIComponent(refreshedEntry.name)}`}
+              title={refreshedEntry.path}
+            />,
+          );
         } finally {
           isSavingFileWorkspaceRef.current = false;
         }
@@ -382,18 +388,25 @@ function DesignerApp() {
           template = project.template;
         } else if (templateIdFromQuery) {
           setActiveFileWorkspaceEntry(null, null);
-          const templateJson = await getTemplateById(templateIdFromQuery);
+          const [templateJson, metadata] = await Promise.all([
+            getTemplateById(templateIdFromQuery),
+            getTemplateMetadataById(templateIdFromQuery),
+          ]);
           checkTemplate(templateJson);
           template = templateJson;
-          setCurrentProjectTitle(fromKebabCase(templateIdFromQuery));
+          setCurrentProjectTitle(metadata.title);
         } else {
           setActiveFileWorkspaceEntry(null, null);
           project = getActivePlaygroundProject();
           if (project) {
             template = project.template;
           } else {
-            template = await getDefaultPlaygroundTemplate();
-            setCurrentProjectTitle(fromKebabCase('invoice'));
+            const [defaultTemplate, metadata] = await Promise.all([
+              getDefaultPlaygroundTemplate(),
+              getDefaultPlaygroundTemplateMetadata(),
+            ]);
+            template = defaultTemplate;
+            setCurrentProjectTitle(metadata.title);
           }
         }
 

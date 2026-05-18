@@ -10,12 +10,20 @@ import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate, generateForm } from '@pdfme/generator';
 import { getPlugins } from './plugins';
 
-export function fromKebabCase(str: string): string {
-  return str
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-}
+const templateAssetSourceKinds = ['designer', 'jsx', 'md2pdf'] as const;
+
+type TemplateAssetSourceKind = (typeof templateAssetSourceKinds)[number];
+
+export type TemplateAssetMetadata = {
+  description: string;
+  order?: number;
+  sourceKind: TemplateAssetSourceKind;
+  tags: string[];
+  title: string;
+};
+
+const isTemplateAssetSourceKind = (value: unknown): value is TemplateAssetSourceKind =>
+  templateAssetSourceKinds.includes(value as TemplateAssetSourceKind);
 
 export const getFontsData = (): Font => ({
   ...getDefaultFont(),
@@ -150,4 +158,37 @@ export const getTemplateById = async (templateId: string): Promise<Template> => 
   return template as Template;
 };
 
+export const getTemplateMetadataById = async (
+  templateId: string,
+): Promise<TemplateAssetMetadata> => {
+  const response = await fetch(`/template-assets/${templateId}/metadata.json`);
+  if (!response.ok) {
+    throw new Error(`Failed to load template metadata: ${response.statusText}`);
+  }
+
+  const metadata = (await response.json()) as Partial<TemplateAssetMetadata>;
+  if (!metadata.title?.trim()) {
+    throw new Error(`Template metadata "${templateId}" must include title.`);
+  }
+  if (!metadata.description?.trim()) {
+    throw new Error(`Template metadata "${templateId}" must include description.`);
+  }
+  if (!isTemplateAssetSourceKind(metadata.sourceKind)) {
+    throw new Error(`Template metadata "${templateId}" must include sourceKind.`);
+  }
+  if (!metadata.tags || metadata.tags.length === 0) {
+    throw new Error(`Template metadata "${templateId}" must include tags.`);
+  }
+
+  return {
+    description: metadata.description,
+    order: metadata.order,
+    sourceKind: metadata.sourceKind,
+    tags: metadata.tags,
+    title: metadata.title.trim(),
+  };
+};
+
 export const getDefaultPlaygroundTemplate = () => getTemplateById(DEFAULT_PLAYGROUND_TEMPLATE_ID);
+export const getDefaultPlaygroundTemplateMetadata = () =>
+  getTemplateMetadataById(DEFAULT_PLAYGROUND_TEMPLATE_ID);
