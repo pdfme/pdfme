@@ -280,14 +280,36 @@ const toDirectoryName = (value: string) => {
 const createUniqueDirectoryName = async (
   rootHandle: FileSystemDirectoryHandle,
   preferredName: string,
+  currentName?: string,
 ) => {
   const baseName = toDirectoryName(preferredName);
+  if (baseName === currentName) return baseName;
+
   const existing = new Set(await getChildDirectoryNames(rootHandle));
   if (!existing.has(baseName)) return baseName;
 
   for (let index = 2; ; index += 1) {
     const candidate = `${baseName}-${index}`;
     if (!existing.has(candidate)) return candidate;
+  }
+};
+
+const copyDirectoryContents = async (
+  sourceDirectoryHandle: FileSystemDirectoryHandle,
+  targetDirectoryHandle: FileSystemDirectoryHandle,
+) => {
+  for (const [name, handle] of await getDirectoryEntries(sourceDirectoryHandle)) {
+    if (handle.kind === 'directory') {
+      const childTargetHandle = await targetDirectoryHandle.getDirectoryHandle(name, {
+        create: true,
+      });
+      await copyDirectoryContents(handle, childTargetHandle);
+      continue;
+    }
+
+    const sourceFile = await handle.getFile();
+    const targetFileHandle = await targetDirectoryHandle.getFileHandle(name, { create: true });
+    await writeBlob(targetFileHandle, sourceFile);
   }
 };
 
@@ -720,12 +742,21 @@ export const createTemplateEntryFromTemplate = async (
 };
 
 export const writeTemplateMetadata = async (
+  collection: Pick<FileWorkspaceCollection, 'rootHandle'>,
   entry: FileWorkspaceTemplateEntry,
   metadata: EditableFileWorkspaceMetadata,
 ): Promise<FileWorkspaceTemplateEntry> => {
-  const metadataFileHandle = await entry.templateDirectoryHandle.getFileHandle('metadata.json', {
-    create: true,
-  });
+  const nextTitle = metadata.title.trim() || entry.title;
+  const nextName = await createUniqueDirectoryName(collection.rootHandle, nextTitle, entry.name);
+  const shouldRename = nextName !== entry.name;
+  const targetDirectoryHandle = shouldRename
+    ? await collection.rootHandle.getDirectoryHandle(nextName, { create: true })
+    : entry.templateDirectoryHandle;
+
+  if (shouldRename) {
+    await copyDirectoryContents(entry.templateDirectoryHandle, targetDirectoryHandle);
+  }
+
   const rawMetadata = await readRawMetadata(entry.templateDirectoryHandle);
   const {
     description: _description,
@@ -736,15 +767,24 @@ export const writeTemplateMetadata = async (
   } = rawMetadata;
   const sourceKind = normalizeMetadata(rawMetadata, entry.name).sourceKind;
   const nextMetadata = {
-    title: metadata.title.trim() || entry.title,
+    title: nextTitle,
     description: metadata.description.trim(),
     sourceKind,
     tags: normalizeTags(metadata.tags),
     ...restMetadata,
   };
 
+  const metadataFileHandle = await targetDirectoryHandle.getFileHandle('metadata.json', {
+    create: true,
+  });
   await writeText(metadataFileHandle, `${JSON.stringify(nextMetadata, null, 2)}\n`);
-  return buildTemplateEntry(entry.name, entry.templateDirectoryHandle);
+  const updatedEntry = await buildTemplateEntry(nextName, targetDirectoryHandle);
+
+  if (shouldRename) {
+    await collection.rootHandle.removeEntry(entry.name, { recursive: true });
+  }
+  await persistFileWorkspaceState(collection.rootHandle, updatedEntry.name).catch(() => undefined);
+  return updatedEntry;
 };
 
 export const writeTemplateEntry = async (

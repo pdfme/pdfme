@@ -95,7 +95,7 @@ class MemoryDirectoryHandle {
     throw new Error(`File not found: ${name}`);
   }
 
-  async removeEntry(name: string) {
+  async removeEntry(name: string, _options: { recursive?: boolean } = {}) {
     if (!this.children.delete(name)) throw new Error(`Entry not found: ${name}`);
   }
 }
@@ -153,11 +153,11 @@ describe('file workspace helpers', () => {
     expect(templateFile.text).toBe(serializeTemplateForFileWorkspace(nextTemplate));
   });
 
-  it('updates editable metadata fields and preserves existing metadata', async () => {
+  it('updates editable metadata fields and renames the template directory', async () => {
     const root = new MemoryDirectoryHandle('templates');
     const invoice = root.addDirectory('invoice');
     invoice.addFile('template.json', serializeTemplateForFileWorkspace(blankTemplate));
-    const metadataFile = invoice.addFile(
+    invoice.addFile(
       'metadata.json',
       JSON.stringify({
         description: 'Old description',
@@ -171,15 +171,19 @@ describe('file workspace helpers', () => {
     const entry = collection.entries[0];
     if (!entry) throw new Error('Missing test entry');
 
-    const updated = await writeTemplateMetadata(entry, {
+    const updated = await writeTemplateMetadata(collection, entry, {
       description: 'New description',
       tags: ['Invoice', 'Business', 'Invoice'],
       title: 'New title',
     });
+    const renamedDirectory = await root.getDirectoryHandle('new-title');
+    const metadataFile = await renamedDirectory.getFileHandle('metadata.json');
 
+    expect(updated.name).toBe('new-title');
     expect(updated.title).toBe('New title');
     expect(updated.description).toBe('New description');
     expect(updated.tags).toEqual(['Invoice', 'Business']);
+    await expect(root.getDirectoryHandle('invoice')).rejects.toThrow('Directory not found');
     expect(JSON.parse(metadataFile.text)).toEqual({
       title: 'New title',
       description: 'New description',

@@ -506,6 +506,9 @@ const MountedMetadataDialog = ({
           <div>
             <h3 className="text-lg font-bold text-gray-900">Edit Metadata</h3>
             <p className="mt-1 text-xs text-gray-500">{entry.name}/metadata.json</p>
+            <p className="mt-1 text-xs text-gray-500">
+              Changing the title also renames the template folder.
+            </p>
           </div>
           <PlaygroundButton disabled={isSaving} onClick={onClose} type="button" variant="ghost">
             Close
@@ -869,7 +872,7 @@ function TemplatesApp() {
     const collection = mountedCollectionRef.current;
     if (!collection) throw new Error('Mounted folder is not available.');
 
-    const updatedEntry = await writeTemplateMetadata(entry, metadata);
+    const updatedEntry = await writeTemplateMetadata(collection, entry, metadata);
     const nextCollection = await refreshTemplateCollection({
       ...collection,
       selectedTemplateName: updatedEntry.name,
