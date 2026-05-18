@@ -60,7 +60,7 @@ export const validateVariables = (value: string, schema: MultiVariableTextSchema
   }
 
   for (const variable of schema.variables) {
-    if (!values[variable]) {
+    if (!Object.prototype.hasOwnProperty.call(values, variable)) {
       if (schema.required) {
         throw new Error(
           `[@pdfme/generator] variable ${variable} is missing for field ${schema.name}`,

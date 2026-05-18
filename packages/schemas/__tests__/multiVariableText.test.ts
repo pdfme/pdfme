@@ -54,6 +54,13 @@ describe('substituteVariables', () => {
     expect(result).toBe('Hello, !');
   });
 
+  it('should substitute variables with empty string values', () => {
+    const text = 'Hello, {name}!';
+    const variables = { name: '' };
+    const result = substituteVariables(text, variables);
+    expect(result).toBe('Hello, !');
+  });
+
   it('should handle variables as a JSON string', () => {
     const text = 'Hello, {name}!';
     const variables = '{"name": "World"}';
@@ -115,6 +122,11 @@ describe('validateVariables', () => {
     expect(validateVariables(value, schema)).toBe(true);
   });
 
+  it('should return true for empty string values with all required variables present', () => {
+    const value = JSON.stringify({ var1: '', var2: '' });
+    expect(validateVariables(value, schema)).toBe(true);
+  });
+
   it('should throw an error for missing required variables', () => {
     const value = JSON.stringify({ var1: 'value1' });
     expect(() => validateVariables(value, schema)).toThrow(
@@ -131,6 +143,17 @@ describe('validateVariables', () => {
     };
     const value = JSON.stringify({ var1: 'value1' });
     expect(validateVariables(value, nonRequiredSchema)).toBe(false);
+  });
+
+  it('should return true for empty string values with all non-required variables present', () => {
+    // @ts-ignore
+    const nonRequiredSchema: MultiVariableTextSchema = {
+      name: 'test',
+      variables: ['var1', 'var2'],
+      required: false,
+    };
+    const value = JSON.stringify({ var1: '', var2: '' });
+    expect(validateVariables(value, nonRequiredSchema)).toBe(true);
   });
 
   it('should throw an error for invalid JSON input', () => {
