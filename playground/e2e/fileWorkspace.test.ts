@@ -3,10 +3,12 @@ import {
   FileWorkspaceTemplateDeletedError,
   FileWorkspaceTemplateInvalidError,
   createBlankTemplateEntry,
+  createTemplateEntryFromTemplate,
   readTemplateEntry,
   scanTemplateCollection,
   serializeTemplateForFileWorkspace,
   writeTemplateEntry,
+  writeTemplateMetadata,
 } from '../src/lib/fileWorkspace';
 
 class MemoryFileHandle {
@@ -149,6 +151,70 @@ describe('file workspace helpers', () => {
 
     expect(saved.template.pdfmeVersion).toBe('test');
     expect(templateFile.text).toBe(serializeTemplateForFileWorkspace(nextTemplate));
+  });
+
+  it('updates editable metadata fields and preserves existing metadata', async () => {
+    const root = new MemoryDirectoryHandle('templates');
+    const invoice = root.addDirectory('invoice');
+    invoice.addFile('template.json', serializeTemplateForFileWorkspace(blankTemplate));
+    const metadataFile = invoice.addFile(
+      'metadata.json',
+      JSON.stringify({
+        description: 'Old description',
+        order: 7,
+        sourceKind: 'designer',
+        tags: ['Old'],
+        title: 'Old title',
+      }),
+    );
+    const collection = await scanTemplateCollection(root as unknown as FileSystemDirectoryHandle);
+    const entry = collection.entries[0];
+    if (!entry) throw new Error('Missing test entry');
+
+    const updated = await writeTemplateMetadata(entry, {
+      description: 'New description',
+      tags: ['Invoice', 'Business', 'Invoice'],
+      title: 'New title',
+    });
+
+    expect(updated.title).toBe('New title');
+    expect(updated.description).toBe('New description');
+    expect(updated.tags).toEqual(['Invoice', 'Business']);
+    expect(JSON.parse(metadataFile.text)).toEqual({
+      title: 'New title',
+      description: 'New description',
+      sourceKind: 'designer',
+      tags: ['Invoice', 'Business'],
+      order: 7,
+    });
+  });
+
+  it('copies a template with metadata and source into a collection', async () => {
+    const root = new MemoryDirectoryHandle('templates');
+    const collection = await scanTemplateCollection(root as unknown as FileSystemDirectoryHandle);
+
+    const entry = await createTemplateEntryFromTemplate(collection, blankTemplate, 'JSX Project', {
+      description: 'Copied project',
+      source: {
+        content: 'export default <Document />;',
+        language: 'jsx',
+      },
+      sourceKind: 'jsx',
+      tags: ['JSX', 'Copied'],
+    });
+    const directory = await root.getDirectoryHandle('jsx-project');
+    const sourceFile = await directory.getFileHandle('source.tsx');
+    const metadataFile = await directory.getFileHandle('metadata.json');
+
+    expect(entry.name).toBe('jsx-project');
+    expect(entry.sourceKind).toBe('jsx');
+    expect(sourceFile.text).toBe('export default <Document />;');
+    expect(JSON.parse(metadataFile.text)).toEqual({
+      title: 'JSX Project',
+      description: 'Copied project',
+      sourceKind: 'jsx',
+      tags: ['JSX', 'Copied'],
+    });
   });
 
   it('reports disk version changes when template JSON changes externally', async () => {

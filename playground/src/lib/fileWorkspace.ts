@@ -12,7 +12,12 @@ const STORE_NAME = 'workspace';
 const ACTIVE_STATE_KEY = 'active';
 const DEFAULT_POLLING_INTERVAL_MS = 1500;
 
-type SourceKind = 'designer' | 'jsx' | 'md2pdf';
+export type SourceKind = 'designer' | 'jsx' | 'md2pdf';
+
+export type FileWorkspaceSourceInput = {
+  content: string;
+  language: 'jsx' | 'markdown';
+};
 
 export type FileWorkspaceMetadata = {
   description?: string;
@@ -74,6 +79,20 @@ type FileWorkspaceSubscriptionOptions = {
   shouldSkip?: () => boolean;
 };
 
+type CreateTemplateEntryOptions = {
+  description?: string;
+  source?: FileWorkspaceSourceInput;
+  sourceKind?: SourceKind;
+  tags?: string[];
+  thumbnailDataUrl?: string;
+};
+
+export type EditableFileWorkspaceMetadata = {
+  description: string;
+  tags: string[];
+  title: string;
+};
+
 export class FileWorkspaceTemplateDeletedError extends Error {
   constructor(name: string) {
     super(`Template "${name}" was deleted from disk.`);
@@ -130,6 +149,16 @@ const normalizeMetadata = (value: unknown, name: string): FileWorkspaceMetadata 
   };
 };
 
+const normalizeTags = (tags: string[]) => [
+  ...new Set(tags.map((tag) => tag.trim()).filter(Boolean)),
+];
+
+const getSourceKindLabel = (sourceKind: SourceKind) => {
+  if (sourceKind === 'jsx') return 'JSX';
+  if (sourceKind === 'md2pdf') return 'md2pdf';
+  return 'Designer';
+};
+
 const hashText = (value: string) => {
   let hash = 5381;
   for (let index = 0; index < value.length; index += 1) {
@@ -155,8 +184,12 @@ const writeBlob = async (fileHandle: FileSystemFileHandle, blob: Blob) => {
   await writable.close();
 };
 
-const writeText = async (fileHandle: FileSystemFileHandle, text: string) => {
-  await writeBlob(fileHandle, new Blob([text], { type: 'application/json' }));
+const writeText = async (
+  fileHandle: FileSystemFileHandle,
+  text: string,
+  type = 'application/json',
+) => {
+  await writeBlob(fileHandle, new Blob([text], { type }));
 };
 
 const readJsonFile = async (fileHandle: FileSystemFileHandle) => {
@@ -190,6 +223,20 @@ const readMetadata = async (
   } catch (error) {
     console.warn(`Failed to read metadata for ${name}`, error);
     return normalizeMetadata(undefined, name);
+  }
+};
+
+const readRawMetadata = async (directoryHandle: FileSystemDirectoryHandle) => {
+  const handle = await getFileHandleIfExists(directoryHandle, 'metadata.json');
+  if (!handle) return {};
+
+  try {
+    const { raw } = await readJsonFile(handle);
+    const parsed = JSON.parse(raw);
+    return isRecord(parsed) ? parsed : {};
+  } catch (error) {
+    console.warn('Failed to parse metadata.json', error);
+    return {};
   }
 };
 
@@ -621,6 +668,7 @@ export const createTemplateEntryFromTemplate = async (
   collection: FileWorkspaceCollection,
   template: Template,
   title: string,
+  options: CreateTemplateEntryOptions = {},
 ) => {
   checkTemplate(template);
   const name = await createUniqueDirectoryName(collection.rootHandle, title);
@@ -631,25 +679,72 @@ export const createTemplateEntryFromTemplate = async (
   const metadataFileHandle = await directoryHandle.getFileHandle('metadata.json', {
     create: true,
   });
+  const sourceKind = options.sourceKind ?? 'designer';
+  const resolvedTitle = title.trim() || titleFromDirectoryName(name);
 
   await writeText(templateFileHandle, serializeTemplateForFileWorkspace(template));
   await writeText(
     metadataFileHandle,
     `${JSON.stringify(
       {
-        description: 'A template saved from the pdfme Playground.',
-        sourceKind: 'designer',
-        tags: ['Designer'],
-        title: title.trim() || titleFromDirectoryName(name),
+        description: options.description ?? 'A template saved from the pdfme Playground.',
+        sourceKind,
+        tags: normalizeTags(options.tags ?? [getSourceKindLabel(sourceKind)]),
+        title: resolvedTitle,
       },
       null,
       2,
     )}\n`,
   );
 
+  if (options.source) {
+    const sourceFileName = options.source.language === 'markdown' ? 'source.md' : 'source.tsx';
+    const sourceFileHandle = await directoryHandle.getFileHandle(sourceFileName, { create: true });
+    await writeText(sourceFileHandle, options.source.content, 'text/plain');
+  }
+
+  if (options.thumbnailDataUrl) {
+    try {
+      const thumbnailFileHandle = await directoryHandle.getFileHandle('thumbnail.png', {
+        create: true,
+      });
+      await writeBlob(thumbnailFileHandle, await dataUrlToBlob(options.thumbnailDataUrl));
+    } catch (error) {
+      console.warn('Failed to copy template thumbnail', error);
+    }
+  }
+
   const entry = await buildTemplateEntry(name, directoryHandle);
   await persistFileWorkspaceState(collection.rootHandle, name).catch(() => undefined);
   return entry;
+};
+
+export const writeTemplateMetadata = async (
+  entry: FileWorkspaceTemplateEntry,
+  metadata: EditableFileWorkspaceMetadata,
+): Promise<FileWorkspaceTemplateEntry> => {
+  const metadataFileHandle = await entry.templateDirectoryHandle.getFileHandle('metadata.json', {
+    create: true,
+  });
+  const rawMetadata = await readRawMetadata(entry.templateDirectoryHandle);
+  const {
+    description: _description,
+    sourceKind: _sourceKind,
+    tags: _tags,
+    title: _title,
+    ...restMetadata
+  } = rawMetadata;
+  const sourceKind = normalizeMetadata(rawMetadata, entry.name).sourceKind;
+  const nextMetadata = {
+    title: metadata.title.trim() || entry.title,
+    description: metadata.description.trim(),
+    sourceKind,
+    tags: normalizeTags(metadata.tags),
+    ...restMetadata,
+  };
+
+  await writeText(metadataFileHandle, `${JSON.stringify(nextMetadata, null, 2)}\n`);
+  return buildTemplateEntry(entry.name, entry.templateDirectoryHandle);
 };
 
 export const writeTemplateEntry = async (

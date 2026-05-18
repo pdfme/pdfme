@@ -35,6 +35,7 @@ import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 import {
   clearPersistedFileWorkspace,
   createBlankTemplateEntry,
+  createTemplateEntryFromTemplate,
   findTemplateEntry,
   isFileWorkspaceSupported,
   openTemplateCollectionDirectory,
@@ -43,9 +44,13 @@ import {
   restorePersistedTemplateCollection,
   setSelectedFileWorkspaceTemplateName,
   subscribeTemplateCollectionChanges,
+  writeTemplateMetadata,
   writeTemplateThumbnail,
+  type EditableFileWorkspaceMetadata,
   type FileWorkspaceCollection,
+  type FileWorkspaceSourceInput,
   type FileWorkspaceTemplateEntry,
+  type SourceKind,
 } from '../lib/fileWorkspace';
 
 declare global {
@@ -282,13 +287,14 @@ const GalleryCard = ({
   </div>
 );
 
-type ProjectActionHandler = (project: PlaygroundProject) => void;
+type ProjectActionHandler = (project: PlaygroundProject) => Promise<void> | void;
 
 type ProjectMoreActionsProps = {
   onDeleteProject: ProjectActionHandler;
   onDownloadProjectTemplate: ProjectActionHandler;
   onDuplicateProject: ProjectActionHandler;
   onOpenDesigner: ProjectActionHandler;
+  onCopyToMountedFolder?: ProjectActionHandler;
   onRenameProject: ProjectActionHandler;
   project: PlaygroundProject;
 };
@@ -322,6 +328,7 @@ function ProjectMoreActions({
   onDownloadProjectTemplate,
   onDuplicateProject,
   onOpenDesigner,
+  onCopyToMountedFolder,
   onRenameProject,
   project,
 }: ProjectMoreActionsProps) {
@@ -330,7 +337,7 @@ function ProjectMoreActions({
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const runAction = (handler: ProjectActionHandler) => {
     setOpen(false);
-    handler(project);
+    void handler(project);
   };
 
   useEffect(() => {
@@ -393,6 +400,12 @@ function ProjectMoreActions({
               <Copy className="size-4" />
               Duplicate
             </ProjectMenuItem>
+            {onCopyToMountedFolder && (
+              <ProjectMenuItem onClick={() => runAction(onCopyToMountedFolder)}>
+                <FolderOpen className="size-4" />
+                Copy to Mounted Folder
+              </ProjectMenuItem>
+            )}
             <ProjectMenuItem onClick={() => runAction(onDownloadProjectTemplate)}>
               <Download className="size-4" />
               Template JSON
@@ -407,6 +420,144 @@ function ProjectMoreActions({
     </div>
   );
 }
+
+const parseTagInput = (value: string) => [
+  ...new Set(
+    value
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+  ),
+];
+
+const getProjectSourceKind = (project: PlaygroundProject): SourceKind => {
+  if (project.kind === 'jsx') return 'jsx';
+  if (project.kind === 'md2pdf') return 'md2pdf';
+  return 'designer';
+};
+
+const getProjectSourceInput = (project: PlaygroundProject): FileWorkspaceSourceInput | undefined =>
+  project.source
+    ? {
+        content: project.source.content,
+        language: project.source.language,
+      }
+    : undefined;
+
+const MountedMetadataDialog = ({
+  entry,
+  onClose,
+  onSave,
+}: {
+  entry: FileWorkspaceTemplateEntry;
+  onClose: () => void;
+  onSave: (
+    entry: FileWorkspaceTemplateEntry,
+    metadata: EditableFileWorkspaceMetadata,
+  ) => Promise<void>;
+}) => {
+  const [title, setTitle] = useState(entry.title);
+  const [description, setDescription] = useState(entry.description ?? '');
+  const [tags, setTags] = useState(entry.tags.join(', '));
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const titleInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    titleInputRef.current?.focus();
+  }, []);
+
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!title.trim()) {
+      setError('Title is required.');
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      await onSave(entry, {
+        description,
+        tags: parseTagInput(tags),
+        title,
+      });
+    } catch (saveError) {
+      console.error(saveError);
+      setError(saveError instanceof Error ? saveError.message : 'Failed to save metadata.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <button
+        type="button"
+        aria-label="Close metadata editor"
+        className="absolute inset-0 cursor-default"
+        onClick={isSaving ? undefined : onClose}
+      />
+      <form
+        onSubmit={(event) => void onSubmit(event)}
+        className="relative z-10 w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Edit Metadata</h3>
+            <p className="mt-1 text-xs text-gray-500">{entry.name}/metadata.json</p>
+          </div>
+          <PlaygroundButton disabled={isSaving} onClick={onClose} type="button" variant="ghost">
+            Close
+          </PlaygroundButton>
+        </div>
+
+        <div className="mt-4 space-y-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Title
+            <input
+              ref={titleInputRef}
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Description
+            <textarea
+              className="mt-1 min-h-24 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium text-gray-700">
+            Tags
+            <input
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+              value={tags}
+              onChange={(event) => setTags(event.target.value)}
+            />
+          </label>
+        </div>
+
+        {error && (
+          <div className="mt-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="mt-5 flex justify-end gap-2">
+          <PlaygroundButton disabled={isSaving} onClick={onClose} type="button" variant="secondary">
+            Cancel
+          </PlaygroundButton>
+          <PlaygroundButton disabled={isSaving} type="submit" variant="primary">
+            {isSaving ? 'Saving...' : 'Save Metadata'}
+          </PlaygroundButton>
+        </div>
+      </form>
+    </div>
+  );
+};
 
 // Author link component to avoid duplication
 const AuthorLink = ({ author }: { author: string }) => {
@@ -445,6 +596,8 @@ function TemplatesApp() {
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
   const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
+  const [editingMountedEntry, setEditingMountedEntry] =
+    useState<FileWorkspaceTemplateEntry | null>(null);
   const [lastFolderName, setLastFolderName] = useState<string | null>(null);
   const [isOpeningFolder, setIsOpeningFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
@@ -709,6 +862,53 @@ function TemplatesApp() {
     }
   };
 
+  const onSaveMountedMetadata = async (
+    entry: FileWorkspaceTemplateEntry,
+    metadata: EditableFileWorkspaceMetadata,
+  ) => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) throw new Error('Mounted folder is not available.');
+
+    const updatedEntry = await writeTemplateMetadata(entry, metadata);
+    const nextCollection = await refreshTemplateCollection({
+      ...collection,
+      selectedTemplateName: updatedEntry.name,
+    });
+    setMountedCollection(nextCollection);
+    setLastFolderName(nextCollection.rootName);
+    setEditingMountedEntry(null);
+    toast.success(`Updated "${updatedEntry.title}" metadata`);
+  };
+
+  const onCopyProjectToMountedFolder = async (project: PlaygroundProject) => {
+    const collection = mountedCollectionRef.current;
+    if (!collection) {
+      toast.error('Open a mounted folder first');
+      return;
+    }
+
+    try {
+      const sourceKind = getProjectSourceKind(project);
+      const entry = await createTemplateEntryFromTemplate(collection, project.template, project.title, {
+        description: 'A template copied from Browser Projects.',
+        source: getProjectSourceInput(project),
+        sourceKind,
+        tags: [getGenerationLabel(sourceKind)],
+        thumbnailDataUrl: project.thumbnail,
+      });
+      const nextCollection = await refreshTemplateCollection({
+        ...collection,
+        selectedTemplateName: entry.name,
+      });
+      setMountedCollection(nextCollection);
+      setLastFolderName(nextCollection.rootName);
+      toast.success(`Copied "${project.title}" to ${nextCollection.rootName}`);
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to copy project');
+    }
+  };
+
   const onImportTemplateJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -864,6 +1064,9 @@ function TemplatesApp() {
                           onOpenDesigner={(item) => navigateToProject(item, 'designer')}
                           onRenameProject={onRenameProject}
                           onDuplicateProject={onDuplicateProject}
+                          onCopyToMountedFolder={
+                            mountedCollection ? onCopyProjectToMountedFolder : undefined
+                          }
                           onDownloadProjectTemplate={onDownloadProjectTemplate}
                           onDeleteProject={onDeleteProject}
                         />
@@ -991,6 +1194,14 @@ function TemplatesApp() {
                               }
                             >
                               Form/Viewer
+                            </PlaygroundButton>
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() => setEditingMountedEntry(entry)}
+                              variant="secondary"
+                            >
+                              <Pencil className="size-4" />
+                              Metadata
                             </PlaygroundButton>
                           </div>
                         }
@@ -1164,6 +1375,13 @@ function TemplatesApp() {
           </div>
         </section>
       </div>
+      {editingMountedEntry && (
+        <MountedMetadataDialog
+          entry={editingMountedEntry}
+          onClose={() => setEditingMountedEntry(null)}
+          onSave={onSaveMountedMetadata}
+        />
+      )}
     </div>
   );
 }
