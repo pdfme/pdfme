@@ -71,6 +71,91 @@ test('Designer keeps toolbar zoom interactive when options.zoomLevel is only an 
   });
 });
 
+test('Designer preserves scroll position when template is updated via prop change', async () => {
+  // jsdom does not implement layout so scrollTop always reads 0.
+  // We verify the scroll-restore mechanism by overriding scrollTop on the canvas
+  // element so that it reports a non-zero value, then checking it is written back
+  // to that value after the template prop changes.
+  //
+  // The root cause being tested: Paper returns null during the transient window
+  // where pageSizes/backgrounds/schemasList are out of sync after a template update.
+  // The browser collapses scrollable height to 0 and clamps scrollTop. The fix
+  // saves scrollTop before the update and restores it once all three collections
+  // are back in sync.
+  setupUIMock();
+
+  const template = getSampleTemplate();
+  let currentScrollTop = 500; // simulate being scrolled to page 2+
+  const scrollTopSetter = vi.fn((v: number) => {
+    currentScrollTop = v;
+  });
+
+  const { container, rerender } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+
+  const canvas = container.querySelector('.pdfme-designer-canvas') as HTMLDivElement;
+  expect(canvas).not.toBeNull();
+
+  // Override scrollTop so the component reads 500 (simulating mid-page scroll)
+  Object.defineProperty(canvas, 'scrollTop', {
+    get: () => currentScrollTop,
+    set: scrollTopSetter,
+    configurable: true,
+  });
+
+  // Trigger a template update by changing the prop
+  const updatedTemplate = {
+    ...template,
+    schemas: [
+      [
+        {
+          ...template.schemas[0][0],
+          content: 'updated content',
+        },
+        template.schemas[0][1],
+      ],
+    ],
+  };
+
+  await act(async () => {
+    rerender(
+      <I18nContext.Provider value={i18n}>
+        <FontContext.Provider value={getDefaultFont()}>
+          <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+            <Designer
+              template={updatedTemplate}
+              onSaveTemplate={console.log}
+              onChangeTemplate={console.log}
+              size={{ width: 1200, height: 1200 }}
+              onPageCursorChange={() => undefined}
+            />
+          </PluginsRegistry.Provider>
+        </FontContext.Provider>
+      </I18nContext.Provider>,
+    );
+  });
+
+  await waitFor(() => {
+    // The restorer should have written 500 back to scrollTop
+    expect(scrollTopSetter).toHaveBeenCalledWith(500);
+  });
+});
+
 test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only an initial value', async () => {
   setupUIMock();
   const { container } = render(
