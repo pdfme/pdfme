@@ -164,6 +164,67 @@ describe('replacePlaceholders', () => {
     const regex = /^Chained: \d+\.\d+$/;
     expect(regex.test(result)).toBe(true);
   });
+
+  it('should replace a placeholder whose name contains a hyphen', () => {
+    // 'field-name' is not a valid JS identifier, so acorn parses it as
+    // subtraction (field - name). The fast-path context lookup must intercept
+    // this before the parser runs.
+    const content = 'Value: {field-name}';
+    const variables = { 'field-name': 'hello' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: hello');
+  });
+
+  it('should replace multiple hyphenated field names in one template', () => {
+    const content = '{first-name} {last-name}';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('John Doe');
+  });
+
+  it('should handle hyphenated field names with leading/trailing whitespace inside braces', () => {
+    const content = 'Value: { field-name }';
+    const variables = { 'field-name': 'world' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: world');
+  });
+
+  it('should still evaluate arithmetic subtraction when the expression is not a context key', () => {
+    // 'a-b' is NOT in context; 'a' and 'b' are separate keys.
+    // The fast-path must not fire, and normal acorn evaluation must still work.
+    const content = 'Result: {a-b}';
+    const variables = { a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 7');
+  });
+
+  it('should still evaluate math expressions that are not literal context keys', () => {
+    const content = 'Sum: {1 + 2}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Sum: 3');
+  });
+
+  it('should still resolve allowed globals when not a literal context key', () => {
+    const content = 'Max: {Math.max(1, 2, 3)}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Max: 3');
+  });
+
+  it('should use schema content for hyphenated field names', () => {
+    const content = 'Label: {my-field}';
+    const schemas = [
+      [
+        {
+          name: 'my-field',
+          type: 'text',
+          content: 'schema-value',
+          readOnly: true,
+        },
+      ],
+    ] as SchemaPageArray;
+    const result = replacePlaceholders({ content, variables: {}, schemas });
+    expect(result).toBe('Label: schema-value');
+  });
 });
 
 describe('replacePlaceholders - Security Tests', () => {

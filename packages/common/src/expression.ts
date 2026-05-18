@@ -402,6 +402,17 @@ const evaluatePlaceholders = (arg: {
     if (braceCount === 0) {
       const code = content.slice(startIndex + 1, endIndex - 1).trim();
 
+      // Fast-path: if `code` is a literal key in the context (e.g. "field-name"),
+      // return the value directly without running it through the JavaScript parser.
+      // This handles field names that contain characters that are not valid JS
+      // identifier characters (hyphens, spaces, dots, etc.) and would otherwise be
+      // mis-parsed as expressions (e.g. `field-name` parsed as subtraction).
+      if (Object.prototype.hasOwnProperty.call(context, code)) {
+        resultContent += String(context[code]);
+        index = endIndex;
+        continue;
+      }
+
       if (expressionCache.has(code)) {
         const evalFunc = expressionCache.get(code)!;
         try {
