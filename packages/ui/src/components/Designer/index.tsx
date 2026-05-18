@@ -67,6 +67,7 @@ const TemplateEditor = ({
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
+  const scrollRestoreRef = useRef<number | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -124,6 +125,27 @@ const TemplateEditor = ({
       onEditEnd();
     },
   });
+
+  // Restore scroll position after a template update.
+  // When a new template prop arrives, Paper briefly returns null because pageSizes,
+  // backgrounds and schemasList update asynchronously in separate React render passes.
+  // The browser clamps scrollTop to 0 whenever the scrollable content collapses.
+  // We save the desired scrollTop into scrollRestoreRef before the update and restore
+  // it here once all three collections are back in sync.
+  useEffect(() => {
+    if (scrollRestoreRef.current === null) return;
+    if (
+      pageSizes.length === 0 ||
+      pageSizes.length !== backgrounds.length ||
+      pageSizes.length !== schemasList.length
+    ) {
+      return;
+    }
+    if (canvasRef.current) {
+      canvasRef.current.scrollTop = scrollRestoreRef.current;
+    }
+    scrollRestoreRef.current = null;
+  }, [pageSizes, backgrounds, schemasList]);
 
   useLayoutEffect(() => {
     const updateHeight = () => {
@@ -192,22 +214,30 @@ const TemplateEditor = ({
 
   const updateTemplate = useCallback(
     async (newTemplate: Template, preservePage = false) => {
+      if (preservePage && canvasRef.current) {
+        // Save the current scroll position before async state updates begin.
+        // Paper returns null during the transient period where pageSizes, backgrounds
+        // and schemasList lengths differ, which collapses the scroll height and causes
+        // the browser to reset scrollTop to 0. The saved value is restored by the
+        // useEffect that watches for all three to come back into sync.
+        scrollRestoreRef.current = canvasRef.current.scrollTop;
+      }
       const sl = await template2SchemasList(newTemplate);
       setSchemasList(sl);
       onEditEnd();
       if (!preservePage) {
         setPageCursor(0);
+        scrollRestoreRef.current = null;
         if (canvasRef.current?.scroll) {
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
         setPageCursor((prev) => {
           const clamped = Math.min(prev, sl.length - 1);
-          if (clamped !== prev && canvasRef.current) {
-            canvasRef.current.scroll({
-              top: getPagesScrollTopByIndex(pageSizes, clamped, scale),
-              behavior: 'smooth',
-            });
+          if (clamped !== prev) {
+            // Page was clamped because the new template has fewer pages; update
+            // the restore target to the clamped page's scroll offset.
+            scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
           }
           return clamped;
         });
