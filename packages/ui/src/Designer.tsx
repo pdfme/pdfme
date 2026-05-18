@@ -22,6 +22,10 @@ class Designer extends BaseUIClass {
   private pageCursor: number = 0;
   private guidesController: GuidesController | null = null;
 
+  private readonly onMountGuidesController = (controller: GuidesController) => {
+    this.guidesController = controller;
+  };
+
   constructor(props: DesignerProps) {
     super(props);
     checkDesignerProps(props);
@@ -117,9 +121,7 @@ class Designer extends BaseUIClass {
               });
             }
           }}
-          onMountGuidesController={(controller) => {
-            this.guidesController = controller;
-          }}
+          onMountGuidesController={this.onMountGuidesController}
           size={this.size}
         />
       </AppContextProvider>,

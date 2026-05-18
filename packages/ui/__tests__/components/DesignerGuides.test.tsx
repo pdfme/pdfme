@@ -29,10 +29,6 @@ const makeGuideInstance = () => {
   };
 };
 
-// Map from the underlying DOM element to our stub instance so that forwardRef
-// can produce a stable ref object.
-const refMap = new Map<object, ReturnType<typeof makeGuideInstance>>();
-
 vi.mock('@scena/react-guides', () => {
   const GuidesStub = React.forwardRef<
     ReturnType<typeof makeGuideInstance>,
