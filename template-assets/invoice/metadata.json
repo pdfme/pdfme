@@ -1,0 +1,12 @@
+{
+  "title": "Invoice",
+  "description": "A practical invoice with customer details, line items, totals, and payment notes.",
+  "sourceKind": "designer",
+  "tags": [
+    "Invoice",
+    "Business",
+    "Table",
+    "Visual"
+  ],
+  "order": 90
+}

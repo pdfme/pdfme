@@ -1,0 +1,12 @@
+{
+  "title": "Pedigree",
+  "description": "A pedigree-style relationship chart for structured family or lineage data.",
+  "sourceKind": "designer",
+  "tags": [
+    "Chart",
+    "QR",
+    "Image",
+    "Visual"
+  ],
+  "order": 110
+}
