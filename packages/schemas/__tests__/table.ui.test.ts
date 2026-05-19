@@ -105,4 +105,33 @@ describe('editableInDesigner on table schema', () => {
     const editableCells = rootElement.querySelectorAll('[contenteditable="true"], [contenteditable="plaintext-only"]');
     expect(editableCells).toHaveLength(0);
   });
+
+  it('hides structural controls (add/remove row, add/remove column, drag handles) when editableInDesigner is false', async () => {
+    const rootElement = await render(getTableSchema({ editableInDesigner: false }), 'designer');
+    const buttons = rootElement.querySelectorAll('button');
+    expect(buttons).toHaveLength(0);
+    const dragHandles = Array.from(rootElement.querySelectorAll<HTMLDivElement>('div[style]')).filter(
+      (el) => el.style.cursor === 'col-resize',
+    );
+    expect(dragHandles).toHaveLength(0);
+  });
+
+  it('shows structural controls when editableInDesigner is omitted in designer mode', async () => {
+    const schema = getTableSchema();
+    const rootElement = document.createElement('div');
+    await uiRender({
+      value: schema.content as string,
+      schema,
+      rootElement,
+      mode: 'designer',
+      options: { font },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+      scale: 1,
+      basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] },
+      onChange: () => {},
+    } as Parameters<typeof uiRender>[0]);
+    const buttons = rootElement.querySelectorAll('button');
+    expect(buttons.length).toBeGreaterThan(0);
+  });
 });

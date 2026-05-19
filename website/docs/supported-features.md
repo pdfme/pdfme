@@ -18,7 +18,7 @@ These properties are available on every schema type.
 
 ### editableInDesigner
 
-`editableInDesigner?: boolean` — when set to `false`, the element is fully non-interactive in the Designer canvas: inline editing is suppressed, click interactions are blocked, and the cursor remains `default`. Form mode editability is controlled separately by `readOnly`; viewer mode is always non-editable regardless of this flag.
+`editableInDesigner?: boolean` — when set to `false`, inline content editing is suppressed in the Designer canvas: the element is not contenteditable, and the cursor remains `default`. Form mode editability is controlled separately by `readOnly`; viewer mode is always non-editable regardless of this flag.
 
 This is useful for schemas that contain static display content — page titles, section headings, instructional text — that should be visible in the Designer but not accidentally changed. The schema can still be selected, moved, and resized in the Designer; only inline content editing is suppressed.
 

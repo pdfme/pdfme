@@ -320,7 +320,7 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     createRemoveRowButtons().forEach((button) => rootElement.appendChild(button));
   }
 
-  if (mode === 'designer' && onChange) {
+  if (mode === 'designer' && onChange && schema.editableInDesigner !== false) {
     const addColumnButton = createButton({
       width: buttonSize,
       height: buttonSize,
