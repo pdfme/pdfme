@@ -25,4 +25,3 @@ export const consumePdfmeAgentSearchParam = (searchParams: URLSearchParams) => {
   nextSearchParams.delete('agent');
   return nextSearchParams;
 };
-
