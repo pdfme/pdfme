@@ -429,11 +429,15 @@ export const buildStyledTextContainer = (
   if (schema.strikethrough) textDecorations.push('line-through');
   if (schema.underline) textDecorations.push('underline');
 
+  // When a variant font file was found, the file already encodes weight/style — applying
+  // CSS font-weight/font-style on top would cause the browser to synthesize a second time.
+  const variantResolved = resolvedFontName !== baseFontName;
+
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
     fontFamily: resolvedFontName ? `'${resolvedFontName}'` : 'inherit',
-    fontWeight: fontWeightToNumeric(schema.fontWeight ?? DEFAULT_FONT_WEIGHT),
-    fontStyle: schema.fontStyle ?? DEFAULT_FONT_STYLE,
+    fontWeight: variantResolved ? 400 : fontWeightToNumeric(schema.fontWeight ?? DEFAULT_FONT_WEIGHT),
+    fontStyle: variantResolved ? 'normal' : (schema.fontStyle ?? DEFAULT_FONT_STYLE),
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
