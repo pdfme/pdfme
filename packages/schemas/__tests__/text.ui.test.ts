@@ -221,3 +221,133 @@ describe('text inline markdown UI rendering', () => {
     expect(textBlock.textContent).not.toContain('world');
   });
 });
+
+describe('editableInDesigner text schema', () => {
+  const makeSchema = (editableInDesigner?: boolean): TextSchema => ({
+    id: 'test-text',
+    name: 'label',
+    type: 'text',
+    content: 'Static Label',
+    position: { x: 0, y: 0 },
+    width: 80,
+    height: 20,
+    alignment: 'left',
+    verticalAlignment: 'top',
+    fontName: 'Base',
+    fontSize: 12,
+    lineHeight: 1,
+    characterSpacing: 0,
+    textFormat: 'plain',
+    fontColor: '#000000',
+    backgroundColor: '',
+    ...(editableInDesigner !== undefined ? { editableInDesigner } : {}),
+  });
+
+  const makeFont = () => ({ Base: { data: new Uint8Array(), fallback: true } }) as Font;
+  const makeCache = () =>
+    new Map<string | number, unknown>([['getFontKitFont-Base', createMockFont(() => true)]]);
+
+  it('does not make the text block contenteditable when editableInDesigner is false', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Static Label',
+      schema: makeSchema(false),
+      rootElement,
+      mode: 'designer',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector('#text-test-text') as HTMLDivElement;
+    expect(textBlock.contentEditable).not.toBe('plaintext-only');
+    expect(textBlock.contentEditable).not.toBe('true');
+  });
+
+  it('renders span-wrapped content when editableInDesigner is false', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Hello',
+      schema: makeSchema(false),
+      rootElement,
+      mode: 'designer',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector('#text-test-text') as HTMLDivElement;
+    expect(Array.from(textBlock.querySelectorAll('span')).length).toBeGreaterThan(0);
+    expect(textBlock.textContent).toBe('Hello');
+  });
+
+  it('uses a default cursor when editableInDesigner is false', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Label',
+      schema: makeSchema(false),
+      rootElement,
+      mode: 'designer',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const container = rootElement.firstElementChild as HTMLDivElement;
+    expect(container.style.cursor).toBe('default');
+  });
+
+  it('remains contenteditable in designer mode when editableInDesigner is omitted', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Editable',
+      schema: makeSchema(),
+      rootElement,
+      mode: 'designer',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector('#text-test-text') as HTMLDivElement;
+    expect(['plaintext-only', 'true']).toContain(textBlock.contentEditable);
+  });
+
+  it('remains contenteditable in designer mode when editableInDesigner is true', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Editable',
+      schema: makeSchema(true),
+      rootElement,
+      mode: 'designer',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector('#text-test-text') as HTMLDivElement;
+    expect(['plaintext-only', 'true']).toContain(textBlock.contentEditable);
+  });
+
+  it('does not affect form-mode editability — editableInDesigner false still allows form editing', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: 'Form value',
+      schema: makeSchema(false),
+      rootElement,
+      mode: 'form',
+      options: { font: makeFont() },
+      _cache: makeCache(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector('#text-test-text') as HTMLDivElement;
+    expect(['plaintext-only', 'true']).toContain(textBlock.contentEditable);
+  });
+});

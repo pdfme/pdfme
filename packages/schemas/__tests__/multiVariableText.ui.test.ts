@@ -606,3 +606,48 @@ describe('multiVariableText inline markdown UI rendering', () => {
     });
   });
 });
+
+describe('editableInDesigner on multiVariableText schema', () => {
+  const schema = (): MultiVariableTextSchema =>
+    ({
+      id: 'mvt-lock-test',
+      name: 'label',
+      type: 'multiVariableText',
+      content: '',
+      position: { x: 0, y: 0 },
+      width: 100,
+      height: 30,
+      text: 'Hello {name}',
+      variables: ['name'],
+      alignment: 'left',
+      verticalAlignment: 'top',
+      fontName: 'SauceHanSansJP',
+      fontSize: 13,
+      lineHeight: 1,
+      characterSpacing: 0,
+      textFormat: 'plain',
+      fontColor: '#000000',
+      backgroundColor: '',
+      editableInDesigner: false,
+    }) as MultiVariableTextSchema;
+
+  it('renders the resolved value (not editable spans) in designer mode when editableInDesigner is false', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: JSON.stringify({ name: 'World' }),
+      schema: schema(),
+      rootElement,
+      mode: 'designer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-mvt-lock-test`) as HTMLDivElement;
+    expect(textBlock).not.toBeNull();
+    // Not contenteditable when locked
+    expect(textBlock.contentEditable).not.toBe('plaintext-only');
+    expect(textBlock.contentEditable).not.toBe('true');
+  });
+});

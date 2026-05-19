@@ -79,7 +79,8 @@ export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
 };
 
 export const isEditable = (mode: Mode, schema: Schema) =>
-  mode === 'designer' || (mode === 'form' && schema.readOnly !== true);
+  (mode === 'designer' && schema.editableInDesigner !== false) ||
+  (mode === 'form' && schema.readOnly !== true);
 
 const hex2rgb = (hex: string) => {
   if (hex.slice(0, 1) === '#') hex = hex.slice(1);

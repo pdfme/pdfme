@@ -162,10 +162,14 @@ const renderRowUi = (args: {
       drawBorder(div, row, colIndex, rowIndex, rows.length, arg);
 
       div.style.cursor =
-        arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
+        (arg.mode === 'designer' && arg.schema.editableInDesigner !== false) ||
+        (arg.mode === 'form' && section === 'body')
+          ? 'text'
+          : 'default';
 
       div.addEventListener('click', () => {
         if (arg.mode === 'viewer') return;
+        if (arg.mode === 'designer' && arg.schema.editableInDesigner === false) return;
         onChangeEditingPosition({ rowIndex, colIndex });
       });
       arg.rootElement.appendChild(div);
@@ -175,7 +179,11 @@ const renderRowUi = (args: {
       if (arg.mode === 'form') {
         mode = section === 'body' && isEditing && !arg.schema.readOnly ? 'designer' : 'viewer';
       } else if (arg.mode === 'designer') {
-        mode = isEditing ? 'designer' : 'form';
+        if (arg.schema.editableInDesigner === false) {
+          mode = 'viewer';
+        } else {
+          mode = isEditing ? 'designer' : 'form';
+        }
       }
 
       void cellUiRender({
