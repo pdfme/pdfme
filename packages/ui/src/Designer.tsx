@@ -83,6 +83,7 @@ class Designer extends BaseUIClass {
 
   public setGuides(guides: Guides): void {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!guides?.horizontal || !guides?.vertical) return;
     if (!this.guidesController) return;
     this.guidesController.setGuides(guides);
   }

@@ -85,6 +85,11 @@ interface GuidesInterface {
 export type Guides = { horizontal: number[][]; vertical: number[][] };
 
 export interface GuidesController {
+  /**
+   * Returns guide positions for each page. The outer array index corresponds to
+   * the page. Note: after pages are removed the array may be longer than the
+   * current page count — removed pages map to `[]`.
+   */
   getGuides: () => Guides;
   setGuides: (guides: Guides) => void;
 }
@@ -142,14 +147,12 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       }),
       setGuides: (guides) => {
         guides.horizontal.forEach((pageGuides, i) => {
-          if (horizontalGuides.current[i]) {
-            horizontalGuides.current[i].loadGuides(pageGuides);
-          }
+          const g = horizontalGuides.current[i];
+          if (g) g.loadGuides(pageGuides);
         });
         guides.vertical.forEach((pageGuides, i) => {
-          if (verticalGuides.current[i]) {
-            verticalGuides.current[i].loadGuides(pageGuides);
-          }
+          const g = verticalGuides.current[i];
+          if (g) g.loadGuides(pageGuides);
         });
       },
     });

@@ -203,10 +203,9 @@ test('getGuides does not return stale data after a page is removed', async () =>
 
   await waitFor(() => {
     const guides = capturedController!.getGuides();
-    // The null ref at index 1 must not return stale positions.
-    if (guides.horizontal.length > 1) {
-      expect(guides.horizontal[1]).toEqual([]);
-      expect(guides.vertical[1]).toEqual([]);
-    }
+    // Every entry must be stale-free: either the slot was cleared (null → [])
+    // or the array shrank. Either way no entry should hold the old [50, 100]/[25].
+    expect(guides.horizontal.every((g) => g.length === 0)).toBe(true);
+    expect(guides.vertical.every((g) => g.length === 0)).toBe(true);
   });
 });
