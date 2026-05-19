@@ -60,6 +60,34 @@ const getEventMessage = (event: BridgeSessionEvent): AgentSessionMessage | null 
   return event.data.message as AgentSessionMessage;
 };
 
+const getEventLogMessage = (event: BridgeSessionEvent): string | null => {
+  if (
+    event.type !== 'agent.log' ||
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    !('message' in event.data) ||
+    typeof event.data.message !== 'string'
+  ) {
+    return null;
+  }
+
+  return event.data.message;
+};
+
+const getEventChangedFiles = (event: BridgeSessionEvent): ChangedFile[] | null => {
+  if (
+    event.type !== 'changed-files.updated' ||
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    !('changedFiles' in event.data) ||
+    !Array.isArray(event.data.changedFiles)
+  ) {
+    return null;
+  }
+
+  return event.data.changedFiles as ChangedFile[];
+};
+
 const statusLabel = (health: BridgeHealth | null, session: AgentSession | null) => {
   if (!health) return 'Checking';
   if (health.requiresPairing && !health.paired) return 'Pairing';
@@ -142,6 +170,10 @@ export default function PdfmeAgentWidget({
       const onBridgeEvent = (event: MessageEvent) => {
         const bridgeEvent = JSON.parse(event.data) as BridgeSessionEvent;
         appendLog(bridgeEvent.type);
+        const logMessage = getEventLogMessage(bridgeEvent);
+        if (logMessage) appendLog(logMessage);
+        const eventChangedFiles = getEventChangedFiles(bridgeEvent);
+        if (eventChangedFiles) setChangedFiles(eventChangedFiles);
         const message = getEventMessage(bridgeEvent);
         if (message) {
           setMessages((currentMessages) => addUniqueMessages(currentMessages, [message]));
@@ -152,6 +184,8 @@ export default function PdfmeAgentWidget({
       eventSource.addEventListener('session.status', onBridgeEvent);
       eventSource.addEventListener('user.message', onBridgeEvent);
       eventSource.addEventListener('agent.message', onBridgeEvent);
+      eventSource.addEventListener('agent.log', onBridgeEvent);
+      eventSource.addEventListener('changed-files.updated', onBridgeEvent);
       eventSource.addEventListener('error', () => {
         appendLog('event stream disconnected');
       });
