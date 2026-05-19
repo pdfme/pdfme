@@ -413,7 +413,7 @@ export default function PdfmeAgentWidget({
         })),
       );
       appendLog(
-        `created ${result.template.path} (${result.template.pageCount} pages, ${result.template.acroFormFieldCount} fields)`,
+        `created ${result.template.path} (${result.template.pageCount} pages, ${result.template.detectionSource}, ${result.template.acroFormFieldCount + result.template.visualFieldCount} fields)`,
       );
       const nextUrl = new URL('/designer', window.location.origin);
       nextUrl.searchParams.set('workspace', result.template.name);

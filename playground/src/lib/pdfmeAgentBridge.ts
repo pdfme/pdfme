@@ -117,11 +117,13 @@ export type TemplateValidationResult = {
 export type CreatedTemplateSummary = {
   acroFormFieldCount: number;
   artifacts: AgentArtifact[];
+  detectionSource: 'acroform' | 'blank' | 'visual';
   files: string[];
   name: string;
   pageCount: number;
   path: string;
   title: string;
+  visualFieldCount: number;
 };
 
 class BridgeRequestError extends Error {
