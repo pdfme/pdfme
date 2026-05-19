@@ -274,6 +274,29 @@ describe('replacePlaceholders', () => {
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     expect(result).toBe('Max: 3');
   });
+
+  it('should resolve a three-part hyphenated key {a-b-c}', () => {
+    const content = 'Value: {a-b-c}';
+    const variables = { 'a-b-c': 'three-parts' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: three-parts');
+  });
+
+  it('should use empty string for a non-readOnly schema field with a hyphenated name', () => {
+    const content = 'Content: {my-field}';
+    const schemas = [
+      [
+        {
+          name: 'my-field',
+          type: 'text',
+          content: 'Should not be used',
+          readOnly: false,
+        },
+      ],
+    ] as SchemaPageArray;
+    const result = replacePlaceholders({ content, variables: {}, schemas });
+    expect(result).toBe('Content: ');
+  });
 });
 
 describe('replacePlaceholders - Security Tests', () => {
