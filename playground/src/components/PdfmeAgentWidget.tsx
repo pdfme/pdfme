@@ -500,6 +500,8 @@ export default function PdfmeAgentWidget({
   }
 
   const requiresPairing = health.requiresPairing && !health.paired;
+  const codexReviewAvailable = health.agentAdapter === 'codex';
+  const adapterLabel = health.agentAdapter ?? 'unknown adapter';
 
   return (
     <aside className="fixed bottom-4 right-4 z-40 flex max-h-[calc(100vh-2rem)] w-[min(24rem,calc(100vw-2rem))] flex-col rounded-lg border border-gray-200 bg-white shadow-xl">
@@ -511,6 +513,7 @@ export default function PdfmeAgentWidget({
             <p className="truncate text-xs capitalize text-gray-500">
               {statusLabel(health, session)}
               {skills.length > 0 ? ` · ${skills.length} skills` : ''}
+              {` · ${adapterLabel}`}
             </p>
           </div>
         </div>
@@ -567,6 +570,11 @@ export default function PdfmeAgentWidget({
             {workspace && workspace.status === 'unmapped' && (
               <div className="rounded border border-yellow-200 bg-yellow-50 px-2 py-1.5 text-xs text-yellow-900">
                 Workspace root is not mapped in the bridge.
+              </div>
+            )}
+            {!codexReviewAvailable && (
+              <div className="rounded border border-yellow-200 bg-yellow-50 px-2 py-1.5 text-xs text-yellow-900">
+                Codex review is not active in the bridge.
               </div>
             )}
 
@@ -659,7 +667,7 @@ export default function PdfmeAgentWidget({
             )}
             <PlaygroundButton
               className="mb-2"
-              disabled={working}
+              disabled={working || !codexReviewAvailable}
               fullWidth
               onClick={() => void onReviewCurrentTemplate()}
               variant="primary"
