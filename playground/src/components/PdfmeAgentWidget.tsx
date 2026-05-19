@@ -142,6 +142,9 @@ const getSessionIdFromUrl = () =>
     ? null
     : new URLSearchParams(window.location.search).get('agentSession');
 
+const REVIEW_CURRENT_TEMPLATE_MESSAGE =
+  'Review the current pdfme template. This is a read-only review request; do not edit files.';
+
 export default function PdfmeAgentWidget({
   getCurrentTemplate,
   getCurrentTemplateTitle,
@@ -364,6 +367,37 @@ export default function PdfmeAgentWidget({
       setArtifacts(await client.getArtifacts(activeSession.id));
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'message failed');
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const onReviewCurrentTemplate = async () => {
+    setWorking(true);
+    try {
+      const activeSession = await ensureSession();
+      const currentTemplate = getCurrentTemplate?.() ?? null;
+      if (!currentTemplate && !activeSession.templateName && !templateName) {
+        throw new Error('No current template is available to review');
+      }
+
+      const nextSession = await client.sendMessage(
+        activeSession.id,
+        REVIEW_CURRENT_TEMPLATE_MESSAGE,
+        {
+          action: 'review-current-template',
+          ...(currentTemplate ? { currentTemplate } : {}),
+          templateName: activeSession.templateName ?? templateName ?? 'current-designer-template',
+          title: getCurrentTemplateTitle?.() ?? activeSession.title,
+        },
+      );
+      setSession(nextSession);
+      setMessages((currentMessages) => addUniqueMessages(currentMessages, nextSession.messages));
+      setChangedFiles(await client.getChangedFiles(activeSession.id));
+      setArtifacts(await client.getArtifacts(activeSession.id));
+      appendLog('requested current template review');
+    } catch (error) {
+      appendLog(error instanceof Error ? error.message : 'review failed');
     } finally {
       setWorking(false);
     }
@@ -623,6 +657,16 @@ export default function PdfmeAgentWidget({
                 Refresh template
               </PlaygroundButton>
             )}
+            <PlaygroundButton
+              className="mb-2"
+              disabled={working}
+              fullWidth
+              onClick={() => void onReviewCurrentTemplate()}
+              variant="primary"
+            >
+              <Bot className="size-4" />
+              Review current template
+            </PlaygroundButton>
             <PlaygroundButton
               className="mb-2"
               disabled={working}

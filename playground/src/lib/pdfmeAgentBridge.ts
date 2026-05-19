@@ -2,6 +2,7 @@ const DEFAULT_BRIDGE_URL = 'http://127.0.0.1:4128';
 const PAIRING_TOKEN_KEY = 'pdfme-agent.pairing-token';
 
 export type BridgeHealth = {
+  agentAdapter?: 'codex' | 'poc';
   bridgeApiVersion: number;
   name: string;
   ok: boolean;
@@ -84,6 +85,13 @@ export type CreateSessionInput = {
   templateName?: string;
   title?: string;
   workspaceId?: string;
+};
+
+export type SendMessageContext = {
+  action?: 'message' | 'review-current-template';
+  currentTemplate?: unknown;
+  templateName?: string | null;
+  title?: string | null;
 };
 
 export type BridgeSessionEvent = {
@@ -203,11 +211,11 @@ export class PdfmeAgentBridgeClient {
     return response.session;
   }
 
-  async sendMessage(sessionId: string, message: string) {
+  async sendMessage(sessionId: string, message: string, context?: SendMessageContext) {
     const response = await this.fetchJson<{ session: AgentSession }>(
       `/sessions/${encodeURIComponent(sessionId)}/messages`,
       {
-        body: JSON.stringify({ message }),
+        body: JSON.stringify({ context, message }),
         method: 'POST',
       },
     );
