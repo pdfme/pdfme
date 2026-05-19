@@ -213,8 +213,8 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(
-    async (newTemplate: Template, preservePage = false) => {
-      if (preservePage && canvasRef.current) {
+    async (newTemplate: Template, preservePage = false, preserveScroll = preservePage) => {
+      if (preserveScroll && canvasRef.current) {
         // Save the current scroll position before async state updates begin.
         // Paper returns null during the transient period where pageSizes, backgrounds
         // and schemasList lengths differ, which collapses the scroll height and causes
@@ -232,18 +232,18 @@ const TemplateEditor = ({
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        setPageCursor((prev) => {
-          const clamped = Math.min(prev, sl.length - 1);
-          if (clamped !== prev) {
-            // Page was clamped because the new template has fewer pages; update
-            // the restore target to the clamped page's scroll offset.
-            scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
-          }
-          return clamped;
-        });
+        // Compute the clamped page outside the updater to keep the updater pure
+        // (React Strict Mode calls updaters twice to surface impurity).
+        const clamped = Math.min(pageCursor, sl.length - 1);
+        if (preserveScroll && clamped !== pageCursor) {
+          // Page was clamped because the new template has fewer pages; update
+          // the restore target to the clamped page's scroll offset.
+          scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
+        }
+        setPageCursor(clamped);
       }
     },
-    [pageSizes, scale],
+    [pageCursor, pageSizes, scale],
   );
 
   const addSchema = (defaultSchema: Schema) => {
@@ -307,7 +307,10 @@ const TemplateEditor = ({
     setPageCursor(newPageCursor);
     const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
-    await updateTemplate(newTemplate, true);
+    // preserveScroll=false: updatePage manages scroll position itself via
+    // setPageCursor + setTimeout below; we must not let the restore effect
+    // overwrite that with the old-page offset.
+    await updateTemplate(newTemplate, true, false);
     void refresh(newTemplate);
 
     // Notify page change with updated total pages

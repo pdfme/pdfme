@@ -155,6 +155,85 @@ test('Designer restores scroll position when updateTemplate is called while scro
   });
 });
 
+test('Designer does not flash old scroll position when adding a page', async () => {
+  // Regression test: updatePage calls updateTemplate(preservePage=true) which used
+  // to save scrollTop into scrollRestoreRef. The restore effect would then write the
+  // OLD page's scroll offset back to the canvas before updatePage's own setTimeout
+  // corrected it — causing a visible scroll flash.
+  //
+  // With preserveScroll=false passed from updatePage, scrollRestoreRef is never set
+  // and the restore effect is a no-op, so scrollTopSetter must not be called with
+  // the old position (500).
+  //
+  // Note: uses a BlankPdf basePdf (not the BLANK_PDF base64 constant) because page
+  // manipulation (addPageAfter) is only enabled when isBlankPdf returns true.
+  setupUIMock();
+
+  const template = {
+    basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] as [number, number, number, number] },
+    schemas: getSampleTemplate().schemas,
+  };
+  let currentScrollTop = 500;
+  const scrollTopSetter = vi.fn((v: number) => {
+    currentScrollTop = v;
+  });
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+
+  const canvas = container.querySelector('.pdfme-designer-canvas') as HTMLDivElement;
+  expect(canvas).not.toBeNull();
+
+  Object.defineProperty(canvas, 'scrollTop', {
+    get: () => currentScrollTop,
+    set: scrollTopSetter,
+    configurable: true,
+  });
+
+  // Open the context menu (the "..." Ellipsis button)
+  const contextMenuButton = container.querySelector('.pdfme-ui-context-menu') as HTMLElement;
+  expect(contextMenuButton).not.toBeNull();
+  await act(async () => {
+    fireEvent.click(contextMenuButton);
+  });
+
+  // The Dropdown renders its menu into a portal — search document.body for the item
+  const addPageItem = await waitFor(() => {
+    const el = Array.from(document.querySelectorAll('[role="menuitem"]')).find((e) =>
+      e.textContent?.includes('Add Page After'),
+    );
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
+  });
+
+  await act(async () => {
+    fireEvent.click(addPageItem);
+  });
+
+  // Allow all microtasks and macrotasks to settle
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 50));
+  });
+
+  // The restore effect must NOT have written the old-page offset (500) back
+  expect(scrollTopSetter).not.toHaveBeenCalledWith(500);
+});
+
 test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only an initial value', async () => {
   setupUIMock();
   const { container } = render(
