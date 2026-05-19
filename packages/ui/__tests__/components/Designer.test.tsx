@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, act, fireEvent, waitFor } from '@testing-library/react';
-import Designer, { type DesignerEditorApi } from '../../src/components/Designer/index.js';
+import Designer from '../../src/components/Designer/index.js';
+import DesignerClass from '../../src/Designer.js';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
@@ -104,58 +105,90 @@ test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only
   });
 });
 
-test('selectSchemas selects the matching schema element and deselects with empty array', async () => {
+const withNoopResizeObserver = (fn: () => void) => {
+  const original = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    constructor(_cb: ResizeObserverCallback) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+  try {
+    fn();
+  } finally {
+    globalThis.ResizeObserver = original;
+  }
+};
+
+test('Designer.selectSchemas selects and deselects schemas via the public class method', async () => {
   setupUIMock();
-  let editorApi: DesignerEditorApi | null = null;
 
-  const { container } = render(
-    <I18nContext.Provider value={i18n}>
-      <FontContext.Provider value={getDefaultFont()}>
-        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
-          <Designer
-            template={getSampleTemplate()}
-            onSaveTemplate={console.log}
-            onChangeTemplate={console.log}
-            size={{ width: 1200, height: 1200 }}
-            onPageCursorChange={() => undefined}
-            onMountEditorApi={(api) => {
-              editorApi = api;
-            }}
-          />
-        </PluginsRegistry.Provider>
-      </FontContext.Provider>
-    </I18nContext.Provider>,
-  );
+  let designer: DesignerClass | undefined;
+  const domContainer = document.createElement('div');
+  Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: 1200 });
+  Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: 1200 });
+  document.body.appendChild(domContainer);
 
-  // Wait for schema elements to be mounted in the DOM.
-  await waitFor(() => {
-    expect(container.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
-  });
+  try {
+    withNoopResizeObserver(() => {
+      designer = new DesignerClass({ domContainer, template: getSampleTemplate(), plugins });
+    });
 
-  expect(editorApi).not.toBeNull();
+    await act(async () => {
+      (designer as any).render();
+      // Flush async template initialisation (template2SchemasList) so subsequent
+      // state updates land inside this act boundary and avoid spurious warnings.
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    });
 
-  // No selection initially – delete button should not be present.
-  expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
+    await waitFor(() => {
+      expect(domContainer.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
+    });
 
-  // Select field1 programmatically.
-  await act(async () => {
-    editorApi!.selectSchemas(['field1']);
-    // The internal selectSchemas uses setTimeout; flush it.
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  });
+    // No selection initially.
+    expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
 
-  // The delete button appears whenever one or more elements are active.
-  await waitFor(() => {
-    expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
-  });
+    // Select field1 via the public class method.
+    await act(async () => {
+      designer!.selectSchemas(['field1']);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
 
-  // Deselect by passing an empty array.
-  await act(async () => {
-    editorApi!.selectSchemas([]);
-    await new Promise((resolve) => setTimeout(resolve, 0));
-  });
+    await waitFor(() => {
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
+    });
 
-  await waitFor(() => {
-    expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
-  });
+    // Deselect by passing an empty array.
+    await act(async () => {
+      designer!.selectSchemas([]);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    await waitFor(() => {
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeNull();
+    });
+  } finally {
+    designer?.destroy();
+    domContainer.remove();
+  }
+});
+
+test('Designer.selectSchemas throws when called before the component mounts', () => {
+  let designer: DesignerClass | undefined;
+  const domContainer = document.createElement('div');
+  Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: 1200 });
+  Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: 1200 });
+  document.body.appendChild(domContainer);
+
+  try {
+    withNoopResizeObserver(() => {
+      designer = new DesignerClass({ domContainer, template: getSampleTemplate(), plugins });
+    });
+    expect(() => designer!.selectSchemas(['field1'])).toThrow(
+      '[@pdfme/ui] selectSchemas was called before the Designer finished mounting',
+    );
+  } finally {
+    designer?.destroy();
+    domContainer.remove();
+  }
 });

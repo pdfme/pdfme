@@ -76,9 +76,13 @@ class Designer extends BaseUIClass {
    */
   public selectSchemas(names: string[]) {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    if (this.editorApi) {
-      this.editorApi.selectSchemas(names);
+    if (!this.editorApi) {
+      throw Error(
+        '[@pdfme/ui] selectSchemas was called before the Designer finished mounting. ' +
+          'Wait for the component to mount (e.g. inside onChangeTemplate) before calling this method.',
+      );
     }
+    this.editorApi.selectSchemas(names);
   }
 
   protected render() {

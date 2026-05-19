@@ -130,8 +130,9 @@ const TemplateEditor = ({
 
         // Use setTimeout so the DOM is guaranteed to be up-to-date (same pattern as addSchema).
         setTimeout(() => {
+          const root = canvasRef.current ?? document;
           const elements = matchedIds
-            .map((id) => document.getElementById(id))
+            .map((id) => root.querySelector<HTMLElement>(`[id="${id}"]`))
             .filter((el): el is HTMLElement => el !== null);
           onEdit(elements);
         });
