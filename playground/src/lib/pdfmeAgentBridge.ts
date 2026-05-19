@@ -55,7 +55,17 @@ export type ChangedFile = {
   status: 'created' | 'deleted' | 'modified' | 'unknown';
 };
 
+export type AgentArtifact = {
+  createdAt: string;
+  kind: 'image' | 'json' | 'pdf' | 'text' | 'unknown';
+  label: string;
+  mimeType: string | null;
+  path: string;
+  templateName: string | null;
+};
+
 export type AgentSession = {
+  artifacts: AgentArtifact[];
   changedFiles: ChangedFile[];
   createdAt: string;
   id: string;
@@ -106,6 +116,7 @@ export type TemplateValidationResult = {
 
 export type CreatedTemplateSummary = {
   acroFormFieldCount: number;
+  artifacts: AgentArtifact[];
   files: string[];
   name: string;
   pageCount: number;
@@ -183,6 +194,13 @@ export class PdfmeAgentBridgeClient {
     return response.session;
   }
 
+  async getSession(sessionId: string) {
+    const response = await this.fetchJson<{ session: AgentSession }>(
+      `/sessions/${encodeURIComponent(sessionId)}`,
+    );
+    return response.session;
+  }
+
   async sendMessage(sessionId: string, message: string) {
     const response = await this.fetchJson<{ session: AgentSession }>(
       `/sessions/${encodeURIComponent(sessionId)}/messages`,
@@ -199,6 +217,13 @@ export class PdfmeAgentBridgeClient {
       `/sessions/${encodeURIComponent(sessionId)}/changed-files`,
     );
     return response.changedFiles;
+  }
+
+  async getArtifacts(sessionId: string) {
+    const response = await this.fetchJson<{ artifacts: AgentArtifact[] }>(
+      `/sessions/${encodeURIComponent(sessionId)}/artifacts`,
+    );
+    return response.artifacts;
   }
 
   async validateTemplate(workspaceId: string, templateName?: string | null) {
@@ -230,6 +255,7 @@ export class PdfmeAgentBridgeClient {
   async createTemplateFromPdf(input: {
     dataUrl: string;
     fileName: string;
+    sessionId?: string;
     title?: string;
     workspaceId: string;
   }) {

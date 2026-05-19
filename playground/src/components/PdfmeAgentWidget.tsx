@@ -14,6 +14,7 @@ import {
 import {
   clearStoredPairingToken,
   createPdfmeAgentBridgeClient,
+  type AgentArtifact,
   type AgentSession,
   type AgentSessionMessage,
   type BridgeHealth,
@@ -101,6 +102,20 @@ const getEventChangedFiles = (event: BridgeSessionEvent): ChangedFile[] | null =
   return event.data.changedFiles as ChangedFile[];
 };
 
+const getEventArtifacts = (event: BridgeSessionEvent): AgentArtifact[] | null => {
+  if (
+    event.type !== 'artifacts.updated' ||
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    !('artifacts' in event.data) ||
+    !Array.isArray(event.data.artifacts)
+  ) {
+    return null;
+  }
+
+  return event.data.artifacts as AgentArtifact[];
+};
+
 const getEventValidation = (event: BridgeSessionEvent): TemplateValidationResult | null => {
   if (
     event.type !== 'validation.result' ||
@@ -122,6 +137,11 @@ const statusLabel = (health: BridgeHealth | null, session: AgentSession | null) 
   return 'Ready';
 };
 
+const getSessionIdFromUrl = () =>
+  typeof window === 'undefined'
+    ? null
+    : new URLSearchParams(window.location.search).get('agentSession');
+
 export default function PdfmeAgentWidget({
   getCurrentTemplate,
   getCurrentTemplateTitle,
@@ -132,6 +152,7 @@ export default function PdfmeAgentWidget({
 }: PdfmeAgentWidgetProps) {
   const enabled = isPdfmeAgentEnabled();
   const client = useMemo(() => createPdfmeAgentBridgeClient(), []);
+  const [artifacts, setArtifacts] = useState<AgentArtifact[]>([]);
   const [available, setAvailable] = useState(false);
   const [changedFiles, setChangedFiles] = useState<ChangedFile[]>([]);
   const [expanded, setExpanded] = useState(true);
@@ -207,6 +228,8 @@ export default function PdfmeAgentWidget({
         appendLog(bridgeEvent.type);
         const logMessage = getEventLogMessage(bridgeEvent);
         if (logMessage) appendLog(logMessage);
+        const eventArtifacts = getEventArtifacts(bridgeEvent);
+        if (eventArtifacts) setArtifacts(eventArtifacts);
         const eventChangedFiles = getEventChangedFiles(bridgeEvent);
         if (eventChangedFiles) setChangedFiles(eventChangedFiles);
         const eventValidation = getEventValidation(bridgeEvent);
@@ -222,6 +245,7 @@ export default function PdfmeAgentWidget({
       eventSource.addEventListener('user.message', onBridgeEvent);
       eventSource.addEventListener('agent.message', onBridgeEvent);
       eventSource.addEventListener('agent.log', onBridgeEvent);
+      eventSource.addEventListener('artifacts.updated', onBridgeEvent);
       eventSource.addEventListener('changed-files.updated', onBridgeEvent);
       eventSource.addEventListener('validation.result', onBridgeEvent);
       eventSource.addEventListener('error', () => {
@@ -230,6 +254,29 @@ export default function PdfmeAgentWidget({
     },
     [appendLog, client],
   );
+
+  useEffect(() => {
+    if (!enabled || !available || !health || (health.requiresPairing && !health.paired) || session) {
+      return;
+    }
+
+    const sessionId = getSessionIdFromUrl();
+    if (!sessionId) return;
+
+    void (async () => {
+      try {
+        const nextSession = await client.getSession(sessionId);
+        setSession(nextSession);
+        setMessages(nextSession.messages);
+        setChangedFiles(await client.getChangedFiles(sessionId));
+        setArtifacts(await client.getArtifacts(sessionId));
+        connectEvents(sessionId);
+        appendLog(`resumed ${sessionId}`);
+      } catch (error) {
+        appendLog(error instanceof Error ? error.message : 'session resume failed');
+      }
+    })();
+  }, [appendLog, available, client, connectEvents, enabled, health, session]);
 
   const ensureSession = useCallback(async () => {
     if (session) return session;
@@ -290,6 +337,7 @@ export default function PdfmeAgentWidget({
   const onResetPairing = async () => {
     clearStoredPairingToken();
     setSession(null);
+    setArtifacts([]);
     setMessages([]);
     setChangedFiles([]);
     setValidation(null);
@@ -313,6 +361,7 @@ export default function PdfmeAgentWidget({
       setSession(nextSession);
       setMessages((currentMessages) => addUniqueMessages(currentMessages, nextSession.messages));
       setChangedFiles(await client.getChangedFiles(activeSession.id));
+      setArtifacts(await client.getArtifacts(activeSession.id));
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'message failed');
     } finally {
@@ -339,7 +388,7 @@ export default function PdfmeAgentWidget({
 
     setWorking(true);
     try {
-      await ensureSession();
+      const activeSession = await ensureSession();
       const activeWorkspace = workspaceRef.current;
       if (!activeWorkspace) throw new Error('Workspace is not registered');
 
@@ -351,10 +400,12 @@ export default function PdfmeAgentWidget({
       const result = await client.createTemplateFromPdf({
         dataUrl: await readFileAsDataUrl(file),
         fileName: file.name,
+        sessionId: activeSession.id,
         title,
         workspaceId: activeWorkspace.id,
       });
       setValidation(result.validation);
+      setArtifacts(result.template.artifacts);
       setChangedFiles(
         result.template.files.map((path) => ({
           path,
@@ -364,7 +415,10 @@ export default function PdfmeAgentWidget({
       appendLog(
         `created ${result.template.path} (${result.template.pageCount} pages, ${result.template.acroFormFieldCount} fields)`,
       );
-      window.location.href = `/designer?workspace=${encodeURIComponent(result.template.name)}`;
+      const nextUrl = new URL('/designer', window.location.origin);
+      nextUrl.searchParams.set('workspace', result.template.name);
+      nextUrl.searchParams.set('agentSession', activeSession.id);
+      window.location.href = `${nextUrl.pathname}${nextUrl.search}`;
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'PDF template creation failed');
     } finally {
@@ -522,11 +576,20 @@ export default function PdfmeAgentWidget({
               </div>
             )}
 
-            {(logs.length > 0 || changedFiles.length > 0) && (
+            {(artifacts.length > 0 || logs.length > 0 || changedFiles.length > 0) && (
               <details className="rounded border border-gray-200 px-2 py-1.5 text-xs text-gray-600">
                 <summary className="cursor-pointer font-medium text-gray-700">Details</summary>
-                {changedFiles.length > 0 && (
+                {artifacts.length > 0 && (
                   <div className="mt-2 space-y-1">
+                    {artifacts.map((artifact) => (
+                      <div key={`${artifact.kind}:${artifact.path}`} className="truncate">
+                        artifact: {artifact.label} · {artifact.path}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {changedFiles.length > 0 && (
+                  <div className="mt-2 space-y-1 border-t border-gray-100 pt-2">
                     {changedFiles.map((file) => (
                       <div key={`${file.status}:${file.path}`} className="truncate">
                         {file.status}: {file.path}
