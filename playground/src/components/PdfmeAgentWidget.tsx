@@ -1,4 +1,4 @@
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Bot,
   ChevronDown,
@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Send,
   Server,
+  Upload,
   X,
 } from 'lucide-react';
 import {
@@ -19,6 +20,8 @@ import {
   type BridgeSessionEvent,
   type ChangedFile,
   type SkillSummary,
+  type TemplateValidationResult,
+  type WorkspaceSummary,
 } from '../lib/pdfmeAgentBridge';
 import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentFeature';
 import PlaygroundButton from './PlaygroundButton';
@@ -34,6 +37,14 @@ type WidgetLog = {
   id: string;
   text: string;
 };
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => resolve(String(reader.result)));
+    reader.addEventListener('error', () => reject(reader.error));
+    reader.readAsDataURL(file);
+  });
 
 const addUniqueMessages = (
   currentMessages: AgentSessionMessage[],
@@ -88,6 +99,20 @@ const getEventChangedFiles = (event: BridgeSessionEvent): ChangedFile[] | null =
   return event.data.changedFiles as ChangedFile[];
 };
 
+const getEventValidation = (event: BridgeSessionEvent): TemplateValidationResult | null => {
+  if (
+    event.type !== 'validation.result' ||
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    !('checks' in event.data) ||
+    !Array.isArray(event.data.checks)
+  ) {
+    return null;
+  }
+
+  return event.data as TemplateValidationResult;
+};
+
 const statusLabel = (health: BridgeHealth | null, session: AgentSession | null) => {
   if (!health) return 'Checking';
   if (health.requiresPairing && !health.paired) return 'Pairing';
@@ -114,13 +139,19 @@ export default function PdfmeAgentWidget({
   const [session, setSession] = useState<AgentSession | null>(null);
   const [skills, setSkills] = useState<SkillSummary[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [validation, setValidation] = useState<TemplateValidationResult | null>(null);
   const [working, setWorking] = useState(false);
+  const [workspace, setWorkspace] = useState<WorkspaceSummary | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const logCounterRef = useRef(0);
+  const workspaceRef = useRef<WorkspaceSummary | null>(null);
 
   const appendLog = useCallback((text: string) => {
+    logCounterRef.current += 1;
+    const id = `${Date.now()}:${logCounterRef.current}`;
     setLogs((currentLogs) => [
       ...currentLogs.slice(-24),
-      { id: `${Date.now()}:${currentLogs.length}`, text },
+      { id, text },
     ]);
   }, []);
 
@@ -174,6 +205,8 @@ export default function PdfmeAgentWidget({
         if (logMessage) appendLog(logMessage);
         const eventChangedFiles = getEventChangedFiles(bridgeEvent);
         if (eventChangedFiles) setChangedFiles(eventChangedFiles);
+        const eventValidation = getEventValidation(bridgeEvent);
+        if (eventValidation) setValidation(eventValidation);
         const message = getEventMessage(bridgeEvent);
         if (message) {
           setMessages((currentMessages) => addUniqueMessages(currentMessages, [message]));
@@ -186,6 +219,7 @@ export default function PdfmeAgentWidget({
       eventSource.addEventListener('agent.message', onBridgeEvent);
       eventSource.addEventListener('agent.log', onBridgeEvent);
       eventSource.addEventListener('changed-files.updated', onBridgeEvent);
+      eventSource.addEventListener('validation.result', onBridgeEvent);
       eventSource.addEventListener('error', () => {
         appendLog('event stream disconnected');
       });
@@ -203,6 +237,8 @@ export default function PdfmeAgentWidget({
       selectedTemplateName: templateName ?? undefined,
       templatePath: templatePath ?? undefined,
     });
+    workspaceRef.current = workspace;
+    setWorkspace(workspace);
     const nextSession = await client.createSession({
       mode: 'designer-review',
       templateName: templateName ?? undefined,
@@ -212,7 +248,12 @@ export default function PdfmeAgentWidget({
 
     setSession(nextSession);
     setMessages(nextSession.messages);
-    appendLog(`registered ${workspace.label}`);
+    appendLog(
+      workspace.status === 'mapped'
+        ? `registered ${workspace.label} at ${workspace.rootPath}`
+        : `registered ${workspace.label}; workspace root is not mapped`,
+    );
+    for (const diagnostic of workspace.diagnostics) appendLog(diagnostic);
     connectEvents(nextSession.id);
     return nextSession;
   }, [
@@ -247,6 +288,9 @@ export default function PdfmeAgentWidget({
     setSession(null);
     setMessages([]);
     setChangedFiles([]);
+    setValidation(null);
+    workspaceRef.current = null;
+    setWorkspace(null);
     eventSourceRef.current?.close();
     appendLog('pairing token cleared');
     await refreshHealth();
@@ -279,6 +323,63 @@ export default function PdfmeAgentWidget({
       appendLog('template refreshed');
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'refresh failed');
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const onCreateFromPdf = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setWorking(true);
+    try {
+      await ensureSession();
+      const activeWorkspace = workspaceRef.current;
+      if (!activeWorkspace) throw new Error('Workspace is not registered');
+
+      const title =
+        window.prompt('Template title', file.name.replace(/\.pdf$/i, '')) ??
+        file.name.replace(/\.pdf$/i, '');
+      if (!title.trim()) return;
+
+      const result = await client.createTemplateFromPdf({
+        dataUrl: await readFileAsDataUrl(file),
+        fileName: file.name,
+        title,
+        workspaceId: activeWorkspace.id,
+      });
+      setValidation(result.validation);
+      setChangedFiles(
+        result.template.files.map((path) => ({
+          path,
+          status: 'created',
+        })),
+      );
+      appendLog(`created ${result.template.path}`);
+      window.location.href = `/designer?workspace=${encodeURIComponent(result.template.name)}`;
+    } catch (error) {
+      appendLog(error instanceof Error ? error.message : 'PDF template creation failed');
+    } finally {
+      setWorking(false);
+    }
+  };
+
+  const onValidate = async () => {
+    setWorking(true);
+    try {
+      const activeSession = await ensureSession();
+      const activeWorkspace = workspaceRef.current;
+      if (!activeWorkspace) return;
+      const nextValidation = await client.validateTemplate(
+        activeWorkspace.id,
+        activeSession.templateName,
+      );
+      setValidation(nextValidation);
+      appendLog(nextValidation.summary);
+    } catch (error) {
+      appendLog(error instanceof Error ? error.message : 'validation failed');
     } finally {
       setWorking(false);
     }
@@ -365,6 +466,11 @@ export default function PdfmeAgentWidget({
                 </span>
               </div>
             )}
+            {workspace && workspace.status === 'unmapped' && (
+              <div className="rounded border border-yellow-200 bg-yellow-50 px-2 py-1.5 text-xs text-yellow-900">
+                Workspace root is not mapped in the bridge.
+              </div>
+            )}
 
             <div className="space-y-2">
               {messages.length === 0 ? (
@@ -386,6 +492,25 @@ export default function PdfmeAgentWidget({
                 ))
               )}
             </div>
+
+            {validation && (
+              <div
+                className={`rounded border px-2 py-1.5 text-xs ${
+                  validation.ok
+                    ? 'border-green-200 bg-green-50 text-green-900'
+                    : 'border-red-200 bg-red-50 text-red-900'
+                }`}
+              >
+                <div className="font-medium">{validation.summary}</div>
+                <div className="mt-1 space-y-0.5">
+                  {validation.checks.map((check) => (
+                    <div key={check.id} className="truncate">
+                      {check.status}: {check.label}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {(logs.length > 0 || changedFiles.length > 0) && (
               <details className="rounded border border-gray-200 px-2 py-1.5 text-xs text-gray-600">
@@ -425,6 +550,31 @@ export default function PdfmeAgentWidget({
                 Refresh template
               </PlaygroundButton>
             )}
+            <PlaygroundButton
+              className="mb-2"
+              disabled={working}
+              fullWidth
+              onClick={() => void onValidate()}
+              variant="secondary"
+            >
+              Validate template
+            </PlaygroundButton>
+            <label
+              aria-disabled={working}
+              className={`mb-2 inline-flex w-full min-w-0 items-center justify-center gap-1 whitespace-nowrap rounded border border-gray-300 bg-white px-2 py-1.5 text-sm font-medium text-gray-700 transition ${
+                working ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+              }`}
+            >
+              <Upload className="size-4" />
+              Create from PDF
+              <input
+                disabled={working}
+                type="file"
+                accept="application/pdf"
+                className="sr-only"
+                onChange={(event) => void onCreateFromPdf(event)}
+              />
+            </label>
             <form className="flex gap-2" onSubmit={onSendMessage}>
               <input
                 className="min-w-0 flex-1 rounded border border-gray-300 px-2 py-1.5 text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"

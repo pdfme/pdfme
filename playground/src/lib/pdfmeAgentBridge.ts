@@ -8,6 +8,7 @@ export type BridgeHealth = {
   paired: boolean;
   requiresPairing: boolean;
   version: string;
+  workspaceRootCount?: number;
 };
 
 export type SkillSummary = {
@@ -21,15 +22,20 @@ export type WorkspaceSummary = {
   id: string;
   label: string;
   metadata: Record<string, unknown>;
+  diagnostics: string[];
+  rootPath: string | null;
   rootName: string | null;
   selectedTemplateName: string | null;
+  status: 'mapped' | 'unmapped';
   templatePath: string | null;
   updatedAt: string;
+  writeScopePath: string | null;
 };
 
 export type RegisterWorkspaceInput = {
   label?: string;
   metadata?: Record<string, unknown>;
+  rootPath?: string;
   rootName?: string;
   selectedTemplateName?: string;
   templatePath?: string;
@@ -76,6 +82,33 @@ export type BridgeSessionEvent = {
   id: string;
   sessionId: string;
   type: string;
+};
+
+export type ValidationCheck = {
+  id: string;
+  label: string;
+  message: string;
+  status: 'error' | 'ok' | 'warning';
+};
+
+export type TemplateValidationResult = {
+  checks: ValidationCheck[];
+  ok: boolean;
+  summary: string;
+  template?: {
+    fieldCount: number;
+    pageCount: number;
+    sourceKind: string | null;
+    templateName: string;
+    title: string | null;
+  };
+};
+
+export type CreatedTemplateSummary = {
+  files: string[];
+  name: string;
+  path: string;
+  title: string;
 };
 
 class BridgeRequestError extends Error {
@@ -166,6 +199,33 @@ export class PdfmeAgentBridgeClient {
     return response.changedFiles;
   }
 
+  async validateTemplate(workspaceId: string, templateName?: string | null) {
+    const response = await this.fetchJson<{ validation: TemplateValidationResult }>(
+      '/templates/validate',
+      {
+        body: JSON.stringify({ templateName, workspaceId }),
+        method: 'POST',
+      },
+    );
+    return response.validation;
+  }
+
+  async createTemplateFromPdf(input: {
+    dataUrl: string;
+    fileName: string;
+    title?: string;
+    workspaceId: string;
+  }) {
+    const response = await this.fetchJson<{
+      template: CreatedTemplateSummary;
+      validation: TemplateValidationResult;
+    }>('/templates/from-pdf', {
+      body: JSON.stringify(input),
+      method: 'POST',
+    });
+    return response;
+  }
+
   streamEvents(sessionId: string) {
     const token = getStoredPairingToken();
     const url = new URL(`${this.baseUrl}/sessions/${encodeURIComponent(sessionId)}/events`);
@@ -203,4 +263,3 @@ export class PdfmeAgentBridgeClient {
 }
 
 export const createPdfmeAgentBridgeClient = () => new PdfmeAgentBridgeClient();
-
