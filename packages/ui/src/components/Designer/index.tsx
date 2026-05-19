@@ -122,7 +122,7 @@ const TemplateEditor = ({
           onEditEnd();
           return;
         }
-        // Resolve schema ids from names, searching the current page first.
+        // Resolve schema ids from names across all pages.
         const allSchemas = schemasListRef.current.flat();
         const matchedIds = names
           .map((name) => allSchemas.find((s) => s.name === name)?.id)
