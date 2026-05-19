@@ -13,6 +13,10 @@ import {
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_FONT_COLOR,
+  DEFAULT_FONT_WEIGHT,
+  DEFAULT_FONT_STYLE,
+  FONT_WEIGHTS,
+  FONT_WEIGHT_LABEL,
   DYNAMIC_FIT_VERTICAL,
   DYNAMIC_FIT_HORIZONTAL,
   DEFAULT_DYNAMIC_FIT,
@@ -87,6 +91,7 @@ const UseInlineMarkdown = (props: PropPanelWidgetProps) => {
   rootElement.appendChild(label);
 };
 
+
 export const propPanel: PropPanel<TextSchema> = {
   schema: ({ options, activeSchema, i18n, basePdf }) => {
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
@@ -127,6 +132,29 @@ export const propPanel: PropPanel<TextSchema> = {
         placeholder: fallbackFontName,
         props: { options: fontNames.map((name) => ({ label: name, value: name })) },
         span: 12,
+      },
+      fontWeight: {
+        title: i18n('schemas.text.fontWeight'),
+        type: 'number',
+        widget: 'select',
+        default: DEFAULT_FONT_WEIGHT,
+        props: {
+          options: FONT_WEIGHTS.map((w) => ({ label: FONT_WEIGHT_LABEL[w], value: w })),
+        },
+        span: 8,
+      },
+      fontStyle: {
+        title: i18n('schemas.text.fontStyle'),
+        type: 'string',
+        widget: 'select',
+        default: DEFAULT_FONT_STYLE,
+        props: {
+          options: [
+            { label: i18n('schemas.text.fontStyleNormal'), value: 'normal' },
+            { label: i18n('schemas.text.fontStyleItalic'), value: 'italic' },
+          ],
+        },
+        span: 4,
       },
       fontSize: {
         title: i18n('schemas.text.size'),
@@ -332,6 +360,8 @@ export const propPanel: PropPanel<TextSchema> = {
     dynamicFontSize: undefined,
     fontColor: DEFAULT_FONT_COLOR,
     fontName: undefined,
+    fontWeight: DEFAULT_FONT_WEIGHT,
+    fontStyle: DEFAULT_FONT_STYLE,
     backgroundColor: '',
     borderColor: '#000000',
     borderWidth: createBoxDimension(0),

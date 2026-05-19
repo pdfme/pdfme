@@ -8,6 +8,19 @@ export type DYNAMIC_FONT_SIZE_FIT = 'horizontal' | 'vertical';
 export type TEXT_FORMAT = 'plain' | 'inline-markdown';
 export type TEXT_OVERFLOW = 'visible' | 'expand';
 export type FONT_VARIANT_FALLBACK = 'synthetic' | 'plain' | 'error';
+export type FONT_WEIGHT_NUMERIC = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+export type FONT_WEIGHT_KEYWORD =
+  | 'thin'
+  | 'extralight'
+  | 'light'
+  | 'normal'
+  | 'medium'
+  | 'semibold'
+  | 'bold'
+  | 'extrabold'
+  | 'black';
+export type FONT_WEIGHT = FONT_WEIGHT_NUMERIC | FONT_WEIGHT_KEYWORD;
+export type FONT_STYLE = 'normal' | 'italic';
 
 export type FontVariants = {
   bold?: string;
@@ -37,6 +50,8 @@ export type TextSchema = Schema & {
   textFormat?: TEXT_FORMAT;
   fontVariants?: FontVariants;
   fontVariantFallback?: FONT_VARIANT_FALLBACK;
+  fontWeight?: FONT_WEIGHT;
+  fontStyle?: FONT_STYLE;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
   fontSize: number;

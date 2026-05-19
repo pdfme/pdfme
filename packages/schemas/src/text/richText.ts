@@ -6,6 +6,7 @@ import {
   DEFAULT_FONT_SIZE,
   DEFAULT_LINE_HEIGHT,
   DEFAULT_FONT_VARIANT_FALLBACK,
+  DEFAULT_FONT_WEIGHT,
   CODE_HORIZONTAL_PADDING,
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
@@ -17,7 +18,7 @@ import {
   SYNTHETIC_ITALIC_SKEW_DEGREES,
   TEXT_FORMAT_INLINE_MARKDOWN,
 } from './constants.js';
-import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
+import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize, resolveVariantFontName } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
 import { getBoxContentArea } from '../box.js';
@@ -53,8 +54,10 @@ type RichTextRunPiece = {
 const richTextWordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
 const richTextGraphemeSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
-const getBaseFontName = (schema: TextSchema, font: Font) =>
-  schema.fontName && font[schema.fontName] ? schema.fontName : getFallbackFontName(font);
+const getBaseFontName = (schema: TextSchema, font: Font) => {
+  const name = schema.fontName && font[schema.fontName] ? schema.fontName : getFallbackFontName(font);
+  return resolveVariantFontName(name, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font) ?? name;
+};
 
 const getLoadedFontName = (font: Font, fontName?: string) =>
   fontName && font[fontName] ? fontName : undefined;

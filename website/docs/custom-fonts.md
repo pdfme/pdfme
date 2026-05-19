@@ -148,3 +148,135 @@ const font = {
 };
 designer.updateOptions({ font });
 ```
+
+## Font weight and style
+
+pdfme has two font systems that handle weight and style. Understanding which one to use will save you time:
+
+| I want to… | Use |
+|---|---|
+| Make a whole text field bold, light, or italic | `fontWeight` / `fontStyle` |
+| Use different fonts for `**bold**` and `*italic*` within one field | `fontVariants` (requires inline-markdown) |
+
+---
+
+## `fontWeight` and `fontStyle`
+
+These properties apply to the **whole field**. Set them on a text schema and pdfme renders the entire field in that weight and style — in both the Designer preview and the generated PDF.
+
+```ts
+{
+  name: 'heading',
+  type: 'text',
+  fontName: 'Roboto',
+  fontWeight: 700,       // the whole field is bold
+  fontStyle: 'italic',   // the whole field is italic
+}
+```
+
+### How font files are resolved
+
+Rather than CSS-only synthesis, pdfme looks up the actual font file using a `<fontName>[_<style>][_<weight>]` naming convention. Register your font variants with that naming pattern and pdfme will use the correct file automatically.
+
+| `fontStyle` | `fontWeight`      | Resolved registry key   |
+|-------------|-------------------|-------------------------|
+| `normal`    | `400` (default)   | `Roboto`                |
+| `normal`    | `700` or `'bold'` | `Roboto_700` / `Roboto_bold` |
+| `italic`    | `400` (default)   | `Roboto_italic`         |
+| `italic`    | `700` or `'bold'` | `Roboto_italic_700` / `Roboto_italic_bold` |
+
+Default values (`normal` style, `400` weight) are omitted from the suffix, so plain `Roboto_700` registrations are valid without any migration.
+
+### Registering weight and style variants
+
+```ts
+const font: Font = {
+  Roboto: {
+    data: 'https://example.com/fonts/Roboto-Regular.ttf',
+    fallback: true,
+  },
+  Roboto_300: {
+    data: 'https://example.com/fonts/Roboto-Light.ttf',
+  },
+  Roboto_700: {
+    data: 'https://example.com/fonts/Roboto-Bold.ttf',
+  },
+  Roboto_italic: {
+    data: 'https://example.com/fonts/Roboto-Italic.ttf',
+  },
+  Roboto_italic_700: {
+    data: 'https://example.com/fonts/Roboto-BoldItalic.ttf',
+  },
+};
+```
+
+Each key is a separate entry in the flat font map — pdfme joins them automatically when `fontWeight`/`fontStyle` are set on a schema.
+
+### Keyword weights
+
+`fontWeight` accepts numeric values (`100`–`900`) or keyword strings:
+
+| Keyword | Numeric |
+|---------|---------|
+| `'thin'` | 100 |
+| `'extralight'` | 200 |
+| `'light'` | 300 |
+| `'normal'` | 400 |
+| `'medium'` | 500 |
+| `'semibold'` | 600 |
+| `'bold'` | 700 |
+| `'extrabold'` | 800 |
+| `'black'` | 900 |
+
+The keyword is used verbatim as the suffix when looking up the registry key, so `fontWeight: 'bold'` looks up `Roboto_bold`, not `Roboto_700`. Register under exactly one name.
+
+### Fallback
+
+When the resolved candidate is not registered, pdfme silently falls back to the base font and additionally sets CSS `font-weight` / `font-style` on the UI element so the browser can synthesize the appearance.
+
+---
+
+## `fontVariants` (inline-markdown only)
+
+`fontVariants` is only relevant when `textFormat: 'inline-markdown'` is enabled. It lets you specify a different registered font for each inline markup style — **bold**, *italic*, ***bold-italic***, and `code` — within a single field.
+
+```ts
+{
+  name: 'body',
+  type: 'text',
+  textFormat: 'inline-markdown',
+  fontName: 'Roboto',              // base font for plain text
+  fontVariants: {
+    bold: 'Roboto_700',            // font for **bold** runs
+    italic: 'Roboto_italic',       // font for *italic* runs
+    boldItalic: 'Roboto_italic_700',
+    code: 'RobotoMono',
+  },
+}
+```
+
+Each value in `fontVariants` is an explicit registered font name — there is no auto-resolution by convention. If a variant is omitted, pdfme uses the base `fontName` for that run type (with synthetic bold/italic applied in the UI as needed).
+
+`fontVariants` is configured in the Designer under the **Markdown Fonts** section, which appears when inline-markdown is enabled for a field.
+
+---
+
+## Using both together
+
+`fontWeight`/`fontStyle` and `fontVariants` are independent systems that compose cleanly. `fontWeight`/`fontStyle` set the base for the whole field; `fontVariants` overrides specific run types on top of that base.
+
+```ts
+{
+  name: 'article',
+  type: 'text',
+  textFormat: 'inline-markdown',
+  fontName: 'Roboto',
+  fontWeight: 300,                  // whole field renders light
+  fontVariants: {
+    bold: 'Roboto_700',             // **bold** runs use the 700 weight
+    boldItalic: 'Roboto_italic_700',
+  },
+}
+```
+
+In this example plain text renders in `Roboto_300` (light), while `**bold**` runs render in `Roboto_700`.

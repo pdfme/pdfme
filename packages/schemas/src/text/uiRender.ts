@@ -3,6 +3,7 @@ import type { Font as FontKitFont } from 'fontkit';
 import {
   UIRenderProps,
   getDefaultFont,
+  getFallbackFontName,
   getInternalLinkTarget,
   mm2pt,
   normalizeLinkHref,
@@ -18,6 +19,8 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_FONT_WEIGHT,
+  DEFAULT_FONT_STYLE,
   PLACEHOLDER_FONT_COLOR,
   CODE_BACKGROUND_COLOR,
   SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
@@ -29,6 +32,8 @@ import {
   getBrowserVerticalFontAdjustments,
   isFirefox,
   splitTextToSize,
+  resolveVariantFontName,
+  fontWeightToNumeric,
 } from './helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
@@ -106,8 +111,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return text;
   };
   const font = options?.font || getDefaultFont();
+  const baseFontName = schema.fontName ?? getFallbackFontName(font);
+  const resolvedFontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
   const fontKitFont = await getFontKitFont(
-    schema.fontName,
+    resolvedFontName,
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
@@ -353,7 +360,10 @@ export const buildStyledTextContainer = (
   value: string,
   resolvedDynamicFontSize?: number,
 ) => {
-  const { schema, rootElement, mode } = arg;
+  const { schema, rootElement, mode, options } = arg;
+  const font = options?.font ?? getDefaultFont();
+  const baseFontName = schema.fontName ?? getFallbackFontName(font);
+  const resolvedFontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 
@@ -421,7 +431,9 @@ export const buildStyledTextContainer = (
 
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
-    fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
+    fontFamily: resolvedFontName ? `'${resolvedFontName}'` : 'inherit',
+    fontWeight: fontWeightToNumeric(schema.fontWeight ?? DEFAULT_FONT_WEIGHT),
+    fontStyle: schema.fontStyle ?? DEFAULT_FONT_STYLE,
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,

@@ -13,6 +13,8 @@ import {
   filterStartJP,
   filterEndJP,
   widthOfTextAtSize,
+  resolveVariantFontName,
+  fontWeightToNumeric,
 } from '../src/text/helper.js';
 import {
   escapeInlineMarkdown,
@@ -1128,5 +1130,110 @@ describe('filterEndJP', () => {
     const input = ['これは「', '文章「', 'です「'];
     const expected = ['これは', '「文章', '「です「'];
     expect(filterEndJP(input)).toEqual(expected);
+  });
+});
+
+describe('resolveVariantFontName', () => {
+  const font: Font = {
+    Roboto: { data: sansData, fallback: true },
+    Roboto_700: { data: serifData },
+    Roboto_900: { data: serifData },
+    Roboto_bold: { data: serifData },
+    Roboto_italic: { data: serifData },
+    Roboto_italic_700: { data: serifData },
+    Roboto_italic_bold: { data: serifData },
+  };
+
+  it('resolves numeric weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 700, font)).toBe('Roboto_700');
+  });
+
+  it('resolves keyword weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 'bold', font)).toBe('Roboto_bold');
+  });
+
+  it('resolves italic style variant (default weight)', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 400, font)).toBe('Roboto_italic');
+  });
+
+  it('resolves composite italic + numeric weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 700, font)).toBe('Roboto_italic_700');
+  });
+
+  it('resolves composite italic + keyword weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 'bold', font)).toBe('Roboto_italic_bold');
+  });
+
+  it('falls back to base font when variant not registered', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 300, font)).toBe('Roboto');
+  });
+
+  it('falls back to base font when italic+weight combo not registered', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 300, font)).toBe('Roboto');
+  });
+
+  it('returns base font for default weight 400 and normal style', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 400, font)).toBe('Roboto');
+  });
+
+  it('returns base font for keyword normal weight', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 'normal', font)).toBe('Roboto');
+  });
+
+  it('returns undefined when fontName is undefined', () => {
+    expect(resolveVariantFontName(undefined, 'normal', 400, font)).toBeUndefined();
+  });
+
+  it('treats undefined style the same as normal', () => {
+    expect(resolveVariantFontName('Roboto', undefined, 700, font)).toBe('Roboto_700');
+    expect(resolveVariantFontName('Roboto', undefined, 400, font)).toBe('Roboto');
+  });
+
+  it('resolves 900 variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 900, font)).toBe('Roboto_900');
+  });
+});
+
+describe('fontWeightToNumeric', () => {
+  it('passes through numeric weights unchanged', () => {
+    expect(fontWeightToNumeric(700)).toBe(700);
+    expect(fontWeightToNumeric(400)).toBe(400);
+  });
+
+  it('maps keyword weights to numeric values', () => {
+    expect(fontWeightToNumeric('bold')).toBe(700);
+    expect(fontWeightToNumeric('normal')).toBe(400);
+    expect(fontWeightToNumeric('light')).toBe(300);
+    expect(fontWeightToNumeric('black')).toBe(900);
+  });
+});
+
+describe('propPanel fontWeight and fontStyle', () => {
+  it('includes fontWeight field with all 9 weight options', () => {
+    const schema = getTextPropPanelSchema();
+    expect(schema).toHaveProperty('fontWeight');
+    const fw = schema.fontWeight as PropPanelSchema & {
+      props: { options: Array<{ value: number }> };
+    };
+    expect(fw.props.options.map((o) => o.value)).toEqual([
+      100, 200, 300, 400, 500, 600, 700, 800, 900,
+    ]);
+  });
+
+  it('defaultSchema has fontWeight 400', () => {
+    expect(textPropPanel.defaultSchema.fontWeight).toBe(400);
+  });
+
+  it('includes fontStyle field with normal and italic options', () => {
+    const schema = getTextPropPanelSchema();
+    expect(schema).toHaveProperty('fontStyle');
+    const fs = schema.fontStyle as PropPanelSchema & {
+      props: { options: Array<{ value: string }> };
+    };
+    expect(fs.props.options.map((o) => o.value)).toEqual(['normal', 'italic']);
+  });
+
+  it('defaultSchema has fontStyle normal', () => {
+    expect(textPropPanel.defaultSchema.fontStyle).toBe('normal');
   });
 });

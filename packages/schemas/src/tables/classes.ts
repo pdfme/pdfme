@@ -1,6 +1,12 @@
 import { Font, mm2pt, pt2mm } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
-import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper.js';
+import {
+  splitTextToSize,
+  getFontKitFont,
+  resolveVariantFontName,
+  widthOfTextAtSize,
+} from '../text/helper.js';
+import { DEFAULT_FONT_WEIGHT } from '../text/constants.js';
 import type { Styles, TableInput, Settings, Section, StylesProps } from './types.js';
 
 type ContentSettings = { body: Row[]; head: Row[]; columns: Column[] };
@@ -152,10 +158,17 @@ async function calculateWidths(arg: {
 }) {
   const { table, font, _cache } = arg;
 
-  const getFontKitFontByFontName = (fontName: string | undefined) =>
-    getFontKitFont(fontName, font, _cache);
+  const getFontKitFontByStyles = (styles: Styles) => {
+    const resolvedName = resolveVariantFontName(
+      styles.fontName,
+      styles.fontStyle,
+      styles.fontWeight ?? DEFAULT_FONT_WEIGHT,
+      font,
+    );
+    return getFontKitFont(resolvedName, font, _cache);
+  };
 
-  await calculate(table, getFontKitFontByFontName);
+  await calculate(table, getFontKitFontByStyles);
 
   const resizableColumns: Column[] = [];
   let initialTableWidth = 0;
@@ -191,7 +204,7 @@ async function calculateWidths(arg: {
   resizeWidth = Math.abs(resizeWidth);
 
   applyColSpans(table);
-  await fitContent(table, getFontKitFontByFontName);
+  await fitContent(table, getFontKitFontByStyles);
   applyRowSpans(table);
 }
 
@@ -261,7 +274,7 @@ function applyColSpans(table: Table) {
 
 async function fitContent(
   table: Table,
-  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>,
+  getFontKitFontByStyles: (styles: Styles) => Promise<FontKitFont>,
 ) {
   const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
@@ -269,7 +282,7 @@ async function fitContent(
       const cell: Cell = row.cells[column.index];
       if (!cell) continue;
 
-      const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
+      const fontKitFont = await getFontKitFontByStyles(cell.styles);
       cell.text = splitTextToSize({
         value: cell.raw,
         characterSpacing: cell.styles.characterSpacing,
@@ -337,7 +350,7 @@ function resizeColumns(
 
 async function calculate(
   table: Table,
-  getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>,
+  getFontKitFontByStyles: (styles: Styles) => Promise<FontKitFont>,
 ) {
   for (const row of table.allRows()) {
     for (const column of table.columns) {
@@ -345,7 +358,7 @@ async function calculate(
       if (!cell) continue;
 
       const hPadding = cell.padding('right') + cell.padding('left');
-      const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
+      const fontKitFont = await getFontKitFontByStyles(cell.styles);
 
       cell.contentWidth = getStringWidth(cell, fontKitFont) + hPadding;
 

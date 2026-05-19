@@ -1,4 +1,4 @@
-import type { ALIGNMENT, VERTICAL_ALIGNMENT } from '../text/types.js';
+import type { ALIGNMENT, VERTICAL_ALIGNMENT, FONT_WEIGHT, FONT_STYLE } from '../text/types.js';
 import type { BoxDimension } from '../box.js';
 import type { Schema } from '@pdfme/common';
 
@@ -8,6 +8,8 @@ type BoxDimensions = Spacing;
 
 export interface CellStyle {
   fontName?: string;
+  fontWeight?: FONT_WEIGHT;
+  fontStyle?: FONT_STYLE;
   alignment: ALIGNMENT;
   verticalAlignment: VERTICAL_ALIGNMENT;
   fontSize: number;
@@ -41,6 +43,8 @@ export type TableSchema = Schema & {
 
 export interface Styles {
   fontName: string | undefined;
+  fontWeight?: FONT_WEIGHT;
+  fontStyle?: FONT_STYLE;
   backgroundColor: string;
   textColor: string;
   lineHeight: number;

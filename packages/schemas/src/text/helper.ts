@@ -12,7 +12,7 @@ import {
   isUrlSafeToFetch,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import type { TextSchema, FontWidthCalcValues } from './types.js';
+import type { TextSchema, FontWidthCalcValues, FONT_WEIGHT, FONT_STYLE } from './types.js';
 import { getBoxContentArea } from '../box.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -25,6 +25,7 @@ import {
   VERTICAL_ALIGN_TOP,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
+  FONT_WEIGHT_KEYWORD_TO_NUMERIC,
 } from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
@@ -128,6 +129,29 @@ export const widthOfTextAtSize = (
   cache.set(cacheKey, width);
 
   return width;
+};
+
+export const fontWeightToNumeric = (weight: FONT_WEIGHT): number => {
+  if (typeof weight === 'number') return weight;
+  return FONT_WEIGHT_KEYWORD_TO_NUMERIC[weight] ?? 400;
+};
+
+export const resolveVariantFontName = (
+  fontName: string | undefined,
+  style: FONT_STYLE | undefined,
+  weight: FONT_WEIGHT,
+  font: Font,
+): string | undefined => {
+  if (!fontName) return undefined;
+  const isDefaultStyle = !style || style === 'normal';
+  const isDefaultWeight = fontWeightToNumeric(weight) === 400;
+  const parts = [
+    isDefaultStyle ? '' : style,
+    isDefaultWeight ? '' : String(weight),
+  ].filter(Boolean);
+  if (parts.length === 0) return fontName;
+  const candidate = `${fontName}_${parts.join('_')}`;
+  return font[candidate] ? candidate : fontName;
 };
 
 const getFallbackFont = (font: Font) => {

@@ -1,5 +1,6 @@
 import {
   getDefaultFont,
+  getFallbackFontName,
   getInternalLinkTarget,
   normalizeLinkHref,
   UIRenderProps,
@@ -11,8 +12,12 @@ import {
   makeElementPlainTextContentEditable,
 } from '../text/uiRender.js';
 import { isEditable } from '../utils.js';
-import { getFontKitFont } from '../text/helper.js';
-import { CODE_BACKGROUND_COLOR, SYNTHETIC_BOLD_CSS_TEXT_SHADOW } from '../text/constants.js';
+import { getFontKitFont, resolveVariantFontName } from '../text/helper.js';
+import {
+  CODE_BACKGROUND_COLOR,
+  DEFAULT_FONT_WEIGHT,
+  SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
+} from '../text/constants.js';
 import { parseInlineMarkdown } from '../text/inlineMarkdown.js';
 import { measureTextLines } from '../text/measure.js';
 import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText.js';
@@ -103,8 +108,15 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     ? parseInlineMarkdown(rawText)
     : undefined;
   const font = options?.font || getDefaultFont();
+  const baseFontName = schema.fontName ?? getFallbackFontName(font);
+  const resolvedFontName = resolveVariantFontName(
+    baseFontName,
+    schema.fontStyle,
+    schema.fontWeight ?? DEFAULT_FONT_WEIGHT,
+    font,
+  );
   const fontKitFont = await getFontKitFont(
-    schema.fontName,
+    resolvedFontName,
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
