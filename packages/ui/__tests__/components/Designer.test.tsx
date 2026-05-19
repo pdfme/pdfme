@@ -72,23 +72,12 @@ test('Designer keeps toolbar zoom interactive when options.zoomLevel is only an 
 });
 
 test('Designer restores scroll position when updateTemplate is called while scrolled', async () => {
-  // jsdom does not implement layout so scrollTop always reads 0.
-  // We verify the scroll-restore mechanism by overriding scrollTop on the canvas
-  // element so that it reports a non-zero value, then checking it is written back
-  // to that value after the template prop changes.
-  //
-  // Root cause: Paper returns null during the transient window where pageSizes,
-  // backgrounds, and schemasList are out of sync after a template update. The
-  // browser collapses scrollable height to 0 and clamps scrollTop. The fix saves
-  // scrollTop before the update and restores it once all three collections are
-  // back in sync.
-  //
-  // Note: because jsdom has no real layout engine, we use Object.defineProperty to
-  // simulate a non-zero scrollTop and verify that the restore logic writes it back.
+  // jsdom has no layout engine so we use Object.defineProperty to simulate a
+  // non-zero scrollTop and verify the restore effect writes it back.
   setupUIMock();
 
   const template = getSampleTemplate();
-  let currentScrollTop = 500; // simulate being scrolled into a later page
+  let currentScrollTop = 500;
   const scrollTopSetter = vi.fn((v: number) => {
     currentScrollTop = v;
   });
@@ -114,7 +103,6 @@ test('Designer restores scroll position when updateTemplate is called while scro
   const canvas = container.querySelector('.pdfme-designer-canvas') as HTMLDivElement;
   expect(canvas).not.toBeNull();
 
-  // Override scrollTop to simulate being scrolled 500px into the canvas
   Object.defineProperty(canvas, 'scrollTop', {
     get: () => currentScrollTop,
     set: scrollTopSetter,
@@ -150,23 +138,12 @@ test('Designer restores scroll position when updateTemplate is called while scro
   });
 
   await waitFor(() => {
-    // The scroll-restore effect should have written 500 back to scrollTop
     expect(scrollTopSetter).toHaveBeenCalledWith(500);
   });
 });
 
 test('Designer does not flash old scroll position when adding a page', async () => {
-  // Regression test: updatePage calls updateTemplate(preservePage=true) which used
-  // to save scrollTop into scrollRestoreRef. The restore effect would then write the
-  // OLD page's scroll offset back to the canvas before updatePage's own setTimeout
-  // corrected it — causing a visible scroll flash.
-  //
-  // With preserveScroll=false passed from updatePage, scrollRestoreRef is never set
-  // and the restore effect is a no-op, so scrollTopSetter must not be called with
-  // the old position (500).
-  //
-  // Note: uses a BlankPdf basePdf (not the BLANK_PDF base64 constant) because page
-  // manipulation (addPageAfter) is only enabled when isBlankPdf returns true.
+  // Uses a BlankPdf basePdf because page manipulation is only enabled when isBlankPdf returns true.
   setupUIMock();
 
   const template = {
@@ -225,12 +202,9 @@ test('Designer does not flash old scroll position when adding a page', async () 
     fireEvent.click(addPageItem);
   });
 
-  // Allow all microtasks and macrotasks to settle
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, 50));
-  });
-
-  // The restore effect must NOT have written the old-page offset (500) back
+  // Wait for updatePage's setTimeout to fire (sets scroll to the new page offset),
+  // then confirm the restore effect never wrote the old offset back.
+  await waitFor(() => expect(scrollTopSetter).toHaveBeenCalled());
   expect(scrollTopSetter).not.toHaveBeenCalledWith(500);
 });
 

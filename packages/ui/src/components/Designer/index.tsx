@@ -126,12 +126,8 @@ const TemplateEditor = ({
     },
   });
 
-  // Restore scroll position after a template update.
-  // When a new template prop arrives, Paper briefly returns null because pageSizes,
-  // backgrounds and schemasList update asynchronously in separate React render passes.
-  // The browser clamps scrollTop to 0 whenever the scrollable content collapses.
-  // We save the desired scrollTop into scrollRestoreRef before the update and restore
-  // it here once all three collections are back in sync.
+  // Paper returns null while pageSizes/backgrounds/schemasList re-sync, collapsing scroll height.
+  // Restore the saved offset once all three are back in sync.
   useEffect(() => {
     if (scrollRestoreRef.current === null) return;
     if (
@@ -215,11 +211,6 @@ const TemplateEditor = ({
   const updateTemplate = useCallback(
     async (newTemplate: Template, preservePage = false, preserveScroll = preservePage) => {
       if (preserveScroll && canvasRef.current) {
-        // Save the current scroll position before async state updates begin.
-        // Paper returns null during the transient period where pageSizes, backgrounds
-        // and schemasList lengths differ, which collapses the scroll height and causes
-        // the browser to reset scrollTop to 0. The saved value is restored by the
-        // useEffect that watches for all three to come back into sync.
         scrollRestoreRef.current = canvasRef.current.scrollTop;
       }
       const sl = await template2SchemasList(newTemplate);
@@ -232,12 +223,9 @@ const TemplateEditor = ({
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        // Compute the clamped page outside the updater to keep the updater pure
-        // (React Strict Mode calls updaters twice to surface impurity).
+        // Read pageCursor outside the updater — React Strict Mode calls updaters twice.
         const clamped = Math.min(pageCursor, sl.length - 1);
         if (preserveScroll && clamped !== pageCursor) {
-          // Page was clamped because the new template has fewer pages; update
-          // the restore target to the clamped page's scroll offset.
           scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
         }
         setPageCursor(clamped);
@@ -307,9 +295,7 @@ const TemplateEditor = ({
     setPageCursor(newPageCursor);
     const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
-    // preserveScroll=false: updatePage manages scroll position itself via
-    // setPageCursor + setTimeout below; we must not let the restore effect
-    // overwrite that with the old-page offset.
+    // preserveScroll=false: updatePage owns scroll via the setTimeout below.
     await updateTemplate(newTemplate, true, false);
     void refresh(newTemplate);
 
