@@ -401,9 +401,9 @@ export default function PdfmeAgentWidget({
       const activeSession = await ensureSession();
       const currentTemplate = getCurrentTemplate?.() ?? null;
       const activeTemplateName =
-        activeSession.templateName ??
         templateName ??
         workspaceRef.current?.selectedTemplateName ??
+        activeSession.templateName ??
         null;
       if (!activeTemplateName) {
         throw new Error('Open a mounted template before asking the agent to edit it');
@@ -432,7 +432,12 @@ export default function PdfmeAgentWidget({
     try {
       const activeSession = await ensureSession();
       const currentTemplate = getCurrentTemplate?.() ?? null;
-      if (!currentTemplate && !activeSession.templateName && !templateName) {
+      const activeTemplateName =
+        templateName ??
+        workspaceRef.current?.selectedTemplateName ??
+        activeSession.templateName ??
+        null;
+      if (!currentTemplate && !activeTemplateName) {
         throw new Error('No current template is available to review');
       }
 
@@ -443,7 +448,7 @@ export default function PdfmeAgentWidget({
         {
           action: 'review-current-template',
           ...(currentTemplate ? { currentTemplate } : {}),
-          templateName: activeSession.templateName ?? templateName ?? 'current-designer-template',
+          templateName: activeTemplateName ?? 'current-designer-template',
           title: getCurrentTemplateTitle?.() ?? activeSession.title,
         },
       );
@@ -520,13 +525,17 @@ export default function PdfmeAgentWidget({
     try {
       const activeSession = await ensureSession();
       const activeWorkspace = workspaceRef.current;
+      const activeTemplateName =
+        templateName ??
+        workspaceRef.current?.selectedTemplateName ??
+        activeSession.templateName ??
+        null;
       const nextValidation =
-        activeWorkspace && activeSession.templateName
-          ? await client.validateTemplate(activeWorkspace.id, activeSession.templateName)
+        activeWorkspace && activeTemplateName
+          ? await client.validateTemplate(activeWorkspace.id, activeTemplateName)
           : await client.validateCurrentTemplate({
               template: getCurrentTemplate?.() ?? null,
-              templateName:
-                activeSession.templateName ?? templateName ?? 'current-designer-template',
+              templateName: activeTemplateName ?? 'current-designer-template',
               title: getCurrentTemplateTitle?.() ?? activeSession.title,
             });
       setValidation(nextValidation);
