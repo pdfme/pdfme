@@ -67,7 +67,7 @@ const TemplateEditor = ({
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
-  const scrollRestoreRef = useRef<number | null>(null);
+  const scrollRestoreRef = useRef<{ offset: number } | { page: number } | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -138,10 +138,14 @@ const TemplateEditor = ({
       return;
     }
     if (canvasRef.current) {
-      canvasRef.current.scrollTop = scrollRestoreRef.current;
+      const restore = scrollRestoreRef.current;
+      canvasRef.current.scrollTop =
+        'page' in restore
+          ? getPagesScrollTopByIndex(pageSizes, restore.page, scale)
+          : restore.offset;
     }
     scrollRestoreRef.current = null;
-  }, [pageSizes, backgrounds, schemasList]);
+  }, [pageSizes, backgrounds, schemasList, scale]);
 
   useLayoutEffect(() => {
     const updateHeight = () => {
@@ -211,7 +215,7 @@ const TemplateEditor = ({
   const updateTemplate = useCallback(
     async (newTemplate: Template, preservePage = false, preserveScroll = preservePage) => {
       if (preserveScroll && canvasRef.current) {
-        scrollRestoreRef.current = canvasRef.current.scrollTop;
+        scrollRestoreRef.current = { offset: canvasRef.current.scrollTop };
       }
       const sl = await template2SchemasList(newTemplate);
       setSchemasList(sl);
@@ -226,12 +230,13 @@ const TemplateEditor = ({
         // Read pageCursor outside the updater — React Strict Mode calls updaters twice.
         const clamped = Math.min(pageCursor, sl.length - 1);
         if (preserveScroll && clamped !== pageCursor) {
-          scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
+          // Store the page index; offset is resolved with fresh pageSizes in the useEffect.
+          scrollRestoreRef.current = { page: clamped };
         }
         setPageCursor(clamped);
       }
     },
-    [pageCursor, pageSizes, scale],
+    [pageCursor],
   );
 
   const addSchema = (defaultSchema: Schema) => {
