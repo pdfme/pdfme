@@ -260,18 +260,18 @@ const TemplateEditor = ({
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        setPageCursor((prev) => {
-          const clamped = Math.min(prev, sl.length - 1);
-          if (clamped !== prev) {
-            // Page was clamped because the new template has fewer pages; update
-            // the restore target to the clamped page's scroll offset.
-            scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
-          }
-          return clamped;
-        });
+        // Compute the clamped page outside the updater to keep the updater pure
+        // (React Strict Mode calls updaters twice to surface impurity).
+        const clamped = Math.min(pageCursor, sl.length - 1);
+        if (clamped !== pageCursor) {
+          // Page was clamped because the new template has fewer pages; update
+          // the restore target to the clamped page's scroll offset.
+          scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
+        }
+        setPageCursor(clamped);
       }
     },
-    [pageSizes, scale],
+    [pageCursor, pageSizes, scale],
   );
 
   const addSchema = (defaultSchema: Schema) => {
