@@ -18,6 +18,7 @@ import {
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
+import PdfmeAgentWidget from '../components/PdfmeAgentWidget';
 import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
@@ -568,6 +569,17 @@ function DesignerApp() {
     }
   };
 
+  const onRefreshAgentTemplate = useCallback(async () => {
+    const currentEntry = fileWorkspaceEntryRef.current;
+    if (!currentEntry) return;
+
+    const readResult = await readTemplateEntry(currentEntry);
+    applyTemplateFromDisk(currentEntry, readResult);
+    toast.info(`Reloaded ${currentEntry.path} from disk`, {
+      toastId: `file-workspace-agent-reload:${currentEntry.path}`,
+    });
+  }, [applyTemplateFromDisk]);
+
   useEffect(() => {
     if (!fileWorkspaceConflict) return;
 
@@ -879,6 +891,12 @@ function DesignerApp() {
           setTemplateJsonSource(null);
         }}
         onCommit={onCommitTemplateJson}
+      />
+      <PdfmeAgentWidget
+        onRefreshTemplate={fileWorkspaceEntry ? onRefreshAgentTemplate : undefined}
+        templateName={fileWorkspaceEntry?.name ?? null}
+        templatePath={fileWorkspaceEntry?.path ?? null}
+        workspaceRootName={fileWorkspaceCollectionRef.current?.rootName ?? null}
       />
     </>
   );
