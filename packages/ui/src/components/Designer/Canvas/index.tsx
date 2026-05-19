@@ -352,8 +352,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     Object.assign(s, obj);
   };
 
-  const getGuideLines = (guides: (GuidesInterface | null)[], index: number) =>
-    guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
+  const getGuideLines = (guides: (GuidesInterface | null)[], index: number): number[] =>
+    guides[index] ? guides[index].getGuides().map((g) => g * ZOOM) : [];
 
   const onClickMoveable = () => {
     // Just set editing to true without trying to access event properties
