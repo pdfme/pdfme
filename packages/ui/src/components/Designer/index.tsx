@@ -101,6 +101,13 @@ const TemplateEditor = ({
     maxZoom,
   });
 
+  // Mirror pageCursor into a ref so updateTemplate always reads the latest committed
+  // value rather than the stale useCallback closure captured before the await.
+  const pageCursorRef = useRef(pageCursor);
+  useLayoutEffect(() => {
+    pageCursorRef.current = pageCursor;
+  }, [pageCursor]);
+
   // Keep the handle ref up-to-date after every committed render so it always
   // closes over the latest paperRefs and scale values.
   useLayoutEffect(() => {
@@ -260,10 +267,12 @@ const TemplateEditor = ({
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        // Compute the clamped page outside the updater to keep the updater pure
-        // (React Strict Mode calls updaters twice to surface impurity).
-        const clamped = Math.min(pageCursor, sl.length - 1);
-        if (clamped !== pageCursor) {
+        // Read from the ref to get the latest committed page cursor. Using the
+        // closure-captured `pageCursor` would be stale after the await if the
+        // user navigated pages during the async template processing.
+        const currentPage = pageCursorRef.current;
+        const clamped = Math.min(currentPage, sl.length - 1);
+        if (clamped !== currentPage) {
           // Page was clamped because the new template has fewer pages; update
           // the restore target to the clamped page's scroll offset.
           scrollRestoreRef.current = getPagesScrollTopByIndex(pageSizes, clamped, scale);
@@ -271,7 +280,7 @@ const TemplateEditor = ({
         setPageCursor(clamped);
       }
     },
-    [pageCursor, pageSizes, scale],
+    [pageSizes, scale],
   );
 
   const addSchema = (defaultSchema: Schema) => {
