@@ -118,18 +118,16 @@ const TemplateEditor = ({
     if (!onMountEditorApi) return;
     onMountEditorApi({
       selectSchemas: (names: string[]) => {
-        if (names.length === 0) {
-          onEditEnd();
-          return;
-        }
-        // Resolve schema ids from names across all pages.
-        const allSchemas = schemasListRef.current.flat();
-        const matchedIds = names
-          .map((name) => allSchemas.find((s) => s.name === name)?.id)
-          .filter((id): id is string => id !== undefined);
-
-        // Use setTimeout so the DOM is guaranteed to be up-to-date (same pattern as addSchema).
         setTimeout(() => {
+          if (names.length === 0) {
+            onEditEnd();
+            return;
+          }
+          const allSchemas = schemasListRef.current.flat();
+          const matchedIds = names
+            .map((name) => allSchemas.find((s) => s.name === name)?.id)
+            .filter((id): id is string => id !== undefined);
+
           const root = canvasRef.current ?? document;
           const elements = matchedIds
             .map((id) => root.querySelector<HTMLElement>(`[id="${id}"]`))
