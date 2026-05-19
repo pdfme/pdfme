@@ -24,7 +24,7 @@ import {
   type TemplateValidationResult,
   type WorkspaceSummary,
 } from '../lib/pdfmeAgentBridge';
-import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentFeature';
+import { PDFME_AGENT_FEATURE_EVENT, isPdfmeAgentEnabled } from '../lib/pdfmeAgentFeature';
 import PlaygroundButton from './PlaygroundButton';
 
 type PdfmeAgentWidgetProps = {
@@ -153,11 +153,11 @@ export default function PdfmeAgentWidget({
   templatePath,
   workspaceRootName,
 }: PdfmeAgentWidgetProps) {
-  const enabled = isPdfmeAgentEnabled();
   const client = useMemo(() => createPdfmeAgentBridgeClient(), []);
   const [artifacts, setArtifacts] = useState<AgentArtifact[]>([]);
   const [available, setAvailable] = useState(false);
   const [changedFiles, setChangedFiles] = useState<ChangedFile[]>([]);
+  const [enabled, setEnabled] = useState(isPdfmeAgentEnabled);
   const [expanded, setExpanded] = useState(true);
   const [health, setHealth] = useState<BridgeHealth | null>(null);
   const [input, setInput] = useState('');
@@ -173,6 +173,17 @@ export default function PdfmeAgentWidget({
   const eventSourceRef = useRef<EventSource | null>(null);
   const logCounterRef = useRef(0);
   const workspaceRef = useRef<WorkspaceSummary | null>(null);
+
+  useEffect(() => {
+    const syncEnabled = () => setEnabled(isPdfmeAgentEnabled());
+    syncEnabled();
+    window.addEventListener(PDFME_AGENT_FEATURE_EVENT, syncEnabled);
+    window.addEventListener('storage', syncEnabled);
+    return () => {
+      window.removeEventListener(PDFME_AGENT_FEATURE_EVENT, syncEnabled);
+      window.removeEventListener('storage', syncEnabled);
+    };
+  }, []);
 
   const appendLog = useCallback((text: string) => {
     logCounterRef.current += 1;
@@ -483,7 +494,9 @@ export default function PdfmeAgentWidget({
     }
   };
 
-  if (!enabled || !available || !health) return null;
+  if (!enabled) return null;
+
+  const bridgeUnavailable = !available || !health;
 
   if (!expanded) {
     return (
@@ -499,9 +512,9 @@ export default function PdfmeAgentWidget({
     );
   }
 
-  const requiresPairing = health.requiresPairing && !health.paired;
-  const codexReviewAvailable = health.agentAdapter === 'codex';
-  const adapterLabel = health.agentAdapter ?? 'unknown adapter';
+  const requiresPairing = Boolean(health?.requiresPairing && !health.paired);
+  const codexReviewAvailable = health?.agentAdapter === 'codex';
+  const adapterLabel = health?.agentAdapter ?? 'unknown adapter';
 
   return (
     <aside className="fixed bottom-4 right-4 z-40 flex max-h-[calc(100vh-2rem)] w-[min(24rem,calc(100vw-2rem))] flex-col rounded-lg border border-gray-200 bg-white shadow-xl">
@@ -511,9 +524,9 @@ export default function PdfmeAgentWidget({
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold text-gray-900">pdfme Agent</h2>
             <p className="truncate text-xs capitalize text-gray-500">
-              {statusLabel(health, session)}
+              {bridgeUnavailable ? 'Bridge unavailable' : statusLabel(health, session)}
               {skills.length > 0 ? ` · ${skills.length} skills` : ''}
-              {` · ${adapterLabel}`}
+              {health ? ` · ${adapterLabel}` : ''}
             </p>
           </div>
         </div>
@@ -537,7 +550,13 @@ export default function PdfmeAgentWidget({
         </div>
       </header>
 
-      {requiresPairing ? (
+      {bridgeUnavailable ? (
+        <div className="space-y-3 p-3">
+          <div className="rounded border border-yellow-200 bg-yellow-50 px-2 py-1.5 text-xs text-yellow-900">
+            Local bridge is unavailable.
+          </div>
+        </div>
+      ) : requiresPairing ? (
         <form className="space-y-3 p-3" onSubmit={onPair}>
           <div className="flex items-center gap-2 text-sm font-medium text-gray-800">
             <KeyRound className="size-4 text-gray-500" />

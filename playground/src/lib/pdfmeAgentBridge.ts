@@ -1,5 +1,6 @@
 const DEFAULT_BRIDGE_URL = 'http://127.0.0.1:4128';
 const PAIRING_TOKEN_KEY = 'pdfme-agent.pairing-token';
+let runtimePairingToken: string | null = null;
 
 export type BridgeHealth = {
   agentAdapter?: 'codex' | 'poc';
@@ -144,17 +145,24 @@ class BridgeRequestError extends Error {
   }
 }
 
-const getStoredPairingToken = () =>
-  typeof window === 'undefined' ? null : window.localStorage.getItem(PAIRING_TOKEN_KEY);
+const getStorage = () => {
+  try {
+    return typeof window === 'undefined' ? null : window.localStorage;
+  } catch {
+    return null;
+  }
+};
+
+const getStoredPairingToken = () => getStorage()?.getItem(PAIRING_TOKEN_KEY) ?? runtimePairingToken;
 
 export const clearStoredPairingToken = () => {
-  if (typeof window === 'undefined') return;
-  window.localStorage.removeItem(PAIRING_TOKEN_KEY);
+  runtimePairingToken = null;
+  getStorage()?.removeItem(PAIRING_TOKEN_KEY);
 };
 
 const setStoredPairingToken = (token: string) => {
-  if (typeof window === 'undefined') return;
-  window.localStorage.setItem(PAIRING_TOKEN_KEY, token);
+  runtimePairingToken = token;
+  getStorage()?.setItem(PAIRING_TOKEN_KEY, token);
 };
 
 const resolveBridgeUrl = () => {
