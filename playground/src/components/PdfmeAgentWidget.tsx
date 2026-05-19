@@ -27,6 +27,8 @@ import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentFeature';
 import PlaygroundButton from './PlaygroundButton';
 
 type PdfmeAgentWidgetProps = {
+  getCurrentTemplate?: () => unknown | null;
+  getCurrentTemplateTitle?: () => string | null;
   onRefreshTemplate?: () => Promise<void> | void;
   templateName?: string | null;
   templatePath?: string | null;
@@ -121,6 +123,8 @@ const statusLabel = (health: BridgeHealth | null, session: AgentSession | null) 
 };
 
 export default function PdfmeAgentWidget({
+  getCurrentTemplate,
+  getCurrentTemplateTitle,
   onRefreshTemplate,
   templateName,
   templatePath,
@@ -357,7 +361,9 @@ export default function PdfmeAgentWidget({
           status: 'created',
         })),
       );
-      appendLog(`created ${result.template.path}`);
+      appendLog(
+        `created ${result.template.path} (${result.template.pageCount} pages, ${result.template.acroFormFieldCount} fields)`,
+      );
       window.location.href = `/designer?workspace=${encodeURIComponent(result.template.name)}`;
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'PDF template creation failed');
@@ -371,11 +377,15 @@ export default function PdfmeAgentWidget({
     try {
       const activeSession = await ensureSession();
       const activeWorkspace = workspaceRef.current;
-      if (!activeWorkspace) return;
-      const nextValidation = await client.validateTemplate(
-        activeWorkspace.id,
-        activeSession.templateName,
-      );
+      const nextValidation =
+        activeWorkspace && activeSession.templateName
+          ? await client.validateTemplate(activeWorkspace.id, activeSession.templateName)
+          : await client.validateCurrentTemplate({
+              template: getCurrentTemplate?.() ?? null,
+              templateName:
+                activeSession.templateName ?? templateName ?? 'current-designer-template',
+              title: getCurrentTemplateTitle?.() ?? activeSession.title,
+            });
       setValidation(nextValidation);
       appendLog(nextValidation.summary);
     } catch (error) {

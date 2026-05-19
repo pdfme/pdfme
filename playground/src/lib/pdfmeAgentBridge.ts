@@ -105,8 +105,10 @@ export type TemplateValidationResult = {
 };
 
 export type CreatedTemplateSummary = {
+  acroFormFieldCount: number;
   files: string[];
   name: string;
+  pageCount: number;
   path: string;
   title: string;
 };
@@ -204,6 +206,21 @@ export class PdfmeAgentBridgeClient {
       '/templates/validate',
       {
         body: JSON.stringify({ templateName, workspaceId }),
+        method: 'POST',
+      },
+    );
+    return response.validation;
+  }
+
+  async validateCurrentTemplate(input: {
+    template: unknown;
+    templateName?: string | null;
+    title?: string | null;
+  }) {
+    const response = await this.fetchJson<{ validation: TemplateValidationResult }>(
+      '/templates/validate',
+      {
+        body: JSON.stringify(input),
         method: 'POST',
       },
     );

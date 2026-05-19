@@ -893,6 +893,8 @@ function DesignerApp() {
         onCommit={onCommitTemplateJson}
       />
       <PdfmeAgentWidget
+        getCurrentTemplate={() => designer.current?.getTemplate() ?? null}
+        getCurrentTemplateTitle={() => projectTitleRef.current}
         onRefreshTemplate={fileWorkspaceEntry ? onRefreshAgentTemplate : undefined}
         templateName={fileWorkspaceEntry?.name ?? null}
         templatePath={fileWorkspaceEntry?.path ?? null}
