@@ -145,12 +145,21 @@ export const resolveVariantFontName = (
   if (!fontName) return undefined;
   const isDefaultStyle = !style || style === 'normal';
   const isDefaultWeight = fontWeightToNumeric(weight) === 400;
-  const parts = [
-    isDefaultStyle ? '' : style,
-    isDefaultWeight ? '' : String(weight),
-  ].filter(Boolean);
-  if (parts.length === 0) return fontName;
-  const candidate = `${fontName}_${parts.join('_')}`;
+
+  if (isDefaultStyle && isDefaultWeight) return fontName;
+
+  if (!isDefaultStyle && !isDefaultWeight) {
+    // Try composite first, then each single-axis variant, then base
+    const composite = `${fontName}_${style}_${weight}`;
+    if (font[composite]) return composite;
+    const styleOnly = `${fontName}_${style}`;
+    if (font[styleOnly]) return styleOnly;
+    const weightOnly = `${fontName}_${weight}`;
+    if (font[weightOnly]) return weightOnly;
+    return fontName;
+  }
+
+  const candidate = isDefaultStyle ? `${fontName}_${weight}` : `${fontName}_${style}`;
   return font[candidate] ? candidate : fontName;
 };
 

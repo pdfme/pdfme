@@ -1168,8 +1168,23 @@ describe('resolveVariantFontName', () => {
     expect(resolveVariantFontName('Roboto', 'normal', 300, font)).toBe('Roboto');
   });
 
-  it('falls back to base font when italic+weight combo not registered', () => {
-    expect(resolveVariantFontName('Roboto', 'italic', 300, font)).toBe('Roboto');
+  it('falls back to style-only variant when composite is not registered', () => {
+    // Roboto_italic_300 is not registered, but Roboto_italic is — should prefer Roboto_italic
+    expect(resolveVariantFontName('Roboto', 'italic', 300, font)).toBe('Roboto_italic');
+  });
+
+  it('falls back to weight-only variant when composite and style-only are not registered', () => {
+    const fontWithWeightOnly: Font = {
+      Roboto: { data: sansData, fallback: true },
+      Roboto_700: { data: serifData },
+    };
+    // Roboto_italic_700 and Roboto_italic are not registered, but Roboto_700 is
+    expect(resolveVariantFontName('Roboto', 'italic', 700, fontWithWeightOnly)).toBe('Roboto_700');
+  });
+
+  it('falls back to base font when composite and all intermediate variants are not registered', () => {
+    const baseOnly: Font = { Roboto: { data: sansData, fallback: true } };
+    expect(resolveVariantFontName('Roboto', 'italic', 300, baseOnly)).toBe('Roboto');
   });
 
   it('returns base font for default weight 400 and normal style', () => {
