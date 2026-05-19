@@ -11,9 +11,9 @@ import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
 import DesignerComponent from './components/Designer/index.js';
 import AppContextProvider from './components/AppContextProvider.js';
-import type { GuidesController } from './components/Designer/Canvas/index.js';
+import type { GuidesController, Guides } from './components/Designer/Canvas/index.js';
 
-export type Guides = { horizontal: number[][]; vertical: number[][] };
+export type { Guides };
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;

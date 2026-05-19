@@ -82,9 +82,11 @@ interface GuidesInterface {
   resize(): void;
 }
 
+export type Guides = { horizontal: number[][]; vertical: number[][] };
+
 export interface GuidesController {
-  getGuides: () => { horizontal: number[][]; vertical: number[][] };
-  setGuides: (guides: { horizontal: number[][]; vertical: number[][] }) => void;
+  getGuides: () => Guides;
+  setGuides: (guides: Guides) => void;
 }
 
 interface Props {
@@ -128,8 +130,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-  const verticalGuides = useRef<GuidesInterface[]>([]);
-  const horizontalGuides = useRef<GuidesInterface[]>([]);
+  const verticalGuides = useRef<(GuidesInterface | null)[]>([]);
+  const horizontalGuides = useRef<(GuidesInterface | null)[]>([]);
 
   useEffect(() => {
     if (!onMountGuidesController) return;
@@ -347,7 +349,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     Object.assign(s, obj);
   };
 
-  const getGuideLines = (guides: GuidesInterface[], index: number) =>
+  const getGuideLines = (guides: (GuidesInterface | null)[], index: number) =>
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
   const onClickMoveable = () => {
@@ -467,10 +469,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {
-                if (e) horizontalGuides.current[index] = e;
+                horizontalGuides.current[index] = e;
               }}
               verticalRef={(e) => {
-                if (e) verticalGuides.current[index] = e;
+                verticalGuides.current[index] = e;
               }}
             />
             {pageCursor !== index ? (
