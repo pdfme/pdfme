@@ -211,10 +211,14 @@ test('Designer does not flash old scroll position when adding a page', async () 
   await waitFor(() => expect(scrollTopSetter).toHaveBeenCalled());
   expect(scrollTopSetter).not.toHaveBeenCalledWith(500);
 
-  // updatePage must have reported pageCursor=1 (page 2) with 2 total pages.
-  // Before the fix, updateTemplate's stale pageCursor closure caused it to call
-  // setPageCursor(0), silently overwriting updatePage's setPageCursor(1).
-  expect(onPageCursorChange).toHaveBeenCalledWith(1, 2);
+  // The pager shows "{pageCursor + 1}/{pageNum}" from internal state.
+  // With the fix: pageCursor=1 → "2/2". Without the fix: updateTemplate's stale
+  // pageCursor closure overwrites setPageCursor(1) with setPageCursor(0) → "1/2".
+  await waitFor(() => {
+    const pagerEl = container.querySelector('.pdfme-ui-pager');
+    expect(pagerEl).not.toBeNull();
+    expect(pagerEl).toHaveTextContent('2/2');
+  });
 });
 
 test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only an initial value', async () => {
