@@ -165,52 +165,30 @@ describe('replacePlaceholders', () => {
     expect(regex.test(result)).toBe(true);
   });
 
-  it('should replace a placeholder whose name contains a hyphen', () => {
-    // 'field-name' is not a valid JS identifier, so acorn parses it as
-    // subtraction (field - name). The fast-path context lookup must intercept
-    // this before the parser runs.
+  // ── Hyphenated field names ──────────────────────────────────────────────────
+
+  it('should replace a standalone hyphenated field name', () => {
     const content = 'Value: {field-name}';
     const variables = { 'field-name': 'hello' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('Value: hello');
   });
 
-  it('should replace multiple hyphenated field names in one template', () => {
+  it('should replace multiple standalone hyphenated placeholders', () => {
     const content = '{first-name} {last-name}';
     const variables = { 'first-name': 'John', 'last-name': 'Doe' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('John Doe');
   });
 
-  it('should handle hyphenated field names with leading/trailing whitespace inside braces', () => {
+  it('should handle whitespace inside braces around a hyphenated name', () => {
     const content = 'Value: { field-name }';
     const variables = { 'field-name': 'world' };
     const result = replacePlaceholders({ content, variables, schemas: [] });
     expect(result).toBe('Value: world');
   });
 
-  it('should still evaluate arithmetic subtraction when the expression is not a context key', () => {
-    // 'a-b' is NOT in context; 'a' and 'b' are separate keys.
-    // The fast-path must not fire, and normal acorn evaluation must still work.
-    const content = 'Result: {a-b}';
-    const variables = { a: 10, b: 3 };
-    const result = replacePlaceholders({ content, variables, schemas: [] });
-    expect(result).toBe('Result: 7');
-  });
-
-  it('should still evaluate math expressions that are not literal context keys', () => {
-    const content = 'Sum: {1 + 2}';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('Sum: 3');
-  });
-
-  it('should still resolve allowed globals when not a literal context key', () => {
-    const content = 'Max: {Math.max(1, 2, 3)}';
-    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
-    expect(result).toBe('Max: 3');
-  });
-
-  it('should use schema content for hyphenated field names', () => {
+  it('should use schema content for a hyphenated field name', () => {
     const content = 'Label: {my-field}';
     const schemas = [
       [
@@ -224,6 +202,77 @@ describe('replacePlaceholders', () => {
     ] as SchemaPageArray;
     const result = replacePlaceholders({ content, variables: {}, schemas });
     expect(result).toBe('Label: schema-value');
+  });
+
+  it('should concatenate two hyphenated fields in a compound expression', () => {
+    const content = 'Hello, {first-name + " " + last-name}!';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Hello, John Doe!');
+  });
+
+  it('should add a number to a hyphenated field value in a compound expression', () => {
+    const content = 'Next: {count-down + 1}';
+    const variables = { 'count-down': 4 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Next: 5');
+  });
+
+  it('should use || fallback with a hyphenated field in a compound expression', () => {
+    const content = 'Name: {nick-name || first-name}';
+    const variables = { 'nick-name': '', 'first-name': 'Alice' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Name: Alice');
+  });
+
+  it('should evaluate a ternary with a hyphenated field in a compound expression', () => {
+    const content = 'Status: {is-active ? "yes" : "no"}';
+    const variables = { 'is-active': true };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Status: yes');
+  });
+
+  it('should not corrupt a hyphen inside a string literal', () => {
+    const content = '{first-name + "-" + last-name}';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('John-Doe');
+  });
+
+  it('should treat {a-b} as arithmetic when neither "a-b" nor a longer key exists in context', () => {
+    const content = 'Result: {a-b}';
+    const variables = { a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 7');
+  });
+
+  it('should prefer the hyphenated key over arithmetic when it exists in context', () => {
+    // Context has both "a-b" as a key AND "a" and "b" as separate keys.
+    // The hyphenated key must win for the adjacent "{a-b}" form.
+    const content = 'Value: {a-b}';
+    const variables = { 'a-b': 'key-wins', a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: key-wins');
+  });
+
+  it('should fall back to arithmetic with spaced "{a - b}" even when "a-b" exists in context', () => {
+    // Spaces break the adjacent-token chain, so the expression is subtraction.
+    const content = 'Result: {a - b}';
+    const variables = { 'a-b': 'should-not-appear', a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 7');
+  });
+
+  it('should still evaluate math expressions not involving context keys', () => {
+    const content = 'Sum: {1 + 2}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Sum: 3');
+  });
+
+  it('should still resolve allowed globals when no hyphenated keys are involved', () => {
+    const content = 'Max: {Math.max(1, 2, 3)}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Max: 3');
   });
 });
 

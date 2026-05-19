@@ -370,6 +370,105 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
   }
 };
 
+const isValidIdentifier = (s: string): boolean => /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(s);
+
+const toSafeIdentifier = (key: string): string =>
+  '__k_' + key.replace(/[^a-zA-Z0-9_$]/g, (c) => `u${c.charCodeAt(0).toString(16)}`) + '__';
+
+// Rewrites an expression so that hyphenated context keys (e.g. "first-name") that
+// would be misread by Acorn as subtraction are substituted with safe JS identifiers
+// (e.g. "__k_first_u2d_name__"). Uses the Acorn tokenizer so string literals and
+// whitespace-separated operators are never touched.
+const preprocessExpression = (
+  code: string,
+  context: Record<string, unknown>,
+): { processedCode: string; augmentedContext: Record<string, unknown> } => {
+  const nonIdentifierKeys = Object.keys(context).filter(
+    (k) => k.includes('-') && !isValidIdentifier(k),
+  );
+  if (nonIdentifierKeys.length === 0) {
+    return { processedCode: code, augmentedContext: context };
+  }
+
+  type TokenInfo = { label: string; value: unknown; start: number; end: number };
+  const tokens: TokenInfo[] = [];
+  try {
+    for (const tok of acorn.tokenizer(code, { ecmaVersion: 'latest' })) {
+      tokens.push({ label: tok.type.label, value: tok.value, start: tok.start, end: tok.end });
+    }
+  } catch {
+    return { processedCode: code, augmentedContext: context };
+  }
+
+  const substitutions: Array<{ start: number; end: number; safeKey: string; origKey: string }> = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    const tok = tokens[i];
+    if (tok.label === 'name') {
+      // Extend into a hyphen chain: ident(-ident)+ where each '-' is adjacent
+      const parts: string[] = [tok.value as string];
+      let j = i + 1;
+      while (
+        j < tokens.length - 1 &&
+        tokens[j].label === '+/-' &&
+        tokens[j].value === '-' &&
+        tokens[j].start === tokens[j - 1].end &&
+        tokens[j + 1].label === 'name' &&
+        tokens[j + 1].start === tokens[j].end
+      ) {
+        parts.push(tokens[j + 1].value as string);
+        j += 2;
+      }
+
+      if (parts.length > 1) {
+        // Pick the longest prefix of the chain that is a context key
+        let found = false;
+        for (let len = parts.length; len >= 2; len--) {
+          const candidateKey = parts.slice(0, len).join('-');
+          if (Object.prototype.hasOwnProperty.call(context, candidateKey)) {
+            const lastTokenIdx = i + 2 * (len - 1);
+            const safeKey = toSafeIdentifier(candidateKey);
+            substitutions.push({
+              start: tok.start,
+              end: tokens[lastTokenIdx].end,
+              safeKey,
+              origKey: candidateKey,
+            });
+            i = lastTokenIdx + 1;
+            found = true;
+            break;
+          }
+        }
+        if (!found) i++;
+      } else {
+        i++;
+      }
+    } else {
+      i++;
+    }
+  }
+
+  if (substitutions.length === 0) {
+    return { processedCode: code, augmentedContext: context };
+  }
+
+  let processedCode = '';
+  let pos = 0;
+  for (const { start, end, safeKey } of substitutions) {
+    processedCode += code.slice(pos, start) + safeKey;
+    pos = end;
+  }
+  processedCode += code.slice(pos);
+
+  const augmentedContext = { ...context };
+  for (const { safeKey, origKey } of substitutions) {
+    augmentedContext[safeKey] = context[origKey];
+  }
+
+  return { processedCode, augmentedContext };
+};
+
 const evaluatePlaceholders = (arg: {
   content: string;
   context: Record<string, unknown>;
@@ -402,32 +501,36 @@ const evaluatePlaceholders = (arg: {
     if (braceCount === 0) {
       const code = content.slice(startIndex + 1, endIndex - 1).trim();
 
-      // Fast-path: if `code` is a literal key in the context (e.g. "field-name"),
-      // return the value directly without running it through the JavaScript parser.
-      // This handles field names that contain characters that are not valid JS
-      // identifier characters (hyphens, spaces, dots, etc.) and would otherwise be
-      // mis-parsed as expressions (e.g. `field-name` parsed as subtraction).
+      // Fast-path: whole placeholder is a literal context key (handles non-identifier
+      // names like "field-name" without tokenisation).
       if (Object.prototype.hasOwnProperty.call(context, code)) {
         resultContent += String(context[code]);
         index = endIndex;
         continue;
       }
 
-      if (expressionCache.has(code)) {
-        const evalFunc = expressionCache.get(code)!;
+      // Rewrite any hyphenated context keys embedded in a compound expression
+      // (e.g. "{first-name + ' ' + last-name}") into safe JS identifiers before
+      // handing the code to Acorn, which would otherwise mis-parse the hyphens.
+      const { processedCode, augmentedContext } = preprocessExpression(code, context);
+
+      if (expressionCache.has(processedCode)) {
+        const evalFunc = expressionCache.get(processedCode)!;
         try {
-          const value = evalFunc(context);
+          const value = evalFunc(augmentedContext);
           resultContent += String(value);
         } catch {
           resultContent += content.slice(startIndex, endIndex);
         }
       } else {
         try {
-          const ast = acorn.parseExpressionAt(code, 0, { ecmaVersion: 'latest' }) as AcornNode;
+          const ast = acorn.parseExpressionAt(processedCode, 0, {
+            ecmaVersion: 'latest',
+          }) as AcornNode;
           validateAST(ast);
           const evalFunc = (ctx: Record<string, unknown>) => evaluateAST(ast, ctx);
-          expressionCache.set(code, evalFunc);
-          const value = evalFunc(context);
+          expressionCache.set(processedCode, evalFunc);
+          const value = evalFunc(augmentedContext);
           resultContent += String(value);
         } catch {
           resultContent += content.slice(startIndex, endIndex);
