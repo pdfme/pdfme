@@ -134,6 +134,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
     dynamicRichTextFontSize,
+    resolvedFontName,
   );
 
   const processedText = replaceUnsupportedChars(
@@ -359,11 +360,12 @@ export const buildStyledTextContainer = (
   fontKitFont: FontKitFont,
   value: string,
   resolvedDynamicFontSize?: number,
+  preResolvedFontName?: string,
 ) => {
   const { schema, rootElement, mode, options } = arg;
   const font = options?.font ?? getDefaultFont();
   const baseFontName = schema.fontName ?? getFallbackFontName(font);
-  const resolvedFontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
+  const resolvedFontName = preResolvedFontName ?? resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 

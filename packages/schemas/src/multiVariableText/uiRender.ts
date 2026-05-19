@@ -130,6 +130,8 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     inlineMarkdownRuns
       ? getInlineMarkdownFormDisplayText(inlineMarkdownRuns, variables)
       : substitutedText,
+    undefined,
+    resolvedFontName,
   );
 
   const lineRange = getTextLineRange(schema);
