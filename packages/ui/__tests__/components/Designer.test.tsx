@@ -173,6 +173,53 @@ test('Designer.selectSchemas selects and deselects schemas via the public class 
   }
 });
 
+test('Designer.selectSchemas preserves existing selection when all names are unmatched', async () => {
+  setupUIMock();
+
+  let designer: DesignerClass | undefined;
+  const domContainer = document.createElement('div');
+  Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: 1200 });
+  Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: 1200 });
+  document.body.appendChild(domContainer);
+
+  try {
+    withNoopResizeObserver(() => {
+      designer = new DesignerClass({ domContainer, template: getSampleTemplate(), plugins });
+    });
+
+    await act(async () => {
+      (designer as any).render();
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    });
+
+    await waitFor(() => {
+      expect(domContainer.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
+    });
+
+    // Select field1 first.
+    await act(async () => {
+      designer!.selectSchemas(['field1']);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    await waitFor(() => {
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
+    });
+
+    // Calling with an unmatched name should be a no-op — selection must be preserved.
+    await act(async () => {
+      designer!.selectSchemas(['this_name_does_not_exist']);
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // Delete button should still be present.
+    expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
+  } finally {
+    designer?.destroy();
+    domContainer.remove();
+  }
+});
+
 test('Designer.selectSchemas throws when called before the component mounts', () => {
   let designer: DesignerClass | undefined;
   const domContainer = document.createElement('div');

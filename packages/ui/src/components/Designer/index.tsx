@@ -132,6 +132,7 @@ const TemplateEditor = ({
           const elements = matchedIds
             .map((id) => root.querySelector<HTMLElement>(`[id="${id}"]`))
             .filter((el): el is HTMLElement => el !== null);
+          if (elements.length === 0) return;
           onEdit(elements);
         });
       },
