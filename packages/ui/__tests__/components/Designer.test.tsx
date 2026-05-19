@@ -144,6 +144,8 @@ test('Designer restores scroll position when updateTemplate is called while scro
 
 test('Designer does not flash old scroll position when adding a page', async () => {
   // Uses a BlankPdf basePdf because page manipulation is only enabled when isBlankPdf returns true.
+  // Also verifies the stale-closure pageCursor fix: updatePage passes targetPage explicitly so
+  // updateTemplate does not overwrite the correct cursor with a stale closure value.
   setupUIMock();
 
   const template = {
@@ -154,6 +156,7 @@ test('Designer does not flash old scroll position when adding a page', async () 
   const scrollTopSetter = vi.fn((v: number) => {
     currentScrollTop = v;
   });
+  const onPageCursorChange = vi.fn();
 
   const { container } = render(
     <I18nContext.Provider value={i18n}>
@@ -164,7 +167,7 @@ test('Designer does not flash old scroll position when adding a page', async () 
             onSaveTemplate={console.log}
             onChangeTemplate={console.log}
             size={{ width: 1200, height: 1200 }}
-            onPageCursorChange={() => undefined}
+            onPageCursorChange={onPageCursorChange}
           />
         </PluginsRegistry.Provider>
       </FontContext.Provider>
@@ -198,6 +201,7 @@ test('Designer does not flash old scroll position when adding a page', async () 
     return el as HTMLElement;
   });
 
+  onPageCursorChange.mockClear();
   await act(async () => {
     fireEvent.click(addPageItem);
   });
@@ -206,6 +210,11 @@ test('Designer does not flash old scroll position when adding a page', async () 
   // then confirm the restore effect never wrote the old offset back.
   await waitFor(() => expect(scrollTopSetter).toHaveBeenCalled());
   expect(scrollTopSetter).not.toHaveBeenCalledWith(500);
+
+  // updatePage must have reported pageCursor=1 (page 2) with 2 total pages.
+  // Before the fix, updateTemplate's stale pageCursor closure caused it to call
+  // setPageCursor(0), silently overwriting updatePage's setPageCursor(1).
+  expect(onPageCursorChange).toHaveBeenCalledWith(1, 2);
 });
 
 test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only an initial value', async () => {

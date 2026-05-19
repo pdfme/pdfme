@@ -213,7 +213,12 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(
-    async (newTemplate: Template, preservePage = false, preserveScroll = preservePage) => {
+    async (
+      newTemplate: Template,
+      preservePage = false,
+      preserveScroll = preservePage,
+      targetPage?: number,
+    ) => {
       if (preserveScroll && canvasRef.current) {
         scrollRestoreRef.current = { offset: canvasRef.current.scrollTop };
       }
@@ -227,9 +232,13 @@ const TemplateEditor = ({
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        // Read pageCursor outside the updater — React Strict Mode calls updaters twice.
-        const clamped = Math.min(pageCursor, sl.length - 1);
-        if (preserveScroll && clamped !== pageCursor) {
+        // Use targetPage when provided by updatePage (which already queued
+        // setPageCursor(newPageCursor)). For external template-update calls
+        // (prevTemplate !== template) no competing state update is in flight,
+        // so the closure-captured pageCursor is the correct value.
+        const currentPage = targetPage ?? pageCursor;
+        const clamped = Math.min(currentPage, sl.length - 1);
+        if (preserveScroll && clamped !== currentPage) {
           // Store the page index; offset is resolved with fresh pageSizes in the useEffect.
           scrollRestoreRef.current = { page: clamped };
         }
@@ -301,7 +310,7 @@ const TemplateEditor = ({
     const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
     // preserveScroll=false: updatePage owns scroll via the setTimeout below.
-    await updateTemplate(newTemplate, true, false);
+    await updateTemplate(newTemplate, true, false, newPageCursor);
     void refresh(newTemplate);
 
     // Notify page change with updated total pages
