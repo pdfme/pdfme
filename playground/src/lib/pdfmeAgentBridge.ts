@@ -89,7 +89,7 @@ export type CreateSessionInput = {
 };
 
 export type SendMessageContext = {
-  action?: 'message' | 'review-current-template';
+  action?: 'edit-template' | 'message' | 'review-current-template';
   currentTemplate?: unknown;
   templateName?: string | null;
   title?: string | null;

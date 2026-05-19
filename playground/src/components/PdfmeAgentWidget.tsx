@@ -399,7 +399,23 @@ export default function PdfmeAgentWidget({
     setInput('');
     try {
       const activeSession = await ensureSession();
-      const nextSession = await client.sendMessage(activeSession.id, message);
+      const currentTemplate = getCurrentTemplate?.() ?? null;
+      const activeTemplateName =
+        activeSession.templateName ??
+        templateName ??
+        workspaceRef.current?.selectedTemplateName ??
+        null;
+      if (!activeTemplateName) {
+        throw new Error('Open a mounted template before asking the agent to edit it');
+      }
+
+      appendLog('requested template edit');
+      const nextSession = await client.sendMessage(activeSession.id, message, {
+        action: 'edit-template',
+        ...(currentTemplate ? { currentTemplate } : {}),
+        templateName: activeTemplateName,
+        title: getCurrentTemplateTitle?.() ?? activeSession.title,
+      });
       setSession(nextSession);
       setMessages((currentMessages) => addUniqueMessages(currentMessages, nextSession.messages));
       setChangedFiles(await client.getChangedFiles(activeSession.id));
