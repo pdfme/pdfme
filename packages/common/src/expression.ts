@@ -372,13 +372,16 @@ const evaluateAST = (node: AcornNode, context: Record<string, unknown>): unknown
 
 const isValidIdentifier = (s: string): boolean => /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(s);
 
-const toSafeIdentifier = (key: string): string =>
-  '__k_' + key.replace(/[^a-zA-Z0-9_$]/g, (c) => `u${c.charCodeAt(0).toString(16)}`) + '__';
+// Matches context key names that look like hyphenated identifiers (e.g. "first-name", "a-b-c").
+// Used to scope the fast-path to the exact case it was designed for: Acorn would otherwise
+// mis-parse these as subtraction.
+const isHyphenatedIdentifier = (s: string): boolean =>
+  /^[a-zA-Z_$][a-zA-Z0-9_$]*(-[a-zA-Z_$][a-zA-Z0-9_$]*)+$/.test(s);
 
 // Rewrites an expression so that hyphenated context keys (e.g. "first-name") that
-// would be misread by Acorn as subtraction are substituted with safe JS identifiers
-// (e.g. "__k_first_u2d_name__"). Uses the Acorn tokenizer so string literals and
-// whitespace-separated operators are never touched.
+// would be misread by Acorn as subtraction are substituted with safe JS identifiers.
+// Uses sequential indices (__pdfme_hk_0__, __pdfme_hk_1__, …) so the mapping is
+// guaranteed collision-free regardless of the original key's content.
 const preprocessExpression = (
   code: string,
   context: Record<string, unknown>,
@@ -391,15 +394,21 @@ const preprocessExpression = (
   }
 
   type TokenInfo = { label: string; value: unknown; start: number; end: number };
+  // acorn's TS declaration omits the runtime `value` field on Token
+  type AcornTokenWithValue = { type: { label: string }; value: unknown; start: number; end: number };
   const tokens: TokenInfo[] = [];
   try {
     for (const tok of acorn.tokenizer(code, { ecmaVersion: 'latest' })) {
-      tokens.push({ label: tok.type.label, value: tok.value, start: tok.start, end: tok.end });
+      const t = tok as unknown as AcornTokenWithValue;
+      tokens.push({ label: t.type.label, value: t.value, start: t.start, end: t.end });
     }
   } catch {
     return { processedCode: code, augmentedContext: context };
   }
 
+  // Assign a stable safe identifier to each unique original key encountered
+  // in this expression, in left-to-right order of first appearance.
+  const keyToSafeId = new Map<string, string>();
   const substitutions: Array<{ start: number; end: number; safeKey: string; origKey: string }> = [];
   let i = 0;
 
@@ -428,7 +437,10 @@ const preprocessExpression = (
           const candidateKey = parts.slice(0, len).join('-');
           if (Object.prototype.hasOwnProperty.call(context, candidateKey)) {
             const lastTokenIdx = i + 2 * (len - 1);
-            const safeKey = toSafeIdentifier(candidateKey);
+            if (!keyToSafeId.has(candidateKey)) {
+              keyToSafeId.set(candidateKey, `__pdfme_hk_${keyToSafeId.size}__`);
+            }
+            const safeKey = keyToSafeId.get(candidateKey)!;
             substitutions.push({
               start: tok.start,
               end: tokens[lastTokenIdx].end,
@@ -462,7 +474,7 @@ const preprocessExpression = (
   processedCode += code.slice(pos);
 
   const augmentedContext = { ...context };
-  for (const { safeKey, origKey } of substitutions) {
+  for (const [origKey, safeKey] of keyToSafeId) {
     augmentedContext[safeKey] = context[origKey];
   }
 
@@ -501,9 +513,10 @@ const evaluatePlaceholders = (arg: {
     if (braceCount === 0) {
       const code = content.slice(startIndex + 1, endIndex - 1).trim();
 
-      // Fast-path: whole placeholder is a literal context key (handles non-identifier
-      // names like "field-name" without tokenisation).
-      if (Object.prototype.hasOwnProperty.call(context, code)) {
+      // Fast-path: whole placeholder is a hyphenated-identifier context key (e.g. "field-name").
+      // Scoped to that exact pattern so expression-like keys (e.g. "1+1") still evaluate as
+      // expressions; valid JS identifiers resolve through the Acorn path as usual.
+      if (isHyphenatedIdentifier(code) && Object.prototype.hasOwnProperty.call(context, code)) {
         resultContent += String(context[code]);
         index = endIndex;
         continue;

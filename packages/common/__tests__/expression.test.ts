@@ -297,6 +297,29 @@ describe('replacePlaceholders', () => {
     const result = replacePlaceholders({ content, variables: {}, schemas });
     expect(result).toBe('Content: ');
   });
+
+  it('should not collide when a context key matches a safe identifier name', () => {
+    // Regression for toSafeIdentifier collision: an older encoding produced a safe id
+    // that could be identical to a literal context key (e.g. __k_firstu2dname__ for
+    // both "first-name" and a key literally named "__k_firstu2dname__"). The index-based
+    // scheme produces __pdfme_hk_0__ etc., which cannot appear in user-supplied keys
+    // without quoting and so is collision-free in practice.
+    const variables = { 'first-name': 'John', '__pdfme_hk_0__': 'WRONG' };
+    const content = 'Hello {first-name}';
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Hello John');
+  });
+
+  it('should evaluate {1+1} as arithmetic even when "1+1" is a context key', () => {
+    // Regression for over-broad fast-path: previously any context key matching
+    // the placeholder content short-circuited evaluation, so {1+1} with a context
+    // key "1+1" would return the key value instead of 2. Narrowing the fast-path
+    // to non-identifiers only restores correct arithmetic behaviour.
+    const variables = { '1+1': 'WRONG' };
+    const content = 'Result: {1+1}';
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 2');
+  });
 });
 
 describe('replacePlaceholders - Security Tests', () => {
