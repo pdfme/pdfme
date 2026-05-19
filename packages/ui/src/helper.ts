@@ -450,7 +450,7 @@ const handleTypeChange = (
   pluginsRegistry: PluginRegistry,
 ) => {
   if (key !== 'type') return;
-  const keysToKeep = ['id', 'name', 'type', 'position', 'required'];
+  const keysToKeep = ['id', 'name', 'type', 'position', 'required', 'custom'];
   Object.keys(schema).forEach((key) => {
     if (!keysToKeep.includes(key)) {
       delete schema[key as keyof typeof schema];

@@ -144,6 +144,7 @@ export const Schema = z
     required: z.boolean().optional(),
     __splitRange: DynamicLayoutSplitRange.optional(),
     __isSplit: z.boolean().optional(),
+    custom: z.record(z.string(), z.unknown()).optional(),
   })
   .passthrough();
 

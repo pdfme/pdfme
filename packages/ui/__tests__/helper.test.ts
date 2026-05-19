@@ -586,6 +586,33 @@ describe('changeSchemas test', () => {
       },
     ]);
   });
+
+  test('changeSchemas - type change preserves custom field', () => {
+    const schema: SchemaForUI = {
+      id: uuid(),
+      ...getSchema(),
+      name: 'field1',
+      content: 'hello',
+      custom: { appFieldId: 'app-123', source: 'import' },
+    };
+
+    const objs = [{ key: 'type', value: 'image', schemaId: schema.id }];
+    const mockCallback = vi.fn();
+
+    changeSchemas({
+      schemas: [schema],
+      objs,
+      commitSchemas: mockCallback,
+      basePdf: basePdf1,
+      pluginsRegistry,
+      pageSize,
+    });
+
+    const result = mockCallback.mock.calls[0][0][0] as Record<string, unknown>;
+
+    expect(result.type).toBe('image');
+    expect(result.custom).toStrictEqual({ appFieldId: 'app-123', source: 'import' });
+  });
 });
 
 describe('getDynamicHeightReflowChanges', () => {
