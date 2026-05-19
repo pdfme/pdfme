@@ -144,7 +144,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   if (!value) return;
 
   const baseFontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
-  const fontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font) ?? baseFontName;
+  const fontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font).name ?? baseFontName;
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
   const contentArea = getBoxContentArea(schema);
   const contentX = x + mm2pt(contentArea.leftInset);

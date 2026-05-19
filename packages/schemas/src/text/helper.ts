@@ -136,31 +136,47 @@ export const fontWeightToNumeric = (weight: FONT_WEIGHT): number => {
   return FONT_WEIGHT_KEYWORD_TO_NUMERIC[weight] ?? 400;
 };
 
+export type ResolvedVariantFont = {
+  name: string | undefined;
+  styleResolved: boolean;
+  weightResolved: boolean;
+};
+
 export const resolveVariantFontName = (
   fontName: string | undefined,
   style: FONT_STYLE | undefined,
   weight: FONT_WEIGHT,
   font: Font,
-): string | undefined => {
-  if (!fontName) return undefined;
+): ResolvedVariantFont => {
+  if (!fontName) return { name: undefined, styleResolved: false, weightResolved: false };
   const isDefaultStyle = !style || style === 'normal';
   const isDefaultWeight = fontWeightToNumeric(weight) === 400;
 
-  if (isDefaultStyle && isDefaultWeight) return fontName;
+  if (isDefaultStyle && isDefaultWeight) return { name: fontName, styleResolved: false, weightResolved: false };
 
   if (!isDefaultStyle && !isDefaultWeight) {
     // Try composite first, then each single-axis variant, then base
     const composite = `${fontName}_${style}_${weight}`;
-    if (font[composite]) return composite;
+    if (font[composite]) return { name: composite, styleResolved: true, weightResolved: true };
     const styleOnly = `${fontName}_${style}`;
-    if (font[styleOnly]) return styleOnly;
+    if (font[styleOnly]) return { name: styleOnly, styleResolved: true, weightResolved: false };
     const weightOnly = `${fontName}_${weight}`;
-    if (font[weightOnly]) return weightOnly;
-    return fontName;
+    if (font[weightOnly]) return { name: weightOnly, styleResolved: false, weightResolved: true };
+    return { name: fontName, styleResolved: false, weightResolved: false };
   }
 
-  const candidate = isDefaultStyle ? `${fontName}_${weight}` : `${fontName}_${style}`;
-  return font[candidate] ? candidate : fontName;
+  if (isDefaultStyle) {
+    const candidate = `${fontName}_${weight}`;
+    return font[candidate]
+      ? { name: candidate, styleResolved: false, weightResolved: true }
+      : { name: fontName, styleResolved: false, weightResolved: false };
+  }
+
+  // Only style is non-default
+  const candidate = `${fontName}_${style}`;
+  return font[candidate]
+    ? { name: candidate, styleResolved: true, weightResolved: false }
+    : { name: fontName, styleResolved: false, weightResolved: false };
 };
 
 const getFallbackFont = (font: Font) => {

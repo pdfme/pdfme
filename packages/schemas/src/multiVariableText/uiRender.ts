@@ -109,14 +109,14 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     : undefined;
   const font = options?.font || getDefaultFont();
   const baseFontName = schema.fontName ?? getFallbackFontName(font);
-  const resolvedFontName = resolveVariantFontName(
+  const resolved = resolveVariantFontName(
     baseFontName,
     schema.fontStyle,
     schema.fontWeight ?? DEFAULT_FONT_WEIGHT,
     font,
   );
   const fontKitFont = await getFontKitFont(
-    resolvedFontName,
+    resolved.name,
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
@@ -131,7 +131,7 @@ const formUiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
       ? getInlineMarkdownFormDisplayText(inlineMarkdownRuns, variables)
       : substitutedText,
     undefined,
-    resolvedFontName,
+    resolved,
   );
 
   const lineRange = getTextLineRange(schema);

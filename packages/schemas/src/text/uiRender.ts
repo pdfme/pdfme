@@ -34,6 +34,7 @@ import {
   splitTextToSize,
   resolveVariantFontName,
   fontWeightToNumeric,
+  type ResolvedVariantFont,
 } from './helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
@@ -112,9 +113,9 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
   };
   const font = options?.font || getDefaultFont();
   const baseFontName = schema.fontName ?? getFallbackFontName(font);
-  const resolvedFontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
+  const resolved = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
   const fontKitFont = await getFontKitFont(
-    resolvedFontName,
+    resolved.name,
     font,
     _cache as Map<string, import('fontkit').Font>,
   );
@@ -134,7 +135,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
     dynamicRichTextFontSize,
-    resolvedFontName,
+    resolved,
   );
 
   const processedText = replaceUnsupportedChars(
@@ -360,12 +361,13 @@ export const buildStyledTextContainer = (
   fontKitFont: FontKitFont,
   value: string,
   resolvedDynamicFontSize?: number,
-  preResolvedFontName?: string,
+  preResolved?: ResolvedVariantFont,
 ) => {
   const { schema, rootElement, mode, options } = arg;
   const font = options?.font ?? getDefaultFont();
   const baseFontName = schema.fontName ?? getFallbackFontName(font);
-  const resolvedFontName = preResolvedFontName ?? resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
+  const resolved = preResolved ?? resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font);
+  const resolvedFontName = resolved.name;
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
 
@@ -431,15 +433,12 @@ export const buildStyledTextContainer = (
   if (schema.strikethrough) textDecorations.push('line-through');
   if (schema.underline) textDecorations.push('underline');
 
-  // When a variant font file was found, the file already encodes weight/style — applying
-  // CSS font-weight/font-style on top would cause the browser to synthesize a second time.
-  const variantResolved = resolvedFontName !== baseFontName;
-
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
     fontFamily: resolvedFontName ? `'${resolvedFontName}'` : 'inherit',
-    fontWeight: variantResolved ? 400 : fontWeightToNumeric(schema.fontWeight ?? DEFAULT_FONT_WEIGHT),
-    fontStyle: variantResolved ? 'normal' : (schema.fontStyle ?? DEFAULT_FONT_STYLE),
+    // Suppress CSS synthesis only for the axis already encoded by the variant font file.
+    fontWeight: resolved.weightResolved ? 400 : fontWeightToNumeric(schema.fontWeight ?? DEFAULT_FONT_WEIGHT),
+    fontStyle: resolved.styleResolved ? 'normal' : (schema.fontStyle ?? DEFAULT_FONT_STYLE),
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,

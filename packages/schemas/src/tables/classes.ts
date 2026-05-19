@@ -164,7 +164,7 @@ async function calculateWidths(arg: {
       styles.fontStyle,
       styles.fontWeight ?? DEFAULT_FONT_WEIGHT,
       font,
-    );
+    ).name;
     return getFontKitFont(resolvedName, font, _cache);
   };
 

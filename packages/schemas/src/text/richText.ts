@@ -56,7 +56,7 @@ const richTextGraphemeSegmenter = new Intl.Segmenter(undefined, { granularity: '
 
 const getBaseFontName = (schema: TextSchema, font: Font) => {
   const name = schema.fontName && font[schema.fontName] ? schema.fontName : getFallbackFontName(font);
-  return resolveVariantFontName(name, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font) ?? name;
+  return resolveVariantFontName(name, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font).name ?? name;
 };
 
 const getLoadedFontName = (font: Font, fontName?: string) =>
