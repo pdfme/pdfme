@@ -17,6 +17,7 @@ import {
   type AgentArtifact,
   type AgentSession,
   type AgentSessionMessage,
+  type AgentSessionStatus,
   type BridgeHealth,
   type BridgeSessionEvent,
   type ChangedFile,
@@ -86,6 +87,20 @@ const getEventLogMessage = (event: BridgeSessionEvent): string | null => {
   }
 
   return event.data.message;
+};
+
+const getEventStatus = (event: BridgeSessionEvent): AgentSessionStatus | null => {
+  if (
+    event.type !== 'session.status' ||
+    typeof event.data !== 'object' ||
+    event.data === null ||
+    !('status' in event.data) ||
+    typeof event.data.status !== 'string'
+  ) {
+    return null;
+  }
+
+  return event.data.status as AgentSessionStatus;
 };
 
 const getEventChangedFiles = (event: BridgeSessionEvent): ChangedFile[] | null => {
@@ -240,6 +255,19 @@ export default function PdfmeAgentWidget({
       const onBridgeEvent = (event: MessageEvent) => {
         const bridgeEvent = JSON.parse(event.data) as BridgeSessionEvent;
         appendLog(bridgeEvent.type);
+        const eventStatus = getEventStatus(bridgeEvent);
+        if (eventStatus) {
+          setSession((currentSession) =>
+            currentSession
+              ? {
+                  ...currentSession,
+                  status: eventStatus,
+                  updatedAt: bridgeEvent.createdAt,
+                }
+              : currentSession,
+          );
+          setWorking(eventStatus === 'running');
+        }
         const logMessage = getEventLogMessage(bridgeEvent);
         if (logMessage) appendLog(logMessage);
         const eventArtifacts = getEventArtifacts(bridgeEvent);
@@ -392,6 +420,7 @@ export default function PdfmeAgentWidget({
         throw new Error('No current template is available to review');
       }
 
+      appendLog('requested current template review');
       const nextSession = await client.sendMessage(
         activeSession.id,
         REVIEW_CURRENT_TEMPLATE_MESSAGE,
@@ -406,7 +435,6 @@ export default function PdfmeAgentWidget({
       setMessages((currentMessages) => addUniqueMessages(currentMessages, nextSession.messages));
       setChangedFiles(await client.getChangedFiles(activeSession.id));
       setArtifacts(await client.getArtifacts(activeSession.id));
-      appendLog('requested current template review');
     } catch (error) {
       appendLog(error instanceof Error ? error.message : 'review failed');
     } finally {
@@ -691,7 +719,11 @@ export default function PdfmeAgentWidget({
               onClick={() => void onReviewCurrentTemplate()}
               variant="primary"
             >
-              <Bot className="size-4" />
+              {working ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Bot className="size-4" />
+              )}
               Review current template
             </PlaygroundButton>
             <PlaygroundButton

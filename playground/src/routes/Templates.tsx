@@ -79,7 +79,7 @@ type TemplateData = {
 };
 
 type UIType = 'designer' | 'form-viewer';
-type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf';
+type GenerationFilter = 'all' | 'designer' | 'jsx' | 'md2pdf' | 'pdf';
 type MountedCollectionWriteRunner = <T>(write: () => Promise<T>) => Promise<T>;
 
 type AuthoringPreset = {
@@ -116,6 +116,7 @@ const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
   { label: 'Designer', value: 'designer' },
   { label: 'JSX', value: 'jsx' },
   { label: 'md2pdf', value: 'md2pdf' },
+  { label: 'PDF', value: 'pdf' },
 ];
 
 const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
@@ -124,6 +125,7 @@ const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter
 const getGenerationLabel = (generation: Exclude<GenerationFilter, 'all'>) => {
   if (generation === 'jsx') return 'JSX';
   if (generation === 'md2pdf') return 'md2pdf';
+  if (generation === 'pdf') return 'PDF';
   return 'Designer';
 };
 
@@ -1363,9 +1365,8 @@ function TemplatesApp() {
               const authoringPreset = getAuthoringPreset(template);
               const title = template.title;
               const generation = getTemplateGeneration(template);
-              const tag =
-                generation === 'jsx' ? 'JSX' : generation === 'md2pdf' ? 'md2pdf' : 'Designer';
-              const Icon = generation === 'md2pdf' ? FileText : Code2;
+              const tag = getGenerationLabel(generation);
+              const Icon = generation === 'md2pdf' || generation === 'pdf' ? FileText : Code2;
               const tags = getTemplateTags(template);
 
               return (

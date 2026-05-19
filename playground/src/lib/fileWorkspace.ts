@@ -13,7 +13,7 @@ const ACTIVE_STATE_KEY = 'active';
 const DEFAULT_COLLECTION_POLLING_INTERVAL_MS = 4000;
 const DEFAULT_ENTRY_POLLING_INTERVAL_MS = 1500;
 
-export type SourceKind = 'designer' | 'jsx' | 'md2pdf';
+export type SourceKind = 'designer' | 'jsx' | 'md2pdf' | 'pdf';
 
 export type FileWorkspaceSourceInput = {
   content: string;
@@ -134,7 +134,7 @@ const inferSourceKind = (name: string): SourceKind => {
 const normalizeMetadata = (value: unknown, name: string): FileWorkspaceMetadata => {
   if (!isRecord(value)) return { sourceKind: inferSourceKind(name), tags: [] };
 
-  const sourceKind = ['designer', 'jsx', 'md2pdf'].includes(String(value.sourceKind))
+  const sourceKind = ['designer', 'jsx', 'md2pdf', 'pdf'].includes(String(value.sourceKind))
     ? (value.sourceKind as SourceKind)
     : inferSourceKind(name);
 
@@ -161,6 +161,7 @@ const normalizeTags = (tags: string[]) => [
 const getSourceKindLabel = (sourceKind: SourceKind) => {
   if (sourceKind === 'jsx') return 'JSX';
   if (sourceKind === 'md2pdf') return 'md2pdf';
+  if (sourceKind === 'pdf') return 'PDF';
   return 'Designer';
 };
 
