@@ -101,9 +101,10 @@ const TemplateEditor = ({
     maxZoom,
   });
 
-  // Keep the handle ref up-to-date on every render so it always closes over the
-  // latest paperRefs and scale values, enabling Designer.getPositionFromEvent().
-  if (handleRef) {
+  // Keep the handle ref up-to-date after every committed render so it always
+  // closes over the latest paperRefs and scale values.
+  useLayoutEffect(() => {
+    if (!handleRef) return;
     handleRef.current = {
       getPositionFromEvent(e: MouseEvent | DragEvent) {
         const pageRects = paperRefs.current.filter(Boolean).map((el) => el.getBoundingClientRect());
@@ -115,7 +116,7 @@ const TemplateEditor = ({
         });
       },
     };
-  }
+  });
 
   const onEdit = (targets: Array<HTMLElement | null | undefined>) => {
     setActiveElements(
