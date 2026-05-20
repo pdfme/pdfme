@@ -156,7 +156,6 @@ test('Designer does not flash old scroll position when adding a page', async () 
   const scrollTopSetter = vi.fn((v: number) => {
     currentScrollTop = v;
   });
-  const onPageCursorChange = vi.fn();
 
   const { container } = render(
     <I18nContext.Provider value={i18n}>
@@ -167,7 +166,7 @@ test('Designer does not flash old scroll position when adding a page', async () 
             onSaveTemplate={console.log}
             onChangeTemplate={console.log}
             size={{ width: 1200, height: 1200 }}
-            onPageCursorChange={onPageCursorChange}
+            onPageCursorChange={() => undefined}
           />
         </PluginsRegistry.Provider>
       </FontContext.Provider>
@@ -201,7 +200,6 @@ test('Designer does not flash old scroll position when adding a page', async () 
     return el as HTMLElement;
   });
 
-  onPageCursorChange.mockClear();
   await act(async () => {
     fireEvent.click(addPageItem);
   });
