@@ -4,6 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import './index.css';
 import App from './App';
+import { initPdfmeAgentLoader } from './lib/pdfmeAgentLoader';
+
+initPdfmeAgentLoader();
 
 // Initialize Sentry
 Sentry.init({

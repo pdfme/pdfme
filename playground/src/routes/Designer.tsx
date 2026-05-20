@@ -18,10 +18,14 @@ import {
 } from '../helper';
 import { getPlugins } from '../plugins';
 import { NavBar, NavItem } from '../components/NavBar';
-import PdfmeAgentWidget from '../components/PdfmeAgentWidget';
 import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
+import {
+  PDFME_AGENT_HOST_DESTROYED_EVENT,
+  PDFME_AGENT_HOST_READY_EVENT,
+  type PdfmeAgentHost,
+} from '../lib/pdfmeAgentHost';
 import {
   clearActivePlaygroundProject,
   getActivePlaygroundProject,
@@ -581,6 +585,39 @@ function DesignerApp() {
   }, [applyTemplateFromDisk]);
 
   useEffect(() => {
+    const host: PdfmeAgentHost = {
+      getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
+      getCurrentTemplateTitle: () => projectTitleRef.current,
+      getWorkspaceContext: () => {
+        const currentEntry = fileWorkspaceEntryRef.current;
+        return {
+          templateName: currentEntry?.name ?? null,
+          templatePath: currentEntry?.path ?? null,
+          workspaceRootName: fileWorkspaceCollectionRef.current?.rootName ?? null,
+        };
+      },
+      navigateToGeneratedTemplate: ({ sessionId, templateName }) => {
+        const nextUrl = new URL('/designer', window.location.origin);
+        nextUrl.searchParams.set('workspace', templateName);
+        nextUrl.searchParams.set('agentSession', sessionId);
+        window.location.href = `${nextUrl.pathname}${nextUrl.search}`;
+      },
+      refreshTemplate: onRefreshAgentTemplate,
+    };
+
+    window.pdfmeAgentHost = host;
+    window.dispatchEvent(new CustomEvent(PDFME_AGENT_HOST_READY_EVENT));
+    window.pdfmeAgent?.start?.(host);
+
+    return () => {
+      if (window.pdfmeAgentHost !== host) return;
+      window.dispatchEvent(new CustomEvent(PDFME_AGENT_HOST_DESTROYED_EVENT));
+      window.pdfmeAgent?.stop?.();
+      delete window.pdfmeAgentHost;
+    };
+  }, [onRefreshAgentTemplate]);
+
+  useEffect(() => {
     if (!fileWorkspaceConflict) return;
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -891,14 +928,6 @@ function DesignerApp() {
           setTemplateJsonSource(null);
         }}
         onCommit={onCommitTemplateJson}
-      />
-      <PdfmeAgentWidget
-        getCurrentTemplate={() => designer.current?.getTemplate() ?? null}
-        getCurrentTemplateTitle={() => projectTitleRef.current}
-        onRefreshTemplate={fileWorkspaceEntry ? onRefreshAgentTemplate : undefined}
-        templateName={fileWorkspaceEntry?.name ?? null}
-        templatePath={fileWorkspaceEntry?.path ?? null}
-        workspaceRootName={fileWorkspaceCollectionRef.current?.rootName ?? null}
       />
     </>
   );

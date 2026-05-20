@@ -1,23 +1,15 @@
-import { Suspense, lazy, useEffect } from 'react';
-import { Routes, Route, useSearchParams } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Designer from './routes/Designer';
 import FormAndViewer from './routes/FormAndViewer';
 import Templates from './routes/Templates';
 import Header from './components/Header';
-import { consumePdfmeAgentSearchParam } from './lib/pdfmeAgentFeature';
 
 const JsxPlayground = lazy(() => import('./routes/JsxPlayground'));
 const Md2Pdf = lazy(() => import('./routes/Md2Pdf'));
 
 export default function App() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    const nextSearchParams = consumePdfmeAgentSearchParam(searchParams);
-    if (nextSearchParams) setSearchParams(nextSearchParams, { replace: true });
-  }, [searchParams, setSearchParams]);
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
