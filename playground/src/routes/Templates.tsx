@@ -1363,8 +1363,7 @@ function TemplatesApp() {
               const authoringPreset = getAuthoringPreset(template);
               const title = template.title;
               const generation = getTemplateGeneration(template);
-              const tag =
-                generation === 'jsx' ? 'JSX' : generation === 'md2pdf' ? 'md2pdf' : 'Designer';
+              const tag = getGenerationLabel(generation);
               const Icon = generation === 'md2pdf' ? FileText : Code2;
               const tags = getTemplateTags(template);
 

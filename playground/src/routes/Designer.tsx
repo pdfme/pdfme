@@ -22,6 +22,12 @@ import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
 import TemplateJsonDialog from '../components/TemplateJsonDialog';
 import {
+  PDFME_AGENT_HOST_DESTROYED_EVENT,
+  PDFME_AGENT_HOST_READY_EVENT,
+  type PdfmeAgentHost,
+} from '../lib/pdfmeAgentHost';
+import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentLoader';
+import {
   clearActivePlaygroundProject,
   getActivePlaygroundProject,
   getPlaygroundProject,
@@ -222,7 +228,7 @@ function DesignerApp() {
 
   const onSaveTemplate = useCallback(
     async (template?: Template, saveAs = false) => {
-      if (!designer.current) return;
+      if (!designer.current) return false;
 
       const currentFileEntry = fileWorkspaceEntryRef.current;
       const currentFileCollection = fileWorkspaceCollectionRef.current;
@@ -234,7 +240,7 @@ function DesignerApp() {
           const title =
             window.prompt('Save as', `${currentFileEntry.title || currentFileEntry.name} Copy`) ??
             '';
-          if (!title.trim()) return;
+          if (!title.trim()) return false;
 
           targetEntry = await createTemplateEntryFromTemplate(
             currentFileCollection,
@@ -256,7 +262,7 @@ function DesignerApp() {
                 message: `${currentFileEntry.path} changed on disk since it was loaded.`,
                 saveTemplate: nextTemplate,
               });
-              return;
+              return false;
             }
           } catch (error) {
             if (
@@ -313,7 +319,7 @@ function DesignerApp() {
         } finally {
           isSavingFileWorkspaceRef.current = false;
         }
-        return;
+        return true;
       }
 
       const currentProject = projectRef.current;
@@ -323,7 +329,7 @@ function DesignerApp() {
       const title = saveAs
         ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
         : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
-      if (!title.trim()) return;
+      if (!title.trim()) return false;
 
       const thumbnail = await createTemplateThumbnailDataUrl(
         nextTemplate,
@@ -346,6 +352,7 @@ function DesignerApp() {
           title={savedProject.title}
         />,
       );
+      return true;
     },
     [setCurrentProjectTitle, setSearchParams],
   );
@@ -567,6 +574,117 @@ function DesignerApp() {
       toast.error(error instanceof Error ? error.message : 'Failed to save over disk');
     }
   };
+
+  const onRefreshAgentTemplate = useCallback(async () => {
+    const currentEntry = fileWorkspaceEntryRef.current;
+    if (!currentEntry) return;
+
+    const readResult = await readTemplateEntry(currentEntry);
+    applyTemplateFromDisk(currentEntry, readResult);
+    toast.info(`Reloaded ${currentEntry.path} from disk`, {
+      toastId: `file-workspace-agent-reload:${currentEntry.path}`,
+    });
+  }, [applyTemplateFromDisk]);
+
+  const applyAgentTemplateUpdate: PdfmeAgentHost['applyTemplateUpdate'] = useCallback(
+    async ({ baseTemplate, template }) => {
+      if (!designer.current) throw new Error('Designer is not ready');
+
+      const currentProject = projectRef.current;
+      if (currentProject && currentProject.kind !== 'template') {
+        throw new Error('AI edits are currently supported for template browser projects only');
+      }
+
+      checkTemplate(template as Template);
+      const nextTemplate = cloneDeep(template as Template);
+
+      if (
+        baseTemplate &&
+        serializeTemplateForFileWorkspace(designer.current.getTemplate()) !==
+          serializeTemplateForFileWorkspace(baseTemplate as Template)
+      ) {
+        throw new Error(
+          'Template changed while the agent was editing. The AI update was not applied.',
+        );
+      }
+
+      if (fileWorkspaceEntryRef.current) {
+        const saved = await onSaveTemplate(nextTemplate);
+        if (!saved) {
+          throw new Error('AI update was not saved because the mounted template changed on disk.');
+        }
+
+        isApplyingTemplateRef.current = true;
+        try {
+          designer.current.updateTemplate(nextTemplate);
+        } finally {
+          isApplyingTemplateRef.current = false;
+        }
+        return;
+      }
+
+      designer.current.updateTemplate(nextTemplate);
+
+      if (!currentProject) {
+        toast.success('AI update applied');
+        return;
+      }
+
+      const thumbnail = await createTemplateThumbnailDataUrl(
+        nextTemplate,
+        currentProject.inputs,
+      ).catch(() => currentProject.thumbnail);
+      const savedProject = savePlaygroundProject({
+        id: currentProject.id,
+        inputs: currentProject.inputs,
+        kind: 'template',
+        source: currentProject.source,
+        template: nextTemplate,
+        thumbnail,
+        title: currentProject.title,
+      });
+      projectRef.current = savedProject;
+      setCurrentProjectTitle(savedProject.title);
+      toast.success('AI update saved to Browser Project');
+    },
+    [onSaveTemplate, setCurrentProjectTitle],
+  );
+
+  useEffect(() => {
+    if (!isPdfmeAgentEnabled()) return;
+
+    const host: PdfmeAgentHost = {
+      applyTemplateUpdate: applyAgentTemplateUpdate,
+      getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
+      getCurrentTemplateTitle: () => projectTitleRef.current,
+      getWorkspaceContext: () => {
+        const currentEntry = fileWorkspaceEntryRef.current;
+        return {
+          templateName: currentEntry?.name ?? null,
+          templatePath: currentEntry?.path ?? null,
+          workspaceRootName: fileWorkspaceCollectionRef.current?.rootName ?? null,
+        };
+      },
+      navigateToGeneratedTemplate: ({ sessionId, templateName }) => {
+        const nextUrl = new URL('/designer', window.location.origin);
+        nextUrl.searchParams.set('workspace', templateName);
+        nextUrl.searchParams.set('agentSession', sessionId);
+        window.location.href = `${nextUrl.pathname}${nextUrl.search}`;
+      },
+      refreshTemplate: onRefreshAgentTemplate,
+    };
+
+    window.pdfmeAgentHost = host;
+    window.dispatchEvent(new CustomEvent(PDFME_AGENT_HOST_READY_EVENT));
+    window.pdfmeAgent?.start?.(host);
+
+    return () => {
+      if (window.pdfmeAgentHost !== host) return;
+      window.dispatchEvent(new CustomEvent(PDFME_AGENT_HOST_DESTROYED_EVENT));
+      window.pdfmeAgent?.stop?.();
+      delete window.pdfmeAgentHost;
+    };
+  }, [applyAgentTemplateUpdate, onRefreshAgentTemplate]);
 
   useEffect(() => {
     if (!fileWorkspaceConflict) return;
