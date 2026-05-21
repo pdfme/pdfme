@@ -21,7 +21,7 @@ const setEnabled = (enabled: boolean) => {
   }
 };
 
-const isEnabled = () => getStorage()?.getItem(ENABLED_KEY) === '1';
+export const isPdfmeAgentEnabled = () => getStorage()?.getItem(ENABLED_KEY) === '1';
 
 const consumeSearchParam = () => {
   const url = new URL(window.location.href);
@@ -73,7 +73,7 @@ export const loadPdfmeAgentSdk = () => {
 export const initPdfmeAgentLoader = () => {
   const explicitEnabled = consumeSearchParam();
   if (explicitEnabled === false) window.pdfmeAgent?.setEnabled?.(false);
-  if (!isEnabled()) {
+  if (!isPdfmeAgentEnabled()) {
     window.pdfmeAgent?.stop?.();
     return;
   }

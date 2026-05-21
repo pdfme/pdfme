@@ -26,6 +26,7 @@ import {
   PDFME_AGENT_HOST_READY_EVENT,
   type PdfmeAgentHost,
 } from '../lib/pdfmeAgentHost';
+import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentLoader';
 import {
   clearActivePlaygroundProject,
   getActivePlaygroundProject,
@@ -650,6 +651,8 @@ function DesignerApp() {
   );
 
   useEffect(() => {
+    if (!isPdfmeAgentEnabled()) return;
+
     const host: PdfmeAgentHost = {
       applyTemplateUpdate: applyAgentTemplateUpdate,
       getCurrentTemplate: () => designer.current?.getTemplate() ?? null,

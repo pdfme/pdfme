@@ -10,7 +10,6 @@ export type PdfmeAgentWorkspaceContext = {
 export type PdfmeAgentTemplateUpdate = {
   baseTemplate?: unknown | null;
   template: unknown;
-  title?: string | null;
 };
 
 export type PdfmeAgentHost = {
