@@ -82,6 +82,18 @@ interface GuidesInterface {
   resize(): void;
 }
 
+export type Guides = { horizontal: number[][]; vertical: number[][] };
+
+export interface GuidesController {
+  /**
+   * Returns guide positions for each page. The outer array index corresponds to
+   * the page. Note: after pages are removed the array may be longer than the
+   * current page count — removed pages map to `[]`.
+   */
+  getGuides: () => Guides;
+  setGuides: (guides: Guides) => void;
+}
+
 interface Props {
   basePdf: BasePdf;
   height: number;
@@ -99,6 +111,7 @@ interface Props {
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   sidebarOpen: boolean;
+  onMountGuidesController?: (controller: GuidesController) => void;
 }
 
 const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
@@ -118,11 +131,32 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     onChangeHoveringSchemaId,
     paperRefs,
     sidebarOpen,
+    onMountGuidesController,
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
-  const verticalGuides = useRef<GuidesInterface[]>([]);
-  const horizontalGuides = useRef<GuidesInterface[]>([]);
+  const verticalGuides = useRef<(GuidesInterface | null)[]>([]);
+  const horizontalGuides = useRef<(GuidesInterface | null)[]>([]);
+
+  useEffect(() => {
+    if (!onMountGuidesController) return;
+    onMountGuidesController({
+      getGuides: () => ({
+        horizontal: horizontalGuides.current.map((g) => (g ? g.getGuides() : [])),
+        vertical: verticalGuides.current.map((g) => (g ? g.getGuides() : [])),
+      }),
+      setGuides: (guides) => {
+        guides.horizontal.forEach((pageGuides, i) => {
+          const g = horizontalGuides.current[i];
+          if (g) g.loadGuides(pageGuides);
+        });
+        guides.vertical.forEach((pageGuides, i) => {
+          const g = verticalGuides.current[i];
+          if (g) g.loadGuides(pageGuides);
+        });
+      },
+    });
+  }, [onMountGuidesController]);
   const moveable = useRef<MoveableComponent>(null);
 
   const [isPressShiftKey, setIsPressShiftKey] = useState(false);
@@ -318,8 +352,8 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     Object.assign(s, obj);
   };
 
-  const getGuideLines = (guides: GuidesInterface[], index: number) =>
-    guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
+  const getGuideLines = (guides: (GuidesInterface | null)[], index: number): number[] =>
+    guides[index] ? guides[index].getGuides().map((g) => g * ZOOM) : [];
 
   const onClickMoveable = () => {
     // Just set editing to true without trying to access event properties
@@ -438,10 +472,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             <Guides
               paperSize={paperSize}
               horizontalRef={(e) => {
-                if (e) horizontalGuides.current[index] = e;
+                horizontalGuides.current[index] = e;
               }}
               verticalRef={(e) => {
-                if (e) verticalGuides.current[index] = e;
+                verticalGuides.current[index] = e;
               }}
             />
             {pageCursor !== index ? (

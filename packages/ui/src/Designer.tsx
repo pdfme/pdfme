@@ -11,12 +11,20 @@ import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
 import DesignerComponent from './components/Designer/index.js';
 import AppContextProvider from './components/AppContextProvider.js';
+import type { GuidesController, Guides } from './components/Designer/Canvas/index.js';
+
+export type { Guides };
 
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
   private onPageChangeCallback?: (pageInfo: { currentPage: number; totalPages: number }) => void;
   private pageCursor: number = 0;
+  private guidesController: GuidesController | null = null;
+
+  private readonly onMountGuidesController = (controller: GuidesController) => {
+    this.guidesController = controller;
+  };
 
   constructor(props: DesignerProps) {
     super(props);
@@ -61,6 +69,25 @@ class Designer extends BaseUIClass {
     return this.template.schemas.length;
   }
 
+  public getGuides(): Guides {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!this.guidesController) {
+      const pageCount = this.template.schemas.length;
+      return {
+        horizontal: Array.from({ length: pageCount }, () => []),
+        vertical: Array.from({ length: pageCount }, () => []),
+      };
+    }
+    return this.guidesController.getGuides();
+  }
+
+  public setGuides(guides: Guides): void {
+    if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    if (!guides?.horizontal || !guides?.vertical) return;
+    if (!this.guidesController) return;
+    this.guidesController.setGuides(guides);
+  }
+
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.mount(
@@ -95,6 +122,7 @@ class Designer extends BaseUIClass {
               });
             }
           }}
+          onMountGuidesController={this.onMountGuidesController}
           size={this.size}
         />
       </AppContextProvider>,

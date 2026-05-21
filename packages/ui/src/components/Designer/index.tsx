@@ -21,7 +21,7 @@ import {
 import { DndContext } from '@dnd-kit/core';
 import RightSidebar from './RightSidebar/index.js';
 import LeftSidebar from './LeftSidebar.js';
-import Canvas from './Canvas/index.js';
+import Canvas, { type GuidesController } from './Canvas/index.js';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, LEFT_SIDEBAR_WIDTH } from '../../constants.js';
 import { I18nContext, OptionsContext, PluginsRegistry } from '../../contexts.js';
 import {
@@ -55,6 +55,7 @@ const TemplateEditor = ({
   onSaveTemplate,
   onChangeTemplate,
   onPageCursorChange,
+  onMountGuidesController,
 }: Omit<DesignerProps, 'domContainer'> & {
   size: Size;
   onSaveTemplate: (t: Template) => void;
@@ -62,6 +63,7 @@ const TemplateEditor = ({
 } & {
   onChangeTemplate: (t: Template) => void;
   onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
+  onMountGuidesController?: (controller: GuidesController) => void;
 }) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
@@ -421,6 +423,7 @@ const TemplateEditor = ({
             removeSchemas={removeSchemas}
             sidebarOpen={sidebarOpen}
             onEdit={onEdit}
+            onMountGuidesController={onMountGuidesController}
           />
         </div>
       </DndContext>
