@@ -11,6 +11,7 @@ import {
   Size,
   isBlankPdf,
   PluginRegistry,
+  px2mm,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import { DEFAULT_MAX_ZOOM, RULER_HEIGHT } from './constants.js';
@@ -555,4 +556,46 @@ export const setFontNameRecursively = (
       setFontNameRecursively(obj[key] as Record<string, unknown>, fontName, seen);
     }
   }
+};
+
+/**
+ * Converts a screen coordinate (clientX/clientY from a MouseEvent or DragEvent) to
+ * a template position expressed in millimetres, given the bounding rects of each page
+ * element and the current canvas scale.
+ *
+ * The page rects must be obtained via `element.getBoundingClientRect()` — they are
+ * already in CSS-pixel/viewport space, so no additional scaling is required to locate
+ * the point inside the rect.  The internal coordinate (px from the page top-left)
+ * must be divided by `scale` to undo the CSS `transform: scale()` applied to the
+ * Paper container, and then converted to mm via `px2mm`.
+ *
+ * Returns `null` when the point does not lie inside any page rect.
+ */
+export const getPositionFromPageRects = (args: {
+  clientX: number;
+  clientY: number;
+  pageRects: DOMRect[];
+  scale: number;
+}): { pageIndex: number; x: number; y: number } | null => {
+  const { clientX, clientY, pageRects, scale } = args;
+
+  for (let i = 0; i < pageRects.length; i++) {
+    const rect = pageRects[i];
+    if (
+      clientX >= rect.left &&
+      clientX <= rect.right &&
+      clientY >= rect.top &&
+      clientY <= rect.bottom
+    ) {
+      const xPx = (clientX - rect.left) / scale;
+      const yPx = (clientY - rect.top) / scale;
+      return {
+        pageIndex: i,
+        x: round(px2mm(xPx), 2),
+        y: round(px2mm(yPx), 2),
+      };
+    }
+  }
+
+  return null;
 };

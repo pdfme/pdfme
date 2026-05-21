@@ -14,6 +14,7 @@ import {
   changeSchemas,
   getDynamicHeightReflowChanges,
   setFontNameRecursively,
+  getPositionFromPageRects,
 } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
@@ -717,5 +718,134 @@ describe('setFontNameRecursively', () => {
   it('returns early for null input or undefined input', () => {
     expect(() => setFontNameRecursively(null as any, 'Arial')).not.toThrow();
     expect(() => setFontNameRecursively(undefined as any, 'Arial')).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPositionFromPageRects
+// ---------------------------------------------------------------------------
+
+/**
+ * Helper to build a minimal DOMRect-like object matching the required interface.
+ * ZOOM = 3.7795275591 px/mm, so for a 210 mm wide page the CSS width is
+ * 210 * ZOOM ≈ 793.7 px.  With scale = 1 the bounding rect equals the CSS size.
+ */
+const makeRect = (left: number, top: number, width: number, height: number): DOMRect => ({
+  left,
+  top,
+  right: left + width,
+  bottom: top + height,
+  width,
+  height,
+  x: left,
+  y: top,
+  toJSON() {
+    return this;
+  },
+});
+
+describe('getPositionFromPageRects', () => {
+  // ZOOM = 3.7795275591, px2mm ratio = 1/ZOOM ≈ 0.26458333
+  // A 210 × 297 mm A4 page at scale 1 → bounding rect 793.7 × 1122.5 screen px.
+  const ZOOM = 3.7795275591;
+  const pageWidthMm = 210;
+  const pageHeightMm = 297;
+  const pageWidthPx = pageWidthMm * ZOOM; // CSS px = screen px at scale 1
+  const pageHeightPx = pageHeightMm * ZOOM;
+
+  const singlePageRects = [makeRect(100, 50, pageWidthPx, pageHeightPx)];
+
+  it('returns null when the point is outside every page rect', () => {
+    const result = getPositionFromPageRects({
+      clientX: 0,
+      clientY: 0,
+      pageRects: singlePageRects,
+      scale: 1,
+    });
+    expect(result).toBeNull();
+  });
+
+  it('returns pageIndex 0 and x=0, y=0 for the top-left corner of the first page', () => {
+    const result = getPositionFromPageRects({
+      clientX: 100, // exactly rect.left
+      clientY: 50, // exactly rect.top
+      pageRects: singlePageRects,
+      scale: 1,
+    });
+    expect(result).not.toBeNull();
+    expect(result!.pageIndex).toBe(0);
+    expect(result!.x).toBe(0);
+    expect(result!.y).toBe(0);
+  });
+
+  it('converts an interior point to the correct mm coordinates at scale 1', () => {
+    // Click 1 mm into the page from top-left.  1 mm = ZOOM CSS px.
+    const oneMmInPx = ZOOM;
+    const result = getPositionFromPageRects({
+      clientX: 100 + oneMmInPx,
+      clientY: 50 + oneMmInPx,
+      pageRects: singlePageRects,
+      scale: 1,
+    });
+    expect(result).not.toBeNull();
+    expect(result!.pageIndex).toBe(0);
+    // Allow floating-point rounding to 2 decimal places
+    expect(result!.x).toBeCloseTo(1, 1);
+    expect(result!.y).toBeCloseTo(1, 1);
+  });
+
+  it('accounts for canvas scale when converting coordinates', () => {
+    // At scale 0.5 the bounding rect is half the CSS size, but the same mm
+    // distance must result from a proportionally smaller screen offset.
+    const scale = 0.5;
+    const scaledRects = [makeRect(100, 50, pageWidthPx * scale, pageHeightPx * scale)];
+
+    // Place the event 1 mm worth of CSS pixels (= ZOOM * scale screen px) from the page corner.
+    const oneMmScreenPx = ZOOM * scale;
+    const result = getPositionFromPageRects({
+      clientX: 100 + oneMmScreenPx,
+      clientY: 50 + oneMmScreenPx,
+      pageRects: scaledRects,
+      scale,
+    });
+    expect(result).not.toBeNull();
+    expect(result!.pageIndex).toBe(0);
+    expect(result!.x).toBeCloseTo(1, 1);
+    expect(result!.y).toBeCloseTo(1, 1);
+  });
+
+  it('returns the correct pageIndex for multi-page layouts', () => {
+    // Two pages stacked vertically, each 297 mm tall
+    const twoPageRects = [
+      makeRect(100, 50, pageWidthPx, pageHeightPx),
+      makeRect(100, 50 + pageHeightPx + 20, pageWidthPx, pageHeightPx), // 20 px gap
+    ];
+
+    // Click in the middle of the second page
+    const secondPageTop = 50 + pageHeightPx + 20;
+    const result = getPositionFromPageRects({
+      clientX: 100 + pageWidthPx / 2,
+      clientY: secondPageTop + pageHeightPx / 2,
+      pageRects: twoPageRects,
+      scale: 1,
+    });
+    expect(result).not.toBeNull();
+    expect(result!.pageIndex).toBe(1);
+    expect(result!.x).toBeCloseTo(pageWidthMm / 2, 0);
+    expect(result!.y).toBeCloseTo(pageHeightMm / 2, 0);
+  });
+
+  it('returns null for a point in the gap between two pages', () => {
+    const twoPageRects = [
+      makeRect(100, 50, pageWidthPx, pageHeightPx),
+      makeRect(100, 50 + pageHeightPx + 20, pageWidthPx, pageHeightPx),
+    ];
+    const result = getPositionFromPageRects({
+      clientX: 100 + 10,
+      clientY: 50 + pageHeightPx + 10, // in the 20 px gap
+      pageRects: twoPageRects,
+      scale: 1,
+    });
+    expect(result).toBeNull();
   });
 });
