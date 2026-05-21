@@ -10,7 +10,7 @@ import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate, generateForm } from '@pdfme/generator';
 import { getPlugins } from './plugins';
 
-const templateAssetSourceKinds = ['designer', 'jsx', 'md2pdf', 'pdf'] as const;
+const templateAssetSourceKinds = ['designer', 'jsx', 'md2pdf'] as const;
 
 type TemplateAssetSourceKind = (typeof templateAssetSourceKinds)[number];
 

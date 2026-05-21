@@ -97,7 +97,7 @@ function normalizeMetadata(rawMetadata) {
   if (typeof rawMetadata.order === 'number' && Number.isFinite(rawMetadata.order)) {
     metadata.order = rawMetadata.order;
   }
-  if (['designer', 'jsx', 'md2pdf', 'pdf'].includes(rawMetadata.sourceKind)) {
+  if (['designer', 'jsx', 'md2pdf'].includes(rawMetadata.sourceKind)) {
     metadata.sourceKind = rawMetadata.sourceKind;
   }
   if (Array.isArray(rawMetadata.tags)) {
@@ -168,7 +168,6 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
 function inferSourceKind(name) {
   if (name.startsWith('jsx-')) return 'jsx';
   if (name.startsWith('md2pdf-')) return 'md2pdf';
-  if (fs.existsSync(path.join(templatesDir, name, 'source.pdf'))) return 'pdf';
   return 'designer';
 }
 
@@ -218,10 +217,6 @@ function getSourcePath(name, sourceKind) {
   if (sourceKind === 'md2pdf') {
     const sourcePath = path.join(templatesDir, name, 'source.md');
     return fs.existsSync(sourcePath) ? `${name}/source.md` : undefined;
-  }
-  if (sourceKind === 'pdf') {
-    const sourcePath = path.join(templatesDir, name, 'source.pdf');
-    return fs.existsSync(sourcePath) ? `${name}/source.pdf` : undefined;
   }
   return undefined;
 }
