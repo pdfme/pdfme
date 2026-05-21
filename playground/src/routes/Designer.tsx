@@ -584,8 +584,58 @@ function DesignerApp() {
     });
   }, [applyTemplateFromDisk]);
 
+  const applyAgentTemplateUpdate: PdfmeAgentHost['applyTemplateUpdate'] = useCallback(
+    async ({ baseTemplate, template }) => {
+      if (!designer.current) throw new Error('Designer is not ready');
+
+      const currentProject = projectRef.current;
+      if (currentProject && currentProject.kind !== 'template') {
+        throw new Error('AI edits are currently supported for template browser projects only');
+      }
+
+      checkTemplate(template as Template);
+      const nextTemplate = cloneDeep(template as Template);
+
+      if (
+        baseTemplate &&
+        serializeTemplateForFileWorkspace(designer.current.getTemplate()) !==
+          serializeTemplateForFileWorkspace(baseTemplate as Template)
+      ) {
+        throw new Error(
+          'Template changed while the agent was editing. The AI update was not applied.',
+        );
+      }
+
+      designer.current.updateTemplate(nextTemplate);
+
+      if (!currentProject) {
+        toast.success('AI update applied');
+        return;
+      }
+
+      const thumbnail = await createTemplateThumbnailDataUrl(
+        nextTemplate,
+        currentProject.inputs,
+      ).catch(() => currentProject.thumbnail);
+      const savedProject = savePlaygroundProject({
+        id: currentProject.id,
+        inputs: currentProject.inputs,
+        kind: 'template',
+        source: currentProject.source,
+        template: nextTemplate,
+        thumbnail,
+        title: currentProject.title,
+      });
+      projectRef.current = savedProject;
+      setCurrentProjectTitle(savedProject.title);
+      toast.success('AI update saved to Browser Project');
+    },
+    [setCurrentProjectTitle],
+  );
+
   useEffect(() => {
     const host: PdfmeAgentHost = {
+      applyTemplateUpdate: applyAgentTemplateUpdate,
       getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
       getCurrentTemplateTitle: () => projectTitleRef.current,
       getWorkspaceContext: () => {
@@ -615,7 +665,7 @@ function DesignerApp() {
       window.pdfmeAgent?.stop?.();
       delete window.pdfmeAgentHost;
     };
-  }, [onRefreshAgentTemplate]);
+  }, [applyAgentTemplateUpdate, onRefreshAgentTemplate]);
 
   useEffect(() => {
     if (!fileWorkspaceConflict) return;
