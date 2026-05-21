@@ -227,7 +227,7 @@ function DesignerApp() {
 
   const onSaveTemplate = useCallback(
     async (template?: Template, saveAs = false) => {
-      if (!designer.current) return;
+      if (!designer.current) return false;
 
       const currentFileEntry = fileWorkspaceEntryRef.current;
       const currentFileCollection = fileWorkspaceCollectionRef.current;
@@ -239,7 +239,7 @@ function DesignerApp() {
           const title =
             window.prompt('Save as', `${currentFileEntry.title || currentFileEntry.name} Copy`) ??
             '';
-          if (!title.trim()) return;
+          if (!title.trim()) return false;
 
           targetEntry = await createTemplateEntryFromTemplate(
             currentFileCollection,
@@ -261,7 +261,7 @@ function DesignerApp() {
                 message: `${currentFileEntry.path} changed on disk since it was loaded.`,
                 saveTemplate: nextTemplate,
               });
-              return;
+              return false;
             }
           } catch (error) {
             if (
@@ -318,7 +318,7 @@ function DesignerApp() {
         } finally {
           isSavingFileWorkspaceRef.current = false;
         }
-        return;
+        return true;
       }
 
       const currentProject = projectRef.current;
@@ -328,7 +328,7 @@ function DesignerApp() {
       const title = saveAs
         ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
         : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
-      if (!title.trim()) return;
+      if (!title.trim()) return false;
 
       const thumbnail = await createTemplateThumbnailDataUrl(
         nextTemplate,
@@ -351,6 +351,7 @@ function DesignerApp() {
           title={savedProject.title}
         />,
       );
+      return true;
     },
     [setCurrentProjectTitle, setSearchParams],
   );
@@ -606,6 +607,21 @@ function DesignerApp() {
         );
       }
 
+      if (fileWorkspaceEntryRef.current) {
+        const saved = await onSaveTemplate(nextTemplate);
+        if (!saved) {
+          throw new Error('AI update was not saved because the mounted template changed on disk.');
+        }
+
+        isApplyingTemplateRef.current = true;
+        try {
+          designer.current.updateTemplate(nextTemplate);
+        } finally {
+          isApplyingTemplateRef.current = false;
+        }
+        return;
+      }
+
       designer.current.updateTemplate(nextTemplate);
 
       if (!currentProject) {
@@ -630,7 +646,7 @@ function DesignerApp() {
       setCurrentProjectTitle(savedProject.title);
       toast.success('AI update saved to Browser Project');
     },
-    [setCurrentProjectTitle],
+    [onSaveTemplate, setCurrentProjectTitle],
   );
 
   useEffect(() => {
