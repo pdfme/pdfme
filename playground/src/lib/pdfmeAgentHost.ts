@@ -7,7 +7,14 @@ export type PdfmeAgentWorkspaceContext = {
   workspaceRootName?: string | null;
 };
 
+export type PdfmeAgentTemplateUpdate = {
+  baseTemplate?: unknown | null;
+  template: unknown;
+  title?: string | null;
+};
+
 export type PdfmeAgentHost = {
+  applyTemplateUpdate?: (input: PdfmeAgentTemplateUpdate) => Promise<void> | void;
   getCurrentTemplate?: () => unknown | null;
   getCurrentTemplateTitle?: () => string | null;
   getWorkspaceContext?: () => PdfmeAgentWorkspaceContext;
