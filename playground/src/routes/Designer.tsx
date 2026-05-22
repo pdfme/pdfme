@@ -575,17 +575,6 @@ function DesignerApp() {
     }
   };
 
-  const onRefreshAgentTemplate = useCallback(async () => {
-    const currentEntry = fileWorkspaceEntryRef.current;
-    if (!currentEntry) return;
-
-    const readResult = await readTemplateEntry(currentEntry);
-    applyTemplateFromDisk(currentEntry, readResult);
-    toast.info(`Reloaded ${currentEntry.path} from disk`, {
-      toastId: `file-workspace-agent-reload:${currentEntry.path}`,
-    });
-  }, [applyTemplateFromDisk]);
-
   const applyAgentTemplateUpdate: PdfmeAgentHost['applyTemplateUpdate'] = useCallback(
     async ({ baseTemplate, template }) => {
       if (!designer.current) throw new Error('Designer is not ready');
@@ -657,21 +646,12 @@ function DesignerApp() {
       applyTemplateUpdate: applyAgentTemplateUpdate,
       getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
       getCurrentTemplateTitle: () => projectTitleRef.current,
-      getWorkspaceContext: () => {
+      getTemplateContext: () => {
         const currentEntry = fileWorkspaceEntryRef.current;
         return {
           templateName: currentEntry?.name ?? null,
-          templatePath: currentEntry?.path ?? null,
-          workspaceRootName: fileWorkspaceCollectionRef.current?.rootName ?? null,
         };
       },
-      navigateToGeneratedTemplate: ({ sessionId, templateName }) => {
-        const nextUrl = new URL('/designer', window.location.origin);
-        nextUrl.searchParams.set('workspace', templateName);
-        nextUrl.searchParams.set('agentSession', sessionId);
-        window.location.href = `${nextUrl.pathname}${nextUrl.search}`;
-      },
-      refreshTemplate: onRefreshAgentTemplate,
     };
 
     window.pdfmeAgentHost = host;
@@ -684,7 +664,7 @@ function DesignerApp() {
       window.pdfmeAgent?.stop?.();
       delete window.pdfmeAgentHost;
     };
-  }, [applyAgentTemplateUpdate, onRefreshAgentTemplate]);
+  }, [applyAgentTemplateUpdate]);
 
   useEffect(() => {
     if (!fileWorkspaceConflict) return;

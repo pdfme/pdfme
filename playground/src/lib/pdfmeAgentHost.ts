@@ -1,10 +1,8 @@
 export const PDFME_AGENT_HOST_READY_EVENT = 'pdfme-agent-host-ready';
 export const PDFME_AGENT_HOST_DESTROYED_EVENT = 'pdfme-agent-host-destroyed';
 
-export type PdfmeAgentWorkspaceContext = {
+export type PdfmeAgentTemplateContext = {
   templateName?: string | null;
-  templatePath?: string | null;
-  workspaceRootName?: string | null;
 };
 
 export type PdfmeAgentTemplateUpdate = {
@@ -16,9 +14,7 @@ export type PdfmeAgentHost = {
   applyTemplateUpdate?: (input: PdfmeAgentTemplateUpdate) => Promise<void> | void;
   getCurrentTemplate?: () => unknown | null;
   getCurrentTemplateTitle?: () => string | null;
-  getWorkspaceContext?: () => PdfmeAgentWorkspaceContext;
-  navigateToGeneratedTemplate?: (input: { sessionId: string; templateName: string }) => void;
-  refreshTemplate?: () => Promise<void> | void;
+  getTemplateContext?: () => PdfmeAgentTemplateContext;
 };
 
 declare global {
