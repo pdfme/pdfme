@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Code2, Copy, Download, Save } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
-import { Designer } from '@pdfme/ui';
+import { Designer, type DesignerSelection } from '@pdfme/ui';
 import {
   getFontsData,
   getTemplateById,
@@ -147,6 +147,11 @@ function DesignerApp() {
   const isFileWorkspaceDirtyRef = useRef(false);
   const fileWorkspaceStatusRef = useRef<FileWorkspaceStatus>(null);
   const projectTitleRef = useRef('Untitled Template');
+  const agentSelectionRef = useRef<DesignerSelection | null>(null);
+  const agentSelectionListenersRef = useRef(
+    new Set<(selection: DesignerSelection | null) => void>(),
+  );
+  const editingStaticSchemasRef = useRef(false);
   const loadRequestRef = useRef<DesignerLoadRequest | null>(null);
   const didCleanLoadQueryRef = useRef(false);
 
@@ -166,6 +171,10 @@ function DesignerApp() {
   useEffect(() => {
     searchParamsRef.current = searchParams;
   }, [searchParams]);
+
+  useEffect(() => {
+    editingStaticSchemasRef.current = editingStaticSchemas;
+  }, [editingStaticSchemas]);
 
   const setCurrentProjectTitle = useCallback((title: string) => {
     projectTitleRef.current = title;
@@ -460,6 +469,11 @@ function DesignerApp() {
           plugins: getPlugins(),
         });
         designer.current = nextDesigner;
+        agentSelectionRef.current = nextDesigner.getSelection();
+        nextDesigner.onChangeSelection((selection) => {
+          agentSelectionRef.current = selection;
+          agentSelectionListenersRef.current.forEach((listener) => listener(selection));
+        });
         nextDesigner.onSaveTemplate(onSaveTemplate);
         nextDesigner.onChangeTemplate((nextTemplate) => {
           if (!fileWorkspaceEntryRef.current || isApplyingTemplateRef.current) return;
@@ -646,10 +660,22 @@ function DesignerApp() {
       applyTemplateUpdate: applyAgentTemplateUpdate,
       getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
       getCurrentTemplateTitle: () => projectTitleRef.current,
+      getSelection: () => agentSelectionRef.current ?? designer.current?.getSelection() ?? null,
+      getSelectedSchemas: () =>
+        agentSelectionRef.current?.schemas ?? designer.current?.getSelectedSchemas() ?? [],
       getTemplateContext: () => {
         const currentEntry = fileWorkspaceEntryRef.current;
         return {
+          editingStaticSchemas: editingStaticSchemasRef.current,
           templateName: currentEntry?.name ?? null,
+        };
+      },
+      onChangeSelection: (cb) => {
+        const listeners = agentSelectionListenersRef.current;
+        listeners.add(cb);
+        cb(agentSelectionRef.current ?? designer.current?.getSelection() ?? null);
+        return () => {
+          listeners.delete(cb);
         };
       },
     };
@@ -732,12 +758,15 @@ function DesignerApp() {
   useEffect(() => {
     let cancelled = false;
     let mountedDesigner: Designer | null = null;
+    const selectionListeners = agentSelectionListenersRef.current;
 
     void buildDesigner(() => cancelled).then((nextDesigner) => {
       if (!nextDesigner) return;
 
       if (cancelled) {
         if (designer.current === nextDesigner) designer.current = null;
+        agentSelectionRef.current = null;
+        agentSelectionListenersRef.current.forEach((listener) => listener(null));
         destroyDesignerInstance(nextDesigner);
         return;
       }
@@ -750,6 +779,8 @@ function DesignerApp() {
       if (!mountedDesigner) return;
 
       if (designer.current === mountedDesigner) designer.current = null;
+      agentSelectionRef.current = null;
+      selectionListeners.forEach((listener) => listener(null));
       destroyDesignerInstance(mountedDesigner);
     };
   }, [buildDesigner]);

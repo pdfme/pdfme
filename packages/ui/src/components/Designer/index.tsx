@@ -34,6 +34,14 @@ import {
   useMaxZoom,
 } from '../../helper.js';
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents } from '../../hooks.js';
+import {
+  createDesignerSelection,
+  getDesignerSelectionPageIndex,
+  getSelectedSchemaIds,
+  normalizeDesignerSchemaSelectionTargets,
+  type DesignerSelectSchemas,
+  type DesignerSelection,
+} from '../../designerSelection.js';
 import Root from '../Root.js';
 import ErrorScreen from '../ErrorScreen.js';
 import CtlBar from '../CtlBar.js';
@@ -55,10 +63,14 @@ const TemplateEditor = ({
   onSaveTemplate,
   onChangeTemplate,
   onPageCursorChange,
+  onChangeSelection,
+  onRegisterSchemaSelectionHandler,
 }: Omit<DesignerProps, 'domContainer'> & {
   size: Size;
   onSaveTemplate: (t: Template) => void;
   onChangeTemplate: (t: Template) => void;
+  onChangeSelection?: (selection: DesignerSelection) => void;
+  onRegisterSchemaSelectionHandler?: (handler: DesignerSelectSchemas | null) => void;
 } & {
   onChangeTemplate: (t: Template) => void;
   onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
@@ -89,12 +101,77 @@ const TemplateEditor = ({
     maxZoom,
   });
 
+  const getElementsByIds = (ids: string[]) =>
+    ids
+      .map((id) => document.getElementById(id))
+      .filter((element): element is HTMLElement => element instanceof HTMLElement);
+
   const onEdit = (targets: Array<HTMLElement | null | undefined>) => {
     setActiveElements(
       targets.filter((target): target is HTMLElement => target instanceof HTMLElement),
     );
     setHoveringSchemaId(null);
   };
+
+  const selectSchemas: DesignerSelectSchemas = useCallback(
+    (targets, options = {}) => {
+      const normalizedTargets = normalizeDesignerSchemaSelectionTargets(targets);
+      if (normalizedTargets.length === 0) {
+        onEditEnd();
+        return;
+      }
+
+      const targetPageIndex = getDesignerSelectionPageIndex(
+        normalizedTargets,
+        pageCursor,
+        options,
+      );
+      const targetSchemas = schemasList[targetPageIndex] ?? [];
+      const selectedSchemaIds = getSelectedSchemaIds({
+        pageIndex: targetPageIndex,
+        schemas: targetSchemas,
+        targets: normalizedTargets,
+      });
+
+      const editSelectedSchemas = () => onEdit(getElementsByIds(selectedSchemaIds));
+      if (selectedSchemaIds.length === 0) {
+        onEditEnd();
+        return;
+      }
+
+      if (targetPageIndex !== pageCursor) {
+        setPageCursor(targetPageIndex);
+        onPageCursorChange(targetPageIndex, schemasList.length);
+        if (options.scroll !== false && canvasRef.current) {
+          canvasRef.current.scrollTop = getPagesScrollTopByIndex(
+            pageSizes,
+            targetPageIndex,
+            scale,
+          );
+        }
+        setTimeout(editSelectedSchemas);
+        return;
+      }
+
+      editSelectedSchemas();
+    },
+    [pageCursor, pageSizes, scale, schemasList, onPageCursorChange],
+  );
+
+  useEffect(() => {
+    onRegisterSchemaSelectionHandler?.(selectSchemas);
+    return () => onRegisterSchemaSelectionHandler?.(null);
+  }, [onRegisterSchemaSelectionHandler, selectSchemas]);
+
+  useEffect(() => {
+    onChangeSelection?.(
+      createDesignerSelection({
+        activeSchemaIds: activeElements.map((element) => element.id),
+        pageIndex: pageCursor,
+        schemasList,
+      }),
+    );
+  }, [activeElements, onChangeSelection, pageCursor, schemasList]);
 
   const onEditEnd = () => {
     setActiveElements([]);
