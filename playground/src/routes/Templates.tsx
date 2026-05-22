@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { checkTemplate, getInputFromTemplate, type Template } from '@pdfme/common';
 import {
+  ChevronDown,
   Code2,
   Copy,
   Download,
@@ -31,6 +32,7 @@ import {
   setPlaygroundProjectThumbnail,
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
+import { createTemplateFromPdfFile, getPdfTemplateTitle } from '../lib/pdfTemplate';
 import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 import {
   clearPersistedFileWorkspace,
@@ -424,6 +426,84 @@ function ProjectMoreActions({
   );
 }
 
+const TemplateCreateMenu = ({
+  busy = false,
+  disabled = false,
+  label,
+  onBlank,
+  onPdf,
+}: {
+  busy?: boolean;
+  disabled?: boolean;
+  label: string;
+  onBlank: () => void;
+  onPdf: () => void;
+}) => {
+  const [open, setOpen] = useState(false);
+  const firstMenuItemRef = React.useRef<HTMLButtonElement | null>(null);
+  const triggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const isDisabled = disabled || busy;
+  const runAction = (action: () => void) => {
+    setOpen(false);
+    action();
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    firstMenuItemRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [open]);
+
+  return (
+    <div className="relative">
+      <PlaygroundButton
+        ref={triggerRef}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        disabled={isDisabled}
+        onClick={() => setOpen((value) => !value)}
+        variant="primary"
+      >
+        <PencilRuler className="size-4" />
+        {busy ? 'Creating...' : label}
+        <ChevronDown className="size-3.5" />
+      </PlaygroundButton>
+      {open && !isDisabled && (
+        <>
+          <button
+            type="button"
+            aria-label="Close template creation menu"
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            role="menu"
+            className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-md border border-gray-200 bg-white py-1 shadow-lg"
+          >
+            <ProjectMenuItem buttonRef={firstMenuItemRef} onClick={() => runAction(onBlank)}>
+              <PencilRuler className="size-4" />
+              Blank template
+            </ProjectMenuItem>
+            <ProjectMenuItem onClick={() => runAction(onPdf)}>
+              <Upload className="size-4" />
+              From PDF
+            </ProjectMenuItem>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const parseTagInput = (value: string) => [
   ...new Set(
     value
@@ -611,8 +691,10 @@ const AuthorLink = ({ author }: { author: string }) => {
 function TemplatesApp() {
   const navigate = useNavigate();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
+  const localPdfTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
   const mountedCollectionRef = React.useRef<FileWorkspaceCollection | null>(null);
   const mountedCollectionWriteCountRef = React.useRef(0);
+  const mountedPdfTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
   const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
@@ -623,6 +705,8 @@ function TemplatesApp() {
     null,
   );
   const [lastFolderName, setLastFolderName] = useState<string | null>(null);
+  const [isCreatingLocalPdfTemplate, setIsCreatingLocalPdfTemplate] = useState(false);
+  const [isCreatingMountedPdfTemplate, setIsCreatingMountedPdfTemplate] = useState(false);
   const [isOpeningFolder, setIsOpeningFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const [tagFilter, setTagFilter] = useState('all');
@@ -917,6 +1001,100 @@ function TemplatesApp() {
     }
   };
 
+  const onCreateLocalTemplateFromPdf = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setIsCreatingLocalPdfTemplate(true);
+    try {
+      const title = window.prompt('Template name', getPdfTemplateTitle(file)) ?? '';
+      if (!title.trim()) return;
+
+      const draft = await createTemplateFromPdfFile(file);
+      const inputs = getInputFromTemplate(draft.template);
+      const thumbnail = await createTemplateThumbnailDataUrl(draft.template, inputs).catch(
+        () => undefined,
+      );
+      const project = savePlaygroundProject({
+        inputs,
+        kind: 'template',
+        template: draft.template,
+        thumbnail,
+        title,
+      });
+
+      refreshProjects();
+      toast.success(`Created "${project.title}" from ${draft.fileName}`);
+      navigateToProject(project, 'designer');
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        error instanceof DOMException && error.name === 'QuotaExceededError'
+          ? 'PDF is too large to save in Browser Projects. Try a mounted folder instead.'
+          : error instanceof Error
+            ? error.message
+            : 'Failed to create template from PDF',
+      );
+    } finally {
+      setIsCreatingLocalPdfTemplate(false);
+    }
+  };
+
+  const onCreateMountedTemplateFromPdf = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const collection = mountedCollectionRef.current;
+    if (!collection) {
+      toast.error('Open a mounted folder first');
+      return;
+    }
+
+    setIsCreatingMountedPdfTemplate(true);
+    try {
+      const title = window.prompt('Template name', getPdfTemplateTitle(file)) ?? '';
+      if (!title.trim()) return;
+
+      const draft = await createTemplateFromPdfFile(file);
+      const thumbnail = await createTemplateThumbnailDataUrl(draft.template).catch(() => undefined);
+      const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
+        const entry = await createTemplateEntryFromTemplate(
+          collection,
+          draft.template,
+          title,
+          {
+            description: `A template created from ${draft.fileName}.`,
+            sourceKind: 'designer',
+            sourcePdf: file,
+            tags: ['PDF', 'Designer'],
+            thumbnailDataUrl: thumbnail,
+          },
+        );
+        const collectionAfterCreate = await refreshTemplateCollection({
+          ...collection,
+          selectedTemplateName: entry.name,
+        });
+
+        return {
+          nextCollection: collectionAfterCreate,
+          nextEntry: findTemplateEntry(collectionAfterCreate, entry.name) ?? entry,
+        };
+      });
+
+      setMountedCollection(nextCollection);
+      setLastFolderName(nextCollection.rootName);
+      toast.success(`Created "${nextEntry.title}" from ${draft.fileName}`);
+      await navigateToMountedTemplate(nextCollection, nextEntry, 'designer');
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to create template from PDF');
+    } finally {
+      setIsCreatingMountedPdfTemplate(false);
+    }
+  };
+
   const onSaveMountedMetadata = async (
     entry: FileWorkspaceTemplateEntry,
     metadata: EditableFileWorkspaceMetadata,
@@ -1083,10 +1261,19 @@ function TemplatesApp() {
                   className="sr-only"
                   onChange={onImportTemplateJson}
                 />
-                <PlaygroundButton onClick={() => navigate('/designer?new=1')} variant="primary">
-                  <PencilRuler className="size-4" />
-                  New Local Template
-                </PlaygroundButton>
+                <input
+                  ref={localPdfTemplateInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  className="sr-only"
+                  onChange={(event) => void onCreateLocalTemplateFromPdf(event)}
+                />
+                <TemplateCreateMenu
+                  busy={isCreatingLocalPdfTemplate}
+                  label="New Local Template"
+                  onBlank={() => navigate('/designer?new=1')}
+                  onPdf={() => localPdfTemplateInputRef.current?.click()}
+                />
               </div>
             </div>
 
@@ -1188,13 +1375,21 @@ function TemplatesApp() {
                   </PlaygroundButton>
                 )}
                 {mountedCollection && (
-                  <PlaygroundButton
-                    onClick={() => void onCreateMountedTemplate()}
-                    variant="primary"
-                  >
-                    <PencilRuler className="size-4" />
-                    New Mounted Template
-                  </PlaygroundButton>
+                  <>
+                    <input
+                      ref={mountedPdfTemplateInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      className="sr-only"
+                      onChange={(event) => void onCreateMountedTemplateFromPdf(event)}
+                    />
+                    <TemplateCreateMenu
+                      busy={isCreatingMountedPdfTemplate}
+                      label="New Mounted Template"
+                      onBlank={() => void onCreateMountedTemplate()}
+                      onPdf={() => mountedPdfTemplateInputRef.current?.click()}
+                    />
+                  </>
                 )}
               </div>
             </div>

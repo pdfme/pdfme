@@ -86,6 +86,7 @@ type FileWorkspaceCollectionSubscriptionOptions = FileWorkspaceSubscriptionOptio
 
 type CreateTemplateEntryOptions = {
   description?: string;
+  sourcePdf?: File;
   source?: FileWorkspaceSourceInput;
   sourceKind?: SourceKind;
   tags?: string[];
@@ -737,6 +738,11 @@ export const createTemplateEntryFromTemplate = async (
     const sourceFileName = options.source.language === 'markdown' ? 'source.md' : 'source.tsx';
     const sourceFileHandle = await directoryHandle.getFileHandle(sourceFileName, { create: true });
     await writeText(sourceFileHandle, options.source.content, 'text/plain');
+  }
+
+  if (options.sourcePdf) {
+    const sourcePdfHandle = await directoryHandle.getFileHandle('source.pdf', { create: true });
+    await writeBlob(sourcePdfHandle, options.sourcePdf);
   }
 
   if (options.thumbnailDataUrl) {
