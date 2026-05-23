@@ -142,6 +142,7 @@ function DesignerApp() {
   const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
   const diskVersionRef = useRef<string | null>(null);
   const lastCleanSerializedTemplateRef = useRef<string | null>(null);
+  const lastCleanBrowserProjectTemplateRef = useRef<string | null>(null);
   const isApplyingTemplateRef = useRef(false);
   const isSavingFileWorkspaceRef = useRef(false);
   const isFileWorkspaceDirtyRef = useRef(false);
@@ -164,6 +165,7 @@ function DesignerApp() {
     null,
   );
   const [isFileWorkspaceDirty, setIsFileWorkspaceDirty] = useState(false);
+  const [isBrowserProjectDirty, setIsBrowserProjectDirty] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
@@ -188,14 +190,23 @@ function DesignerApp() {
       lastCleanSerializedTemplateRef.current = entry
         ? serializeTemplateForFileWorkspace(entry.template)
         : null;
+      lastCleanBrowserProjectTemplateRef.current = null;
       setFileWorkspaceEntry(entry);
       setFileWorkspaceStatus(null);
       setFileWorkspaceConflict(null);
       setIsFileWorkspaceDirty(false);
+      setIsBrowserProjectDirty(false);
       if (entry) setCurrentProjectTitle(entry.title);
     },
     [setCurrentProjectTitle],
   );
+
+  const setCleanBrowserProjectTemplate = useCallback((template: Template | null) => {
+    lastCleanBrowserProjectTemplateRef.current = template
+      ? serializeTemplateForFileWorkspace(template)
+      : null;
+    setIsBrowserProjectDirty(false);
+  }, []);
 
   const updateFileWorkspaceDirtyState = useCallback((template: Template) => {
     const cleanTemplate = lastCleanSerializedTemplateRef.current;
@@ -203,6 +214,13 @@ function DesignerApp() {
       cleanTemplate != null && serializeTemplateForFileWorkspace(template) !== cleanTemplate;
     isFileWorkspaceDirtyRef.current = dirty;
     setIsFileWorkspaceDirty(dirty);
+  }, []);
+
+  const updateBrowserProjectDirtyState = useCallback((template: Template) => {
+    const cleanTemplate = lastCleanBrowserProjectTemplateRef.current;
+    const dirty =
+      cleanTemplate != null && serializeTemplateForFileWorkspace(template) !== cleanTemplate;
+    setIsBrowserProjectDirty(dirty);
   }, []);
 
   const applyTemplateFromDisk = useCallback(
@@ -354,6 +372,7 @@ function DesignerApp() {
         title,
       });
       projectRef.current = savedProject;
+      setCleanBrowserProjectTemplate(savedProject.template);
       setCurrentProjectTitle(savedProject.title);
       toast.success(
         <ProjectSavedToast
@@ -363,7 +382,7 @@ function DesignerApp() {
       );
       return true;
     },
-    [setCurrentProjectTitle, setSearchParams],
+    [setCleanBrowserProjectTemplate, setCurrentProjectTitle, setSearchParams],
   );
 
   const buildDesigner = useCallback(
@@ -435,6 +454,11 @@ function DesignerApp() {
         }
 
         projectRef.current = project;
+        if (fileWorkspaceEntryRef.current) {
+          setCleanBrowserProjectTemplate(null);
+        } else {
+          setCleanBrowserProjectTemplate(template);
+        }
         if (project) setCurrentProjectTitle(project.title);
 
         if (shouldConsumeQuery && !didCleanLoadQueryRef.current) {
@@ -476,8 +500,12 @@ function DesignerApp() {
         });
         nextDesigner.onSaveTemplate(onSaveTemplate);
         nextDesigner.onChangeTemplate((nextTemplate) => {
-          if (!fileWorkspaceEntryRef.current || isApplyingTemplateRef.current) return;
-          updateFileWorkspaceDirtyState(nextTemplate);
+          if (isApplyingTemplateRef.current) return;
+          if (fileWorkspaceEntryRef.current) {
+            updateFileWorkspaceDirtyState(nextTemplate);
+            return;
+          }
+          updateBrowserProjectDirtyState(nextTemplate);
         });
         return nextDesigner;
       } catch (error) {
@@ -491,8 +519,10 @@ function DesignerApp() {
     [
       onSaveTemplate,
       setActiveFileWorkspaceEntry,
+      setCleanBrowserProjectTemplate,
       setCurrentProjectTitle,
       setSearchParams,
+      updateBrowserProjectDirtyState,
       updateFileWorkspaceDirtyState,
     ],
   );
@@ -535,7 +565,9 @@ function DesignerApp() {
     clearActivePlaygroundProject();
     setSearchParams(new URLSearchParams([['new', '1']]), { replace: true });
     if (designer.current) {
-      designer.current.updateTemplate(getBlankTemplate());
+      const blankTemplate = getBlankTemplate();
+      setCleanBrowserProjectTemplate(blankTemplate);
+      designer.current.updateTemplate(blankTemplate);
     }
   };
 
@@ -647,10 +679,11 @@ function DesignerApp() {
         title: currentProject.title,
       });
       projectRef.current = savedProject;
+      setCleanBrowserProjectTemplate(savedProject.template);
       setCurrentProjectTitle(savedProject.title);
       toast.success('AI update saved to Browser Project');
     },
-    [onSaveTemplate, setCurrentProjectTitle],
+    [onSaveTemplate, setCleanBrowserProjectTemplate, setCurrentProjectTitle],
   );
 
   useEffect(() => {
@@ -840,6 +873,14 @@ function DesignerApp() {
     );
   }, [applyTemplateFromDisk, fileWorkspaceEntry]);
 
+  const saveTemplateLabel = fileWorkspaceEntry ? `Save ${fileWorkspaceEntry.path}` : 'Save Project';
+  const hasUnsavedFileWorkspaceChanges = Boolean(
+    fileWorkspaceEntry && isFileWorkspaceDirty && !fileWorkspaceStatus,
+  );
+  const hasUnsavedBrowserProjectChanges = Boolean(!fileWorkspaceEntry && isBrowserProjectDirty);
+  const hasUnsavedTemplateChanges =
+    hasUnsavedFileWorkspaceChanges || hasUnsavedBrowserProjectChanges;
+
   const navItems: NavItem[] = [
     {
       label: 'Lang',
@@ -893,12 +934,24 @@ function DesignerApp() {
       content: (
         <div className="flex gap-1">
           <PlaygroundButton
+            className="relative"
             id="save-local"
+            aria-label={
+              hasUnsavedTemplateChanges
+                ? `${saveTemplateLabel} (unsaved changes)`
+                : saveTemplateLabel
+            }
             disabled={editingStaticSchemas}
             onClick={() => void onSaveTemplate()}
           >
+            {hasUnsavedTemplateChanges && (
+              <span
+                aria-hidden="true"
+                className="absolute -right-1 -top-1 size-2.5 rounded-full bg-red-500 ring-2 ring-white"
+              />
+            )}
             <Save className="size-3.5" />
-            {fileWorkspaceEntry ? `Save ${fileWorkspaceEntry.path}` : 'Save Project'}
+            {saveTemplateLabel}
           </PlaygroundButton>
           <PlaygroundButton
             id="save-as"
@@ -948,21 +1001,29 @@ function DesignerApp() {
     },
   ];
 
+  const fileWorkspaceStatusMessage = fileWorkspaceEntry
+    ? fileWorkspaceStatus === 'invalid'
+      ? `${fileWorkspaceEntry.path} is currently invalid on disk. The editor is keeping the last valid template.`
+      : fileWorkspaceStatus === 'deleted'
+        ? `${fileWorkspaceEntry.path} was deleted on disk. Saving will recreate it.`
+        : ''
+    : '';
+
   return (
-    <>
+    <main className="flex min-h-0 flex-1 flex-col">
       <NavBar items={navItems} />
-      {fileWorkspaceEntry && (fileWorkspaceStatus || isFileWorkspaceDirty) && (
-        <div className="border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
-          {fileWorkspaceStatus === 'invalid' &&
-            `${fileWorkspaceEntry.path} is currently invalid on disk. The editor is keeping the last valid template.`}
-          {fileWorkspaceStatus === 'deleted' &&
-            `${fileWorkspaceEntry.path} was deleted on disk. Saving will recreate it.`}
-          {!fileWorkspaceStatus &&
-            isFileWorkspaceDirty &&
-            `${fileWorkspaceEntry.path} has unsaved changes.`}
+      {fileWorkspaceEntry && fileWorkspaceStatusMessage && (
+        <div
+          key="file-workspace-status"
+          aria-atomic="true"
+          aria-live="polite"
+          className="flex items-center border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900"
+          role="status"
+        >
+          <span className="min-w-0 flex-1 truncate">{fileWorkspaceStatusMessage}</span>
         </div>
       )}
-      <div ref={designerRef} className="flex-1 w-full" />
+      <div key="designer-container" ref={designerRef} className="min-h-0 flex-1 w-full" />
       {fileWorkspaceConflict && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div
@@ -1009,7 +1070,7 @@ function DesignerApp() {
         }}
         onCommit={onCommitTemplateJson}
       />
-    </>
+    </main>
   );
 }
 
