@@ -356,6 +356,8 @@ export const buildStyledTextContainer = (
   const { schema, rootElement, mode } = arg;
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
+  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const editable = isEditable(mode, schema);
 
   if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema, arg.basePdf) && value) {
     dynamicFontSize = calculateDynamicFontSize({
@@ -408,7 +410,7 @@ export const buildStyledTextContainer = (
     justifyContent: mapVerticalAlignToFlex(verticalAlignment),
     width: '100%',
     height: '100%',
-    cursor: isEditable(mode, schema) ? 'text' : 'default',
+    cursor: editable ? 'text' : 'default',
   };
   Object.assign(container.style, containerStyle);
   rootElement.innerHTML = '';
@@ -424,7 +426,7 @@ export const buildStyledTextContainer = (
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
     color: schema.fontColor ? schema.fontColor : DEFAULT_FONT_COLOR,
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
-    letterSpacing: `${schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING}pt`,
+    letterSpacing: `${characterSpacing}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
     textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
     whiteSpace: 'pre-wrap',
@@ -437,6 +439,8 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
+    // Browsers include the final letter-spacing in editable text wrapping, unlike PDF rendering.
+    ...(editable && characterSpacing > 0 ? { width: `calc(100% + ${characterSpacing}pt)` } : {}),
     ...(isTopAligned ? { height: '100%' } : {}),
   };
 

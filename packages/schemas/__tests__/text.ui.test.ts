@@ -186,6 +186,38 @@ describe('text inline markdown UI rendering', () => {
     expect(textBlock.style.height).toBe('');
   });
 
+  it('compensates editable text wrapping for final character spacing', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      readOnly: false,
+      textFormat: 'plain',
+      characterSpacing: 12,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: '12345',
+      schema,
+      rootElement,
+      mode: 'form',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+
+    expect(textBlock.contentEditable).toBe('plaintext-only');
+    expect(textBlock.style.letterSpacing).toBe('12pt');
+    expect(textBlock.style.width).toBe('calc(100% + 16px)');
+  });
+
   it('renders split inline markdown form chunks as read-only', async () => {
     const rootElement = document.createElement('div');
     const onChange = vi.fn();
