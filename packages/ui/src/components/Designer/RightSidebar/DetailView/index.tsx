@@ -20,6 +20,7 @@ import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
 import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
+import { expandSameTypeBulkUpdateChanges } from './schemaChangeHelpers.js';
 import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
 import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '../layout.js';
 
@@ -45,6 +46,7 @@ type DetailViewProps = Pick<
 };
 
 type WidgetMap = Record<string, (props: PropPanelWidgetProps) => React.JSX.Element>;
+const getElementIds = (elements: HTMLElement[]) => elements.map(({ id }) => id);
 
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
@@ -59,6 +61,23 @@ const DetailView = (props: DetailViewProps) => {
   const pluginsRegistry = useContext(PluginsRegistry);
   const options = useContext(OptionsContext);
 
+  const activeSchemas = useMemo(() => {
+    const ids = new Set(props.activeElements.map((element) => element.id));
+    return props.schemas.filter((schema) => ids.has(schema.id));
+  }, [props.activeElements, props.schemas]);
+
+  const changeSchemasWithSameTypeSelection = useCallback(
+    (changes: ChangeSchemaItem[]) =>
+      changeSchemas(
+        expandSameTypeBulkUpdateChanges({
+          activeSchema,
+          activeSchemas,
+          changes,
+        }),
+      ),
+    [activeSchema, activeSchemas, changeSchemas],
+  );
+
   // Define a type-safe i18n function that accepts string keys
   const typedI18n = useCallback(
     (key: string): string => {
@@ -70,11 +89,25 @@ const DetailView = (props: DetailViewProps) => {
 
   const widgets = useMemo<WidgetMap>(() => {
     const newWidgets: WidgetMap = {
-      AlignWidget: (p) => <AlignWidget {...p} {...props} options={options} />,
+      AlignWidget: (p) => (
+        <AlignWidget
+          {...p}
+          {...props}
+          changeSchemas={changeSchemasWithSameTypeSelection}
+          options={options}
+        />
+      ),
       Divider: () => (
         <Divider style={{ marginTop: token.marginXS, marginBottom: token.marginXS }} />
       ),
-      ButtonGroup: (p) => <ButtonGroupWidget {...p} {...props} options={options} />,
+      ButtonGroup: (p) => (
+        <ButtonGroupWidget
+          {...p}
+          {...props}
+          changeSchemas={changeSchemasWithSameTypeSelection}
+          options={options}
+        />
+      ),
     };
     for (const plugin of pluginsRegistry.values()) {
       const pluginWidgets = (plugin.propPanel.widgets ?? {}) as Record<
@@ -86,6 +119,7 @@ const DetailView = (props: DetailViewProps) => {
           <WidgetRenderer
             {...p}
             {...props}
+            changeSchemas={changeSchemasWithSameTypeSelection}
             options={options}
             theme={token}
             i18n={typedI18n}
@@ -95,7 +129,7 @@ const DetailView = (props: DetailViewProps) => {
       });
     }
     return newWidgets;
-  }, [options, pluginsRegistry, props, token, typedI18n]);
+  }, [changeSchemasWithSameTypeSelection, options, pluginsRegistry, props, token, typedI18n]);
 
   useEffect(() => form.resetFields(), [activeSchema.id, form]);
 
@@ -178,6 +212,8 @@ const DetailView = (props: DetailViewProps) => {
 
     let changes: ChangeSchemaItem[] = [];
     for (const key in formSchema) {
+      // `id` is UI-only and `content` is edited by schema renderers/widgets, not this form watcher.
+      // Other active-schema-only keys are handled by expandSameTypeBulkUpdateChanges.
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
@@ -220,7 +256,7 @@ const DetailView = (props: DetailViewProps) => {
       // Only commit these schema changes if they have passed form validation
       form
         .validateFields()
-        .then(() => changeSchemas(changes))
+        .then(() => changeSchemasWithSameTypeSelection(changes))
         .catch((reason: ValidateErrorEntity) => {
           if (reason.errorFields.length) {
             changes = changes.filter(
@@ -231,7 +267,7 @@ const DetailView = (props: DetailViewProps) => {
             );
           }
           if (changes.length) {
-            changeSchemas(changes);
+            changeSchemasWithSameTypeSelection(changes);
           }
         });
     }
@@ -402,16 +438,8 @@ const DetailView = (props: DetailViewProps) => {
 
   if (typeof activePropPanelSchema === 'function') {
     // Create a new object without the schemasList property
-    const {
-      size,
-      schemas,
-      pageSize,
-      basePdf,
-      changeSchemas,
-      activeElements,
-      deselectSchema,
-      activeSchema,
-    } = props;
+    const { size, schemas, pageSize, basePdf, activeElements, deselectSchema, activeSchema } =
+      props;
     const propPanelProps = {
       size,
       schemas,
@@ -500,7 +528,11 @@ const DetailView = (props: DetailViewProps) => {
 };
 
 const propsAreUnchanged = (prevProps: DetailViewProps, nextProps: DetailViewProps) => {
-  return JSON.stringify(prevProps.activeSchema) == JSON.stringify(nextProps.activeSchema);
+  return (
+    JSON.stringify(prevProps.activeSchema) === JSON.stringify(nextProps.activeSchema) &&
+    JSON.stringify(getElementIds(prevProps.activeElements)) ===
+      JSON.stringify(getElementIds(nextProps.activeElements))
+  );
 };
 
 export default React.memo(DetailView, propsAreUnchanged);

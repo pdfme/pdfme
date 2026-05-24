@@ -1,6 +1,7 @@
 import { Space, Button, Form, theme } from 'antd';
 import React from 'react';
 import type { PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { getSameTypeBulkUpdateSchemas } from './schemaChangeHelpers.js';
 interface ButtonConfig {
   key: string;
   icon: string;
@@ -9,37 +10,49 @@ interface ButtonConfig {
 }
 
 const ButtonGroupWidget = (props: PropPanelWidgetProps) => {
-  const { activeElements, changeSchemas, schemas, schema } = props;
+  const { activeElements, activeSchema, changeSchemas, schemas, schema } = props;
   const { token } = theme.useToken();
   const buttons = Array.isArray(schema?.buttons) ? (schema.buttons as ButtonConfig[]) : [];
 
-  const apply = (btn: ButtonConfig) => {
-    const key = btn.key;
-    const type = btn.type;
+  const getSelectedSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
-    const ass = schemas.filter((s) => ids.includes(s.id));
-    changeSchemas(
-      ass.map((s: SchemaForUI) => {
-        const oldValue = Boolean((s as Record<string, unknown>)[key] ?? false);
-        const newValue = type === 'boolean' ? !oldValue : btn.value;
-        return { key, value: newValue, schemaId: s.id };
-      }),
+    return schemas.filter((s) => ids.includes(s.id));
+  };
+
+  const getTargetSchemas = () =>
+    getSameTypeBulkUpdateSchemas({
+      activeSchema,
+      activeSchemas: getSelectedSchemas(),
+    });
+
+  const getButtonValue = (btn: ButtonConfig, targetSchemas: SchemaForUI[]) => {
+    if (btn.type !== 'boolean') return btn.value;
+
+    const isActive = targetSchemas.every((s) =>
+      Boolean((s as Record<string, unknown>)[btn.key] ?? false),
     );
+    return !isActive;
+  };
+
+  const apply = (btn: ButtonConfig) => {
+    const targetSchemas = getTargetSchemas();
+    const value = getButtonValue(btn, targetSchemas);
+    changeSchemas(targetSchemas.map((s: SchemaForUI) => ({ key: btn.key, value, schemaId: s.id })));
   };
 
   const isActive = (btn: ButtonConfig) => {
     const key = btn.key;
     const type = btn.type;
-    let active = false;
-    const ids = activeElements.map((ae) => ae.id);
-    const ass = schemas.filter((s) => ids.includes(s.id));
-    ass.forEach((s: SchemaForUI) => {
+    const targetSchemas = getTargetSchemas();
+    if (targetSchemas.length === 0) return false;
+
+    return targetSchemas.every((s: SchemaForUI) => {
       // Cast schema to Record to safely access dynamic properties
       const schemaRecord = s as Record<string, unknown>;
-      active =
-        type === 'boolean' ? Boolean(schemaRecord[key] ?? false) : schemaRecord[key] === btn.value;
+      return type === 'boolean'
+        ? Boolean(schemaRecord[key] ?? false)
+        : schemaRecord[key] === btn.value;
     });
-    return active;
   };
 
   const replaceCurrentColor = (svgString: string, color?: string) =>
