@@ -615,6 +615,31 @@
       "title": "Location Number"
     },
     {
+      "name": "mhlw-regular-health-check-report",
+      "author": "pdfme",
+      "path": "mhlw-regular-health-check-report/template.json",
+      "thumbnailPath": "mhlw-regular-health-check-report/thumbnail.png",
+      "pageCount": 2,
+      "fieldCount": 73,
+      "schemaTypes": [
+        "text"
+      ],
+      "fontNames": [
+        "NotoSansJP"
+      ],
+      "hasCJK": true,
+      "basePdfKind": "dataUri",
+      "description": "A Japanese Ministry of Health, Labour and Welfare regular health check report form with CJK text fields.",
+      "sourceKind": "designer",
+      "tags": [
+        "Government",
+        "Healthcare",
+        "CJK",
+        "Form"
+      ],
+      "title": "MHLW Regular Health Check Report"
+    },
+    {
       "name": "md2pdf-overview",
       "author": "pdfme",
       "path": "md2pdf-overview/template.json",
