@@ -96,9 +96,11 @@ const config = {
   /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
   {
     announcementBar: {
-      id: 'deepwiki_launch',
-      content: `🚀 &nbsp; Check out our new <a target="_blank" rel="noopener noreferrer" href="https://deepwiki.com/pdfme/pdfme">DeepWiki</a>! Ask interactive questions on docs and source code. &nbsp; 🧑‍💻`,
-    },    
+      id: 'github_star_cta',
+      content: `⭐ &nbsp; pdfme is open source. If it saves you time, please <a target="_blank" rel="noopener noreferrer" href="https://github.com/pdfme/pdfme" style="color: #ffffff; font-weight: 700; text-decoration: underline; text-underline-offset: 2px;">star us on GitHub</a> to help more developers discover it. &nbsp; ⭐`,
+      backgroundColor: '#24292f',
+      textColor: '#ffffff',
+    },
     image: 'img/ogimage.png',
     docs: {
       sidebar: {
