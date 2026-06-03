@@ -98,7 +98,12 @@ jobs:
 
       - name: Install Puppeteer Chrome
         working-directory: playground
-        run: ./node_modules/.bin/puppeteer browsers install chrome
+        env:
+          PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.cache/puppeteer
+          PUPPETEER_CHROME_HEADLESS_SHELL_SKIP_DOWNLOAD: true
+        run: |
+          node node_modules/puppeteer/install.mjs
+          node -e "console.log(require('puppeteer').executablePath())"
 
       - name: Run playground checks
         run: |
@@ -107,3 +112,4 @@ jobs:
           npm --prefix playground run test
         env:
           CI: true
+          PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.cache/puppeteer
