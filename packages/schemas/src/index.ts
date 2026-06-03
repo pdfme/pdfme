@@ -14,6 +14,7 @@ import time from './date/time.js';
 import select from './select/index.js';
 import radioGroup from './radioGroup/index.js';
 import checkbox from './checkbox/index.js';
+import circleMark from './circleMark/index.js';
 export { builtInPlugins } from './builtins.js';
 
 export {
@@ -35,6 +36,7 @@ export {
   select,
   radioGroup,
   checkbox,
+  circleMark,
 };
 
 // Export utility functions

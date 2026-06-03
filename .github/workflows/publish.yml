@@ -96,8 +96,16 @@ jobs:
         run: |
           npm ci --prefix playground
 
-      - name: Install Puppeteer Chrome
-        run: npm --prefix playground exec -- puppeteer browsers install chrome
+      - name: Configure Puppeteer Chrome
+        run: |
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_PATH" ]; then
+            echo "No system Chrome executable found" >&2
+            exit 1
+          fi
+          test -x "$CHROME_PATH"
+          echo "PUPPETEER_EXECUTABLE_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
+          echo "$CHROME_PATH"
 
       - name: Run playground checks
         run: |

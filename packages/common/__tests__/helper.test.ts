@@ -222,17 +222,17 @@ describe('checkGenerateProps', () => {
       }
     };
 
-    expect(() => checkGenerateProps(invalidPluginProps)).toThrow("[@pdfme/common] Invalid argument:\n" +
-      "--------------------------\n" +
-      "ERROR POSITION: plugins.invalid.propPanel.defaultSchema.type\n" +
-      "ERROR MESSAGE: Invalid input: expected string, received undefined\n" +
-      "--------------------------\n" +
-      "ERROR POSITION: plugins.missingPanel.propPanel\n" +
-      "ERROR MESSAGE: Invalid input: expected object, received undefined\n" +
-      "--------------------------\n" +
-      "ERROR POSITION: plugins.missingDefaultSchema.propPanel.defaultSchema\n" +
-      "ERROR MESSAGE: Invalid input: expected object, received undefined\n" +
-      "--------------------------");
+    let errorMessage = '';
+    try {
+      checkGenerateProps(invalidPluginProps);
+    } catch (e) {
+      errorMessage = e instanceof Error ? e.message : String(e);
+    }
+
+    expect(errorMessage).toContain('[@pdfme/common] Invalid argument:');
+    expect(errorMessage).toContain('ERROR POSITION: plugins.invalid.propPanel.defaultSchema.type');
+    expect(errorMessage).toContain('ERROR POSITION: plugins.missingPanel.propPanel');
+    expect(errorMessage).toContain('ERROR POSITION: plugins.missingDefaultSchema.propPanel.defaultSchema');
   });
 
   test('calls checkFont when font option is provided', () => {

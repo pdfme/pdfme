@@ -402,7 +402,7 @@ function buildFieldInputHint(
     };
   }
 
-  if (type === 'checkbox') {
+  if (type === 'checkbox' || type === 'circleMark') {
     return {
       name: schema.name as string,
       type,

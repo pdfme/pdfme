@@ -16,6 +16,7 @@ describe('schema plugin discovery', () => {
         'code128',
         'radioGroup',
         'checkbox',
+        'circleMark',
       ]),
     );
   });

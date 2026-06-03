@@ -493,6 +493,49 @@ describe('generate command', () => {
     expect(parsed.error.message).toContain('Received boolean');
   });
 
+  it('returns structured EVALIDATE when circleMark input uses a boolean', () => {
+    const workDir = join(TMP, 'invalid-circle-mark-boolean');
+    mkdirSync(workDir, { recursive: true });
+
+    writeFileSync(
+      join(workDir, 'job.json'),
+      JSON.stringify({
+        template: {
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'applicableItem',
+                type: 'circleMark',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
+        },
+        inputs: [{ applicableItem: true }],
+      }),
+    );
+
+    const result = runCli([
+      'generate',
+      join(workDir, 'job.json'),
+      '-o',
+      join(workDir, 'out.pdf'),
+      '--json',
+    ]);
+
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.ok).toBe(false);
+    expect(parsed.error.code).toBe('EVALIDATE');
+    expect(parsed.error.message).toContain('Field "applicableItem" (circleMark)');
+    expect(parsed.error.message).toContain('expects one of: "false", "true"');
+    expect(parsed.error.message).toContain('Example: "true"');
+    expect(parsed.error.message).toContain('Received boolean');
+  });
+
   it('returns structured EVALIDATE when radioGroup sets multiple fields in the same group to true', () => {
     const workDir = join(TMP, 'invalid-radio-group-selection');
     mkdirSync(workDir, { recursive: true });

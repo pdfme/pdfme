@@ -16,6 +16,7 @@ import {
   select,
   checkbox,
   radioGroup,
+  circleMark,
 } from '@pdfme/schemas';
 
 export const getPlugins = () => {
@@ -37,6 +38,7 @@ export const getPlugins = () => {
     Select: select,
     Checkbox: checkbox,
     RadioGroup: radioGroup,
+    'Circle Mark': circleMark,
     // JAPANPOST: barcodes.japanpost,
     EAN13: barcodes.ean13,
     // EAN8: barcodes.ean8,
