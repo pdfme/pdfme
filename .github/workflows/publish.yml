@@ -100,10 +100,15 @@ jobs:
         working-directory: playground
         env:
           PUPPETEER_CACHE_DIR: ${{ github.workspace }}/.cache/puppeteer
+          PUPPETEER_SKIP_DOWNLOAD: false
+          PUPPETEER_CHROME_SKIP_DOWNLOAD: false
+          PUPPETEER_SKIP_CHROME_DOWNLOAD: false
           PUPPETEER_CHROME_HEADLESS_SHELL_SKIP_DOWNLOAD: true
         run: |
           node node_modules/puppeteer/install.mjs
-          node -e "console.log(require('puppeteer').executablePath())"
+          CHROME_PATH="$(node -e "process.stdout.write(require('puppeteer').executablePath())")"
+          test -x "$CHROME_PATH"
+          echo "$CHROME_PATH"
 
       - name: Run playground checks
         run: |
