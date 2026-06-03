@@ -100,7 +100,8 @@ jobs:
         run: |
           npm ci --prefix playground
       - name: Install Puppeteer Chrome
-        run: npm --prefix playground exec -- puppeteer browsers install chrome
+        working-directory: playground
+        run: ./node_modules/.bin/puppeteer browsers install chrome
       - name: Run playground checks
         run: |
           npm --prefix playground run lint
