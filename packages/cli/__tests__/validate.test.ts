@@ -393,7 +393,7 @@ describe('validate command', () => {
     });
   });
 
-  it('returns field-level input hints for text, asset-like strings, barcode strings, table, date/time, select, checkbox, radioGroup, and multiVariableText', () => {
+  it('returns field-level input hints for text, asset-like strings, barcode strings, table, date/time, select, checkbox, circleMark, radioGroup, and multiVariableText', () => {
     const file = join(TMP, 'input-hints.json');
     writeFileSync(
       file,
@@ -430,6 +430,13 @@ describe('validate command', () => {
               name: 'approved',
               type: 'checkbox',
               position: { x: 20, y: 95 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'applicableItem',
+              type: 'circleMark',
+              position: { x: 35, y: 95 },
               width: 10,
               height: 10,
             },
@@ -561,6 +568,16 @@ describe('validate command', () => {
         expect.objectContaining({
           name: 'approved',
           type: 'checkbox',
+          pages: [1],
+          expectedInput: {
+            kind: 'enumString',
+            allowedValues: ['false', 'true'],
+            example: 'true',
+          },
+        }),
+        expect.objectContaining({
+          name: 'applicableItem',
+          type: 'circleMark',
           pages: [1],
           expectedInput: {
             kind: 'enumString',
@@ -892,6 +909,43 @@ describe('validate command', () => {
     expect(parsed.valid).toBe(false);
     expect(parsed.errors).toEqual(
       expect.arrayContaining([expect.stringContaining('Field "approved" (checkbox)')]),
+    );
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('expects one of: "false", "true"')]),
+    );
+  });
+
+  it('marks unified jobs invalid when circleMark input uses a boolean', () => {
+    const file = join(TMP, 'job-invalid-circle-mark.json');
+    writeFileSync(
+      file,
+      JSON.stringify({
+        template: {
+          basePdf: a4BasePdf(),
+          schemas: [
+            [
+              {
+                name: 'applicableItem',
+                type: 'circleMark',
+                position: { x: 20, y: 20 },
+                width: 10,
+                height: 10,
+              },
+            ],
+          ],
+        },
+        inputs: [{ applicableItem: true }],
+      }),
+    );
+
+    const result = runCli(['validate', file, '--json']);
+    expect(result.exitCode).toBe(1);
+
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.valid).toBe(false);
+    expect(parsed.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('Field "applicableItem" (circleMark)')]),
     );
     expect(parsed.errors).toEqual(
       expect.arrayContaining([expect.stringContaining('expects one of: "false", "true"')]),

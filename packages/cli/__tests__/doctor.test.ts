@@ -146,7 +146,7 @@ describe('doctor command', () => {
     );
   });
 
-  it('returns field-level input hints for asset-like strings, barcode strings, table, date/time, select, checkbox, radioGroup, and multiVariableText discovery', () => {
+  it('returns field-level input hints for asset-like strings, barcode strings, table, date/time, select, checkbox, circleMark, radioGroup, and multiVariableText discovery', () => {
     const file = join(TMP, 'doctor-input-hints.json');
     writeFileSync(
       file,
@@ -183,6 +183,13 @@ describe('doctor command', () => {
               name: 'approved',
               type: 'checkbox',
               position: { x: 20, y: 95 },
+              width: 10,
+              height: 10,
+            },
+            {
+              name: 'applicableItem',
+              type: 'circleMark',
+              position: { x: 35, y: 95 },
               width: 10,
               height: 10,
             },
@@ -312,6 +319,15 @@ describe('doctor command', () => {
         expect.objectContaining({
           name: 'approved',
           type: 'checkbox',
+          expectedInput: {
+            kind: 'enumString',
+            allowedValues: ['false', 'true'],
+            example: 'true',
+          },
+        }),
+        expect.objectContaining({
+          name: 'applicableItem',
+          type: 'circleMark',
           expectedInput: {
             kind: 'enumString',
             allowedValues: ['false', 'true'],
