@@ -22,6 +22,7 @@ import {
   select,
   checkbox,
   radioGroup,
+  circleMark,
 } from '@pdfme/schemas';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +51,7 @@ export const plugins = {
   select,
   checkbox,
   radioGroup,
+  circleMark,
   signature,
 };
 

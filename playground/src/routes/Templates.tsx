@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { checkTemplate, getInputFromTemplate, type Template } from '@pdfme/common';
 import {
   ChevronDown,
@@ -119,6 +119,13 @@ const generationFilters: Array<{ label: string; value: GenerationFilter }> = [
   { label: 'JSX', value: 'jsx' },
   { label: 'md2pdf', value: 'md2pdf' },
 ];
+
+const tagFilterParam = 'tag';
+
+const normalizeTagFilterParam = (value: string | null) => {
+  const tag = value?.trim();
+  return tag && tag.toLowerCase() !== 'all' ? tag : 'all';
+};
 
 const getTemplateGeneration = (template: TemplateData): Exclude<GenerationFilter, 'all'> =>
   template.sourceKind;
@@ -690,6 +697,7 @@ const AuthorLink = ({ author }: { author: string }) => {
 
 function TemplatesApp() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
   const localPdfTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
   const mountedCollectionRef = React.useRef<FileWorkspaceCollection | null>(null);
@@ -709,9 +717,21 @@ function TemplatesApp() {
   const [isCreatingMountedPdfTemplate, setIsCreatingMountedPdfTemplate] = useState(false);
   const [isOpeningFolder, setIsOpeningFolder] = useState(false);
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
-  const [tagFilter, setTagFilter] = useState('all');
+  const tagFilterFromQuery = normalizeTagFilterParam(searchParams.get(tagFilterParam));
 
   const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+  const setTemplateTagFilter = useCallback(
+    (tag: string) => {
+      const nextSearchParams = new URLSearchParams(searchParams);
+      if (normalizeTagFilterParam(tag) === 'all') {
+        nextSearchParams.delete(tagFilterParam);
+      } else {
+        nextSearchParams.set(tagFilterParam, tag);
+      }
+      setSearchParams(nextSearchParams);
+    },
+    [searchParams, setSearchParams],
+  );
   const runMountedCollectionWrite = useCallback(async <T,>(write: () => Promise<T>) => {
     mountedCollectionWriteCountRef.current += 1;
     try {
@@ -756,6 +776,15 @@ function TemplatesApp() {
     });
   }, [templates]);
 
+  const tagFilter = useMemo(() => {
+    if (tagFilterFromQuery === 'all') return 'all';
+
+    return (
+      tagOptions.find((tag) => tag.toLowerCase() === tagFilterFromQuery.toLowerCase()) ??
+      tagFilterFromQuery
+    );
+  }, [tagFilterFromQuery, tagOptions]);
+
   const filteredTemplates = useMemo(
     () =>
       templates.filter((template) => {
@@ -773,7 +802,7 @@ function TemplatesApp() {
 
   const clearTemplateFilters = () => {
     setGenerationFilter('all');
-    setTagFilter('all');
+    setTemplateTagFilter('all');
   };
 
   useEffect(() => {
@@ -1528,7 +1557,7 @@ function TemplatesApp() {
                     <PlaygroundButton
                       className="px-2 py-1 text-xs sm:px-2"
                       variant={tagFilter === 'all' ? 'primary' : 'secondary'}
-                      onClick={() => setTagFilter('all')}
+                      onClick={() => setTemplateTagFilter('all')}
                     >
                       All
                     </PlaygroundButton>
@@ -1537,7 +1566,7 @@ function TemplatesApp() {
                         key={tag}
                         className="px-2 py-1 text-xs sm:px-2"
                         variant={tagFilter === tag ? 'primary' : 'secondary'}
-                        onClick={() => setTagFilter(tag)}
+                        onClick={() => setTemplateTagFilter(tag)}
                       >
                         {tag}
                       </PlaygroundButton>

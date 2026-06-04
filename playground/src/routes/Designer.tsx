@@ -109,7 +109,7 @@ function getDesignerLoadRequest(): DesignerLoadRequest {
     projectId,
     searchParams,
     shouldCreateNewProject,
-    shouldConsumeQuery: shouldCreateNewProject || templateId != null || projectId != null,
+    shouldConsumeQuery: shouldCreateNewProject,
     templateId,
     workspaceTemplateName,
   };
@@ -424,7 +424,17 @@ function DesignerApp() {
           workspaceTemplateName,
         } = loadRequestRef.current;
 
-        if (workspaceTemplateName) {
+        if (templateIdFromQuery) {
+          setActiveFileWorkspaceEntry(null, null);
+          const [templateJson, metadata] = await Promise.all([
+            getTemplateById(templateIdFromQuery),
+            getTemplateMetadataById(templateIdFromQuery),
+          ]);
+          checkTemplate(templateJson);
+          template = templateJson;
+          currentMetadataRef.current = metadata;
+          setCurrentProjectTitle(metadata.title);
+        } else if (workspaceTemplateName) {
           const restored = await restorePersistedTemplateCollection();
           if (restored.status !== 'mounted') {
             throw new Error('Mounted folder is not available. Reopen it from Templates.');
@@ -455,16 +465,6 @@ function DesignerApp() {
           if (!project) throw new Error('Project not found');
           template = project.template;
           currentMetadataRef.current = project.metadata ?? null;
-        } else if (templateIdFromQuery) {
-          setActiveFileWorkspaceEntry(null, null);
-          const [templateJson, metadata] = await Promise.all([
-            getTemplateById(templateIdFromQuery),
-            getTemplateMetadataById(templateIdFromQuery),
-          ]);
-          checkTemplate(templateJson);
-          template = templateJson;
-          currentMetadataRef.current = metadata;
-          setCurrentProjectTitle(metadata.title);
         } else {
           setActiveFileWorkspaceEntry(null, null);
           project = getActivePlaygroundProject();
@@ -493,8 +493,6 @@ function DesignerApp() {
         if (shouldConsumeQuery && !didCleanLoadQueryRef.current) {
           const nextSearchParams = new URLSearchParams(initialSearchParams);
           nextSearchParams.delete('new');
-          nextSearchParams.delete('template');
-          nextSearchParams.delete('project');
           didCleanLoadQueryRef.current = true;
           setSearchParams(nextSearchParams, { replace: true });
         }
