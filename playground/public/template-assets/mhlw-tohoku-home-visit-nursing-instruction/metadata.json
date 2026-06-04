@@ -1,0 +1,40 @@
+{
+  "title": "MHLW Tohoku Home-Visit Nursing Instruction",
+  "description": "MHLW Tohoku Home-Visit Nursing Instruction as a PDF-backed pdfme designer template with fillable fields.",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "Tohoku Regional Bureau of Health and Welfare",
+  "sourceUrl": "https://kouseikyoku.mhlw.go.jp/tohoku/news/000326193.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-04T04:56:59.299Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "医療",
+          "患者",
+          "退院証明書",
+          "訪問看護",
+          "訪問看護指示書",
+          "在宅患者訪問点滴注射指示書",
+          "傷病",
+          "看護",
+          "点滴",
+          "要介護認定",
+          "聴覚"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}
