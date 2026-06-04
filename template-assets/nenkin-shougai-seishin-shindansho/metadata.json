@@ -1,0 +1,44 @@
+{
+  "title": "障害年金 診断書 精神の障害用",
+  "description": "日本年金機構が公開する障害年金 診断書（精神の障害用）のPDF-backed pdfme template.",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "CJK",
+    "Healthcare",
+    "Form"
+  ],
+  "publisher": "日本年金機構",
+  "sourceLabel": "日本年金機構 障害年金 診断書 精神の障害用",
+  "sourceUrl": "https://www.nenkin.go.jp/shinsei/jukyu/shougai/shindansho/20140421-23.files/04-1.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-04T05:43:53.038Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "診療",
+          "診断書",
+          "主治医",
+          "傷病",
+          "障害年金",
+          "障害",
+          "年金機構",
+          "日本年金機構",
+          "精神の障害",
+          "精神保健指定医",
+          "精神科",
+          "nenkin",
+          "shougai",
+          "shindansho"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}

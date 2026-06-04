@@ -637,6 +637,33 @@
     "title": "MHLW Regular Health Check Report"
   },
   {
+    "name": "mhlw-tohoku-home-visit-nursing-instruction",
+    "author": "pdfme",
+    "path": "mhlw-tohoku-home-visit-nursing-instruction/template.json",
+    "thumbnailPath": "mhlw-tohoku-home-visit-nursing-instruction/thumbnail.png",
+    "pageCount": 1,
+    "fieldCount": 114,
+    "schemaTypes": [
+      "circleMark",
+      "image",
+      "text"
+    ],
+    "fontNames": [
+      "NotoSansJP"
+    ],
+    "hasCJK": true,
+    "basePdfKind": "dataUri",
+    "description": "MHLW Tohoku Home-Visit Nursing Instruction as a PDF-backed pdfme designer template with fillable fields.",
+    "sourceKind": "designer",
+    "tags": [
+      "Government",
+      "Healthcare",
+      "CJK",
+      "Form"
+    ],
+    "title": "MHLW Tohoku Home-Visit Nursing Instruction"
+  },
+  {
     "name": "md2pdf-overview",
     "author": "pdfme",
     "path": "md2pdf-overview/template.json",
@@ -843,5 +870,32 @@
       "Print"
     ],
     "title": "Z-Fold Brochure"
+  },
+  {
+    "name": "nenkin-shougai-seishin-shindansho",
+    "author": "pdfme",
+    "path": "nenkin-shougai-seishin-shindansho/template.json",
+    "thumbnailPath": "nenkin-shougai-seishin-shindansho/thumbnail.png",
+    "pageCount": 2,
+    "fieldCount": 248,
+    "schemaTypes": [
+      "checkbox",
+      "circleMark",
+      "text"
+    ],
+    "fontNames": [
+      "NotoSansJP"
+    ],
+    "hasCJK": true,
+    "basePdfKind": "dataUri",
+    "description": "日本年金機構が公開する障害年金 診断書（精神の障害用）のPDF-backed pdfme template.",
+    "sourceKind": "designer",
+    "tags": [
+      "Government",
+      "CJK",
+      "Healthcare",
+      "Form"
+    ],
+    "title": "障害年金 診断書 精神の障害用"
   }
 ]
