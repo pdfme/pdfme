@@ -15,6 +15,13 @@ import {
   table,
   list,
   multiVariableText,
+  dateTime,
+  date,
+  time,
+  select,
+  checkbox,
+  radioGroup,
+  circleMark,
 } from '@pdfme/schemas';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
@@ -38,6 +45,13 @@ const generatorPlugins = {
   table,
   list,
   multiVariableText,
+  dateTime,
+  date,
+  time,
+  select,
+  checkbox,
+  radioGroup,
+  circleMark,
   ...barcodes,
 };
 

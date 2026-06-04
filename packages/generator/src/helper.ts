@@ -17,22 +17,101 @@ import {
   PDFPage,
   PDFDocument,
   PDFEmbeddedPage,
-  TransformationMatrix,
   PDFDict,
   PDFName,
   PDFArray,
   PDFObjectCopier,
   PDFString,
   PDFHexString,
+  EncryptedPDFError,
 } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
-import type { EmbedPdfBox } from './types.js';
+import type { EmbedPdfBox, PdfBox } from './types.js';
 
-export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDocument }) => {
+const isEncryptedPdfError = (error: unknown) =>
+  error instanceof EncryptedPDFError ||
+  (error instanceof Error &&
+    error.message.startsWith('Input document to `PDFDocument.load` is encrypted.'));
+
+const isPasswordFailure = (error: unknown) =>
+  error instanceof Error &&
+  (error.message === 'NEEDS PASSWORD' || error.message === 'Password incorrect');
+
+const loadBasePdfWithPassword = async (
+  pdf: string | Uint8Array | ArrayBuffer,
+  password: string,
+) => {
+  try {
+    return await PDFDocument.load(pdf, { password });
+  } catch (error) {
+    if (!isPasswordFailure(error)) {
+      throw error;
+    }
+    throw new Error(
+      '[@pdfme/generator] basePdf is encrypted and requires a valid password. Pass options.basePdfPassword to generate().',
+    );
+  }
+};
+
+const loadBasePdf = async (pdf: string | Uint8Array | ArrayBuffer, password?: string) => {
+  if (password !== undefined) {
+    return loadBasePdfWithPassword(pdf, password);
+  }
+
+  try {
+    return await PDFDocument.load(pdf);
+  } catch (error) {
+    if (!isEncryptedPdfError(error)) {
+      throw error;
+    }
+    return loadBasePdfWithPassword(pdf, '');
+  }
+};
+
+const toBoundingBox = ({ x, y, width, height }: PdfBox) => ({
+  left: x,
+  bottom: y,
+  right: x + width,
+  top: y + height,
+});
+
+const toOriginBox = ({ width, height }: PdfBox): PdfBox => ({ x: 0, y: 0, width, height });
+
+const getVisibleRect = (rect: PdfBox, sourceBox?: PdfBox): PdfBox | undefined => {
+  if (!sourceBox) {
+    return rect;
+  }
+
+  const left = Math.max(rect.x, sourceBox.x);
+  const bottom = Math.max(rect.y, sourceBox.y);
+  const right = Math.min(rect.x + rect.width, sourceBox.x + sourceBox.width);
+  const top = Math.min(rect.y + rect.height, sourceBox.y + sourceBox.height);
+  if (right <= left || top <= bottom) {
+    return undefined;
+  }
+
+  return {
+    x: left - sourceBox.x,
+    y: bottom - sourceBox.y,
+    width: right - left,
+    height: top - bottom,
+  };
+};
+
+export const getEmbedPdfPages = async (arg: {
+  options?: GeneratorOptions;
+  pdfDoc: PDFDocument;
+  template: Template;
+}) => {
   const {
     template: { schemas, basePdf },
+    options,
     pdfDoc,
-  } = arg as { template: { schemas: Schema[][]; basePdf: BasePdf }; pdfDoc: PDFDocument };
+  } = arg as {
+    options?: GeneratorOptions;
+    template: { schemas: Schema[][]; basePdf: BasePdf };
+    pdfDoc: PDFDocument;
+  };
   let basePages: (PDFEmbeddedPage | PDFPage)[] = [];
   let embedPdfBoxes: EmbedPdfBox[] = [];
 
@@ -52,22 +131,22 @@ export const getEmbedPdfPages = async (arg: { template: Template; pdfDoc: PDFDoc
     }));
   } else {
     const willLoadPdf = await getB64BasePdf(basePdf);
-    const embedPdf = await PDFDocument.load(willLoadPdf);
+    const embedPdf = await loadBasePdf(willLoadPdf, options?.basePdfPassword);
     const embedPdfPages = embedPdf.getPages();
-    embedPdfBoxes = embedPdfPages.map((p) => ({
-      mediaBox: p.getMediaBox(),
-      bleedBox: p.getBleedBox(),
-      trimBox: p.getTrimBox(),
-      sourcePage: p,
-    }));
-    const boundingBoxes = embedPdfPages.map((p) => {
-      const { x, y, width, height } = p.getMediaBox();
-      return { left: x, bottom: y, right: width, top: height + y };
+    const sourceBoxes = embedPdfPages.map((p) => p.getCropBox());
+    embedPdfBoxes = embedPdfPages.map((p, index) => {
+      const sourceBox = sourceBoxes[index];
+      const outputBox = toOriginBox(sourceBox);
+      return {
+        mediaBox: outputBox,
+        bleedBox: outputBox,
+        trimBox: outputBox,
+        sourceBox,
+        sourcePage: p,
+      };
     });
-    const transformationMatrices = embedPdfPages.map(
-      () => [1, 0, 0, 1, 0, 0] as TransformationMatrix,
-    );
-    basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes, transformationMatrices);
+    const boundingBoxes = sourceBoxes.map(toBoundingBox);
+    basePages = await pdfDoc.embedPages(embedPdfPages, boundingBoxes);
   }
   return { basePages, embedPdfBoxes };
 };
@@ -85,11 +164,12 @@ const getSafeUriFromLinkAnnotation = (annotation: PDFDict) => {
 };
 
 const copyBasePdfUriLinkAnnotations = (arg: {
+  sourceBox?: PdfBox;
   sourcePage: PDFPage;
   targetPage: PDFPage;
   pdfDoc: PDFDocument;
 }) => {
-  const { sourcePage, targetPage, pdfDoc } = arg;
+  const { sourceBox, sourcePage, targetPage, pdfDoc } = arg;
   const sourceAnnots = sourcePage.node.Annots();
   if (!sourceAnnots) return;
 
@@ -103,6 +183,8 @@ const copyBasePdfUriLinkAnnotations = (arg: {
     if (!safeUri) continue;
     const rect = sourceAnnotation.lookupMaybe(PDFName.of('Rect'), PDFArray);
     if (!rect) continue;
+    const visibleRect = getVisibleRect(rect.asRectangle(), sourceBox);
+    if (!visibleRect) continue;
 
     const border = sourceAnnotation.lookupMaybe(PDFName.of('Border'), PDFArray);
     const color = sourceAnnotation.lookupMaybe(PDFName.of('C'), PDFArray);
@@ -113,7 +195,12 @@ const copyBasePdfUriLinkAnnotations = (arg: {
     const copiedAnnotation = pdfDoc.context.obj({
       Type: PDFName.of('Annot'),
       Subtype: PDFName.of('Link'),
-      Rect: copier.copy(rect),
+      Rect: [
+        visibleRect.x,
+        visibleRect.y,
+        visibleRect.x + visibleRect.width,
+        visibleRect.y + visibleRect.height,
+      ],
       Border: border ? copier.copy(border) : pdfDoc.context.obj([0, 0, 0]),
       C: color ? copier.copy(color) : undefined,
       H: highlightMode ? copier.copy(highlightMode) : undefined,
@@ -237,6 +324,7 @@ export const insertPage = (arg: {
     insertedPage.setTrimBox(trimBox.x, trimBox.y, trimBox.width, trimBox.height);
     if (embedPdfBox.sourcePage) {
       copyBasePdfUriLinkAnnotations({
+        sourceBox: embedPdfBox.sourceBox,
         sourcePage: embedPdfBox.sourcePage,
         targetPage: insertedPage,
         pdfDoc,

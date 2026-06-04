@@ -1,5 +1,5 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, Schema, PDFRenderProps, Template } from '@pdfme/common';
+import type { GenerateProps, GeneratorOptions, Schema, PDFRenderProps, Template } from '@pdfme/common';
 import {
   checkGenerateProps,
   applyInternalLinkAnnotations,
@@ -97,9 +97,16 @@ const registerSchemaAnchor = (
   });
 };
 
+const getRenderOptions = (options: GeneratorOptions): GeneratorOptions => {
+  const renderOptions = { ...options };
+  delete renderOptions.basePdfPassword;
+  return renderOptions;
+};
+
 const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> => {
   checkGenerateProps(props);
   const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
+  const renderOptions = getRenderOptions(options);
   const template = cloneDeep(_template);
 
   const basePdf = template.basePdf;
@@ -122,6 +129,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
   const cachedEmbedPdfPages = isBlankBasePdf
     ? undefined
     : await getEmbedPdfPages({
+        options,
         template,
         pdfDoc,
       });
@@ -137,7 +145,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
       ? await getDynamicTemplate({
           template,
           input,
-          options,
+          options: renderOptions,
           _cache,
           getDynamicHeights: getDynamicLayoutForSchema,
         })
@@ -145,6 +153,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
     const { basePages, embedPdfBoxes } =
       cachedEmbedPdfPages ??
       (await getEmbedPdfPages({
+        options,
         template: dynamicTemplate,
         pdfDoc,
       }));
@@ -195,7 +204,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
             pdfLib,
             pdfDoc,
             page,
-            options,
+            options: renderOptions,
             _cache,
           };
           await render(staticRenderProps);
@@ -236,7 +245,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           pdfLib,
           pdfDoc,
           page,
-          options,
+          options: renderOptions,
           _cache,
         };
         await render(renderProps);
@@ -246,7 +255,7 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
     applyInternalLinkAnnotations({ _cache, pdfDoc });
   }
 
-  postProcessing({ pdfDoc, options });
+  postProcessing({ pdfDoc, options: renderOptions });
 
   return pdfDoc.save();
 };

@@ -1,7 +1,12 @@
+import { readFileSync } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('generate integrate test', () => {
   describe('basic generator', () => {
@@ -67,7 +72,7 @@ describe('generate integrate test', () => {
       });
     }
 
-    test('does not accumulate custom base PDF media box offsets across inputs', async () => {
+    test('uses custom base PDF crop box as template coordinate space across inputs', async () => {
       const basePdfDoc = await PDFDocument.create();
       const basePage = basePdfDoc.addPage([120, 120]);
       basePage.setMediaBox(10, 20, 120, 120);
@@ -106,8 +111,86 @@ describe('generate integrate test', () => {
 
       expect(observedPositions).toHaveLength(2);
       expect(observedPositions[0]).toEqual(observedPositions[1]);
-      expect(observedPositions[0].x).toBeGreaterThan(probeSchema.position.x);
-      expect(observedPositions[0].y).toBeLessThan(probeSchema.position.y);
+      expect(observedPositions[0]).toEqual(probeSchema.position);
+    });
+
+    test('loads permission encrypted custom base PDFs with empty password fallback', async () => {
+      const encryptedBasePdf = readFileSync(
+        path.join(
+          __dirname,
+          '../../../playground/public/template-assets/nenkin-shougai-seishin-shindansho/source.pdf',
+        ),
+      );
+
+      const pdf = await generate({
+        template: {
+          basePdf: encryptedBasePdf,
+          schemas: [[], []],
+        },
+        inputs: [{}],
+      });
+      const pdfDoc = await PDFDocument.load(pdf);
+      const mediaBox = pdfDoc.getPage(0).getMediaBox();
+
+      expect(pdfDoc.isEncrypted).toBe(false);
+      expect(pdfDoc.getPageCount()).toBe(2);
+      expect(mediaBox.x).toBe(0);
+      expect(mediaBox.y).toBe(0);
+      expect(mediaBox.width).toBeCloseTo(834.5225);
+      expect(mediaBox.height).toBeCloseTo(1208.697);
+    });
+
+    test('reports password required custom base PDFs', async () => {
+      const passwordProtectedBasePdf = readFileSync(
+        path.join(__dirname, '../../../packages/pdf-lib/assets/pdfs/encrypted_new.pdf'),
+      );
+
+      await expect(
+        generate({
+          template: {
+            basePdf: passwordProtectedBasePdf,
+            schemas: [[]],
+          },
+          inputs: [{}],
+        }),
+      ).rejects.toThrow(
+        '[@pdfme/generator] basePdf is encrypted and requires a valid password. Pass options.basePdfPassword to generate().',
+      );
+    });
+
+    test('does not expose basePdfPassword to schema plugins', async () => {
+      const observedOptions: unknown[] = [];
+      const probeSchema: Schema = {
+        name: 'probe',
+        type: 'probe',
+        content: '',
+        position: { x: 3, y: 30 },
+        width: 10,
+        height: 10,
+      };
+      const probePlugin: Plugin = {
+        pdf: ({ options }) => {
+          observedOptions.push(options);
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: probeSchema,
+        },
+      };
+
+      await generate({
+        template: {
+          basePdf: BLANK_PDF,
+          schemas: [[probeSchema]],
+        },
+        inputs: [{ probe: 'value' }],
+        plugins: { probe: probePlugin },
+        options: { basePdfPassword: 'secret' },
+      });
+
+      expect(observedOptions).toHaveLength(1);
+      expect(observedOptions[0]).not.toHaveProperty('basePdfPassword');
     });
 
     test('expands text schemas and pushes following schemas on blank PDFs', async () => {

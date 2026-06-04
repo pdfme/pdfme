@@ -1,8 +1,11 @@
 import type { PDFPage } from '@pdfme/pdf-lib';
 
+export type PdfBox = { x: number; y: number; width: number; height: number };
+
 export type EmbedPdfBox = {
-  mediaBox: { x: number; y: number; width: number; height: number };
-  bleedBox: { x: number; y: number; width: number; height: number };
-  trimBox: { x: number; y: number; width: number; height: number };
+  mediaBox: PdfBox;
+  bleedBox: PdfBox;
+  trimBox: PdfBox;
+  sourceBox?: PdfBox;
   sourcePage?: PDFPage;
 };

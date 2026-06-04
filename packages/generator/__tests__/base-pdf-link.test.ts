@@ -50,6 +50,32 @@ const createBasePdfWithLink = async () => {
   return pdfDoc.save();
 };
 
+const createCroppedBasePdfWithLink = async () => {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([300, 200]);
+  page.setCropBox(50, 40, 200, 120);
+  page.drawText('pdfme', { x: 60, y: 80, size: 16, color: rgb(0, 0, 1) });
+  addSourceUriLink({
+    pdfDoc,
+    pageIndex: 0,
+    uri: 'https://pdfme.com/cropped',
+    rect: [60, 78, 130, 98],
+  });
+  addSourceUriLink({
+    pdfDoc,
+    pageIndex: 0,
+    uri: 'https://pdfme.com/partial',
+    rect: [220, 140, 280, 180],
+  });
+  addSourceUriLink({
+    pdfDoc,
+    pageIndex: 0,
+    uri: 'https://pdfme.com/outside',
+    rect: [260, 50, 290, 80],
+  });
+  return pdfDoc.save();
+};
+
 const createBasePdfWithUnsafeAndSafeLinks = async () => {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([200, 120]);
@@ -144,6 +170,35 @@ describe('generate custom basePdf links', () => {
     const links = await getUriLinkAnnotations(pdf);
 
     expect(links.map(getAnnotationUri)).toEqual(['https://pdfme.com']);
+  });
+
+  test('preserves URI link annotations relative to cropped basePdf pages', async () => {
+    const basePdf = await createCroppedBasePdfWithLink();
+    const template: Template = {
+      basePdf,
+      schemas: [[]],
+    };
+
+    const pdf = await generate({ template, inputs: [{}], plugins: {} });
+    const links = await getUriLinkAnnotations(pdf);
+
+    expect(links).toHaveLength(2);
+    expect(links.map(getAnnotationUri)).toEqual([
+      'https://pdfme.com/cropped',
+      'https://pdfme.com/partial',
+    ]);
+    expect(getAnnotationRect(links[0]).asRectangle()).toEqual({
+      x: 10,
+      y: 38,
+      width: 70,
+      height: 20,
+    });
+    expect(getAnnotationRect(links[1]).asRectangle()).toEqual({
+      x: 170,
+      y: 100,
+      width: 30,
+      height: 20,
+    });
   });
 
   test('does not preserve unsafe URI schemes from basePdf pages', async () => {

@@ -215,6 +215,7 @@ const CommonProps = z.object({
 export const GeneratorOptions = CommonOptions.extend({
   colorType: ColorType,
   author: z.string().optional(),
+  basePdfPassword: z.string().optional(),
   creationDate: z.date().optional(),
   creator: z.string().optional(),
   keywords: z.array(z.string()).optional(),
