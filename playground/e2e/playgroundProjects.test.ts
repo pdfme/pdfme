@@ -3,30 +3,72 @@ import {
   deletePlaygroundProject,
   duplicatePlaygroundProject,
   getActivePlaygroundProject,
+  PlaygroundProjectStorageQuotaError,
   readPlaygroundProjects,
   renamePlaygroundProject,
   savePlaygroundProject,
   setPlaygroundProjectThumbnail,
+  type PlaygroundProject,
+  type PlaygroundProjectStorage,
 } from '../src/lib/playgroundProjects';
 
-class MemoryStorage {
-  private values = new Map<string, string>();
+const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
-  getItem(key: string) {
-    return this.values.get(key) ?? null;
+class MemoryPlaygroundProjectStorage implements PlaygroundProjectStorage {
+  protected activeProjectId: string | null = null;
+  protected projects = new Map<string, unknown>();
+
+  async clearActiveProjectId() {
+    this.activeProjectId = null;
   }
 
-  removeItem(key: string) {
-    this.values.delete(key);
+  async deleteProject(projectId: string) {
+    this.projects.delete(projectId);
   }
 
-  setItem(key: string, value: string) {
-    this.values.set(key, value);
+  async getActiveProjectId() {
+    return this.activeProjectId;
+  }
+
+  async putProject(project: PlaygroundProject) {
+    this.projects.set(project.id, clone(project));
+  }
+
+  async readProjects() {
+    return [...this.projects.values()].map((project) => clone(project));
+  }
+
+  async setActiveProjectId(projectId: string) {
+    this.activeProjectId = projectId;
+  }
+
+  seedProject(project: unknown) {
+    if (
+      typeof project === 'object' &&
+      project !== null &&
+      'id' in project &&
+      typeof project.id === 'string'
+    ) {
+      this.projects.set(project.id, clone(project));
+    }
   }
 }
 
-const projectsStorageKey = 'playground:projects:v1';
-const activeProjectStorageKey = 'playground:activeProjectId:v1';
+class ThumbnailQuotaStorage extends MemoryPlaygroundProjectStorage {
+  async putProject(project: PlaygroundProject) {
+    if (project.thumbnail?.includes('too-large')) {
+      throw new PlaygroundProjectStorageQuotaError();
+    }
+
+    await super.putProject(project);
+  }
+}
+
+class AlwaysQuotaStorage extends MemoryPlaygroundProjectStorage {
+  async putProject() {
+    throw new PlaygroundProjectStorageQuotaError();
+  }
+}
 
 const template: Template = {
   basePdf: { height: 100, padding: [0, 0, 0, 0], width: 100 },
@@ -34,9 +76,9 @@ const template: Template = {
 };
 
 describe('playground project storage', () => {
-  it('saves, updates, activates, and deletes local projects', () => {
-    const storage = new MemoryStorage();
-    const saved = savePlaygroundProject(
+  it('saves, updates, activates, and deletes local projects', async () => {
+    const storage = new MemoryPlaygroundProjectStorage();
+    const saved = await savePlaygroundProject(
       {
         kind: 'jsx',
         metadata: {
@@ -62,10 +104,10 @@ describe('playground project storage', () => {
       title: 'JSX draft',
     });
     expect(saved.thumbnail).toBe('data:image/png;base64,abc');
-    expect(getActivePlaygroundProject(storage)?.id).toBe(saved.id);
-    expect(readPlaygroundProjects(storage)).toHaveLength(1);
+    expect((await getActivePlaygroundProject(storage))?.id).toBe(saved.id);
+    expect(await readPlaygroundProjects(storage)).toHaveLength(1);
 
-    const updated = savePlaygroundProject(
+    const updated = await savePlaygroundProject(
       {
         ...saved,
         template,
@@ -77,25 +119,27 @@ describe('playground project storage', () => {
     expect(updated.id).toBe(saved.id);
     expect(updated.metadata).toEqual(saved.metadata);
     expect(updated.thumbnail).toBe(saved.thumbnail);
-    expect(readPlaygroundProjects(storage)).toHaveLength(1);
-    expect(readPlaygroundProjects(storage)[0]?.title).toBe('Updated draft');
+    expect(await readPlaygroundProjects(storage)).toHaveLength(1);
+    expect((await readPlaygroundProjects(storage))[0]?.title).toBe('Updated draft');
 
-    const withUpdatedThumbnail = setPlaygroundProjectThumbnail(
+    const withUpdatedThumbnail = await setPlaygroundProjectThumbnail(
       saved.id,
       'data:image/png;base64,updated',
       storage,
     );
     expect(withUpdatedThumbnail?.updatedAt).toBe(updated.updatedAt);
-    expect(readPlaygroundProjects(storage)[0]?.thumbnail).toBe('data:image/png;base64,updated');
+    expect((await readPlaygroundProjects(storage))[0]?.thumbnail).toBe(
+      'data:image/png;base64,updated',
+    );
 
-    deletePlaygroundProject(saved.id, storage);
-    expect(readPlaygroundProjects(storage)).toEqual([]);
-    expect(getActivePlaygroundProject(storage)).toBeNull();
+    await deletePlaygroundProject(saved.id, storage);
+    expect(await readPlaygroundProjects(storage)).toEqual([]);
+    expect(await getActivePlaygroundProject(storage)).toBeNull();
   });
 
-  it('renames and duplicates projects without changing the original content', () => {
-    const storage = new MemoryStorage();
-    const saved = savePlaygroundProject(
+  it('renames and duplicates projects without changing the original content', async () => {
+    const storage = new MemoryPlaygroundProjectStorage();
+    const saved = await savePlaygroundProject(
       {
         inputs: [{ name: 'Ada' }],
         kind: 'template',
@@ -107,24 +151,28 @@ describe('playground project storage', () => {
       storage,
     );
 
-    const renamed = renamePlaygroundProject(saved.id, ' Renamed project ', storage);
+    const renamed = await renamePlaygroundProject(saved.id, ' Renamed project ', storage);
     expect(renamed?.id).toBe(saved.id);
     expect(renamed?.title).toBe('Renamed project');
-    expect(readPlaygroundProjects(storage)).toHaveLength(1);
+    expect(await readPlaygroundProjects(storage)).toHaveLength(1);
 
-    const duplicated = duplicatePlaygroundProject(saved.id, ' Copy project ', storage);
+    const duplicated = await duplicatePlaygroundProject(saved.id, ' Copy project ', storage);
     expect(duplicated?.id).not.toBe(saved.id);
     expect(duplicated?.title).toBe('Copy project');
     expect(duplicated?.template).toEqual(template);
     expect(duplicated?.metadata).toEqual(saved.metadata);
     expect(duplicated?.inputs).toEqual([{ name: 'Ada' }]);
     expect(duplicated?.thumbnail).toBe('data:image/png;base64,abc');
-    expect(getActivePlaygroundProject(storage)?.id).toBe(duplicated?.id);
+    expect((await getActivePlaygroundProject(storage))?.id).toBe(duplicated?.id);
 
-    const duplicateWithSameTitle = duplicatePlaygroundProject(saved.id, ' Copy project ', storage);
+    const duplicateWithSameTitle = await duplicatePlaygroundProject(
+      saved.id,
+      ' Copy project ',
+      storage,
+    );
     expect(duplicateWithSameTitle?.title).toBe('Copy project 2');
 
-    const projects = readPlaygroundProjects(storage);
+    const projects = await readPlaygroundProjects(storage);
     expect(projects).toHaveLength(3);
     expect(projects.map((project) => project.title).sort()).toEqual([
       'Copy project',
@@ -133,46 +181,57 @@ describe('playground project storage', () => {
     ]);
   });
 
-  it('returns null when project actions target a missing project', () => {
-    const storage = new MemoryStorage();
+  it('returns null when project actions target a missing project', async () => {
+    const storage = new MemoryPlaygroundProjectStorage();
 
-    expect(renamePlaygroundProject('missing', 'Nope', storage)).toBeNull();
-    expect(duplicatePlaygroundProject('missing', 'Nope', storage)).toBeNull();
+    expect(await renamePlaygroundProject('missing', 'Nope', storage)).toBeNull();
+    expect(await duplicatePlaygroundProject('missing', 'Nope', storage)).toBeNull();
   });
 
-  it('migrates legacy localStorage template state into a project', () => {
-    const storage = new MemoryStorage();
-    storage.setItem('template', JSON.stringify(template));
-    storage.setItem('inputs', JSON.stringify([{ field: 'value' }]));
-
-    const projects = readPlaygroundProjects(storage);
-
-    expect(projects).toHaveLength(1);
-    expect(projects[0]?.title).toBe('Imported local template');
-    expect(projects[0]?.inputs).toEqual([{ field: 'value' }]);
-    expect(storage.getItem('template')).toBeNull();
-    expect(storage.getItem('inputs')).toBeNull();
-    expect(storage.getItem(projectsStorageKey)).toBeTruthy();
-    expect(storage.getItem(activeProjectStorageKey)).toBe(projects[0]?.id);
-  });
-
-  it('ignores malformed stored projects', () => {
-    const storage = new MemoryStorage();
-    storage.setItem(
-      projectsStorageKey,
-      JSON.stringify([
-        {
-          createdAt: 1,
-          id: 'project_invalid_inputs',
-          inputs: [{ field: 123 }],
-          kind: 'template',
-          template,
-          title: 'Invalid inputs',
-          updatedAt: 1,
-        },
-      ]),
+  it('retries project saves without thumbnails when browser storage quota is exceeded', async () => {
+    const storage = new ThumbnailQuotaStorage();
+    const saved = await savePlaygroundProject(
+      {
+        kind: 'template',
+        template,
+        thumbnail: 'data:image/png;base64,too-large',
+        title: 'Large thumbnail',
+      },
+      storage,
     );
 
-    expect(readPlaygroundProjects(storage)).toEqual([]);
+    expect(saved.thumbnail).toBeUndefined();
+    expect((await readPlaygroundProjects(storage))[0]?.thumbnail).toBeUndefined();
+    expect((await getActivePlaygroundProject(storage))?.id).toBe(saved.id);
+  });
+
+  it('throws a friendly quota error when the project is too large without a thumbnail', async () => {
+    const storage = new AlwaysQuotaStorage();
+
+    await expect(
+      savePlaygroundProject(
+        {
+          kind: 'template',
+          template,
+          title: 'Too large',
+        },
+        storage,
+      ),
+    ).rejects.toThrow(PlaygroundProjectStorageQuotaError);
+  });
+
+  it('ignores malformed stored projects', async () => {
+    const storage = new MemoryPlaygroundProjectStorage();
+    storage.seedProject({
+      createdAt: 1,
+      id: 'project_invalid_inputs',
+      inputs: [{ field: 123 }],
+      kind: 'template',
+      template,
+      title: 'Invalid inputs',
+      updatedAt: 1,
+    });
+
+    expect(await readPlaygroundProjects(storage)).toEqual([]);
   });
 });

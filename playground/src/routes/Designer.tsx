@@ -27,6 +27,7 @@ import {
   type PdfmeAgentHost,
 } from '../lib/pdfmeAgentHost';
 import { isPdfmeAgentEnabled } from '../lib/pdfmeAgentLoader';
+import { getErrorMessage } from '../lib/errors';
 import {
   clearActivePlaygroundProject,
   getActivePlaygroundProject,
@@ -98,8 +99,7 @@ type FileWorkspaceConflict = {
   saveTemplate?: Template;
 };
 
-function getDesignerLoadRequest(): DesignerLoadRequest {
-  const searchParams = new URLSearchParams(window.location.search);
+function createDesignerLoadRequest(searchParams: URLSearchParams): DesignerLoadRequest {
   const shouldCreateNewProject = searchParams.get('new') === '1';
   const templateId = searchParams.get('template');
   const projectId = searchParams.get('project');
@@ -107,12 +107,16 @@ function getDesignerLoadRequest(): DesignerLoadRequest {
 
   return {
     projectId,
-    searchParams,
+    searchParams: new URLSearchParams(searchParams),
     shouldCreateNewProject,
     shouldConsumeQuery: shouldCreateNewProject,
     templateId,
     workspaceTemplateName,
   };
+}
+
+function getDesignerLoadRequest(): DesignerLoadRequest {
+  return createDesignerLoadRequest(new URLSearchParams(window.location.search));
 }
 
 type DesignerFileButtonProps = {
@@ -296,6 +300,7 @@ function DesignerApp() {
           nextSearchParams.delete('new');
           nextSearchParams.delete('template');
           nextSearchParams.delete('project');
+          loadRequestRef.current = createDesignerLoadRequest(nextSearchParams);
           setSearchParams(nextSearchParams, { replace: true });
         } else if (diskVersionRef.current) {
           try {
@@ -383,20 +388,34 @@ function DesignerApp() {
         currentMetadataRef.current ?? currentProject?.metadata ?? null,
         title,
       );
-      const savedProject = savePlaygroundProject({
-        id: saveAs ? undefined : currentProject?.id,
-        inputs: currentProject?.inputs,
-        kind: currentProject?.kind ?? 'template',
-        metadata: nextMetadata,
-        source: currentProject?.source,
-        template: nextTemplate,
-        thumbnail,
-        title,
-      });
+      let savedProject: PlaygroundProject;
+      try {
+        savedProject = await savePlaygroundProject({
+          id: saveAs ? undefined : currentProject?.id,
+          inputs: currentProject?.inputs,
+          kind: currentProject?.kind ?? 'template',
+          metadata: nextMetadata,
+          source: currentProject?.source,
+          template: nextTemplate,
+          thumbnail,
+          title,
+        });
+      } catch (error) {
+        console.error(error);
+        toast.error(getErrorMessage(error));
+        return false;
+      }
       projectRef.current = savedProject;
       currentMetadataRef.current = savedProject.metadata ?? null;
       setCleanBrowserProjectTemplate(savedProject.template);
       setCurrentProjectTitle(savedProject.title);
+      const nextSearchParams = new URLSearchParams(searchParamsRef.current);
+      nextSearchParams.set('project', savedProject.id);
+      nextSearchParams.delete('new');
+      nextSearchParams.delete('template');
+      nextSearchParams.delete('workspace');
+      loadRequestRef.current = createDesignerLoadRequest(nextSearchParams);
+      setSearchParams(nextSearchParams, { replace: true });
       toast.success(
         <ProjectSavedToast
           formPath={`/form-viewer?project=${encodeURIComponent(savedProject.id)}`}
@@ -457,17 +476,17 @@ function DesignerApp() {
         } else if (shouldCreateNewProject) {
           setActiveFileWorkspaceEntry(null, null);
           currentMetadataRef.current = null;
-          clearActivePlaygroundProject();
+          await clearActivePlaygroundProject();
           setCurrentProjectTitle('Untitled Template');
         } else if (projectIdFromQuery) {
           setActiveFileWorkspaceEntry(null, null);
-          project = getPlaygroundProject(projectIdFromQuery);
+          project = await getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
           currentMetadataRef.current = project.metadata ?? null;
         } else {
           setActiveFileWorkspaceEntry(null, null);
-          project = getActivePlaygroundProject();
+          project = await getActivePlaygroundProject();
           if (project) {
             template = project.template;
             currentMetadataRef.current = project.metadata ?? null;
@@ -573,7 +592,7 @@ function DesignerApp() {
     }
   };
 
-  const onResetTemplate = () => {
+  const onResetTemplate = async () => {
     if (fileWorkspaceEntryRef.current && designer.current) {
       const entry = fileWorkspaceEntryRef.current;
       isApplyingTemplateRef.current = true;
@@ -590,8 +609,11 @@ function DesignerApp() {
     projectRef.current = null;
     currentMetadataRef.current = null;
     setCurrentProjectTitle('Untitled Template');
-    clearActivePlaygroundProject();
-    setSearchParams(new URLSearchParams([['new', '1']]), { replace: true });
+    await clearActivePlaygroundProject();
+    const nextSearchParams = new URLSearchParams([['new', '1']]);
+    loadRequestRef.current = createDesignerLoadRequest(nextSearchParams);
+    didCleanLoadQueryRef.current = false;
+    setSearchParams(nextSearchParams, { replace: true });
     if (designer.current) {
       const blankTemplate = getBlankTemplate();
       setCleanBrowserProjectTemplate(blankTemplate);
@@ -720,7 +742,7 @@ function DesignerApp() {
         nextTemplate,
         currentProject.inputs,
       ).catch(() => currentProject.thumbnail);
-      const savedProject = savePlaygroundProject({
+      const savedProject = await savePlaygroundProject({
         id: currentProject.id,
         inputs: currentProject.inputs,
         kind: 'template',
@@ -1018,7 +1040,7 @@ function DesignerApp() {
           <PlaygroundButton
             id="reset-template"
             disabled={editingStaticSchemas}
-            onClick={onResetTemplate}
+            onClick={() => void onResetTemplate()}
           >
             Reset
           </PlaygroundButton>

@@ -18,6 +18,7 @@ import { getPlugins } from '../plugins';
 import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
 import { NavItem, NavBar } from '../components/NavBar';
+import { getErrorMessage } from '../lib/errors';
 import {
   getActivePlaygroundProject,
   getPlaygroundProject,
@@ -125,7 +126,7 @@ function FormAndViewerApp() {
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          project = getPlaygroundProject(projectIdFromQuery);
+          project = await getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
           inputs = project.inputs;
@@ -146,7 +147,7 @@ function FormAndViewerApp() {
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          project = getActivePlaygroundProject();
+          project = await getActivePlaygroundProject();
           if (project) {
             template = project.template;
             inputs = project.inputs;
@@ -242,15 +243,22 @@ function FormAndViewerApp() {
     const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate, nextInputs).catch(
       () => currentProject?.thumbnail,
     );
-    const savedProject = savePlaygroundProject({
-      id: saveAs ? undefined : currentProject?.id,
-      inputs: nextInputs,
-      kind: currentProject?.kind ?? 'template',
-      source: currentProject?.source,
-      template: nextTemplate,
-      thumbnail,
-      title,
-    });
+    let savedProject: PlaygroundProject;
+    try {
+      savedProject = await savePlaygroundProject({
+        id: saveAs ? undefined : currentProject?.id,
+        inputs: nextInputs,
+        kind: currentProject?.kind ?? 'template',
+        source: currentProject?.source,
+        template: nextTemplate,
+        thumbnail,
+        title,
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(getErrorMessage(error));
+      return;
+    }
     projectRef.current = savedProject;
     currentTemplateRef.current = nextTemplate;
     currentInputsRef.current = nextInputs;

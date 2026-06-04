@@ -163,8 +163,7 @@ type PlaygroundStorageState = {
   mode?: 'form' | 'viewer';
 };
 
-const playgroundProjectsStorageKey = 'playground:projects:v1';
-const activePlaygroundProjectStorageKey = 'playground:activeProjectId:v1';
+const playgroundProjectsDbName = 'pdfme-playground-projects';
 
 const cloneSchema = <T extends Schema>(schema: T, overrides: Partial<T>): T =>
   ({
@@ -252,30 +251,58 @@ async function loadRouteWithStorage(
 
   await page.goto(baseUrl, { waitUntil: 'networkidle2', timeout });
   await page.evaluate(
-    (state, resolvedInputs, id, projectsStorageKey, activeProjectStorageKey) => {
-      localStorage.removeItem('template');
-      localStorage.removeItem('inputs');
+    async (state, resolvedInputs, id, dbName) => {
+      const deleteDatabase = (name: string) =>
+        new Promise<void>((resolve, reject) => {
+          const request = indexedDB.deleteDatabase(name);
+          request.addEventListener('success', () => resolve());
+          request.addEventListener('blocked', () => resolve());
+          request.addEventListener('error', () => reject(request.error));
+        });
+      const openDatabase = (name: string) =>
+        new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open(name, 1);
+          request.addEventListener('upgradeneeded', () => {
+            const db = request.result;
+            if (!db.objectStoreNames.contains('projects')) {
+              db.createObjectStore('projects', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('meta')) {
+              db.createObjectStore('meta');
+            }
+          });
+          request.addEventListener('success', () => resolve(request.result));
+          request.addEventListener('error', () => reject(request.error));
+        });
+      const waitForTransaction = (transaction: IDBTransaction) =>
+        new Promise<void>((resolve, reject) => {
+          transaction.addEventListener('complete', () => resolve());
+          transaction.addEventListener('error', () => reject(transaction.error));
+          transaction.addEventListener('abort', () => reject(transaction.error));
+        });
+
+      await deleteDatabase(dbName);
       localStorage.removeItem('mode');
-      localStorage.removeItem(projectsStorageKey);
-      localStorage.removeItem(activeProjectStorageKey);
 
       if (state.template) {
+        const db = await openDatabase(dbName);
         const now = Date.now();
-        localStorage.setItem(
-          projectsStorageKey,
-          JSON.stringify([
-            {
-              createdAt: now,
-              id,
-              inputs: resolvedInputs,
-              kind: 'template',
-              template: state.template,
-              title: 'E2E deterministic template',
-              updatedAt: now,
-            },
-          ]),
-        );
-        localStorage.setItem(activeProjectStorageKey, id);
+        try {
+          const transaction = db.transaction(['projects', 'meta'], 'readwrite');
+          transaction.objectStore('projects').put({
+            createdAt: now,
+            id,
+            inputs: resolvedInputs,
+            kind: 'template',
+            template: state.template,
+            title: 'E2E deterministic template',
+            updatedAt: now,
+          });
+          transaction.objectStore('meta').put(id, 'activeProjectId');
+          await waitForTransaction(transaction);
+        } finally {
+          db.close();
+        }
       }
       if (state.mode) {
         localStorage.setItem('mode', state.mode);
@@ -284,8 +311,7 @@ async function loadRouteWithStorage(
     storageState,
     inputs,
     projectId,
-    playgroundProjectsStorageKey,
-    activePlaygroundProjectStorageKey,
+    playgroundProjectsDbName,
   );
 
   await page.goto(`${baseUrl}${path}?project=${encodeURIComponent(projectId)}`, {

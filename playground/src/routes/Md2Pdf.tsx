@@ -92,8 +92,9 @@ export default function Md2Pdf() {
       setPdfDuration(null);
     };
 
-    if (projectId) {
-      const project = getPlaygroundProject(projectId);
+    const loadProject = async (projectId: string) => {
+      const project = await getPlaygroundProject(projectId);
+      if (cancelled) return;
       if (!project || project.kind !== 'md2pdf' || !project.source) {
         toast.error('md2pdf project not found');
         return;
@@ -106,21 +107,27 @@ export default function Md2Pdf() {
       setTemplate(project.template);
       setInputs(project.inputs);
       didLoadInitialStarterRef.current = true;
-      return;
-    }
+    };
 
-    const preset = presetId
-      ? presets.find((item) => item.id === presetId || item.assetName === presetId)
-      : presets[0];
-    if (!preset) {
-      if (presetId) toast.error('md2pdf starter not found');
-      return;
-    }
+    if (projectId) {
+      void loadProject(projectId).catch((err) => {
+        if (cancelled) return;
+        toast.error(getErrorMessage(err));
+      });
+    } else {
+      const preset = presetId
+        ? presets.find((item) => item.id === presetId || item.assetName === presetId)
+        : presets[0];
+      if (!preset) {
+        if (presetId) toast.error('md2pdf starter not found');
+        return;
+      }
 
-    void loadPreset(preset).catch((err) => {
-      if (cancelled) return;
-      toast.error(getErrorMessage(err));
-    });
+      void loadPreset(preset).catch((err) => {
+        if (cancelled) return;
+        toast.error(getErrorMessage(err));
+      });
+    }
 
     return () => {
       cancelled = true;
@@ -232,7 +239,7 @@ export default function Md2Pdf() {
       const thumbnail = await createTemplateThumbnailDataUrl(template, inputs).catch(
         () => projectRef.current?.thumbnail,
       );
-      const savedProject = savePlaygroundProject({
+      const savedProject = await savePlaygroundProject({
         id: saveAs ? undefined : projectRef.current?.id,
         inputs,
         kind: 'md2pdf',

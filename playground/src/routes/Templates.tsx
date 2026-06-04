@@ -27,6 +27,7 @@ import {
   getProjectKindLabel,
   readPlaygroundProjects,
   renamePlaygroundProject,
+  isPlaygroundProjectStorageQuotaError,
   savePlaygroundProject,
   setActivePlaygroundProjectId,
   setPlaygroundProjectThumbnail,
@@ -172,7 +173,7 @@ const ProjectThumbnailImage = ({
   onCreated,
   project,
 }: {
-  onCreated: () => void;
+  onCreated: () => Promise<void> | void;
   project: PlaygroundProject;
 }) => {
   const [src, setSrc] = useState(project.thumbnail);
@@ -188,8 +189,11 @@ const ProjectThumbnailImage = ({
       .then((thumbnail) => {
         if (cancelled) return;
         setSrc(thumbnail);
-        setPlaygroundProjectThumbnail(project.id, thumbnail);
-        onCreated();
+        void setPlaygroundProjectThumbnail(project.id, thumbnail)
+          .then(() => onCreated())
+          .catch((error) => {
+            console.warn(error);
+          });
       })
       .catch((err) => {
         if (cancelled) return;
@@ -708,6 +712,7 @@ function TemplatesApp() {
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
   const [editingMountedEntry, setEditingMountedEntry] = useState<FileWorkspaceTemplateEntry | null>(
     null,
@@ -719,7 +724,16 @@ function TemplatesApp() {
   const [generationFilter, setGenerationFilter] = useState<GenerationFilter>('all');
   const tagFilterFromQuery = normalizeTagFilterParam(searchParams.get(tagFilterParam));
 
-  const refreshProjects = useCallback(() => setProjects(readPlaygroundProjects()), []);
+  const refreshProjects = useCallback(async () => {
+    try {
+      setProjects(await readPlaygroundProjects());
+    } catch (error) {
+      console.error(error);
+      toast.error(error instanceof Error ? error.message : 'Failed to load Browser Projects');
+    } finally {
+      setIsLoadingProjects(false);
+    }
+  }, []);
   const setTemplateTagFilter = useCallback(
     (tag: string) => {
       const nextSearchParams = new URLSearchParams(searchParams);
@@ -806,9 +820,10 @@ function TemplatesApp() {
   };
 
   useEffect(() => {
-    refreshProjects();
-    window.addEventListener('focus', refreshProjects);
-    return () => window.removeEventListener('focus', refreshProjects);
+    void refreshProjects();
+    const onFocus = () => void refreshProjects();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
   }, [refreshProjects]);
 
   useEffect(() => {
@@ -901,8 +916,8 @@ function TemplatesApp() {
     navigate(`${path}?template=${name}`);
   };
 
-  const navigateToProject = (project: PlaygroundProject, target: UIType | 'source') => {
-    setActivePlaygroundProjectId(project.id);
+  const navigateToProject = async (project: PlaygroundProject, target: UIType | 'source') => {
+    await setActivePlaygroundProjectId(project.id);
     if (target === 'source') {
       navigate(getProjectAuthoringPath(project));
       return;
@@ -1045,7 +1060,7 @@ function TemplatesApp() {
       const thumbnail = await createTemplateThumbnailDataUrl(draft.template, inputs).catch(
         () => undefined,
       );
-      const project = savePlaygroundProject({
+      const project = await savePlaygroundProject({
         inputs,
         kind: 'template',
         template: draft.template,
@@ -1053,13 +1068,13 @@ function TemplatesApp() {
         title,
       });
 
-      refreshProjects();
+      await refreshProjects();
       toast.success(`Created "${project.title}" from ${draft.fileName}`);
-      navigateToProject(project, 'designer');
+      await navigateToProject(project, 'designer');
     } catch (error) {
       console.error(error);
       toast.error(
-        error instanceof DOMException && error.name === 'QuotaExceededError'
+        isPlaygroundProjectStorageQuotaError(error)
           ? 'PDF is too large to save in Browser Projects. Try a mounted folder instead.'
           : error instanceof Error
             ? error.message
@@ -1199,14 +1214,14 @@ function TemplatesApp() {
       const thumbnail = await createTemplateThumbnailDataUrl(template, inputs).catch(
         () => undefined,
       );
-      const project = savePlaygroundProject({
+      const project = await savePlaygroundProject({
         inputs,
         kind: 'template',
         template,
         thumbnail,
         title,
       });
-      refreshProjects();
+      await refreshProjects();
       toast.success(`Imported "${project.title}" into My Workspace`);
     } catch (err) {
       console.error(err);
@@ -1214,38 +1229,38 @@ function TemplatesApp() {
     }
   };
 
-  const onDeleteProject = (project: PlaygroundProject) => {
+  const onDeleteProject = async (project: PlaygroundProject) => {
     if (!window.confirm(`Delete "${project.title}" from this browser?`)) return;
-    deletePlaygroundProject(project.id);
-    refreshProjects();
+    await deletePlaygroundProject(project.id);
+    await refreshProjects();
     toast.info(`Deleted "${project.title}"`);
   };
 
-  const onRenameProject = (project: PlaygroundProject) => {
+  const onRenameProject = async (project: PlaygroundProject) => {
     const title = window.prompt('Project name', project.title) ?? '';
     if (!title.trim()) return;
 
-    const renamedProject = renamePlaygroundProject(project.id, title);
+    const renamedProject = await renamePlaygroundProject(project.id, title);
     if (!renamedProject) {
       toast.error('Project not found');
       return;
     }
 
-    refreshProjects();
+    await refreshProjects();
     toast.success(`Renamed to "${renamedProject.title}"`);
   };
 
-  const onDuplicateProject = (project: PlaygroundProject) => {
+  const onDuplicateProject = async (project: PlaygroundProject) => {
     const title = window.prompt('Duplicate as', `${project.title} Copy`) ?? '';
     if (!title.trim()) return;
 
-    const duplicatedProject = duplicatePlaygroundProject(project.id, title);
+    const duplicatedProject = await duplicatePlaygroundProject(project.id, title);
     if (!duplicatedProject) {
       toast.error('Project not found');
       return;
     }
 
-    refreshProjects();
+    await refreshProjects();
     toast.success(`Duplicated "${duplicatedProject.title}"`);
   };
 
@@ -1306,7 +1321,11 @@ function TemplatesApp() {
               </div>
             </div>
 
-            {projects.length > 0 ? (
+            {isLoadingProjects ? (
+              <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+                Loading Browser Projects...
+              </div>
+            ) : projects.length > 0 ? (
               <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
                 {projects.map((project) => (
                   <GalleryCard
@@ -1325,7 +1344,10 @@ function TemplatesApp() {
                       <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
                         <PlaygroundButton
                           onClick={() =>
-                            navigateToProject(project, project.source ? 'source' : 'designer')
+                            void navigateToProject(
+                              project,
+                              project.source ? 'source' : 'designer',
+                            )
                           }
                         >
                           {project.source ? (
@@ -1340,7 +1362,9 @@ function TemplatesApp() {
                             </>
                           )}
                         </PlaygroundButton>
-                        <PlaygroundButton onClick={() => navigateToProject(project, 'form-viewer')}>
+                        <PlaygroundButton
+                          onClick={() => void navigateToProject(project, 'form-viewer')}
+                        >
                           Preview
                         </PlaygroundButton>
                         <ProjectMoreActions

@@ -169,8 +169,9 @@ export default function JsxPlayground() {
       setPdfDuration(null);
     };
 
-    if (projectId) {
-      const project = getPlaygroundProject(projectId);
+    const loadProject = async (projectId: string) => {
+      const project = await getPlaygroundProject(projectId);
+      if (cancelled) return;
       if (!project || project.kind !== 'jsx' || !project.source) {
         toast.error('JSX project not found');
         return;
@@ -188,21 +189,27 @@ export default function JsxPlayground() {
       setInputs(project.inputs);
       inputsRef.current = project.inputs;
       didLoadInitialStarterRef.current = true;
-      return;
-    }
+    };
 
-    const preset = presetId
-      ? presets.find((item) => item.id === presetId || item.assetName === presetId)
-      : presets[0];
-    if (!preset) {
-      if (presetId) toast.error('JSX starter not found');
-      return;
-    }
+    if (projectId) {
+      void loadProject(projectId).catch((err) => {
+        if (cancelled) return;
+        toast.error(getErrorMessage(err));
+      });
+    } else {
+      const preset = presetId
+        ? presets.find((item) => item.id === presetId || item.assetName === presetId)
+        : presets[0];
+      if (!preset) {
+        if (presetId) toast.error('JSX starter not found');
+        return;
+      }
 
-    void loadPreset(preset).catch((err) => {
-      if (cancelled) return;
-      toast.error(getErrorMessage(err));
-    });
+      void loadPreset(preset).catch((err) => {
+        if (cancelled) return;
+        toast.error(getErrorMessage(err));
+      });
+    }
 
     return () => {
       cancelled = true;
@@ -396,7 +403,7 @@ export default function JsxPlayground() {
     const thumbnail = await createTemplateThumbnailDataUrl(template, inputsRef.current).catch(
       () => projectRef.current?.thumbnail,
     );
-    const savedProject = savePlaygroundProject({
+    const savedProject = await savePlaygroundProject({
       id: saveAs ? undefined : projectRef.current?.id,
       inputs: inputsRef.current,
       kind: 'jsx',

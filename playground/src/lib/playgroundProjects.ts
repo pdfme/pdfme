@@ -33,15 +33,20 @@ export type SavePlaygroundProjectInput = {
   title: string;
 };
 
-const PROJECTS_STORAGE_KEY = 'playground:projects:v1';
-const ACTIVE_PROJECT_STORAGE_KEY = 'playground:activeProjectId:v1';
-const LEGACY_TEMPLATE_STORAGE_KEY = 'template';
-const LEGACY_INPUTS_STORAGE_KEY = 'inputs';
+export type PlaygroundProjectStorage = {
+  clearActiveProjectId: () => Promise<void>;
+  deleteProject: (projectId: string) => Promise<void>;
+  getActiveProjectId: () => Promise<string | null>;
+  putProject: (project: PlaygroundProject) => Promise<void>;
+  readProjects: () => Promise<unknown[]>;
+  setActiveProjectId: (projectId: string) => Promise<void>;
+};
 
-type StorageLike = Pick<Storage, 'getItem' | 'removeItem' | 'setItem'>;
-
-const getStorage = (): StorageLike | null =>
-  typeof window === 'undefined' ? null : window.localStorage;
+const DB_NAME = 'pdfme-playground-projects';
+const DB_VERSION = 1;
+const PROJECTS_STORE_NAME = 'projects';
+const META_STORE_NAME = 'meta';
+const ACTIVE_PROJECT_ID_KEY = 'activeProjectId';
 
 const createProjectId = () => {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -56,6 +61,15 @@ const normalizeTitle = (title: string, fallback: string) => {
   return normalized || fallback;
 };
 
+export class PlaygroundProjectStorageQuotaError extends Error {
+  constructor() {
+    super(
+      'Browser Project is too large to save in browser storage. Try a mounted folder or delete unused Browser Projects.',
+    );
+    this.name = 'PlaygroundProjectStorageQuotaError';
+  }
+}
+
 const createUniqueProjectTitle = (title: string, projects: PlaygroundProject[]) => {
   const normalizedTitle = normalizeTitle(title, 'Untitled Project');
   const existingTitles = new Set(projects.map((project) => project.title));
@@ -69,6 +83,13 @@ const createUniqueProjectTitle = (title: string, projects: PlaygroundProject[]) 
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
+
+const isStorageQuotaExceededError = (error: unknown) =>
+  isRecord(error) &&
+  (error.name === 'QuotaExceededError' || error.name === 'NS_ERROR_DOM_QUOTA_REACHED');
+
+export const isPlaygroundProjectStorageQuotaError = (error: unknown) =>
+  error instanceof PlaygroundProjectStorageQuotaError || isStorageQuotaExceededError(error);
 
 const cloneRecord = (value: Record<string, unknown> | undefined) =>
   value ? (JSON.parse(JSON.stringify(value)) as Record<string, unknown>) : undefined;
@@ -128,79 +149,165 @@ const parseProject = (value: unknown): PlaygroundProject | null => {
   };
 };
 
-const writePlaygroundProjects = (projects: PlaygroundProject[], storage = getStorage()) => {
-  if (!storage) return;
-  storage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+const idbRequest = <T>(request: IDBRequest<T>) =>
+  new Promise<T>((resolve, reject) => {
+    request.addEventListener('success', () => resolve(request.result));
+    request.addEventListener('error', () => reject(request.error));
+  });
+
+const idbTransactionDone = (transaction: IDBTransaction) =>
+  new Promise<void>((resolve, reject) => {
+    transaction.addEventListener('complete', () => resolve());
+    transaction.addEventListener('error', () => reject(transaction.error));
+    transaction.addEventListener('abort', () => reject(transaction.error));
+  });
+
+const normalizeStorageWriteError = (error: unknown) => {
+  if (isStorageQuotaExceededError(error)) {
+    return new PlaygroundProjectStorageQuotaError();
+  }
+  return error;
 };
 
-const migrateLegacyProject = (storage: StorageLike): PlaygroundProject | null => {
-  const legacyTemplate = storage.getItem(LEGACY_TEMPLATE_STORAGE_KEY);
-  if (!legacyTemplate) return null;
-
+const wrapProjectStorageWrite = async (write: () => Promise<void>) => {
   try {
-    const template = JSON.parse(legacyTemplate) as Template;
-    checkTemplate(template);
-
-    const parsedInputs = JSON.parse(storage.getItem(LEGACY_INPUTS_STORAGE_KEY) ?? 'null');
-    const now = Date.now();
-    const project: PlaygroundProject = {
-      createdAt: now,
-      id: `project_legacy_${now.toString(36)}`,
-      inputs: parseInputs(parsedInputs) ?? getInputFromTemplate(template),
-      kind: 'template',
-      metadata: undefined,
-      template,
-      title: 'Imported local template',
-      updatedAt: now,
-    };
-
-    writePlaygroundProjects([project], storage);
-    setActivePlaygroundProjectId(project.id, storage);
-    storage.removeItem(LEGACY_TEMPLATE_STORAGE_KEY);
-    storage.removeItem(LEGACY_INPUTS_STORAGE_KEY);
-    return project;
-  } catch {
-    return null;
+    await write();
+  } catch (error) {
+    throw normalizeStorageWriteError(error);
   }
 };
 
-export const readPlaygroundProjects = (storage = getStorage()): PlaygroundProject[] => {
-  if (!storage) return [];
+const openProjectsDb = () =>
+  new Promise<IDBDatabase>((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      reject(new Error('IndexedDB is not available.'));
+      return;
+    }
 
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.addEventListener('upgradeneeded', () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(PROJECTS_STORE_NAME)) {
+        db.createObjectStore(PROJECTS_STORE_NAME, { keyPath: 'id' });
+      }
+      if (!db.objectStoreNames.contains(META_STORE_NAME)) {
+        db.createObjectStore(META_STORE_NAME);
+      }
+    });
+    request.addEventListener('success', () => resolve(request.result));
+    request.addEventListener('error', () => reject(request.error));
+  });
+
+const defaultProjectStorage: PlaygroundProjectStorage = {
+  clearActiveProjectId: async () => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(META_STORE_NAME, 'readwrite');
+      await wrapProjectStorageWrite(async () => {
+        await idbRequest(transaction.objectStore(META_STORE_NAME).delete(ACTIVE_PROJECT_ID_KEY));
+        await idbTransactionDone(transaction);
+      });
+    } finally {
+      db.close();
+    }
+  },
+  deleteProject: async (projectId: string) => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(PROJECTS_STORE_NAME, 'readwrite');
+      await wrapProjectStorageWrite(async () => {
+        await idbRequest(transaction.objectStore(PROJECTS_STORE_NAME).delete(projectId));
+        await idbTransactionDone(transaction);
+      });
+    } finally {
+      db.close();
+    }
+  },
+  getActiveProjectId: async () => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(META_STORE_NAME, 'readonly');
+      const value = await idbRequest<unknown>(
+        transaction.objectStore(META_STORE_NAME).get(ACTIVE_PROJECT_ID_KEY),
+      );
+      return typeof value === 'string' ? value : null;
+    } finally {
+      db.close();
+    }
+  },
+  putProject: async (project: PlaygroundProject) => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(PROJECTS_STORE_NAME, 'readwrite');
+      await wrapProjectStorageWrite(async () => {
+        await idbRequest(transaction.objectStore(PROJECTS_STORE_NAME).put(project));
+        await idbTransactionDone(transaction);
+      });
+    } finally {
+      db.close();
+    }
+  },
+  readProjects: async () => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(PROJECTS_STORE_NAME, 'readonly');
+      return await idbRequest<unknown[]>(
+        transaction.objectStore(PROJECTS_STORE_NAME).getAll(),
+      );
+    } finally {
+      db.close();
+    }
+  },
+  setActiveProjectId: async (projectId: string) => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(META_STORE_NAME, 'readwrite');
+      await wrapProjectStorageWrite(async () => {
+        await idbRequest(
+          transaction.objectStore(META_STORE_NAME).put(projectId, ACTIVE_PROJECT_ID_KEY),
+        );
+        await idbTransactionDone(transaction);
+      });
+    } finally {
+      db.close();
+    }
+  },
+};
+
+const sortProjectsByUpdatedAt = (projects: PlaygroundProject[]) =>
+  projects.sort((a, b) => b.updatedAt - a.updatedAt);
+
+export const readPlaygroundProjects = async (
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+): Promise<PlaygroundProject[]> => {
   try {
-    const parsed = JSON.parse(storage.getItem(PROJECTS_STORAGE_KEY) ?? '[]');
-    if (!Array.isArray(parsed)) return [];
-
-    const projects = parsed
-      .map(parseProject)
-      .filter((project): project is PlaygroundProject => project != null)
-      .sort((a, b) => b.updatedAt - a.updatedAt);
-
-    if (projects.length > 0) return projects;
-
-    const migratedProject = migrateLegacyProject(storage);
-    return migratedProject ? [migratedProject] : [];
-  } catch {
+    return sortProjectsByUpdatedAt(
+      (await storage.readProjects())
+        .map(parseProject)
+        .filter((project): project is PlaygroundProject => project != null),
+    );
+  } catch (error) {
+    console.error(error);
     return [];
   }
 };
 
-export const getPlaygroundProject = (
+export const getPlaygroundProject = async (
   projectId: string,
-  storage = getStorage(),
-): PlaygroundProject | null =>
-  readPlaygroundProjects(storage).find((project) => project.id === projectId) ?? null;
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+): Promise<PlaygroundProject | null> =>
+  (await readPlaygroundProjects(storage)).find((project) => project.id === projectId) ?? null;
 
-export const savePlaygroundProject = (
+export const savePlaygroundProject = async (
   input: SavePlaygroundProjectInput,
-  storage = getStorage(),
-): PlaygroundProject => {
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+): Promise<PlaygroundProject> => {
   checkTemplate(input.template);
 
-  const projects = readPlaygroundProjects(storage);
+  const projects = await readPlaygroundProjects(storage);
   const existing = input.id ? projects.find((project) => project.id === input.id) : undefined;
   const now = Date.now();
-  const project: PlaygroundProject = {
+  let savedProject: PlaygroundProject = {
     createdAt: existing?.createdAt ?? now,
     id: existing?.id ?? input.id ?? createProjectId(),
     inputs: input.inputs ?? getInputFromTemplate(input.template),
@@ -213,30 +320,37 @@ export const savePlaygroundProject = (
     updatedAt: now,
   };
 
-  writePlaygroundProjects(
-    [project, ...projects.filter((item) => item.id !== project.id)].sort(
-      (a, b) => b.updatedAt - a.updatedAt,
-    ),
-    storage,
-  );
-  setActivePlaygroundProjectId(project.id, storage);
-  return project;
+  try {
+    await storage.putProject(savedProject);
+  } catch (error) {
+    if (!isPlaygroundProjectStorageQuotaError(error) || !savedProject.thumbnail) {
+      throw error;
+    }
+
+    savedProject = { ...savedProject, thumbnail: undefined };
+    await storage.putProject(savedProject);
+  }
+
+  await storage.setActiveProjectId(savedProject.id);
+  return savedProject;
 };
 
-export const deletePlaygroundProject = (projectId: string, storage = getStorage()) => {
-  const projects = readPlaygroundProjects(storage).filter((project) => project.id !== projectId);
-  writePlaygroundProjects(projects, storage);
-  if (getActivePlaygroundProjectId(storage) === projectId) {
-    storage?.removeItem(ACTIVE_PROJECT_STORAGE_KEY);
+export const deletePlaygroundProject = async (
+  projectId: string,
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+) => {
+  await storage.deleteProject(projectId);
+  if ((await getActivePlaygroundProjectId(storage)) === projectId) {
+    await storage.clearActiveProjectId();
   }
 };
 
-export const renamePlaygroundProject = (
+export const renamePlaygroundProject = async (
   projectId: string,
   title: string,
-  storage = getStorage(),
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
 ) => {
-  const projects = readPlaygroundProjects(storage);
+  const projects = await readPlaygroundProjects(storage);
   const project = projects.find((item) => item.id === projectId);
   if (!project) return null;
 
@@ -245,21 +359,16 @@ export const renamePlaygroundProject = (
     title: normalizeTitle(title, project.title),
     updatedAt: Date.now(),
   };
-  writePlaygroundProjects(
-    projects
-      .map((item) => (item.id === projectId ? updatedProject : item))
-      .sort((a, b) => b.updatedAt - a.updatedAt),
-    storage,
-  );
+  await storage.putProject(updatedProject);
   return updatedProject;
 };
 
-export const duplicatePlaygroundProject = (
+export const duplicatePlaygroundProject = async (
   projectId: string,
   title?: string,
-  storage = getStorage(),
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
 ) => {
-  const projects = readPlaygroundProjects(storage);
+  const projects = await readPlaygroundProjects(storage);
   const project = projects.find((item) => item.id === projectId);
   if (!project) return null;
 
@@ -272,44 +381,45 @@ export const duplicatePlaygroundProject = (
     updatedAt: now,
   };
 
-  writePlaygroundProjects(
-    [duplicatedProject, ...projects].sort((a, b) => b.updatedAt - a.updatedAt),
-    storage,
-  );
-  setActivePlaygroundProjectId(duplicatedProject.id, storage);
+  await storage.putProject(duplicatedProject);
+  await storage.setActiveProjectId(duplicatedProject.id);
   return duplicatedProject;
 };
 
-export const setPlaygroundProjectThumbnail = (
+export const setPlaygroundProjectThumbnail = async (
   projectId: string,
   thumbnail: string,
-  storage = getStorage(),
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
 ) => {
-  const projects = readPlaygroundProjects(storage);
-  const project = projects.find((item) => item.id === projectId);
+  const project = await getPlaygroundProject(projectId, storage);
   if (!project) return null;
 
   const updatedProject = { ...project, thumbnail };
-  writePlaygroundProjects(
-    projects.map((item) => (item.id === projectId ? updatedProject : item)),
-    storage,
-  );
+  await storage.putProject(updatedProject);
   return updatedProject;
 };
 
-export const getActivePlaygroundProjectId = (storage = getStorage()) =>
-  storage?.getItem(ACTIVE_PROJECT_STORAGE_KEY) ?? null;
+export const getActivePlaygroundProjectId = async (
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+) => storage.getActiveProjectId();
 
-export const setActivePlaygroundProjectId = (projectId: string, storage = getStorage()) => {
-  storage?.setItem(ACTIVE_PROJECT_STORAGE_KEY, projectId);
+export const setActivePlaygroundProjectId = async (
+  projectId: string,
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+) => {
+  await storage.setActiveProjectId(projectId);
 };
 
-export const clearActivePlaygroundProject = (storage = getStorage()) => {
-  storage?.removeItem(ACTIVE_PROJECT_STORAGE_KEY);
+export const clearActivePlaygroundProject = async (
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+) => {
+  await storage.clearActiveProjectId();
 };
 
-export const getActivePlaygroundProject = (storage = getStorage()) => {
-  const projectId = getActivePlaygroundProjectId(storage);
+export const getActivePlaygroundProject = async (
+  storage: PlaygroundProjectStorage = defaultProjectStorage,
+) => {
+  const projectId = await getActivePlaygroundProjectId(storage);
   return projectId ? getPlaygroundProject(projectId, storage) : null;
 };
 
