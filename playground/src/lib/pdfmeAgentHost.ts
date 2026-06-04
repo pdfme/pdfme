@@ -27,12 +27,15 @@ export type PdfmeAgentSelection = {
 };
 
 export type PdfmeAgentTemplateUpdate = {
+  baseMetadata?: unknown | null;
   baseTemplate?: unknown | null;
+  metadata?: unknown | null;
   template: unknown;
 };
 
 export type PdfmeAgentHost = {
   applyTemplateUpdate?: (input: PdfmeAgentTemplateUpdate) => Promise<void> | void;
+  getCurrentTemplateMetadata?: () => unknown | null;
   getCurrentTemplate?: () => unknown | null;
   getCurrentTemplateTitle?: () => string | null;
   getSelectedSchemas?: () => PdfmeAgentSelectedSchema[];

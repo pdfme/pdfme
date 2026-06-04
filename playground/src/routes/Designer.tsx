@@ -41,12 +41,14 @@ import {
   createTemplateEntryFromTemplate,
   findTemplateEntry,
   readTemplateEntry,
+  readTemplateEntryMetadata,
   refreshTemplateCollection,
   restorePersistedTemplateCollection,
   serializeTemplateForFileWorkspace,
   setSelectedFileWorkspaceTemplateName,
   subscribeTemplateEntryChanges,
   writeTemplateEntry,
+  writeTemplateEntryMetadata,
   writeTemplateThumbnail,
   type FileWorkspaceCollection,
   type FileWorkspaceTemplateEntry,
@@ -74,6 +76,19 @@ type DesignerLoadRequest = {
   templateId: string | null;
   workspaceTemplateName: string | null;
 };
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const serializeAgentMetadata = (metadata: unknown) => JSON.stringify(metadata ?? null);
+
+const cloneMetadata = (metadata: unknown): Record<string, unknown> | null =>
+  isRecord(metadata) ? cloneDeep(metadata) : null;
+
+const mergeMetadataTitle = (metadata: Record<string, unknown> | null, title: string) => ({
+  ...metadata,
+  title,
+});
 
 type FileWorkspaceStatus = 'deleted' | 'invalid' | null;
 
@@ -148,6 +163,7 @@ function DesignerApp() {
   const isFileWorkspaceDirtyRef = useRef(false);
   const fileWorkspaceStatusRef = useRef<FileWorkspaceStatus>(null);
   const projectTitleRef = useRef('Untitled Template');
+  const currentMetadataRef = useRef<Record<string, unknown> | null>(null);
   const agentSelectionRef = useRef<DesignerSelection | null>(null);
   const agentSelectionListenersRef = useRef(
     new Set<(selection: DesignerSelection | null) => void>(),
@@ -197,6 +213,7 @@ function DesignerApp() {
       setIsFileWorkspaceDirty(false);
       setIsBrowserProjectDirty(false);
       if (entry) setCurrentProjectTitle(entry.title);
+      if (!entry) currentMetadataRef.current = null;
     },
     [setCurrentProjectTitle],
   );
@@ -362,16 +379,22 @@ function DesignerApp() {
         nextTemplate,
         currentProject?.inputs,
       ).catch(() => currentProject?.thumbnail);
+      const nextMetadata = mergeMetadataTitle(
+        currentMetadataRef.current ?? currentProject?.metadata ?? null,
+        title,
+      );
       const savedProject = savePlaygroundProject({
         id: saveAs ? undefined : currentProject?.id,
         inputs: currentProject?.inputs,
         kind: currentProject?.kind ?? 'template',
+        metadata: nextMetadata,
         source: currentProject?.source,
         template: nextTemplate,
         thumbnail,
         title,
       });
       projectRef.current = savedProject;
+      currentMetadataRef.current = savedProject.metadata ?? null;
       setCleanBrowserProjectTemplate(savedProject.template);
       setCurrentProjectTitle(savedProject.title);
       toast.success(
@@ -415,6 +438,7 @@ function DesignerApp() {
           }
 
           template = entry.template;
+          currentMetadataRef.current = await readTemplateEntryMetadata(entry);
           await setSelectedFileWorkspaceTemplateName(restored.collection.rootHandle, entry.name);
           setActiveFileWorkspaceEntry(
             { ...restored.collection, selectedTemplateName: entry.name },
@@ -422,6 +446,7 @@ function DesignerApp() {
           );
         } else if (shouldCreateNewProject) {
           setActiveFileWorkspaceEntry(null, null);
+          currentMetadataRef.current = null;
           clearActivePlaygroundProject();
           setCurrentProjectTitle('Untitled Template');
         } else if (projectIdFromQuery) {
@@ -429,6 +454,7 @@ function DesignerApp() {
           project = getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
+          currentMetadataRef.current = project.metadata ?? null;
         } else if (templateIdFromQuery) {
           setActiveFileWorkspaceEntry(null, null);
           const [templateJson, metadata] = await Promise.all([
@@ -437,18 +463,21 @@ function DesignerApp() {
           ]);
           checkTemplate(templateJson);
           template = templateJson;
+          currentMetadataRef.current = metadata;
           setCurrentProjectTitle(metadata.title);
         } else {
           setActiveFileWorkspaceEntry(null, null);
           project = getActivePlaygroundProject();
           if (project) {
             template = project.template;
+            currentMetadataRef.current = project.metadata ?? null;
           } else {
             const [defaultTemplate, metadata] = await Promise.all([
               getDefaultPlaygroundTemplate(),
               getDefaultPlaygroundTemplateMetadata(),
             ]);
             template = defaultTemplate;
+            currentMetadataRef.current = metadata;
             setCurrentProjectTitle(metadata.title);
           }
         }
@@ -561,6 +590,7 @@ function DesignerApp() {
     }
 
     projectRef.current = null;
+    currentMetadataRef.current = null;
     setCurrentProjectTitle('Untitled Template');
     clearActivePlaygroundProject();
     setSearchParams(new URLSearchParams([['new', '1']]), { replace: true });
@@ -622,7 +652,7 @@ function DesignerApp() {
   };
 
   const applyAgentTemplateUpdate: PdfmeAgentHost['applyTemplateUpdate'] = useCallback(
-    async ({ baseTemplate, template }) => {
+    async ({ baseMetadata, baseTemplate, metadata, template }) => {
       if (!designer.current) throw new Error('Designer is not ready');
 
       const currentProject = projectRef.current;
@@ -632,6 +662,7 @@ function DesignerApp() {
 
       checkTemplate(template as Template);
       const nextTemplate = cloneDeep(template as Template);
+      const nextMetadata = cloneMetadata(metadata);
 
       if (
         baseTemplate &&
@@ -642,11 +673,32 @@ function DesignerApp() {
           'Template changed while the agent was editing. The AI update was not applied.',
         );
       }
+      if (
+        metadata !== undefined &&
+        baseMetadata !== undefined &&
+        serializeAgentMetadata(currentMetadataRef.current) !== serializeAgentMetadata(baseMetadata)
+      ) {
+        throw new Error(
+          'Template metadata changed while the agent was editing. The AI metadata update was not applied.',
+        );
+      }
 
       if (fileWorkspaceEntryRef.current) {
         const saved = await onSaveTemplate(nextTemplate);
         if (!saved) {
           throw new Error('AI update was not saved because the mounted template changed on disk.');
+        }
+
+        if (nextMetadata) {
+          const currentEntry = fileWorkspaceEntryRef.current;
+          if (!currentEntry) {
+            throw new Error('AI metadata update was not saved because the mounted template closed.');
+          }
+          const updatedEntry = await writeTemplateEntryMetadata(currentEntry, nextMetadata);
+          fileWorkspaceEntryRef.current = updatedEntry;
+          currentMetadataRef.current = await readTemplateEntryMetadata(updatedEntry);
+          setFileWorkspaceEntry(updatedEntry);
+          setCurrentProjectTitle(updatedEntry.title);
         }
 
         isApplyingTemplateRef.current = true;
@@ -659,6 +711,7 @@ function DesignerApp() {
       }
 
       designer.current.updateTemplate(nextTemplate);
+      if (nextMetadata) currentMetadataRef.current = nextMetadata;
 
       if (!currentProject) {
         toast.success('AI update applied');
@@ -673,12 +726,14 @@ function DesignerApp() {
         id: currentProject.id,
         inputs: currentProject.inputs,
         kind: 'template',
+        metadata: nextMetadata ?? currentProject.metadata,
         source: currentProject.source,
         template: nextTemplate,
         thumbnail,
         title: currentProject.title,
       });
       projectRef.current = savedProject;
+      currentMetadataRef.current = savedProject.metadata ?? null;
       setCleanBrowserProjectTemplate(savedProject.template);
       setCurrentProjectTitle(savedProject.title);
       toast.success('AI update saved to Browser Project');
@@ -692,6 +747,7 @@ function DesignerApp() {
     const host: PdfmeAgentHost = {
       applyTemplateUpdate: applyAgentTemplateUpdate,
       getCurrentTemplate: () => designer.current?.getTemplate() ?? null,
+      getCurrentTemplateMetadata: () => currentMetadataRef.current,
       getCurrentTemplateTitle: () => projectTitleRef.current,
       getSelection: () => agentSelectionRef.current ?? designer.current?.getSelection() ?? null,
       getSelectedSchemas: () =>

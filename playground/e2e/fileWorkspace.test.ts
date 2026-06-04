@@ -5,9 +5,11 @@ import {
   createBlankTemplateEntry,
   createTemplateEntryFromTemplate,
   readTemplateEntry,
+  readTemplateEntryMetadata,
   scanTemplateCollection,
   serializeTemplateForFileWorkspace,
   writeTemplateEntry,
+  writeTemplateEntryMetadata,
   writeTemplateMetadata,
 } from '../src/lib/fileWorkspace';
 
@@ -192,6 +194,49 @@ describe('file workspace helpers', () => {
       tags: ['Invoice', 'Business'],
       order: 7,
       customField: 'keep me',
+    });
+  });
+
+  it('reads and writes raw template metadata without renaming the directory', async () => {
+    const root = new MemoryDirectoryHandle('templates');
+    const invoice = root.addDirectory('invoice');
+    invoice.addFile('template.json', serializeTemplateForFileWorkspace(blankTemplate));
+    invoice.addFile(
+      'metadata.json',
+      JSON.stringify({
+        description: 'Invoice template',
+        sourceKind: 'designer',
+        tags: ['Invoice'],
+        title: 'Invoice',
+      }),
+    );
+    const collection = await scanTemplateCollection(root as unknown as FileSystemDirectoryHandle);
+    const entry = collection.entries[0];
+    if (!entry) throw new Error('Missing test entry');
+
+    expect(await readTemplateEntryMetadata(entry)).toEqual({
+      description: 'Invoice template',
+      sourceKind: 'designer',
+      tags: ['Invoice'],
+      title: 'Invoice',
+    });
+
+    const updated = await writeTemplateEntryMetadata(entry, {
+      description: 'Invoice template',
+      pdfmeAgent: { domainRuleSkillIds: ['medical-form-rules'] },
+      sourceKind: 'designer',
+      tags: ['Invoice'],
+      title: 'Invoice',
+    });
+    const metadataFile = await invoice.getFileHandle('metadata.json');
+
+    expect(updated.name).toBe('invoice');
+    expect(JSON.parse(metadataFile.text)).toEqual({
+      description: 'Invoice template',
+      pdfmeAgent: { domainRuleSkillIds: ['medical-form-rules'] },
+      sourceKind: 'designer',
+      tags: ['Invoice'],
+      title: 'Invoice',
     });
   });
 

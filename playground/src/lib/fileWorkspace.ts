@@ -246,6 +246,10 @@ const readRawMetadata = async (directoryHandle: FileSystemDirectoryHandle) => {
   }
 };
 
+export const readTemplateEntryMetadata = async (
+  entry: Pick<FileWorkspaceTemplateEntry, 'templateDirectoryHandle'>,
+) => readRawMetadata(entry.templateDirectoryHandle);
+
 const readThumbnail = async (directoryHandle: FileSystemDirectoryHandle) => {
   const handle = await getFileHandleIfExists(directoryHandle, 'thumbnail.png');
   if (!handle) return {};
@@ -824,6 +828,17 @@ export const writeTemplateEntry = async (
     template: readResult.template,
     updatedAt: readResult.templateFile.lastModified,
   };
+};
+
+export const writeTemplateEntryMetadata = async (
+  entry: FileWorkspaceTemplateEntry,
+  metadata: Record<string, unknown>,
+): Promise<FileWorkspaceTemplateEntry> => {
+  const metadataFileHandle = await entry.templateDirectoryHandle.getFileHandle('metadata.json', {
+    create: true,
+  });
+  await writeText(metadataFileHandle, `${JSON.stringify(metadata, null, 2)}\n`);
+  return buildTemplateEntry(entry.name, entry.templateDirectoryHandle);
 };
 
 export const writeTemplateThumbnail = async (

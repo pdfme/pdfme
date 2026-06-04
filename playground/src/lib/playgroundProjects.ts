@@ -14,6 +14,7 @@ export type PlaygroundProject = {
   id: string;
   inputs: Record<string, string>[];
   kind: PlaygroundProjectKind;
+  metadata?: Record<string, unknown>;
   source?: PlaygroundProjectSource;
   template: Template;
   thumbnail?: string;
@@ -25,6 +26,7 @@ export type SavePlaygroundProjectInput = {
   id?: string;
   inputs?: Record<string, string>[];
   kind: PlaygroundProjectKind;
+  metadata?: Record<string, unknown>;
   source?: PlaygroundProjectSource;
   template: Template;
   thumbnail?: string;
@@ -67,6 +69,9 @@ const createUniqueProjectTitle = (title: string, projects: PlaygroundProject[]) 
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
+
+const cloneRecord = (value: Record<string, unknown> | undefined) =>
+  value ? (JSON.parse(JSON.stringify(value)) as Record<string, unknown>) : undefined;
 
 const parseInputs = (value: unknown): Record<string, string>[] | null => {
   if (!Array.isArray(value)) return null;
@@ -114,6 +119,7 @@ const parseProject = (value: unknown): PlaygroundProject | null => {
     id: value.id,
     inputs,
     kind: value.kind as PlaygroundProjectKind,
+    metadata: isRecord(value.metadata) ? cloneRecord(value.metadata) : undefined,
     source: isRecord(value.source) ? (value.source as PlaygroundProjectSource) : undefined,
     template: value.template as Template,
     thumbnail: typeof value.thumbnail === 'string' ? value.thumbnail : undefined,
@@ -142,6 +148,7 @@ const migrateLegacyProject = (storage: StorageLike): PlaygroundProject | null =>
       id: `project_legacy_${now.toString(36)}`,
       inputs: parseInputs(parsedInputs) ?? getInputFromTemplate(template),
       kind: 'template',
+      metadata: undefined,
       template,
       title: 'Imported local template',
       updatedAt: now,
@@ -198,6 +205,7 @@ export const savePlaygroundProject = (
     id: existing?.id ?? input.id ?? createProjectId(),
     inputs: input.inputs ?? getInputFromTemplate(input.template),
     kind: input.kind,
+    metadata: cloneRecord(input.metadata ?? existing?.metadata),
     source: input.source,
     template: input.template,
     thumbnail: input.thumbnail ?? existing?.thumbnail,

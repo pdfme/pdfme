@@ -39,6 +39,10 @@ describe('playground project storage', () => {
     const saved = savePlaygroundProject(
       {
         kind: 'jsx',
+        metadata: {
+          pdfmeAgent: { domainRuleSkillIds: ['medical-form-rules'] },
+          title: 'JSX draft',
+        },
         source: {
           content: 'return <Page />;',
           language: 'jsx',
@@ -53,6 +57,10 @@ describe('playground project storage', () => {
     );
 
     expect(saved.title).toBe('JSX draft');
+    expect(saved.metadata).toEqual({
+      pdfmeAgent: { domainRuleSkillIds: ['medical-form-rules'] },
+      title: 'JSX draft',
+    });
     expect(saved.thumbnail).toBe('data:image/png;base64,abc');
     expect(getActivePlaygroundProject(storage)?.id).toBe(saved.id);
     expect(readPlaygroundProjects(storage)).toHaveLength(1);
@@ -67,6 +75,7 @@ describe('playground project storage', () => {
     );
 
     expect(updated.id).toBe(saved.id);
+    expect(updated.metadata).toEqual(saved.metadata);
     expect(updated.thumbnail).toBe(saved.thumbnail);
     expect(readPlaygroundProjects(storage)).toHaveLength(1);
     expect(readPlaygroundProjects(storage)[0]?.title).toBe('Updated draft');
@@ -90,6 +99,7 @@ describe('playground project storage', () => {
       {
         inputs: [{ name: 'Ada' }],
         kind: 'template',
+        metadata: { pdfmeAgent: { domainRuleSkillIds: ['medical-form-rules'] } },
         template,
         thumbnail: 'data:image/png;base64,abc',
         title: 'Original',
@@ -106,6 +116,7 @@ describe('playground project storage', () => {
     expect(duplicated?.id).not.toBe(saved.id);
     expect(duplicated?.title).toBe('Copy project');
     expect(duplicated?.template).toEqual(template);
+    expect(duplicated?.metadata).toEqual(saved.metadata);
     expect(duplicated?.inputs).toEqual([{ name: 'Ada' }]);
     expect(duplicated?.thumbnail).toBe('data:image/png;base64,abc');
     expect(getActivePlaygroundProject(storage)?.id).toBe(duplicated?.id);
