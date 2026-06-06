@@ -877,7 +877,7 @@
     "path": "nenkin-shougai-seishin-shindansho/template.json",
     "thumbnailPath": "nenkin-shougai-seishin-shindansho/thumbnail.png",
     "pageCount": 2,
-    "fieldCount": 248,
+    "fieldCount": 270,
     "schemaTypes": [
       "checkbox",
       "circleMark",
