@@ -152,37 +152,31 @@ describe('generate integration test(playground)', () => {
     global.Date = RealDate;
   });
 
-  describe.each([playgroundTemplates])('%s', (templateData) => {
-    const entries = Object.entries(templateData);
-    for (let l = 0; l < entries.length; l += 1) {
-      const [key, template] = entries[l];
+  for (const [key, template] of Object.entries(playgroundTemplates)) {
+    test(`snapshot ${key}`, async () => {
+      const inputs = getInputFromTemplate(template);
 
-      // eslint-disable-next-line no-loop-func
-      test(`snapshot ${key}`, async () => {
-        const inputs = getInputFromTemplate(template);
+      const font = getFont();
 
-        const font = getFont();
+      const hrstart = process.hrtime();
 
-        const hrstart = process.hrtime();
-
-        const pdf = await generate({
-          inputs,
-          template,
-          plugins: generatorPlugins,
-          options: { font },
-        });
-
-        const hrend = process.hrtime(hrstart);
-        const execSeconds = hrend[0] + hrend[1] / 1000000000;
-        checkPerformanceThreshold(key, execSeconds);
-
-        const images = await pdfToImages(pdf);
-        for (let i = 0; i < images.length; i++) {
-          await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
-        }
+      const pdf = await generate({
+        inputs,
+        template,
+        plugins: generatorPlugins,
+        options: { font },
       });
-    }
-  });
+
+      const hrend = process.hrtime(hrstart);
+      const execSeconds = hrend[0] + hrend[1] / 1000000000;
+      checkPerformanceThreshold(key, execSeconds);
+
+      const images = await pdfToImages(pdf);
+      for (let i = 0; i < images.length; i++) {
+        await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
+      }
+    });
+  }
 
   test('benchmarks generator-only paths used by performance-sensitive templates', async () => {
     const font = getFont();
