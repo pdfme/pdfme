@@ -68,6 +68,11 @@ const loadBasePdf = async (pdf: string | Uint8Array | ArrayBuffer, password?: st
   }
 };
 
+const getBasePdfPassword = (options?: GeneratorOptions) => {
+  const password = options?.basePdfPassword;
+  return typeof password === 'string' ? password : undefined;
+};
+
 const toBoundingBox = ({ x, y, width, height }: PdfBox) => ({
   left: x,
   bottom: y,
@@ -131,7 +136,7 @@ export const getEmbedPdfPages = async (arg: {
     }));
   } else {
     const willLoadPdf = await getB64BasePdf(basePdf);
-    const embedPdf = await loadBasePdf(willLoadPdf, options?.basePdfPassword);
+    const embedPdf = await loadBasePdf(willLoadPdf, getBasePdfPassword(options));
     const embedPdfPages = embedPdf.getPages();
     const sourceBoxes = embedPdfPages.map((p) => p.getCropBox());
     embedPdfBoxes = embedPdfPages.map((p, index) => {

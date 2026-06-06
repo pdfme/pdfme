@@ -6,26 +6,19 @@ import { Form, Viewer } from '@pdfme/ui';
 import {
   getFontsData,
   getTemplateById,
-  getTemplateMetadataById,
   getBlankTemplate,
   getDefaultPlaygroundTemplate,
-  getDefaultPlaygroundTemplateMetadata,
   generatePDF,
   isJsonString,
   translations,
 } from '../helper';
 import { getPlugins } from '../plugins';
 import PlaygroundButton from '../components/PlaygroundButton';
-import ProjectSavedToast from '../components/ProjectSavedToast';
 import { NavItem, NavBar } from '../components/NavBar';
-import { getErrorMessage } from '../lib/errors';
 import {
   getActivePlaygroundProject,
   getPlaygroundProject,
-  savePlaygroundProject,
-  type PlaygroundProject,
 } from '../lib/playgroundProjects';
-import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
 import {
   FileWorkspaceTemplateDeletedError,
   FileWorkspaceTemplateInvalidError,
@@ -43,7 +36,6 @@ function FormAndViewerApp() {
   const [searchParams] = useSearchParams();
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
-  const projectRef = useRef<PlaygroundProject | null>(null);
   const fileWorkspaceEntryRef = useRef<FileWorkspaceTemplateEntry | null>(null);
   const diskVersionRef = useRef<string | null>(null);
   const fileWorkspaceStatusRef = useRef<'deleted' | 'invalid' | null>(null);
@@ -59,8 +51,6 @@ function FormAndViewerApp() {
   const [fileWorkspaceStatus, setFileWorkspaceStatus] = useState<'deleted' | 'invalid' | null>(
     null,
   );
-  const [projectTitle, setProjectTitle] = useState('Untitled Template');
-
   const snapshotCurrentUi = useCallback(() => {
     if (!ui.current) return;
 
@@ -83,7 +73,6 @@ function FormAndViewerApp() {
 
       try {
         let template: Template = getBlankTemplate();
-        let project: PlaygroundProject | null = null;
         let inputs: Record<string, string>[] | null = null;
         const templateIdFromQuery = searchParams.get('template');
         const projectIdFromQuery = searchParams.get('project');
@@ -99,7 +88,6 @@ function FormAndViewerApp() {
         if (currentSourceKeyRef.current === sourceKey && currentTemplateRef.current) {
           template = currentTemplateRef.current;
           inputs = ui.current?.getInputs() ?? currentInputsRef.current;
-          project = projectRef.current;
         } else if (workspaceTemplateName) {
           const restored = await restorePersistedTemplateCollection();
           if (restored.status !== 'mounted') {
@@ -119,14 +107,13 @@ function FormAndViewerApp() {
           diskVersionRef.current = entry.diskVersion;
           setFileWorkspaceEntry(entry);
           setFileWorkspaceStatus(null);
-          setProjectTitle(entry.title);
           await setSelectedFileWorkspaceTemplateName(restored.collection.rootHandle, entry.name);
         } else if (projectIdFromQuery) {
           fileWorkspaceEntryRef.current = null;
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          project = await getPlaygroundProject(projectIdFromQuery);
+          const project = await getPlaygroundProject(projectIdFromQuery);
           if (!project) throw new Error('Project not found');
           template = project.template;
           inputs = project.inputs;
@@ -135,29 +122,20 @@ function FormAndViewerApp() {
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          const [templateJson, metadata] = await Promise.all([
-            getTemplateById(templateIdFromQuery),
-            getTemplateMetadataById(templateIdFromQuery),
-          ]);
+          const templateJson = await getTemplateById(templateIdFromQuery);
           checkTemplate(templateJson);
           template = templateJson;
-          setProjectTitle(metadata.title);
         } else {
           fileWorkspaceEntryRef.current = null;
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          project = await getActivePlaygroundProject();
+          const project = await getActivePlaygroundProject();
           if (project) {
             template = project.template;
             inputs = project.inputs;
           } else {
-            const [defaultTemplate, metadata] = await Promise.all([
-              getDefaultPlaygroundTemplate(),
-              getDefaultPlaygroundTemplateMetadata(),
-            ]);
-            template = defaultTemplate;
-            setProjectTitle(metadata.title);
+            template = await getDefaultPlaygroundTemplate();
           }
         }
 
@@ -166,11 +144,9 @@ function FormAndViewerApp() {
         if (buildId !== buildIdRef.current || !uiRef.current) return;
 
         destroyCurrentUi();
-        projectRef.current = project;
         currentSourceKeyRef.current = sourceKey;
         currentTemplateRef.current = template;
         currentInputsRef.current = resolvedInputs;
-        if (project) setProjectTitle(project.title);
 
         ui.current = new (mode === 'form' ? Form : Viewer)({
           domContainer: uiRef.current,
@@ -189,7 +165,6 @@ function FormAndViewerApp() {
           plugins: getPlugins(),
         });
       } catch (error) {
-        projectRef.current = null;
         fileWorkspaceEntryRef.current = null;
         diskVersionRef.current = null;
         setFileWorkspaceEntry(null);
@@ -226,49 +201,6 @@ function FormAndViewerApp() {
         alert(e);
       }
     }
-  };
-
-  const onSaveInputs = async (saveAs = false) => {
-    if (!ui.current) return;
-
-    const currentProject = projectRef.current;
-    const nextInputs = ui.current.getInputs();
-    const nextTemplate = ui.current.getTemplate();
-    const currentTitle = (currentProject?.title ?? projectTitle) || 'Untitled Template';
-    const title = saveAs
-      ? (window.prompt('Save as', `${currentTitle} Copy`) ?? '')
-      : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
-    if (!title.trim()) return;
-
-    const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate, nextInputs).catch(
-      () => currentProject?.thumbnail,
-    );
-    let savedProject: PlaygroundProject;
-    try {
-      savedProject = await savePlaygroundProject({
-        id: saveAs ? undefined : currentProject?.id,
-        inputs: nextInputs,
-        kind: currentProject?.kind ?? 'template',
-        source: currentProject?.source,
-        template: nextTemplate,
-        thumbnail,
-        title,
-      });
-    } catch (error) {
-      console.error(error);
-      toast.error(getErrorMessage(error));
-      return;
-    }
-    projectRef.current = savedProject;
-    currentTemplateRef.current = nextTemplate;
-    currentInputsRef.current = nextInputs;
-    setProjectTitle(savedProject.title);
-    toast.success(
-      <ProjectSavedToast
-        formPath={`/form-viewer?project=${encodeURIComponent(savedProject.id)}`}
-        title={savedProject.title}
-      />,
-    );
   };
 
   const onResetInputs = () => {
@@ -387,12 +319,6 @@ function FormAndViewerApp() {
         <div className="flex gap-1">
           <PlaygroundButton onClick={onGetInputs}>Get</PlaygroundButton>
           <PlaygroundButton onClick={onSetInputs}>Set</PlaygroundButton>
-          <PlaygroundButton onClick={() => void onSaveInputs()}>
-            {fileWorkspaceEntry ? 'Save Local Copy' : 'Save'}
-          </PlaygroundButton>
-          <PlaygroundButton onClick={() => void onSaveInputs(true)}>
-            {fileWorkspaceEntry ? 'Save As Local Copy' : 'Save As'}
-          </PlaygroundButton>
           <PlaygroundButton onClick={onResetInputs}>Reset</PlaygroundButton>
         </div>
       ),

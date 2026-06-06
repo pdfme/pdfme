@@ -3,11 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { checkTemplate, getInputFromTemplate, type Template } from '@pdfme/common';
 import {
   ChevronDown,
-  Code2,
   Copy,
   Download,
-  Eye,
-  FileText,
   FolderOpen,
   FolderX,
   MoreHorizontal,
@@ -34,7 +31,10 @@ import {
   type PlaygroundProject,
 } from '../lib/playgroundProjects';
 import { createTemplateFromPdfFile, getPdfTemplateTitle } from '../lib/pdfTemplate';
-import { createTemplateThumbnailDataUrl } from '../lib/templateThumbnails';
+import {
+  createTemplateThumbnailDataUrl,
+  getProjectThumbnailInputs,
+} from '../lib/templateThumbnails';
 import {
   clearPersistedFileWorkspace,
   createBlankTemplateEntry,
@@ -185,7 +185,7 @@ const ProjectThumbnailImage = ({
     if (project.thumbnail) return;
 
     let cancelled = false;
-    void createTemplateThumbnailDataUrl(project.template, project.inputs)
+    void createTemplateThumbnailDataUrl(project.template, getProjectThumbnailInputs(project))
       .then((thumbnail) => {
         if (cancelled) return;
         setSrc(thumbnail);
@@ -1351,21 +1351,15 @@ function TemplatesApp() {
                           }
                         >
                           {project.source ? (
-                            <>
-                              <Code2 className="size-4" />
-                              Source
-                            </>
+                            'Source'
                           ) : (
-                            <>
-                              <PencilRuler className="size-4" />
-                              Designer
-                            </>
+                            'Designer'
                           )}
                         </PlaygroundButton>
                         <PlaygroundButton
                           onClick={() => void navigateToProject(project, 'form-viewer')}
                         >
-                          Preview
+                          Form/Viewer
                         </PlaygroundButton>
                         <ProjectMoreActions
                           project={project}
@@ -1500,7 +1494,6 @@ function TemplatesApp() {
                                 void navigateToMountedTemplate(mountedCollection, entry, 'designer')
                               }
                             >
-                              <PencilRuler className="size-4" />
                               Designer
                             </PlaygroundButton>
                             <PlaygroundButton
@@ -1520,8 +1513,7 @@ function TemplatesApp() {
                               onClick={() => setEditingMountedEntry(entry)}
                               variant="secondary"
                             >
-                              <Pencil className="size-4" />
-                              Metadata
+                              Edit Metadata
                             </PlaygroundButton>
                           </div>
                         }
@@ -1612,7 +1604,6 @@ function TemplatesApp() {
               const title = template.title;
               const generation = getTemplateGeneration(template);
               const tag = getGenerationLabel(generation);
-              const Icon = generation === 'md2pdf' ? FileText : Code2;
               const tags = getTemplateTags(template);
 
               return (
@@ -1663,20 +1654,17 @@ function TemplatesApp() {
                           fullWidth
                           onClick={() => navigateToAuthoringPreset(authoringPreset)}
                         >
-                          <Icon className="size-4" />
                           Open Starter
                         </PlaygroundButton>
                       ) : (
                         <div className="space-y-2">
                           <PlaygroundButton fullWidth onClick={() => navigateTo(name, 'designer')}>
-                            <PencilRuler className="size-4" />
                             Designer
                           </PlaygroundButton>
                           <PlaygroundButton
                             fullWidth
                             onClick={() => navigateTo(name, 'form-viewer')}
                           >
-                            <Eye className="size-4" />
                             Form/Viewer
                           </PlaygroundButton>
                         </div>

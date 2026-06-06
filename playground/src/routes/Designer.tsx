@@ -380,10 +380,9 @@ function DesignerApp() {
         : (currentProject?.title ?? window.prompt('Project name', currentTitle) ?? '');
       if (!title.trim()) return false;
 
-      const thumbnail = await createTemplateThumbnailDataUrl(
-        nextTemplate,
-        currentProject?.inputs,
-      ).catch(() => currentProject?.thumbnail);
+      const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate).catch(
+        () => currentProject?.thumbnail,
+      );
       const nextMetadata = mergeMetadataTitle(
         currentMetadataRef.current ?? currentProject?.metadata ?? null,
         title,
@@ -738,10 +737,9 @@ function DesignerApp() {
         return;
       }
 
-      const thumbnail = await createTemplateThumbnailDataUrl(
-        nextTemplate,
-        currentProject.inputs,
-      ).catch(() => currentProject.thumbnail);
+      const thumbnail = await createTemplateThumbnailDataUrl(nextTemplate).catch(
+        () => currentProject.thumbnail,
+      );
       const savedProject = await savePlaygroundProject({
         id: currentProject.id,
         inputs: currentProject.inputs,
