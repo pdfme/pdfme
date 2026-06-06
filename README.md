@@ -109,7 +109,3 @@ I definitely could not have created pdfme without these libraries. I am grateful
 
 If you want to contribute to pdfme, please refer to the [Development Guide](https://pdfme.com/docs/development-guide).  
 We look forward to your contributions!
-
----
-
-pdfme is supported by [Devin AI](https://app.devin.ai/invite/KyOTXVPrlFl2TjcT) and [Greptile](https://app.greptile.com/signup?ref=MzgyNzgtMjQ1MTU=).

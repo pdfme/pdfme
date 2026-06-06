@@ -1006,9 +1006,9 @@ function DesignerApp() {
     {
       label: fileWorkspaceEntry ? 'Workspace' : 'Project',
       content: (
-        <div className="flex gap-1">
+        <div className="flex min-w-0 gap-1">
           <PlaygroundButton
-            className="relative"
+            className={`relative ${fileWorkspaceEntry ? 'max-w-60 xl:max-w-72' : ''}`}
             id="save-local"
             aria-label={
               hasUnsavedTemplateChanges
@@ -1017,6 +1017,7 @@ function DesignerApp() {
             }
             disabled={editingStaticSchemas}
             onClick={() => void onSaveTemplate()}
+            title={fileWorkspaceEntry ? saveTemplateLabel : undefined}
           >
             {hasUnsavedTemplateChanges && (
               <span
@@ -1024,8 +1025,8 @@ function DesignerApp() {
                 className="absolute -right-1 -top-1 size-2.5 rounded-full bg-red-500 ring-2 ring-white"
               />
             )}
-            <Save className="size-3.5" />
-            {saveTemplateLabel}
+            <Save className="size-3.5 shrink-0" />
+            <span className="min-w-0 truncate">{saveTemplateLabel}</span>
           </PlaygroundButton>
           <PlaygroundButton
             id="save-as"
