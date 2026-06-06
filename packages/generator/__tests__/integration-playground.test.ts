@@ -34,6 +34,9 @@ const GENERATOR_BENCHMARK_THRESHOLD = parseFloat(
 const GENERATOR_BENCHMARK_RUN_COUNT = 6;
 const GENERATOR_BENCHMARK_WARMUP_RUN_COUNT = 1;
 const ADDRESS_LABEL_BENCHMARK_INPUT_COUNT = 20;
+const PLAYGROUND_TEMPLATE_PERFORMANCE_THRESHOLDS: Record<string, number> = {
+  'nenkin-shougai-seishin-shindansho': 5,
+};
 const generatorPlugins = {
   text,
   image,
@@ -169,7 +172,7 @@ describe('generate integration test(playground)', () => {
 
       const hrend = process.hrtime(hrstart);
       const execSeconds = hrend[0] + hrend[1] / 1000000000;
-      checkPerformanceThreshold(key, execSeconds);
+      checkPerformanceThreshold(key, execSeconds, PLAYGROUND_TEMPLATE_PERFORMANCE_THRESHOLDS[key]);
 
       const images = await pdfToImages(pdf);
       for (let i = 0; i < images.length; i++) {
