@@ -1,6 +1,11 @@
 /** @jsxImportSource @pdfme/jsx */
 import { describe, expect, it } from 'vitest';
-import { isBlankPdf, PAGE_SIZE_PRESETS } from '@pdfme/common';
+import {
+  DYNAMIC_CONTAINER_METADATA_KEY,
+  getDynamicContainerMetadata,
+  isBlankPdf,
+  PAGE_SIZE_PRESETS,
+} from '@pdfme/common';
 
 import {
   Absolute,
@@ -595,6 +600,55 @@ describe('@pdfme/jsx renderToTemplate', () => {
       height: (text?.height ?? 0) + 4,
     });
     expect(after?.position.y).toBeCloseTo(box?.height ?? 0);
+  });
+
+  it('defaults Text and MultiVariableText overflow to expand', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Text name="note">Editable note</Text>
+        <MultiVariableText name="message" text="Hello {name}" />
+      </Page>,
+    );
+
+    const [note, message] = result.template.schemas[0] ?? [];
+    expect(note).toMatchObject({ type: 'text', overflow: 'expand' });
+    expect(message).toMatchObject({ type: 'multiVariableText', overflow: 'expand' });
+  });
+
+  it('allows Text and MultiVariableText overflow to opt out of expand', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Text name="note" overflow="visible">
+          Editable note
+        </Text>
+        <MultiVariableText name="message" text="Hello {name}" overflow="visible" />
+      </Page>,
+    );
+
+    const [note, message] = result.template.schemas[0] ?? [];
+    expect(note).toMatchObject({ type: 'text', overflow: 'visible' });
+    expect(message).toMatchObject({ type: 'multiVariableText', overflow: 'visible' });
+  });
+
+  it('marks auto-height visual Box schemas as dynamic containers', async () => {
+    const result = await renderToTemplate(
+      <Page margin={0}>
+        <Box background="#eeeeee" padding={{ x: 3, y: 2 }}>
+          <Stack gap={1}>
+            <Text>Message</Text>
+            <MultiVariableText name="message" text="Hello {name}" />
+          </Stack>
+        </Box>
+      </Page>,
+    );
+
+    const [box, label, message] = result.template.schemas[0] ?? [];
+    expect(box?.type).toBe('rectangle');
+    expect(getDynamicContainerMetadata(box!)).toEqual({
+      childNames: [label?.name, message?.name],
+      paddingBottom: 2,
+    });
+    expect(box).toHaveProperty(DYNAMIC_CONTAINER_METADATA_KEY);
   });
 
   it('does not render a rectangle schema for a Box without visual styles', async () => {

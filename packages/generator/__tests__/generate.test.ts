@@ -2,7 +2,13 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import generate from '../src/generate.js';
-import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
+import {
+  Template,
+  BLANK_PDF,
+  Schema,
+  setDynamicContainerMetadata,
+  type Plugin,
+} from '@pdfme/common';
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 
@@ -246,6 +252,225 @@ describe('generate integrate test', () => {
       expect(after?.position.y).toBeGreaterThan(20);
     });
 
+    test('resizes JSX dynamic container decorations around expanded children', async () => {
+      const renderedSchemas: Schema[] = [];
+      const createProbePlugin = (defaultSchema: Schema): Plugin => ({
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema,
+        },
+      });
+      const boxSchema: Schema = {
+        name: 'box',
+        type: 'rectangle',
+        content: '',
+        position: { x: 10, y: 10 },
+        width: 50,
+        height: 24,
+        color: '#f8fafc',
+      };
+      setDynamicContainerMetadata(boxSchema, {
+        childNames: ['label', 'body'],
+        paddingBottom: 4,
+      });
+
+      await generate({
+        template: {
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+          schemas: [
+            [
+              boxSchema,
+              {
+                ...textObject(14, 14, 'label'),
+                width: 42,
+                height: 5,
+                readOnly: true,
+                content: 'Message',
+              },
+              {
+                ...textObject(14, 21, 'body'),
+                width: 32,
+                height: 5,
+                overflow: 'expand',
+                fontSize: 10,
+                lineHeight: 1,
+                characterSpacing: 0,
+              },
+              {
+                ...textObject(10, 38, 'after'),
+                width: 50,
+                height: 5,
+              },
+            ],
+          ],
+        },
+        inputs: [{ body: 'long text '.repeat(10), after: 'after' }],
+        options: { font: getFont() },
+        plugins: {
+          rectangle: createProbePlugin(boxSchema),
+          text: createProbePlugin(textObject(0, 0)),
+        },
+      });
+
+      const box = renderedSchemas.find((schema) => schema.name === 'box');
+      const body = renderedSchemas.find((schema) => schema.name === 'body');
+      const after = renderedSchemas.find((schema) => schema.name === 'after');
+
+      expect(body?.height).toBeGreaterThan(5);
+      expect(box?.height).toBeCloseTo(21 - 10 + (body?.height ?? 0) + 4);
+      expect(after?.position.y).toBeCloseTo(38 + (body?.height ?? 0) - 5);
+    });
+
+    test('propagates expanded child height through nested dynamic container decorations', async () => {
+      const renderedSchemas: Schema[] = [];
+      const createProbePlugin = (defaultSchema: Schema): Plugin => ({
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema,
+        },
+      });
+      const outerBox: Schema = {
+        name: 'outer',
+        type: 'rectangle',
+        content: '',
+        position: { x: 10, y: 10 },
+        width: 60,
+        height: 24,
+        color: '#f8fafc',
+      };
+      const innerBox: Schema = {
+        name: 'inner',
+        type: 'rectangle',
+        content: '',
+        position: { x: 14, y: 14 },
+        width: 52,
+        height: 16,
+        color: '#ffffff',
+      };
+      setDynamicContainerMetadata(innerBox, {
+        childNames: ['body'],
+        paddingBottom: 3,
+      });
+      setDynamicContainerMetadata(outerBox, {
+        childNames: ['inner'],
+        paddingBottom: 4,
+      });
+
+      await generate({
+        template: {
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+          schemas: [
+            [
+              outerBox,
+              innerBox,
+              {
+                ...textObject(18, 18, 'body'),
+                width: 28,
+                height: 5,
+                overflow: 'expand',
+                fontSize: 10,
+                lineHeight: 1,
+                characterSpacing: 0,
+              },
+              {
+                ...textObject(10, 34, 'after'),
+                width: 50,
+                height: 5,
+              },
+            ],
+          ],
+        },
+        inputs: [{ body: 'long text '.repeat(10), after: 'after' }],
+        options: { font: getFont() },
+        plugins: {
+          rectangle: createProbePlugin(outerBox),
+          text: createProbePlugin(textObject(0, 0)),
+        },
+      });
+
+      const outer = renderedSchemas.find((schema) => schema.name === 'outer');
+      const inner = renderedSchemas.find((schema) => schema.name === 'inner');
+      const body = renderedSchemas.find((schema) => schema.name === 'body');
+      const after = renderedSchemas.find((schema) => schema.name === 'after');
+
+      expect(body?.height).toBeGreaterThan(5);
+      expect(inner?.height).toBeCloseTo(18 - 14 + (body?.height ?? 0) + 3);
+      expect(outer?.height).toBeCloseTo(14 - 10 + (inner?.height ?? 0) + 4);
+      expect(after?.position.y).toBeCloseTo(34 + (body?.height ?? 0) - 5);
+    });
+
+    test('falls back safely when dynamic container metadata is circular', async () => {
+      const renderedSchemas: Schema[] = [];
+      const rectangleProbePlugin: Plugin = {
+        pdf: ({ schema }) => {
+          renderedSchemas.push({
+            ...schema,
+            position: { ...schema.position },
+          });
+        },
+        ui: () => {},
+        propPanel: {
+          schema: {},
+          defaultSchema: {
+            name: 'box',
+            type: 'rectangle',
+            content: '',
+            position: { x: 0, y: 0 },
+            width: 20,
+            height: 20,
+          },
+        },
+      };
+      const outerBox: Schema = {
+        name: 'outer',
+        type: 'rectangle',
+        content: '',
+        position: { x: 10, y: 10 },
+        width: 50,
+        height: 20,
+      };
+      const innerBox: Schema = {
+        name: 'inner',
+        type: 'rectangle',
+        content: '',
+        position: { x: 14, y: 14 },
+        width: 42,
+        height: 12,
+      };
+      setDynamicContainerMetadata(outerBox, { childNames: ['inner'], paddingBottom: 4 });
+      setDynamicContainerMetadata(innerBox, { childNames: ['outer'], paddingBottom: 3 });
+
+      await expect(
+        generate({
+          template: {
+            basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+            schemas: [[outerBox, innerBox]],
+          },
+          inputs: [{}],
+          plugins: { rectangle: rectangleProbePlugin },
+        }),
+      ).resolves.toBeInstanceOf(Uint8Array);
+
+      const outer = renderedSchemas.find((schema) => schema.name === 'outer');
+      const inner = renderedSchemas.find((schema) => schema.name === 'inner');
+      expect(outer?.height).toBeGreaterThanOrEqual(outerBox.height);
+      expect(inner?.height).toBeGreaterThanOrEqual(innerBox.height);
+    });
+
     test('splits expanded text schemas by line across blank PDF pages', async () => {
       const renderedSchemas: Schema[] = [];
       const textProbePlugin: Plugin = {
@@ -435,7 +660,7 @@ ERROR MESSAGE: Too small: expected array to have >=1 items
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] fallback flag is not found in font. true fallback flag must be only one.
-Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`,
       );
     }
   });
@@ -466,7 +691,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] 2 fallback flags found in font. true fallback flag must be only one.
-Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`,
       );
     }
   });
@@ -502,7 +727,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] DUMMY_FONT of template.schemas is not found in font.
-Check this document: https://pdfme.com/docs/custom-fonts`
+Check this document: https://pdfme.com/docs/custom-fonts`,
       );
     }
   });

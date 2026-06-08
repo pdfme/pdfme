@@ -31,6 +31,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       }
@@ -60,6 +61,7 @@
         "fontColor": "#0f172a",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -85,6 +87,7 @@
         "fontColor": "#64748b",
         "backgroundColor": "",
         "textFormat": "plain",
+        "overflow": "expand",
         "strikethrough": false,
         "underline": false
       },
@@ -103,7 +106,13 @@
         "color": "#f8fafc",
         "borderColor": "#cbd5e1",
         "borderWidth": 0.4,
-        "radius": 0
+        "radius": 0,
+        "__pdfmeDynamicContainer": {
+          "childNames": [
+            "text_4"
+          ],
+          "paddingBottom": 5
+        }
       },
       {
         "name": "text_4",

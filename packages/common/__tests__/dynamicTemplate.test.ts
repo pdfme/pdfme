@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  getDynamicContainerMetadata,
+  setDynamicContainerMetadata,
+} from '../src/dynamicContainer.js';
 import { getDynamicTemplate } from '../src/dynamicTemplate.js';
 import { Template, Schema, Font } from '../src/index.js';
 
@@ -68,6 +72,16 @@ describe('getDynamicTemplate', () => {
   };
 
   describe('Single page scenarios', () => {
+    test('should ignore non-finite dynamic container padding metadata', () => {
+      const schema = { ...template.schemas[0][0] };
+      setDynamicContainerMetadata(schema, {
+        childNames: ['a'],
+        paddingBottom: Number.NaN,
+      });
+
+      expect(getDynamicContainerMetadata(schema)).toEqual({ childNames: ['a'] });
+    });
+
     test('should handle no page break', async () => {
       const increaseHeights = [10, 10, 10, 10, 10];
       const dynamicTemplate = await getDynamicTemplate(
@@ -82,6 +96,69 @@ describe('getDynamicTemplate', () => {
         increaseHeights.reduce((a, b) => a + b, 0) - height + bPositionY,
       );
       expect(dynamicTemplate.schemas[0][1].name).toEqual('b');
+    });
+
+    test('should resize non-flow decoration schemas without pushing their children twice', async () => {
+      const dynamicTemplate = await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'box',
+                content: '',
+                type: 'rectangle',
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 20,
+              },
+              {
+                name: 'a',
+                content: 'a',
+                type: 'a',
+                position: { x: 14, y: 14 },
+                width: 20,
+                height: 5,
+              },
+              {
+                name: 'b',
+                content: 'b',
+                type: 'b',
+                position: { x: 10, y: 30 },
+                width: 20,
+                height: 5,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [0, 0, 0, 0] },
+        },
+        input,
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (_value: string, args: { schema: Schema }) => {
+          if (args.schema.name === 'box') {
+            return { heights: [40], contributesToFlow: false };
+          }
+          if (args.schema.name === 'a') {
+            return [30];
+          }
+          return [args.schema.height];
+        },
+      });
+
+      expect(dynamicTemplate.schemas[0][0]).toMatchObject({
+        name: 'box',
+        position: { x: 10, y: 10 },
+        height: 40,
+      });
+      expect(dynamicTemplate.schemas[0][1]).toMatchObject({
+        name: 'a',
+        position: { x: 14, y: 14 },
+        height: 30,
+      });
+      expect(dynamicTemplate.schemas[0][2]).toMatchObject({
+        name: 'b',
+        position: { x: 10, y: 55 },
+      });
     });
   });
 

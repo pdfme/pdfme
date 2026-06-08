@@ -118,7 +118,7 @@ return (
         <Text size={18} color="#0f172a">
           Second page
         </Text>
-        <Text size={9} lineHeight={1.35} overflow="expand">
+        <Text size={9} lineHeight={1.35}>
           PageBreak creates another schemas array in the generated template. This page shows that JSX is only an authoring layer: the output remains a normal pdfme Template.
         </Text>
         <Box padding={5} borderColor="#cbd5e1" borderWidth={0.4} background="#f8fafc">

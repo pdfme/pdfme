@@ -1,4 +1,11 @@
-import { getDefaultFont, isBlankPdf, pt2mm, resolvePageSize } from '@pdfme/common';
+import {
+  getDefaultFont,
+  getDynamicContainerMetadata,
+  isBlankPdf,
+  pt2mm,
+  resolvePageSize,
+  setDynamicContainerMetadata,
+} from '@pdfme/common';
 import type { Font, Schema, Template } from '@pdfme/common';
 import type {
   CellStyle as SchemaCellStyle,
@@ -86,6 +93,7 @@ const DEFAULT_VISUAL_HEIGHT = 40;
 const DEFAULT_LINE_THICKNESS = 0.5;
 const DEFAULT_LINE_COLOR = '#000000';
 const DEFAULT_SHAPE_BORDER_COLOR = '#000000';
+const DEFAULT_TEXT_OVERFLOW = 'expand' as const satisfies TextSchema['overflow'];
 const DEFAULT_DYNAMIC_FONT_SIZE = {
   min: 4,
   max: 72,
@@ -791,7 +799,20 @@ const renderBox = async (
   const height = props.height ?? childSize.height + padding.top + padding.bottom;
 
   if (needsRect) {
-    ctx.schemas[beforeCount] = { ...ctx.schemas[beforeCount]!, height };
+    const boxSchema = { ...ctx.schemas[beforeCount]!, height };
+    if (props.height == null) {
+      const childSchemas = ctx.schemas.slice(beforeCount + 1);
+      const childNames = childSchemas
+        .map((schema) => schema.name)
+        .filter((name): name is string => typeof name === 'string' && name.length > 0);
+      if (childSchemas.some(isSchemaDynamicContainerSource)) {
+        setDynamicContainerMetadata(boxSchema, {
+          childNames,
+          paddingBottom: padding.bottom,
+        });
+      }
+    }
+    ctx.schemas[beforeCount] = boxSchema;
   }
 
   return { width, height };
@@ -801,6 +822,13 @@ const renderSpacer = (props: SpacerProps): { width: number; height: number } => 
   width: props.width ?? 0,
   height: props.height ?? 0,
 });
+
+const isSchemaDynamicContainerSource = (schema: Schema) =>
+  schema.type === 'table' ||
+  schema.type === 'list' ||
+  ((schema.type === 'text' || schema.type === 'multiVariableText') &&
+    (schema as { overflow?: unknown }).overflow === 'expand') ||
+  getDynamicContainerMetadata(schema) != null;
 
 const renderText = async (
   props: TextProps,
@@ -841,7 +869,7 @@ const renderText = async (
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
     textFormat,
-    overflow: props.overflow,
+    overflow: props.overflow ?? DEFAULT_TEXT_OVERFLOW,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
   };
@@ -903,7 +931,7 @@ const renderMultiVariableText = async (
     fontColor: props.color ?? DEFAULT_FONT_COLOR,
     backgroundColor: props.background ?? '',
     textFormat,
-    overflow: props.overflow,
+    overflow: props.overflow ?? DEFAULT_TEXT_OVERFLOW,
     strikethrough: props.strikethrough ?? false,
     underline: props.underline ?? false,
     text: templateText,

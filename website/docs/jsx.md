@@ -83,8 +83,11 @@ Use `gap`, `margin`, `alignItems`, `justifyContent`, and `flex` / `flexGrow` for
 
 `Text`, `MultiVariableText`, `List`, and `Table` can usually omit `height`. JSX measures their initial
 content while rendering and advances the surrounding `Stack`, `Row`, or `Box`. Use explicit `height`
-when you want a fixed field, a fixed visual area, or predictable form input box. A `Box` without
-`height` grows around its children during JSX rendering.
+with `overflow="visible"` when you want a fixed field, a fixed visual area, or predictable form input
+box. JSX defaults `Text` and `MultiVariableText` to `overflow="expand"` so input-backed text reflows
+in Form/Viewer and generator output by default. A `Box` without `height` grows around its children
+during JSX rendering. If that visual `Box` contains runtime dynamic text/MVT content, pdfme also
+keeps the Box decoration height in sync during reflow.
 
 ## Schema Components
 
@@ -166,5 +169,6 @@ page coordinate system and is intended for advanced overlays such as watermarks,
   fonts, and generator/viewer options.
 - `Header`, `Footer`, and `Static` are supported only as direct children of `Document`. They generate
   blank `basePdf.staticSchema` and cannot be used with a custom PDF `basePdf`.
-- If a form input later expands at runtime, a parent `Box` rectangle is not dynamically resized yet.
-  Dynamic parent/child container reflow is a future layout feature.
+- Dynamic Box decoration reflow is intended for same-page parent/child visual containers. If a child
+  expands across a page break, the child schema can split across pages, but the parent Box decoration
+  is not a multi-page container yet.
