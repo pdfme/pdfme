@@ -123,6 +123,79 @@ const getGraphemeSegmenter = () => {
   return graphemeSegmenter;
 };
 
+// -----------------------------------------------------------------------------
+// Helpers for handling mixed‑script text rendering.
+//
+// The rendering engine in pdf-lib does not correctly position Thai combining
+// marks when they appear in the same run as Latin characters. The issue
+// manifests when a string like "A วันที่" is passed as a single chunk to
+// `page.drawText()`: the Thai tone mark (ไม้เอก) can be dropped because
+// OpenType shaping breaks at script boundaries. To work around this, we split
+// the text into “script runs” of homogeneous scripts before drawing. See
+// https://github.com/pdfme/pdfme/issues/1347 for discussion.
+
+// A run consists of a contiguous sequence of characters from the same script
+// (Thai vs. everything else). The `script` property is retained for future
+// extensibility even though it is currently unused by the renderer.
+type TextScriptRun = {
+  text: string;
+  script: 'thai' | 'other';
+};
+
+// Regular expression to detect Thai script code points using Unicode property
+// escapes. Note: Node.js ≥ 16.0.0 supports `\p{Script=Thai}` by default.
+const THAI_SCRIPT_RE = /\p{Script=Thai}/u;
+
+// Classify a single grapheme segment as either Thai or other. We treat any
+// non‑Thai code point as belonging to the 'other' script. Spaces and
+// punctuation are also classified as 'other'.
+const getScriptOfSegment = (segment: string): TextScriptRun['script'] => {
+  return THAI_SCRIPT_RE.test(segment) ? 'thai' : 'other';
+};
+
+/**
+ * Break a string into an array of {@link TextScriptRun} where each run
+ * contains characters of the same script. Runs are produced in order from
+ * left to right. Grapheme segmentation is used so that combining marks are
+ * kept with their base characters. Leading spaces and punctuation are
+ * preserved on the preceding run to avoid starting a Thai run with a space.
+ *
+ * @param text The string to segment
+ * @returns An array of script runs
+ */
+const splitTextByScriptRuns = (text: string): TextScriptRun[] => {
+  if (!text) return [];
+
+  const segmenter = getGraphemeSegmenter();
+  const runs: TextScriptRun[] = [];
+
+  for (const { segment } of segmenter.segment(text)) {
+    const script = getScriptOfSegment(segment);
+    const prev = runs[runs.length - 1];
+
+    // Keep whitespace and punctuation with the previous run so that Thai runs
+    // begin with Thai glyphs and spacing adjustments remain consistent.
+    if (!THAI_SCRIPT_RE.test(segment) && segment.trim() === '' && prev) {
+      prev.text += segment;
+      continue;
+    }
+
+    if (!prev || prev.script !== script) {
+      runs.push({ text: segment, script });
+    } else {
+      prev.text += segment;
+    }
+  }
+
+  return runs;
+};
+
+// Helper to calculate extra spacing between runs when character spacing is
+// applied. A spacing value is inserted between runs except after the last run.
+const getInterRunSpacing = (spacing: number, runIndex: number, runCount: number) => {
+  return runIndex < runCount - 1 ? spacing : 0;
+};
+
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const { value, pdfDoc, pdfLib, page, options, schema, basePdf, _cache } = arg;
   const { font = getDefaultFont(), colorType } = options;
@@ -293,13 +366,9 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       });
     }
 
-    if (rotate.angle !== 0) {
-      // As we draw each line individually from different points, we must translate each lines position
-      // relative to the UI rotation pivot point. see comments in convertForPdfLayoutProps() for more info.
-      const rotatedPoint = rotatePoint({ x: xLine, y: yLine }, pivotPoint, rotate.angle);
-      xLine = rotatedPoint.x;
-      yLine = rotatedPoint.y;
-    }
+    // We intentionally do not rotate the entire line before splitting into script runs.
+    // Instead, rotation is applied per run inside the loop below so each run starts
+    // from the correct pivot point. See https://github.com/pdfme/pdfme/issues/1347.
 
     let spacing = characterSpacing;
     if (alignment === 'justify' && line.slice(-1) !== '\n') {
@@ -311,15 +380,41 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
-    page.drawText(trimmed, {
-      x: xLine,
-      y: yLine,
-      rotate,
-      size: fontSize,
-      color,
-      lineHeight: lineHeight * fontSize,
-      font: pdfFontValue,
-      opacity,
+    // Split the trimmed line into homogeneous script runs. This prevents mixed
+    // Latin/Thai strings from dropping Thai combining marks during shaping. Each
+    // run is rendered sequentially with appropriate spacing.
+    const runs = splitTextByScriptRuns(trimmed);
+    let runX = xLine;
+
+    runs.forEach((run, runIndex) => {
+      let drawX = runX;
+      let drawY = yLine;
+
+      // Apply rotation per run rather than once per line. This ensures each run
+      // starts from the correct rotated position relative to the pivot point.
+      if (rotate.angle !== 0) {
+        const rotatedPoint = rotatePoint({ x: drawX, y: drawY }, pivotPoint, rotate.angle);
+        drawX = rotatedPoint.x;
+        drawY = rotatedPoint.y;
+      }
+
+      page.drawText(run.text, {
+        x: drawX,
+        y: drawY,
+        rotate,
+        size: fontSize,
+        color,
+        lineHeight: lineHeight * fontSize,
+        font: pdfFontValue,
+        opacity,
+      });
+
+      // Advance the X position by the width of this run plus any extra spacing
+      // between runs. Character spacing is applied within runs via
+      // `setCharacterSpacing` above.
+      runX +=
+        widthOfTextAtSize(run.text, fontKitFont, fontSize, spacing) +
+        getInterRunSpacing(spacing, runIndex, runs.length);
     });
   });
 };
