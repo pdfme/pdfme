@@ -877,7 +877,7 @@
     "path": "nenkin-shougai-seishin-shindansho/template.json",
     "thumbnailPath": "nenkin-shougai-seishin-shindansho/thumbnail.png",
     "pageCount": 2,
-    "fieldCount": 270,
+    "fieldCount": 290,
     "schemaTypes": [
       "checkbox",
       "circleMark",
@@ -897,5 +897,31 @@
       "Form"
     ],
     "title": "障害年金 診断書 精神の障害用"
+  },
+  {
+    "name": "nenkin-shougai-limb-shindansho",
+    "author": "pdfme",
+    "path": "nenkin-shougai-limb-shindansho/template.json",
+    "thumbnailPath": "nenkin-shougai-limb-shindansho/thumbnail.png",
+    "pageCount": 2,
+    "fieldCount": 191,
+    "schemaTypes": [
+      "circleMark",
+      "text"
+    ],
+    "fontNames": [
+      "NotoSansJP"
+    ],
+    "hasCJK": true,
+    "basePdfKind": "dataUri",
+    "description": "日本年金機構が公開する障害年金 診断書（肢体の障害用）のPDF-backed pdfme template.",
+    "sourceKind": "designer",
+    "tags": [
+      "Government",
+      "CJK",
+      "Healthcare",
+      "Form"
+    ],
+    "title": "障害年金 診断書 肢体の障害用"
   }
 ]
