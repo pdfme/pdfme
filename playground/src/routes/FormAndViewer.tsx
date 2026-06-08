@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Pencil } from 'lucide-react';
 import { Template, checkTemplate, getInputFromTemplate, Lang } from '@pdfme/common';
 import { Form, Viewer } from '@pdfme/ui';
 import {
@@ -28,11 +29,13 @@ import {
   subscribeTemplateEntryChanges,
   type FileWorkspaceTemplateEntry,
 } from '../lib/fileWorkspace';
+import { createPlaygroundTemplateRouteFromSearchParams } from '../lib/playgroundRoutes';
 import { reconcileInputsWithTemplate } from '../lib/templateInputs';
 
 type Mode = 'form' | 'viewer';
 
 function FormAndViewerApp() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const uiRef = useRef<HTMLDivElement | null>(null);
   const ui = useRef<Form | Viewer | null>(null);
@@ -77,10 +80,10 @@ function FormAndViewerApp() {
         const templateIdFromQuery = searchParams.get('template');
         const projectIdFromQuery = searchParams.get('project');
         const workspaceTemplateName = searchParams.get('workspace');
-        const sourceKey = projectIdFromQuery
-          ? `project:${projectIdFromQuery}`
-          : workspaceTemplateName
-            ? `workspace:${workspaceTemplateName}`
+        const sourceKey = workspaceTemplateName
+          ? `workspace:${workspaceTemplateName}`
+          : projectIdFromQuery
+            ? `project:${projectIdFromQuery}`
             : templateIdFromQuery
               ? `template:${templateIdFromQuery}`
               : 'current-or-default';
@@ -279,7 +282,18 @@ function FormAndViewerApp() {
     );
   }, [fileWorkspaceEntry]);
 
+  const designerPath = createPlaygroundTemplateRouteFromSearchParams('designer', searchParams);
+
   const navItems: NavItem[] = [
+    {
+      label: 'Design',
+      content: (
+        <PlaygroundButton id="open-designer" onClick={() => navigate(designerPath)}>
+          <Pencil className="size-3.5" />
+          Designer
+        </PlaygroundButton>
+      ),
+    },
     {
       label: 'Lang',
       content: (

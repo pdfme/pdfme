@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Designer from './routes/Designer';
 import FormAndViewer from './routes/FormAndViewer';
-import Templates from './routes/Templates';
+import Templates, { WorkspaceApp } from './routes/Templates';
 import Header from './components/Header';
 
 const JsxPlayground = lazy(() => import('./routes/JsxPlayground'));
@@ -16,6 +16,7 @@ export default function App() {
       <Suspense fallback={<main className="min-h-0 flex-1 bg-gray-100" />}>
         <Routes>
           <Route path={'/'} element={<Templates />} />
+          <Route path="/workspace" element={<WorkspaceApp />} />
           <Route path={'/designer'} element={<Designer />} />
           <Route path="/form-viewer" element={<FormAndViewer />} />
           <Route path="/jsx" element={<JsxPlayground />} />

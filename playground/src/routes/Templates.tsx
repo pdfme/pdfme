@@ -699,7 +699,13 @@ const AuthorLink = ({ author }: { author: string }) => {
   );
 };
 
-function TemplatesApp() {
+type TemplatesAppProps = {
+  view?: 'templates' | 'workspace';
+};
+
+function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
+  const showWorkspace = view === 'workspace';
+  const showTemplateGallery = view === 'templates';
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const importTemplateInputRef = React.useRef<HTMLInputElement | null>(null);
@@ -820,14 +826,16 @@ function TemplatesApp() {
   };
 
   useEffect(() => {
+    if (!showWorkspace) return;
+
     void refreshProjects();
     const onFocus = () => void refreshProjects();
     window.addEventListener('focus', onFocus);
     return () => window.removeEventListener('focus', onFocus);
-  }, [refreshProjects]);
+  }, [refreshProjects, showWorkspace]);
 
   useEffect(() => {
-    if (!fileWorkspaceSupported) return;
+    if (!fileWorkspaceSupported || !showWorkspace) return;
 
     let cancelled = false;
     void restorePersistedTemplateCollection().then((result) => {
@@ -846,13 +854,15 @@ function TemplatesApp() {
     return () => {
       cancelled = true;
     };
-  }, [fileWorkspaceSupported]);
+  }, [fileWorkspaceSupported, showWorkspace]);
 
   useEffect(() => {
     mountedCollectionRef.current = mountedCollection;
   }, [mountedCollection]);
 
   useEffect(() => {
+    if (!showWorkspace) return;
+
     const collection = mountedCollectionRef.current;
     if (!collection) return;
 
@@ -870,10 +880,12 @@ function TemplatesApp() {
         shouldSkip: shouldSkipMountedCollectionRefresh,
       },
     );
-  }, [mountedCollection?.rootHandle, shouldSkipMountedCollectionRefresh]);
+  }, [mountedCollection?.rootHandle, shouldSkipMountedCollectionRefresh, showWorkspace]);
 
   // Fetch templates and author avatars
   useEffect(() => {
+    if (!showTemplateGallery) return;
+
     fetch('/template-assets/index.json')
       .then((response) => response.json())
       .then((data: TemplateData[]) => {
@@ -899,16 +911,18 @@ function TemplatesApp() {
           setAvatarUrlMap(avatarUrlMap);
         });
       });
-  }, []);
+  }, [showTemplateGallery]);
 
   // Load ethical ads
   useEffect(() => {
+    if (!showTemplateGallery) return;
+
     if (window.ethicalads && typeof window.ethicalads.load === 'function') {
       window.ethicalads.load();
     } else {
       console.warn('EthicalAds script is not loaded yet.');
     }
-  }, [templates]);
+  }, [showTemplateGallery, templates]);
 
   // Unified navigation function
   const navigateTo = (name: string, ui: UIType) => {
@@ -1272,271 +1286,280 @@ function TemplatesApp() {
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
-        <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
-            <p className="mt-2 max-w-3xl text-sm text-green-900">
-              Work with templates saved in this browser, or mount a folder to edit template files
-              directly on disk.
-            </p>
-          </div>
-
-          <div className="mt-5 border-t border-green-200 pt-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Browser Projects</h3>
-                <p className="mt-1 text-sm text-green-900">
-                  Drafts stored in this browser. They include template JSON, form inputs, and source
-                  code when available.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <PlaygroundButton
-                  onClick={() => importTemplateInputRef.current?.click()}
-                  variant="secondary"
-                >
-                  <Upload className="size-4" />
-                  Import Template JSON
-                </PlaygroundButton>
-                <input
-                  ref={importTemplateInputRef}
-                  type="file"
-                  accept="application/json"
-                  className="sr-only"
-                  onChange={onImportTemplateJson}
-                />
-                <input
-                  ref={localPdfTemplateInputRef}
-                  type="file"
-                  accept="application/pdf"
-                  className="sr-only"
-                  onChange={(event) => void onCreateLocalTemplateFromPdf(event)}
-                />
-                <TemplateCreateMenu
-                  busy={isCreatingLocalPdfTemplate}
-                  label="New Local Template"
-                  onBlank={() => navigate('/designer?new=1')}
-                  onPdf={() => localPdfTemplateInputRef.current?.click()}
-                />
-              </div>
+        {showWorkspace && (
+          <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">My Workspace</h2>
+              <p className="mt-2 max-w-3xl text-sm text-green-900">
+                Work with templates saved in this browser, or mount a folder to edit template files
+                directly on disk.
+              </p>
             </div>
 
-            {isLoadingProjects ? (
-              <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
-                Loading Browser Projects...
-              </div>
-            ) : projects.length > 0 ? (
-              <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                {projects.map((project) => (
-                  <GalleryCard
-                    key={project.id}
-                    tag={`Local ${getProjectKindLabel(project.kind)}`}
-                    title={project.title}
-                    description={
-                      <p className="text-xs text-gray-500">
-                        Updated {new Date(project.updatedAt).toLocaleString()}
-                      </p>
-                    }
-                    thumbnail={
-                      <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
-                    }
-                    actions={
-                      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
-                        <PlaygroundButton
-                          onClick={() =>
-                            void navigateToProject(
-                              project,
-                              project.source ? 'source' : 'designer',
-                            )
-                          }
-                        >
-                          {project.source ? (
-                            'Source'
-                          ) : (
-                            'Designer'
-                          )}
-                        </PlaygroundButton>
-                        <PlaygroundButton
-                          onClick={() => void navigateToProject(project, 'form-viewer')}
-                        >
-                          Form/Viewer
-                        </PlaygroundButton>
-                        <ProjectMoreActions
-                          project={project}
-                          onOpenDesigner={(item) => navigateToProject(item, 'designer')}
-                          onRenameProject={onRenameProject}
-                          onDuplicateProject={onDuplicateProject}
-                          onCopyToMountedFolder={
-                            mountedCollection ? onCopyProjectToMountedFolder : undefined
-                          }
-                          onDownloadProjectTemplate={onDownloadProjectTemplate}
-                          onDeleteProject={onDeleteProject}
-                        />
-                      </div>
-                    }
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
-                No browser projects yet. Create a local template, import JSON, or save from
-                Designer, JSX, or md2pdf.
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6 border-t border-green-200 pt-5">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">Mounted Folder</h3>
-                <p className="mt-1 text-sm text-green-900">
-                  Templates in this section are read from and saved back to template files on disk.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                {!mountedCollection && (
-                  <PlaygroundButton
-                    disabled={!fileWorkspaceSupported || isOpeningFolder}
-                    onClick={() => void onOpenFolder()}
-                    variant="primary"
-                  >
-                    <FolderOpen className="size-4" />
-                    {isOpeningFolder ? 'Opening...' : 'Open Folder'}
-                  </PlaygroundButton>
-                )}
-                {!mountedCollection && lastFolderName && (
-                  <PlaygroundButton
-                    disabled={!fileWorkspaceSupported || isOpeningFolder}
-                    onClick={() => void onReopenFolder()}
-                    title={lastFolderName}
-                    variant="secondary"
-                  >
-                    <FolderOpen className="size-4" />
-                    Reopen Folder
-                  </PlaygroundButton>
-                )}
-                {mountedCollection && (
-                  <PlaygroundButton onClick={() => void onDisconnectFolder()} variant="secondary">
-                    <FolderX className="size-4" />
-                    Disconnect
-                  </PlaygroundButton>
-                )}
-                {mountedCollection && (
-                  <>
+            <div>
+              <div className="mt-5 border-t border-green-200 pt-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Browser Projects</h3>
+                    <p className="mt-1 text-sm text-green-900">
+                      Drafts stored in this browser. They include template JSON, form inputs, and
+                      source code when available.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <PlaygroundButton
+                      onClick={() => importTemplateInputRef.current?.click()}
+                      variant="secondary"
+                    >
+                      <Upload className="size-4" />
+                      Import Template JSON
+                    </PlaygroundButton>
                     <input
-                      ref={mountedPdfTemplateInputRef}
+                      ref={importTemplateInputRef}
+                      type="file"
+                      accept="application/json"
+                      className="sr-only"
+                      onChange={onImportTemplateJson}
+                    />
+                    <input
+                      ref={localPdfTemplateInputRef}
                       type="file"
                       accept="application/pdf"
                       className="sr-only"
-                      onChange={(event) => void onCreateMountedTemplateFromPdf(event)}
+                      onChange={(event) => void onCreateLocalTemplateFromPdf(event)}
                     />
                     <TemplateCreateMenu
-                      busy={isCreatingMountedPdfTemplate}
-                      label="New Mounted Template"
-                      onBlank={() => void onCreateMountedTemplate()}
-                      onPdf={() => mountedPdfTemplateInputRef.current?.click()}
+                      busy={isCreatingLocalPdfTemplate}
+                      label="New Local Template"
+                      onBlank={() => navigate('/designer?new=1')}
+                      onPdf={() => localPdfTemplateInputRef.current?.click()}
                     />
-                  </>
-                )}
-              </div>
-            </div>
-            {!fileWorkspaceSupported && (
-              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                Folder workspaces need a Chromium browser in a secure context. Browser projects,
-                JSON import, and JSON download are still available.
-              </div>
-            )}
-            {mountedCollection && (
-              <>
-                <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-green-900">
-                  <span className="font-semibold">{mountedCollection.rootName}</span>
-                  <span className="text-green-700">
-                    {mountedCollection.entries.length} template
-                    {mountedCollection.entries.length === 1 ? '' : 's'}
-                  </span>
-                  {mountedCollection.invalidEntries.length > 0 && (
-                    <span className="rounded border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800">
-                      {mountedCollection.invalidEntries.length} invalid skipped
-                    </span>
-                  )}
+                  </div>
                 </div>
-                {mountedCollection.entries.length > 0 ? (
+
+                {isLoadingProjects ? (
+                  <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+                    Loading Browser Projects...
+                  </div>
+                ) : projects.length > 0 ? (
                   <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-                    {mountedCollection.entries.map((entry) => (
+                    {projects.map((project) => (
                       <GalleryCard
-                        key={entry.name}
-                        tag={`Disk ${getGenerationLabel(entry.sourceKind)}`}
-                        title={entry.title}
-                        tags={entry.tags}
+                        key={project.id}
+                        tag={`Local ${getProjectKindLabel(project.kind)}`}
+                        title={project.title}
                         description={
-                          <div className="space-y-2">
-                            <p>
-                              {entry.description ??
-                                `${entry.name}/template.json from the mounted folder.`}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              Updated {new Date(entry.updatedAt).toLocaleString()}
-                            </p>
-                          </div>
+                          <p className="text-xs text-gray-500">
+                            Updated {new Date(project.updatedAt).toLocaleString()}
+                          </p>
                         }
                         thumbnail={
-                          <MountedThumbnailImage
-                            entry={entry}
-                            onCreated={refreshMountedCollection}
-                            runWrite={runMountedCollectionWrite}
-                          />
+                          <ProjectThumbnailImage project={project} onCreated={refreshProjects} />
                         }
                         actions={
-                          <div className="space-y-2">
+                          <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2">
                             <PlaygroundButton
-                              fullWidth
                               onClick={() =>
-                                void navigateToMountedTemplate(mountedCollection, entry, 'designer')
-                              }
-                            >
-                              Designer
-                            </PlaygroundButton>
-                            <PlaygroundButton
-                              fullWidth
-                              onClick={() =>
-                                void navigateToMountedTemplate(
-                                  mountedCollection,
-                                  entry,
-                                  'form-viewer',
+                                void navigateToProject(
+                                  project,
+                                  project.source ? 'source' : 'designer',
                                 )
                               }
                             >
-                              Form/Viewer
+                              {project.source ? 'Source' : 'Designer'}
                             </PlaygroundButton>
                             <PlaygroundButton
-                              fullWidth
-                              onClick={() => setEditingMountedEntry(entry)}
-                              variant="secondary"
+                              onClick={() => void navigateToProject(project, 'form-viewer')}
                             >
-                              Edit Metadata
+                              Form/Viewer
                             </PlaygroundButton>
+                            <ProjectMoreActions
+                              project={project}
+                              onOpenDesigner={(item) => navigateToProject(item, 'designer')}
+                              onRenameProject={onRenameProject}
+                              onDuplicateProject={onDuplicateProject}
+                              onCopyToMountedFolder={
+                                mountedCollection ? onCopyProjectToMountedFolder : undefined
+                              }
+                              onDownloadProjectTemplate={onDownloadProjectTemplate}
+                              onDeleteProject={onDeleteProject}
+                            />
                           </div>
                         }
                       />
                     ))}
                   </div>
                 ) : (
-                  <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                    No valid template directories are mounted. Create a mounted template to write a
-                    new folder with template.json.
+                  <div className="mt-5 rounded-md border border-dashed border-green-300 bg-white px-4 py-6 text-sm text-green-900">
+                    No browser projects yet. Create a local template, import JSON, or save from
+                    Designer, JSX, or md2pdf.
                   </div>
                 )}
-              </>
-            )}
-            {!mountedCollection && fileWorkspaceSupported && !lastFolderName && (
-              <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                Open a folder that contains directories like{' '}
-                <code className="rounded bg-green-100 px-1">invoice/template.json</code>.
               </div>
-            )}
+
+              <div className="mt-6 border-t border-green-200 pt-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">Mounted Folder</h3>
+                    <p className="mt-1 text-sm text-green-900">
+                      Templates in this section are read from and saved back to template files on
+                      disk.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    {!mountedCollection && (
+                      <PlaygroundButton
+                        disabled={!fileWorkspaceSupported || isOpeningFolder}
+                        onClick={() => void onOpenFolder()}
+                        variant="primary"
+                      >
+                        <FolderOpen className="size-4" />
+                        {isOpeningFolder ? 'Opening...' : 'Open Folder'}
+                      </PlaygroundButton>
+                    )}
+                    {!mountedCollection && lastFolderName && (
+                      <PlaygroundButton
+                        disabled={!fileWorkspaceSupported || isOpeningFolder}
+                        onClick={() => void onReopenFolder()}
+                        title={lastFolderName}
+                        variant="secondary"
+                      >
+                        <FolderOpen className="size-4" />
+                        Reopen Folder
+                      </PlaygroundButton>
+                    )}
+                    {mountedCollection && (
+                      <PlaygroundButton
+                        onClick={() => void onDisconnectFolder()}
+                        variant="secondary"
+                      >
+                        <FolderX className="size-4" />
+                        Disconnect
+                      </PlaygroundButton>
+                    )}
+                    {mountedCollection && (
+                      <>
+                        <input
+                          ref={mountedPdfTemplateInputRef}
+                          type="file"
+                          accept="application/pdf"
+                          className="sr-only"
+                          onChange={(event) => void onCreateMountedTemplateFromPdf(event)}
+                        />
+                        <TemplateCreateMenu
+                          busy={isCreatingMountedPdfTemplate}
+                          label="New Mounted Template"
+                          onBlank={() => void onCreateMountedTemplate()}
+                          onPdf={() => mountedPdfTemplateInputRef.current?.click()}
+                        />
+                      </>
+                    )}
+                  </div>
+                </div>
+                {!fileWorkspaceSupported && (
+                  <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                    Folder workspaces need a Chromium browser in a secure context. Browser
+                    projects, JSON import, and JSON download are still available.
+                  </div>
+                )}
+                {mountedCollection && (
+                  <>
+                    <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-green-900">
+                      <span className="font-semibold">{mountedCollection.rootName}</span>
+                      <span className="text-green-700">
+                        {mountedCollection.entries.length} template
+                        {mountedCollection.entries.length === 1 ? '' : 's'}
+                      </span>
+                      {mountedCollection.invalidEntries.length > 0 && (
+                        <span className="rounded border border-yellow-300 bg-yellow-50 px-2 py-0.5 text-xs font-medium text-yellow-800">
+                          {mountedCollection.invalidEntries.length} invalid skipped
+                        </span>
+                      )}
+                    </div>
+                    {mountedCollection.entries.length > 0 ? (
+                      <div className="mt-5 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+                        {mountedCollection.entries.map((entry) => (
+                          <GalleryCard
+                            key={entry.name}
+                            tag={`Disk ${getGenerationLabel(entry.sourceKind)}`}
+                            title={entry.title}
+                            tags={entry.tags}
+                            description={
+                              <div className="space-y-2">
+                                <p>
+                                  {entry.description ??
+                                    `${entry.name}/template.json from the mounted folder.`}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Updated {new Date(entry.updatedAt).toLocaleString()}
+                                </p>
+                              </div>
+                            }
+                            thumbnail={
+                              <MountedThumbnailImage
+                                entry={entry}
+                                onCreated={refreshMountedCollection}
+                                runWrite={runMountedCollectionWrite}
+                              />
+                            }
+                            actions={
+                              <div className="space-y-2">
+                                <PlaygroundButton
+                                  fullWidth
+                                  onClick={() =>
+                                    void navigateToMountedTemplate(
+                                      mountedCollection,
+                                      entry,
+                                      'designer',
+                                    )
+                                  }
+                                >
+                                  Designer
+                                </PlaygroundButton>
+                                <PlaygroundButton
+                                  fullWidth
+                                  onClick={() =>
+                                    void navigateToMountedTemplate(
+                                      mountedCollection,
+                                      entry,
+                                      'form-viewer',
+                                    )
+                                  }
+                                >
+                                  Form/Viewer
+                                </PlaygroundButton>
+                                <PlaygroundButton
+                                  fullWidth
+                                  onClick={() => setEditingMountedEntry(entry)}
+                                  variant="secondary"
+                                >
+                                  Edit Metadata
+                                </PlaygroundButton>
+                              </div>
+                            }
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                        No valid template directories are mounted. Create a mounted template to
+                        write a new folder with template.json.
+                      </div>
+                    )}
+                  </>
+                )}
+                {!mountedCollection && fileWorkspaceSupported && !lastFolderName && (
+                  <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
+                    Open a folder that contains directories like{' '}
+                    <code className="rounded bg-green-100 px-1">invoice/template.json</code>.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-        <section>
+        )}
+        {showTemplateGallery && (
+          <section>
           <div className="border-b border-dashed border-gray-200 pb-2">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Templates</h2>
@@ -1680,7 +1703,8 @@ function TemplatesApp() {
               </div>
             )}
           </div>
-        </section>
+          </section>
+        )}
       </div>
       {editingMountedEntry && (
         <MountedMetadataDialog
@@ -1691,6 +1715,10 @@ function TemplatesApp() {
       )}
     </div>
   );
+}
+
+export function WorkspaceApp() {
+  return <TemplatesApp view="workspace" />;
 }
 
 export default TemplatesApp;

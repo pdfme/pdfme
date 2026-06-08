@@ -164,6 +164,7 @@ type PlaygroundStorageState = {
 };
 
 const playgroundProjectsDbName = 'pdfme-playground-projects';
+const deterministicProjectId = 'project_e2e_deterministic_template';
 
 const cloneSchema = <T extends Schema>(schema: T, overrides: Partial<T>): T =>
   ({
@@ -244,7 +245,6 @@ async function loadRouteWithStorage(
   path: '/designer' | '/form-viewer',
   storageState: PlaygroundStorageState,
 ) {
-  const projectId = 'project_e2e_deterministic_template';
   const inputs =
     storageState.inputs ??
     (storageState.template ? getInputFromTemplate(storageState.template) : []);
@@ -310,11 +310,11 @@ async function loadRouteWithStorage(
     },
     storageState,
     inputs,
-    projectId,
+    deterministicProjectId,
     playgroundProjectsDbName,
   );
 
-  await page.goto(`${baseUrl}${path}?project=${encodeURIComponent(projectId)}`, {
+  await page.goto(`${baseUrl}${path}?project=${encodeURIComponent(deterministicProjectId)}`, {
     waitUntil: 'networkidle2',
     timeout,
   });
@@ -553,6 +553,43 @@ describe('Playground E2E Tests', () => {
     const template = buildModifiedTemplate();
 
     await loadRouteWithStorage(page, '/designer', { template });
+    await waitForDesignerReady(page, 'Type Something...');
+
+    await page.click('#open-form-viewer');
+    await page.waitForFunction(
+      (projectId) =>
+        (location.pathname === '/form-viewer' &&
+          new URLSearchParams(location.search).get('project') === projectId) ||
+        document.querySelector('#open-form-viewer-without-saving'),
+      { timeout },
+      deterministicProjectId,
+    );
+    const didOpenFormViewer = await page.evaluate(
+      (projectId) =>
+        location.pathname === '/form-viewer' &&
+        new URLSearchParams(location.search).get('project') === projectId,
+      deterministicProjectId,
+    );
+    if (!didOpenFormViewer) {
+      await page.click('#open-form-viewer-without-saving');
+    }
+    await page.waitForFunction(
+      (projectId) =>
+        location.pathname === '/form-viewer' &&
+        new URLSearchParams(location.search).get('project') === projectId,
+      { timeout },
+      deterministicProjectId,
+    );
+    await waitForFormReady(page);
+
+    await page.click('#open-designer');
+    await page.waitForFunction(
+      (projectId) =>
+        location.pathname === '/designer' &&
+        new URLSearchParams(location.search).get('project') === projectId,
+      { timeout },
+      deterministicProjectId,
+    );
     await waitForDesignerReady(page, 'Type Something...');
 
     await captureAndCompareScreenshot(page, 'modified-template-designer');

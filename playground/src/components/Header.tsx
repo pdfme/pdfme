@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { PDFME_VERSION } from '@pdfme/common';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 
@@ -106,18 +106,20 @@ function HelpModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 
 export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const location = useLocation();
 
   const navLinks = [
-    { id: 'templates-nav', to: '/', label: 'Templates' },
+    { id: 'templates-nav', to: '/templates', label: 'Templates' },
+    { id: 'workspace-nav', to: '/workspace', label: 'My Workspace' },
     { id: 'designer-nav', to: '/designer', label: 'Designer' },
     { id: 'form-viewer-nav', to: '/form-viewer', label: 'Form/Viewer' },
     { id: 'jsx-nav', to: '/jsx', label: 'JSX' },
     { id: 'md2pdf-nav', to: '/md2pdf', label: 'md2pdf' },
   ];
 
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
+  const linkClass = ({ isActive }: { isActive: boolean }, to: string) =>
     classNames(
-      isActive
+      isActive || (to === '/templates' && location.pathname === '/')
         ? 'border-green-500 text-green-600'
         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
       'whitespace-nowrap border-b-2 px-1 py-2 text-sm font-medium',
@@ -138,7 +140,13 @@ export default function Navigation() {
         </span>
 
         {navLinks.map((item) => (
-          <NavLink id={item.id} key={item.to} to={item.to} end className={linkClass}>
+          <NavLink
+            id={item.id}
+            key={item.to}
+            to={item.to}
+            end
+            className={(state) => linkClass(state, item.to)}
+          >
             {item.label}
           </NavLink>
         ))}

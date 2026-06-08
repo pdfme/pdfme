@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Code2, Copy, Download, Save } from 'lucide-react';
+import { Code2, Copy, Download, Eye, Save } from 'lucide-react';
 import { cloneDeep, Template, checkTemplate, Lang, isBlankPdf } from '@pdfme/common';
 import { Designer, type DesignerSelection } from '@pdfme/ui';
 import {
@@ -55,6 +55,10 @@ import {
   type FileWorkspaceTemplateEntry,
   type FileWorkspaceTemplateRead,
 } from '../lib/fileWorkspace';
+import {
+  createPlaygroundTemplateRoute,
+  type PlaygroundTemplateRouteSource,
+} from '../lib/playgroundRoutes';
 
 function destroyDesignerInstance(instance: Designer) {
   try {
@@ -97,6 +101,11 @@ type FileWorkspaceConflict = {
   incoming?: FileWorkspaceTemplateRead;
   message: string;
   saveTemplate?: Template;
+};
+
+type PreviewNavigationRequest = {
+  requiresSave: boolean;
+  targetPath: string;
 };
 
 function createDesignerLoadRequest(searchParams: URLSearchParams): DesignerLoadRequest {
@@ -152,6 +161,7 @@ function DesignerFileButton({
 }
 
 function DesignerApp() {
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const designerRef = useRef<HTMLDivElement | null>(null);
   const designer = useRef<Designer | null>(null);
@@ -187,6 +197,9 @@ function DesignerApp() {
   const [isFileWorkspaceDirty, setIsFileWorkspaceDirty] = useState(false);
   const [isBrowserProjectDirty, setIsBrowserProjectDirty] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<Template | null>(null);
+  const [pendingPreviewNavigation, setPendingPreviewNavigation] =
+    useState<PreviewNavigationRequest | null>(null);
+  const [isSavingPreviewNavigation, setIsSavingPreviewNavigation] = useState(false);
   const [jsonDialogOpen, setJsonDialogOpen] = useState(false);
   const [templateJsonSource, setTemplateJsonSource] = useState<Template | null>(null);
 
@@ -954,6 +967,63 @@ function DesignerApp() {
   const hasUnsavedBrowserProjectChanges = Boolean(!fileWorkspaceEntry && isBrowserProjectDirty);
   const hasUnsavedTemplateChanges =
     hasUnsavedFileWorkspaceChanges || hasUnsavedBrowserProjectChanges;
+  const requiresSaveBeforePreview = Boolean(fileWorkspaceEntry && fileWorkspaceStatus);
+
+  const getCurrentTemplateRouteSource = (): PlaygroundTemplateRouteSource => {
+    const activeWorkspaceName = fileWorkspaceEntryRef.current?.name;
+    if (activeWorkspaceName) return { workspace: activeWorkspaceName };
+
+    const activeProjectId = projectRef.current?.id;
+    if (activeProjectId) return { project: activeProjectId };
+
+    const sourceParams = searchParamsRef.current;
+    const template = sourceParams.get('template');
+    if (template) return { template };
+
+    const workspace = sourceParams.get('workspace');
+    if (workspace) return { workspace };
+
+    const project = sourceParams.get('project');
+    if (project) return { project };
+
+    return {};
+  };
+
+  const getFormViewerRoute = () =>
+    createPlaygroundTemplateRoute('form-viewer', getCurrentTemplateRouteSource());
+
+  const onOpenFormViewer = () => {
+    if (editingStaticSchemasRef.current) return;
+
+    const targetPath = getFormViewerRoute();
+    if (hasUnsavedTemplateChanges || requiresSaveBeforePreview) {
+      setPendingPreviewNavigation({
+        requiresSave: requiresSaveBeforePreview,
+        targetPath,
+      });
+      return;
+    }
+
+    navigate(targetPath);
+  };
+
+  const onSaveAndOpenPreview = async () => {
+    if (!pendingPreviewNavigation || isSavingPreviewNavigation) return;
+
+    setIsSavingPreviewNavigation(true);
+    try {
+      const saved = await onSaveTemplate();
+      if (!saved) {
+        setPendingPreviewNavigation(null);
+        return;
+      }
+
+      setPendingPreviewNavigation(null);
+      navigate(getFormViewerRoute());
+    } finally {
+      setIsSavingPreviewNavigation(false);
+    }
+  };
 
   const navItems: NavItem[] = [
     {
@@ -1047,6 +1117,20 @@ function DesignerApp() {
       ),
     },
     {
+      label: 'Preview',
+      content: (
+        <PlaygroundButton
+          id="open-form-viewer"
+          disabled={editingStaticSchemas}
+          onClick={onOpenFormViewer}
+          title={editingStaticSchemas ? 'End static schema editing first' : undefined}
+        >
+          <Eye className="size-3.5" />
+          Form/Viewer
+        </PlaygroundButton>
+      ),
+    },
+    {
       label: 'Output',
       content: (
         <div className="flex gap-1">
@@ -1099,6 +1183,62 @@ function DesignerApp() {
         </div>
       )}
       <div key="designer-container" ref={designerRef} className="min-h-0 flex-1 w-full" />
+      {pendingPreviewNavigation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div
+            aria-describedby="preview-navigation-description"
+            aria-labelledby="preview-navigation-title"
+            aria-modal="true"
+            className="w-full max-w-lg rounded-lg bg-white p-5 shadow-xl"
+            role="dialog"
+          >
+            <h2 id="preview-navigation-title" className="text-lg font-bold text-gray-900">
+              Save before opening Form/Viewer?
+            </h2>
+            <div
+              id="preview-navigation-description"
+              className="mt-2 space-y-2 text-sm text-gray-600"
+            >
+              {pendingPreviewNavigation.requiresSave ? (
+                <p>The workspace file needs to be saved before Form/Viewer can open it.</p>
+              ) : (
+                <p>Opening without saving will use the last saved template.</p>
+              )}
+            </div>
+            <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-end">
+              <PlaygroundButton
+                disabled={isSavingPreviewNavigation}
+                onClick={() => setPendingPreviewNavigation(null)}
+                variant="secondary"
+              >
+                Cancel
+              </PlaygroundButton>
+              {!pendingPreviewNavigation.requiresSave && (
+                <PlaygroundButton
+                  id="open-form-viewer-without-saving"
+                  disabled={isSavingPreviewNavigation}
+                  onClick={() => {
+                    const { targetPath } = pendingPreviewNavigation;
+                    setPendingPreviewNavigation(null);
+                    navigate(targetPath);
+                  }}
+                  variant="secondary"
+                >
+                  Open without saving
+                </PlaygroundButton>
+              )}
+              <PlaygroundButton
+                id="save-and-open-form-viewer"
+                disabled={isSavingPreviewNavigation}
+                onClick={() => void onSaveAndOpenPreview()}
+                variant="primary"
+              >
+                {isSavingPreviewNavigation ? 'Saving...' : 'Save & Open'}
+              </PlaygroundButton>
+            </div>
+          </div>
+        </div>
+      )}
       {fileWorkspaceConflict && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div

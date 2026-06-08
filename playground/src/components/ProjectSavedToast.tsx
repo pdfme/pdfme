@@ -11,17 +11,17 @@ export default function ProjectSavedToast({ formPath, title }: ProjectSavedToast
       <p>Saved "{title}"</p>
       <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
         <Link
-          to="/"
+          to="/workspace"
           className="inline-flex text-sm font-medium text-green-700 underline hover:text-green-600"
         >
-          View in Templates
+          View in My Workspace
         </Link>
         {formPath && (
           <Link
             to={formPath}
             className="inline-flex text-sm font-medium text-green-700 underline hover:text-green-600"
           >
-            Open Form
+            Open Form/Viewer
           </Link>
         )}
       </div>
