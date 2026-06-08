@@ -125,13 +125,15 @@ const CtlBar = (props: CtlBarProps) => {
   if (addPageAfter) {
     contextMenuItems.push({
       key: '1',
-      label: <div onClick={addPageAfter}>{i18n('addPageAfter')}</div>,
+      label: i18n('addPageAfter'),
+      onClick: () => addPageAfter(),
     });
   }
   if (removePage && pageNum > 1 && pageCursor !== 0) {
     contextMenuItems.push({
       key: '2',
-      label: <div onClick={removePage}>{i18n('removePage')}</div>,
+      label: i18n('removePage'),
+      onClick: () => removePage(),
     });
   }
 

@@ -71,6 +71,154 @@ test('Designer keeps toolbar zoom interactive when options.zoomLevel is only an 
   });
 });
 
+test('Designer restores scroll position when updateTemplate is called while scrolled', async () => {
+  // jsdom has no layout engine so we use Object.defineProperty to simulate a
+  // non-zero scrollTop and verify the restore effect writes it back.
+  setupUIMock();
+
+  const template = getSampleTemplate();
+  let currentScrollTop = 500;
+  const scrollTopSetter = vi.fn((v: number) => {
+    currentScrollTop = v;
+  });
+
+  const { container, rerender } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+
+  const canvas = container.querySelector('.pdfme-designer-canvas') as HTMLDivElement;
+  expect(canvas).not.toBeNull();
+
+  Object.defineProperty(canvas, 'scrollTop', {
+    get: () => currentScrollTop,
+    set: scrollTopSetter,
+    configurable: true,
+  });
+
+  const updatedTemplate = {
+    ...template,
+    schemas: [
+      [
+        { ...template.schemas[0][0], content: 'updated' },
+        template.schemas[0][1],
+      ],
+    ],
+  };
+
+  await act(async () => {
+    rerender(
+      <I18nContext.Provider value={i18n}>
+        <FontContext.Provider value={getDefaultFont()}>
+          <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+            <Designer
+              template={updatedTemplate}
+              onSaveTemplate={console.log}
+              onChangeTemplate={console.log}
+              size={{ width: 1200, height: 1200 }}
+              onPageCursorChange={() => undefined}
+            />
+          </PluginsRegistry.Provider>
+        </FontContext.Provider>
+      </I18nContext.Provider>,
+    );
+  });
+
+  await waitFor(() => {
+    expect(scrollTopSetter).toHaveBeenCalledWith(500);
+  });
+});
+
+test('Designer does not flash old scroll position when adding a page', async () => {
+  // Uses a BlankPdf basePdf because page manipulation is only enabled when isBlankPdf returns true.
+  // Also verifies the stale-closure pageCursor fix: updatePage passes targetPage explicitly so
+  // updateTemplate does not overwrite the correct cursor with a stale closure value.
+  setupUIMock();
+
+  const template = {
+    basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] as [number, number, number, number] },
+    schemas: getSampleTemplate().schemas,
+  };
+  let currentScrollTop = 500;
+  const scrollTopSetter = vi.fn((v: number) => {
+    currentScrollTop = v;
+  });
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+
+  const canvas = container.querySelector('.pdfme-designer-canvas') as HTMLDivElement;
+  expect(canvas).not.toBeNull();
+
+  Object.defineProperty(canvas, 'scrollTop', {
+    get: () => currentScrollTop,
+    set: scrollTopSetter,
+    configurable: true,
+  });
+
+  // Open the context menu (the "..." Ellipsis button)
+  const contextMenuButton = container.querySelector('.pdfme-ui-context-menu') as HTMLElement;
+  expect(contextMenuButton).not.toBeNull();
+  await act(async () => {
+    fireEvent.click(contextMenuButton);
+  });
+
+  // The Dropdown renders its menu into a portal — search document.body for the item
+  const addPageItem = await waitFor(() => {
+    const el = Array.from(document.querySelectorAll('[role="menuitem"]')).find((e) =>
+      e.textContent?.includes('Add Page After'),
+    );
+    expect(el).not.toBeNull();
+    return el as HTMLElement;
+  });
+
+  await act(async () => {
+    fireEvent.click(addPageItem);
+  });
+
+  // Wait for updatePage's setTimeout to fire (sets scroll to the new page offset),
+  // then confirm the restore effect never wrote the old offset back.
+  await waitFor(() => expect(scrollTopSetter).toHaveBeenCalled());
+  expect(scrollTopSetter).not.toHaveBeenCalledWith(500);
+
+  // The pager shows "{pageCursor + 1}/{pageNum}" from internal state.
+  // With the fix: pageCursor=1 → "2/2". Without the fix: updateTemplate's stale
+  // pageCursor closure overwrites setPageCursor(1) with setPageCursor(0) → "1/2".
+  await waitFor(() => {
+    const pagerEl = container.querySelector('.pdfme-ui-pager');
+    expect(pagerEl).not.toBeNull();
+    expect(pagerEl).toHaveTextContent('2/2');
+  });
+});
+
 test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only an initial value', async () => {
   setupUIMock();
   const { container } = render(

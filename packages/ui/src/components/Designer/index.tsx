@@ -79,6 +79,7 @@ const TemplateEditor = ({
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
+  const scrollRestoreRef = useRef<{ offset: number } | { page: number } | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -202,6 +203,27 @@ const TemplateEditor = ({
     },
   });
 
+  // Paper returns null while pageSizes/backgrounds/schemasList re-sync, collapsing scroll height.
+  // Restore the saved offset once all three are back in sync.
+  useEffect(() => {
+    if (scrollRestoreRef.current === null) return;
+    if (
+      pageSizes.length === 0 ||
+      pageSizes.length !== backgrounds.length ||
+      pageSizes.length !== schemasList.length
+    ) {
+      return;
+    }
+    if (canvasRef.current) {
+      const restore = scrollRestoreRef.current;
+      canvasRef.current.scrollTop =
+        'page' in restore
+          ? getPagesScrollTopByIndex(pageSizes, restore.page, scale)
+          : restore.offset;
+    }
+    scrollRestoreRef.current = null;
+  }, [pageSizes, backgrounds, schemasList, scale]);
+
   useLayoutEffect(() => {
     const updateHeight = () => {
       setCanvasHeight(canvasRef.current ? canvasRef.current.clientHeight : 0);
@@ -268,29 +290,39 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(
-    async (newTemplate: Template, preservePage = false) => {
+    async (
+      newTemplate: Template,
+      preservePage = false,
+      preserveScroll = preservePage,
+      targetPage?: number,
+    ) => {
+      if (preserveScroll && canvasRef.current) {
+        scrollRestoreRef.current = { offset: canvasRef.current.scrollTop };
+      }
       const sl = await template2SchemasList(newTemplate);
       setSchemasList(sl);
       onEditEnd();
       if (!preservePage) {
         setPageCursor(0);
+        scrollRestoreRef.current = null;
         if (canvasRef.current?.scroll) {
           canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
         }
       } else {
-        setPageCursor((prev) => {
-          const clamped = Math.min(prev, sl.length - 1);
-          if (clamped !== prev && canvasRef.current) {
-            canvasRef.current.scroll({
-              top: getPagesScrollTopByIndex(pageSizes, clamped, scale),
-              behavior: 'smooth',
-            });
-          }
-          return clamped;
-        });
+        // Use targetPage when provided by updatePage (which already queued
+        // setPageCursor(newPageCursor)). For external template-update calls
+        // (prevTemplate !== template) no competing state update is in flight,
+        // so the closure-captured pageCursor is the correct value.
+        const currentPage = targetPage ?? pageCursor;
+        const clamped = Math.min(currentPage, sl.length - 1);
+        if (preserveScroll && clamped !== currentPage) {
+          // Store the page index; offset is resolved with fresh pageSizes in the useEffect.
+          scrollRestoreRef.current = { page: clamped };
+        }
+        setPageCursor(clamped);
       }
     },
-    [pageSizes, scale],
+    [pageCursor],
   );
 
   const addSchema = (defaultSchema: Schema) => {
@@ -354,7 +386,8 @@ const TemplateEditor = ({
     setPageCursor(newPageCursor);
     const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
-    await updateTemplate(newTemplate, true);
+    // preserveScroll=false: updatePage owns scroll via the setTimeout below.
+    await updateTemplate(newTemplate, true, false, newPageCursor);
     void refresh(newTemplate);
 
     // Notify page change with updated total pages

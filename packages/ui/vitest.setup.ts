@@ -7,6 +7,16 @@ if (typeof globalThis.TextDecoder === 'undefined' || typeof globalThis.TextEncod
   Object.assign(globalThis, { TextDecoder, TextEncoder });
 }
 
+// jsdom does not provide ResizeObserver. Polyfill with a no-op implementation so
+// that libraries like @dnd-kit and Ant Design that require it don't crash.
+if (typeof globalThis.ResizeObserver === 'undefined') {
+  globalThis.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
+
 const createCanvasContext2D = () => {
   const noop = vi.fn();
 
