@@ -529,14 +529,53 @@ export const useZoom = ({
 
 type ScrollPageCursorProps = {
   ref: RefObject<HTMLDivElement>;
+  paperRefs: MutableRefObject<HTMLDivElement[]>;
   pageSizes: Size[];
   scale: number;
   pageCursor: number;
   onChangePageCursor: (page: number) => void;
 };
 
+const getVisibleArea = (containerRect: DOMRect, elementRect: DOMRect) => {
+  const visibleWidth = Math.max(
+    0,
+    Math.min(containerRect.right, elementRect.right) -
+      Math.max(containerRect.left, elementRect.left),
+  );
+  const visibleHeight = Math.max(
+    0,
+    Math.min(containerRect.bottom, elementRect.bottom) -
+      Math.max(containerRect.top, elementRect.top),
+  );
+
+  return visibleWidth * visibleHeight;
+};
+
+const getMostVisiblePageIndex = (
+  container: HTMLElement,
+  paperRefs: MutableRefObject<HTMLDivElement[]>,
+  pageCursor: number,
+) => {
+  const containerRect = container.getBoundingClientRect();
+  let bestPageIndex = pageCursor;
+  let bestVisibleArea = 0;
+
+  paperRefs.current.forEach((paper, pageIndex) => {
+    if (!paper) return;
+
+    const visibleArea = getVisibleArea(containerRect, paper.getBoundingClientRect());
+    if (visibleArea > bestVisibleArea) {
+      bestVisibleArea = visibleArea;
+      bestPageIndex = pageIndex;
+    }
+  });
+
+  return bestVisibleArea > 0 ? bestPageIndex : pageCursor;
+};
+
 export const useScrollPageCursor = ({
   ref,
+  paperRefs,
   pageSizes,
   scale,
   pageCursor,
@@ -547,37 +586,22 @@ export const useScrollPageCursor = ({
       return;
     }
 
-    const scroll = ref.current.scrollTop;
-    const { top } = ref.current.getBoundingClientRect();
-    const pageHeights = pageSizes.reduce((acc, cur, i) => {
-      let value = (cur.height * ZOOM + RULER_HEIGHT) * scale;
-      if (i === 0) {
-        value += top - value / 2;
-      } else {
-        value += acc[i - 1];
-      }
-
-      return acc.concat(value);
-    }, [] as number[]);
-    let _pageCursor = 0;
-    pageHeights.forEach((ph, i) => {
-      if (scroll > ph) {
-        _pageCursor = i + 1 >= pageHeights.length ? pageHeights.length - 1 : i + 1;
-      }
-    });
+    const _pageCursor = getMostVisiblePageIndex(ref.current, paperRefs, pageCursor);
     if (_pageCursor !== pageCursor) {
       onChangePageCursor(_pageCursor);
     }
-  }, [onChangePageCursor, pageCursor, pageSizes, ref, scale]);
+  }, [onChangePageCursor, pageCursor, pageSizes, paperRefs, ref]);
 
   useEffect(() => {
     const node = ref.current;
     node?.addEventListener('scroll', onScroll);
+    const animationFrame = window.requestAnimationFrame(onScroll);
 
     return () => {
+      window.cancelAnimationFrame(animationFrame);
       node?.removeEventListener('scroll', onScroll);
     };
-  }, [ref, onScroll]);
+  }, [ref, onScroll, scale]);
 };
 
 export const useMountStatus = () => {

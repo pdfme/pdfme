@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { BLANK_PDF, PAGE_SIZE_PRESETS, type SchemaForUI, type Template } from '@pdfme/common';
 import * as converter from '@pdfme/converter';
 import * as helper from '../src/helper';
-import { useInitEvents, useUIPreProcessor } from '../src/hooks';
+import { useInitEvents, useScrollPageCursor, useUIPreProcessor } from '../src/hooks';
 
 vi.mock('@pdfme/converter', () => ({
   pdf2size: vi.fn(),
@@ -141,4 +141,70 @@ test('useInitEvents paste ignores missing DOM nodes instead of storing null acti
   expect(onEdit).toHaveBeenCalledWith([]);
 
   vi.useRealTimers();
+});
+
+const mockRect = ({
+  left,
+  top,
+  width,
+  height,
+}: {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}) =>
+  ({
+    left,
+    top,
+    right: left + width,
+    bottom: top + height,
+    width,
+    height,
+    x: left,
+    y: top,
+    toJSON: () => undefined,
+  }) as DOMRect;
+
+test('useScrollPageCursor selects the page with the largest visible area', async () => {
+  const container = document.createElement('div');
+  const firstPaper = document.createElement('div');
+  const secondPaper = document.createElement('div');
+  const containerRef = { current: container };
+  const paperRefs = { current: [firstPaper, secondPaper] };
+  const onChangePageCursor = vi.fn();
+  let firstPaperRect = mockRect({ left: 0, top: -20, width: 100, height: 80 });
+  let secondPaperRect = mockRect({ left: 0, top: 60, width: 100, height: 100 });
+
+  vi.spyOn(container, 'getBoundingClientRect').mockReturnValue(
+    mockRect({ left: 0, top: 0, width: 100, height: 100 }),
+  );
+  vi.spyOn(firstPaper, 'getBoundingClientRect').mockImplementation(() => firstPaperRect);
+  vi.spyOn(secondPaper, 'getBoundingClientRect').mockImplementation(() => secondPaperRect);
+
+  renderHook(() =>
+    useScrollPageCursor({
+      ref: containerRef,
+      paperRefs,
+      pageSizes: [PAGE_SIZE_PRESETS.A4, PAGE_SIZE_PRESETS.A4],
+      scale: 2.5,
+      pageCursor: 0,
+      onChangePageCursor,
+    }),
+  );
+
+  await act(async () => {
+    await new Promise((resolve) => window.requestAnimationFrame(resolve));
+  });
+
+  expect(onChangePageCursor).not.toHaveBeenCalled();
+
+  firstPaperRect = mockRect({ left: 0, top: -60, width: 100, height: 100 });
+  secondPaperRect = mockRect({ left: 0, top: 40, width: 100, height: 100 });
+
+  act(() => {
+    container.dispatchEvent(new Event('scroll'));
+  });
+
+  expect(onChangePageCursor).toHaveBeenCalledWith(1);
 });

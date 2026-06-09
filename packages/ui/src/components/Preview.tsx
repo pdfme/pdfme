@@ -158,6 +158,7 @@ const Preview = ({
 
   useScrollPageCursor({
     ref: containerRef,
+    paperRefs,
     pageSizes,
     scale: displayScale,
     pageCursor,

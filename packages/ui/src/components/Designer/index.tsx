@@ -215,6 +215,7 @@ const TemplateEditor = ({
 
   useScrollPageCursor({
     ref: canvasRef,
+    paperRefs,
     pageSizes,
     scale: displayScale,
     pageCursor,
