@@ -119,11 +119,11 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; width: 1155px; margin-left: 45px;"
     >
       <div
-        style="position: absolute; top: auto; bottom: 6%; width: 755px;"
+        style="position: absolute; top: auto; bottom: 6%; width: 755px; display: flex; justify-content: center; pointer-events: none;"
       >
         <div
           class="pdfme-ui-control-bar"
-          style="display: flex; align-items: center; justify-content: space-evenly; position: relative; z-index: 1; left: calc(50% - 75px); width: 150px; height: 40px; box-sizing: border-box; padding: 12px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45);"
+          style="display: inline-flex; align-items: center; justify-content: center; position: relative; z-index: 1; height: 40px; box-sizing: border-box; padding: 12px; gap: 8px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45); pointer-events: auto;"
         >
           <div
             class="pdfme-ui-zoom"
@@ -132,14 +132,12 @@ exports[`Designer snapshot 1`] = `
               style="display: flex; align-items: center;"
             >
               <button
-                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-out"
+                aria-label="Zoom out"
+                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-zoom-out"
+                title="Zoom out"
                 type="button"
               >
-                <span
-                  class="ant-btn-icon"
-                >
-                  Minus
-                </span>
+                Minus
               </button>
               <span
                 class="ant-typography"
@@ -151,14 +149,31 @@ exports[`Designer snapshot 1`] = `
                 </strong>
               </span>
               <button
-                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text ant-btn-icon-only pdfme-ui-zoom-in"
+                aria-label="Zoom in"
+                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-zoom-in"
+                title="Zoom in"
                 type="button"
               >
-                <span
-                  class="ant-btn-icon"
-                >
-                  Plus
-                </span>
+                Plus
+              </button>
+              <div
+                style="width: 1px; height: 24px; margin: 0px 6px; background-color: rgb(255, 255, 255); opacity: 0.45;"
+              />
+              <button
+                aria-label="Fit width"
+                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-fit-width"
+                title="Fit width"
+                type="button"
+              >
+                MoveHorizontal
+              </button>
+              <button
+                aria-label="Fit height"
+                class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-fit-height"
+                title="Fit height"
+                type="button"
+              >
+                MoveVertical
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import {
   BLANK_PDF,
   BasePdf,
   PAGE_SIZE_PRESETS,
+  ZOOM,
   pluginRegistry,
 } from '@pdfme/common';
 import {
@@ -12,7 +13,11 @@ import {
   getUniqueSchemaName,
   schemasList2template,
   changeSchemas,
+  clampZoomLevel,
+  getFitZoomLevel,
+  getZoomAnchor,
   getDynamicHeightReflowChanges,
+  restoreZoomAnchor,
   setFontNameRecursively,
 } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
@@ -717,5 +722,80 @@ describe('setFontNameRecursively', () => {
   it('returns early for null input or undefined input', () => {
     expect(() => setFontNameRecursively(null as any, 'Arial')).not.toThrow();
     expect(() => setFontNameRecursively(undefined as any, 'Arial')).not.toThrow();
+  });
+});
+
+describe('zoom helpers', () => {
+  test('clampZoomLevel keeps zoom within min and max', () => {
+    expect(clampZoomLevel(0.1, 2)).toBe(0.25);
+    expect(clampZoomLevel(3, 2)).toBe(2);
+    expect(clampZoomLevel(1.25, 2)).toBe(1.25);
+  });
+
+  test('getFitZoomLevel computes width and height zoom against the container', () => {
+    const container = document.createElement('div');
+    Object.defineProperty(container, 'clientWidth', { value: 440 });
+    Object.defineProperty(container, 'clientHeight', { value: 520 });
+    const pageSize = { width: 100, height: 100 };
+    const baseScale = 0.5;
+
+    expect(
+      getFitZoomLevel({
+        mode: 'fit-width',
+        pageSize,
+        container,
+        baseScale,
+        maxZoom: 3,
+      }),
+    ).toBeCloseTo(400 / (pageSize.width * ZOOM) / baseScale);
+
+    expect(
+      getFitZoomLevel({
+        mode: 'fit-height',
+        pageSize,
+        container,
+        baseScale,
+        maxZoom: 3,
+      }),
+    ).toBe(1);
+  });
+
+  test('getZoomAnchor and restoreZoomAnchor keep the anchored point stable', () => {
+    const container = document.createElement('div');
+    container.scrollLeft = 100;
+    container.scrollTop = 100;
+    const paper = document.createElement('div');
+    vi.spyOn(paper, 'getBoundingClientRect').mockReturnValue({
+      left: 50,
+      top: 60,
+      right: 250,
+      bottom: 260,
+      width: 200,
+      height: 200,
+      x: 50,
+      y: 60,
+      toJSON: () => undefined,
+    });
+
+    const anchor = getZoomAnchor({
+      pageIndex: 0,
+      paper,
+      clientX: 90,
+      clientY: 120,
+      scale: 2,
+    });
+
+    expect(anchor).toEqual({
+      pageIndex: 0,
+      localX: 20,
+      localY: 30,
+      clientX: 90,
+      clientY: 120,
+    });
+
+    restoreZoomAnchor({ container, paper, anchor, scale: 3 });
+
+    expect(container.scrollLeft).toBe(120);
+    expect(container.scrollTop).toBe(130);
   });
 });

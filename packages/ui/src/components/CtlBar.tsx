@@ -2,12 +2,20 @@ import React, { useContext } from 'react';
 import { Size } from '@pdfme/common';
 // Import icons from lucide-react
 // Note: In tests, these are replaced via the Vitest lucide-react mock.
-import { Plus, Minus, ChevronLeft, ChevronRight, Ellipsis } from 'lucide-react';
+import {
+  Plus,
+  Minus,
+  ChevronLeft,
+  ChevronRight,
+  Ellipsis,
+  MoveHorizontal,
+  MoveVertical,
+} from 'lucide-react';
 
 import type { MenuProps } from 'antd';
-import { theme, Typography, Button, Dropdown } from 'antd';
+import { theme, Typography, Button, Dropdown, Tooltip } from 'antd';
 import { I18nContext } from '../contexts.js';
-import { useMaxZoom } from '../helper.js';
+import { MIN_ZOOM, type ZoomMode, useMaxZoom } from '../helper.js';
 import { UI_CLASSNAME } from '../constants.js';
 
 const { Text } = Typography;
@@ -16,36 +24,106 @@ type TextStyle = { color: string; fontSize: number; margin: number };
 type ZoomProps = {
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
+  zoomMode: ZoomMode;
+  fitWidth: () => void;
+  fitHeight: () => void;
   style: { textStyle: TextStyle };
+  labels: {
+    zoomIn: string;
+    zoomOut: string;
+    fitWidth: string;
+    fitHeight: string;
+  };
 };
 
-const Zoom = ({ zoomLevel, setZoomLevel, style }: ZoomProps) => {
+const ToolbarButton = ({
+  className,
+  label,
+  disabled,
+  active,
+  onClick,
+  children,
+}: {
+  className: string;
+  label: string;
+  disabled?: boolean;
+  active?: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) => (
+  <Tooltip title={label}>
+    <Button
+      className={className}
+      type="text"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      style={active ? { backgroundColor: 'rgba(255, 255, 255, 0.18)' } : undefined}
+    >
+      {children}
+    </Button>
+  </Tooltip>
+);
+
+const Separator = ({ color }: { color: string }) => (
+  <div style={{ width: 1, height: 24, margin: '0 6px', backgroundColor: color, opacity: 0.45 }} />
+);
+
+const Zoom = ({
+  zoomLevel,
+  setZoomLevel,
+  zoomMode,
+  fitWidth,
+  fitHeight,
+  style,
+  labels,
+}: ZoomProps) => {
   const zoomStep = 0.25;
   const maxZoom = useMaxZoom();
-  const minZoom = 0.25;
 
   const nextZoomOut = zoomLevel - zoomStep;
   const nextZoomIn = zoomLevel + zoomStep;
+  const iconProps = { size: 16, color: style.textStyle.color };
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
-      <Button
+      <ToolbarButton
         className={UI_CLASSNAME + 'zoom-out'}
-        type="text"
-        disabled={minZoom >= nextZoomOut}
+        label={labels.zoomOut}
+        disabled={zoomLevel <= MIN_ZOOM}
         onClick={() => setZoomLevel(nextZoomOut)}
-        icon={<Minus size={16} color={style.textStyle.color} />}
-      />
+      >
+        <Minus {...iconProps} />
+      </ToolbarButton>
       <Text strong style={style.textStyle}>
         {Math.round(zoomLevel * 100)}%
       </Text>
-      <Button
+      <ToolbarButton
         className={UI_CLASSNAME + 'zoom-in'}
-        type="text"
-        disabled={maxZoom < nextZoomIn}
+        label={labels.zoomIn}
+        disabled={maxZoom <= zoomLevel}
         onClick={() => setZoomLevel(nextZoomIn)}
-        icon={<Plus size={16} color={style.textStyle.color} />}
-      />
+      >
+        <Plus {...iconProps} />
+      </ToolbarButton>
+      <Separator color={style.textStyle.color} />
+      <ToolbarButton
+        className={UI_CLASSNAME + 'fit-width'}
+        label={labels.fitWidth}
+        active={zoomMode === 'fit-width'}
+        onClick={fitWidth}
+      >
+        <MoveHorizontal {...iconProps} />
+      </ToolbarButton>
+      <ToolbarButton
+        className={UI_CLASSNAME + 'fit-height'}
+        label={labels.fitHeight}
+        active={zoomMode === 'fit-height'}
+        onClick={fitHeight}
+      >
+        <MoveVertical {...iconProps} />
+      </ToolbarButton>
     </div>
   );
 };
@@ -102,6 +180,9 @@ type CtlBarProps = {
   setPageCursor: (page: number) => void;
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
+  zoomMode: ZoomMode;
+  fitWidth: () => void;
+  fitHeight: () => void;
   addPageAfter?: () => void;
   removePage?: () => void;
 };
@@ -117,6 +198,9 @@ const CtlBar = (props: CtlBarProps) => {
     setPageCursor,
     zoomLevel,
     setZoomLevel,
+    zoomMode,
+    fitWidth,
+    fitHeight,
     addPageAfter,
     removePage,
   } = props;
@@ -135,10 +219,6 @@ const CtlBar = (props: CtlBarProps) => {
     });
   }
 
-  const barWidth = 300;
-  const contextMenuWidth = contextMenuItems.length > 0 ? 50 : 0;
-  const width = (pageNum > 1 ? barWidth : barWidth / 2) + contextMenuWidth;
-
   const textStyle = {
     color: token.colorWhite,
     fontSize: token.fontSize,
@@ -146,22 +226,32 @@ const CtlBar = (props: CtlBarProps) => {
   };
 
   return (
-    <div style={{ position: 'absolute', top: 'auto', bottom: '6%', width: size.width }}>
+    <div
+      style={{
+        position: 'absolute',
+        top: 'auto',
+        bottom: '6%',
+        width: size.width,
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
+      }}
+    >
       <div
         className={UI_CLASSNAME + 'control-bar'}
         style={{
-          display: 'flex',
+          display: 'inline-flex',
           alignItems: 'center',
-          justifyContent: 'space-evenly',
+          justifyContent: 'center',
           position: 'relative',
           zIndex: 1,
-          left: `calc(50% - ${width / 2}px)`,
-          width,
           height: 40,
           boxSizing: 'border-box',
           padding: token.paddingSM,
+          gap: token.marginXS,
           borderRadius: token.borderRadius,
           backgroundColor: token.colorBgMask,
+          pointerEvents: 'auto',
         }}
       >
         {pageNum > 1 && (
@@ -175,7 +265,20 @@ const CtlBar = (props: CtlBarProps) => {
           </div>
         )}
         <div className={UI_CLASSNAME + 'zoom'}>
-          <Zoom style={{ textStyle }} zoomLevel={zoomLevel} setZoomLevel={setZoomLevel} />
+          <Zoom
+            style={{ textStyle }}
+            zoomLevel={zoomLevel}
+            setZoomLevel={setZoomLevel}
+            zoomMode={zoomMode}
+            fitWidth={fitWidth}
+            fitHeight={fitHeight}
+            labels={{
+              zoomIn: i18n('zoomIn'),
+              zoomOut: i18n('zoomOut'),
+              fitWidth: i18n('fitWidth'),
+              fitHeight: i18n('fitHeight'),
+            }}
+          />
         </div>
         {contextMenuItems.length > 0 && (
           <ContextMenu items={contextMenuItems} style={{ textStyle }} />

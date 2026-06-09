@@ -90,6 +90,7 @@ interface Props {
   pageCursor: number;
   schemasList: SchemaForUI[][];
   scale: number;
+  renderScale: number;
   backgrounds: string[];
   pageSizes: Size[];
   size: Size;
@@ -106,6 +107,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     basePdf,
     pageCursor,
     scale,
+    renderScale,
     backgrounds,
     pageSizes,
     size,
@@ -167,6 +169,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       moveable.current?.updateRect();
     }
   }, [pageCursor, schemasList, prevSchemas]);
+
+  useEffect(() => {
+    moveable.current?.updateRect();
+  }, [renderScale]);
 
   const onDrag = ({ target, top, left }: OnDrag) => {
     const { width: _width, height: _height } = target.style;
@@ -431,7 +437,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               input={Object.fromEntries(
                 schemasList.flat().map(({ name, content = '' }) => [name, content]),
               )}
-              scale={scale}
+              scale={renderScale}
               totalPages={schemasList.length}
               currentPage={index + 1}
             />
@@ -525,7 +531,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                   ? 'transparent'
                   : token.colorPrimary
               }`}
-              scale={scale}
+              scale={renderScale}
             />
           );
         }}

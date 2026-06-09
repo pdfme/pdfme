@@ -6,16 +6,55 @@ import { i18n } from '../../src/i18n';
 import { SELECTABLE_CLASSNAME } from '../../src/constants';
 import {
   CUSTOM_A4_PDF,
+  PAGE_SIZE_PRESETS,
+  ZOOM,
   getDefaultFont,
   pluginRegistry,
   type Plugin,
   type Template,
 } from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
-import { setupUIMock, getSampleTemplate } from '../assets/helper';
+import {
+  getSampleTemplate,
+  getTwoPageTemplate,
+  mockClientSizeFromStyle,
+  setupUIMock,
+} from '../assets/helper';
 import { text, image } from '@pdfme/schemas';
 
 const plugins = pluginRegistry({ text, image });
+
+const getScrollContainer = (container: HTMLElement) => {
+  const scrollContainer = Array.from(container.querySelectorAll('div')).find(
+    (element) => element.style.overflow === 'auto' && element.style.position === 'relative',
+  );
+  if (!(scrollContainer instanceof HTMLDivElement)) {
+    throw new Error('Scroll container was not found');
+  }
+  return scrollContainer;
+};
+
+let restoreClientSizeMock: (() => void) | undefined;
+
+afterEach(() => {
+  restoreClientSizeMock?.();
+  restoreClientSizeMock = undefined;
+});
+
+const createTouchList = (items: Array<{ clientX: number; clientY: number }>) =>
+  Object.assign(items, {
+    item: (index: number) => items[index] ?? null,
+  }) as unknown as TouchList;
+
+const dispatchTouchEvent = (
+  element: HTMLElement,
+  type: 'touchstart' | 'touchmove' | 'touchend',
+  touches: TouchList,
+) => {
+  const event = new Event(type, { bubbles: true, cancelable: true }) as TouchEvent;
+  Object.defineProperty(event, 'touches', { value: touches });
+  element.dispatchEvent(event);
+};
 
 const getFormReflowTemplate = (basePdf: Template['basePdf']): Template => ({
   basePdf,
@@ -233,5 +272,197 @@ test('Preview keeps toolbar zoom interactive when options.zoomLevel is only an i
 
   await waitFor(() => {
     expect(container).toHaveTextContent('125%');
+  });
+});
+
+test('Preview does not reapply options.zoomLevel when changing pages', async () => {
+  setupUIMock(2);
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <OptionsContext.Provider value={{ zoomLevel: 1 }}>
+            <Preview
+              template={getTwoPageTemplate()}
+              inputs={[
+                {
+                  field1: 'field1',
+                  field2: 'field2',
+                  field1Page2: 'field1Page2',
+                  field2Page2: 'field2Page2',
+                },
+              ]}
+              size={{ width: 1200, height: 1200 }}
+            />
+          </OptionsContext.Provider>
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-zoom-in')!);
+  await waitFor(() => {
+    expect(container).toHaveTextContent('125%');
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-page-next')!);
+  await waitFor(() => {
+    expect(container).toHaveTextContent('2/2');
+    expect(container).toHaveTextContent('125%');
+  });
+});
+
+test('Preview toolbar fit width updates the zoom level', async () => {
+  setupUIMock();
+  restoreClientSizeMock = mockClientSizeFromStyle();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getSampleTemplate()}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-fit-width')!);
+
+  const expectedZoom = Math.round((1160 / (PAGE_SIZE_PRESETS.A4.width * ZOOM)) * 100);
+  await waitFor(() => {
+    expect(container).toHaveTextContent(`${expectedZoom}%`);
+  });
+});
+
+test('Preview toolbar fit height returns to 100 percent', async () => {
+  setupUIMock();
+  restoreClientSizeMock = mockClientSizeFromStyle();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getSampleTemplate()}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-zoom-in')!);
+  await waitFor(() => {
+    expect(container).toHaveTextContent('125%');
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-fit-height')!);
+  await waitFor(() => {
+    expect(container).toHaveTextContent('100%');
+  });
+});
+
+test('Preview zooms with ctrl wheel but not ordinary wheel', async () => {
+  setupUIMock();
+  restoreClientSizeMock = mockClientSizeFromStyle();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getSampleTemplate()}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  const scrollContainer = getScrollContainer(container);
+  fireEvent.wheel(scrollContainer, { deltaY: -100 });
+  expect(container).toHaveTextContent('100%');
+
+  fireEvent.wheel(scrollContainer, { deltaY: -100, ctrlKey: true, clientX: 100, clientY: 100 });
+
+  await waitFor(() => {
+    expect(container).toHaveTextContent('149%');
+  });
+});
+
+test('Preview zooms with two-finger touch but not one-finger touch', async () => {
+  setupUIMock();
+  restoreClientSizeMock = mockClientSizeFromStyle();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getSampleTemplate()}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  const scrollContainer = getScrollContainer(container);
+  dispatchTouchEvent(scrollContainer, 'touchstart', createTouchList([{ clientX: 0, clientY: 0 }]));
+  dispatchTouchEvent(scrollContainer, 'touchmove', createTouchList([{ clientX: 0, clientY: 50 }]));
+  expect(container).toHaveTextContent('100%');
+
+  dispatchTouchEvent(
+    scrollContainer,
+    'touchstart',
+    createTouchList([
+      { clientX: 0, clientY: 0 },
+      { clientX: 100, clientY: 0 },
+    ]),
+  );
+  dispatchTouchEvent(
+    scrollContainer,
+    'touchmove',
+    createTouchList([
+      { clientX: 0, clientY: 0 },
+      { clientX: 125, clientY: 0 },
+    ]),
+  );
+
+  await waitFor(() => {
+    expect(container).toHaveTextContent('149%');
   });
 });

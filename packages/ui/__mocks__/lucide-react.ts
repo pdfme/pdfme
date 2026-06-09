@@ -5,6 +5,8 @@ export const ChevronRight = () => 'ChevronRight';
 export const ChevronsLeft = () => 'ChevronsLeft';
 export const ChevronsRight = () => 'ChevronsRight';
 export const Ellipsis = () => 'Ellipsis';
+export const MoveHorizontal = () => 'MoveHorizontal';
+export const MoveVertical = () => 'MoveVertical';
 export const X = () => 'X';
 export const Menu = () => 'Menu';
 export const GripVertical = () => 'GripVertical';

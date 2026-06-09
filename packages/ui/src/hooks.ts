@@ -1,4 +1,12 @@
-import { RefObject, useRef, useState, useCallback, useEffect } from 'react';
+import {
+  RefObject,
+  MutableRefObject,
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+} from 'react';
 import {
   cloneDeep,
   ZOOM,
@@ -20,6 +28,12 @@ import {
   arrayBufferToBase64,
   initShortCuts,
   destroyShortCuts,
+  clampZoomLevel,
+  getFitZoomLevel,
+  getZoomAnchor,
+  restoreZoomAnchor,
+  type ZoomAnchor,
+  type ZoomMode,
 } from './helper.js';
 import { RULER_HEIGHT } from './constants.js';
 
@@ -141,9 +155,375 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
   return {
     backgrounds,
     pageSizes,
+    baseScale: scale,
     scale: scale * zoomLevel,
     error,
     refresh,
+  };
+};
+
+type UseZoomProps = {
+  baseScale: number;
+  maxZoom: number;
+  pageCursor: number;
+  pageSizes: Size[];
+  containerRef: RefObject<HTMLDivElement>;
+  paperRefs: MutableRefObject<HTMLDivElement[]>;
+  size: Size;
+  hasRulers?: boolean;
+  initialZoomLevel?: number;
+  onZoomCommit?: () => void;
+};
+
+const ZOOM_RENDER_COMMIT_DELAY = 220;
+const WHEEL_ZOOM_SENSITIVITY = 0.004;
+const MAX_WHEEL_DELTA_PER_FRAME = 120;
+const TOUCH_ZOOM_SENSITIVITY = 1.8;
+
+const getTouchDistance = (touches: TouchList) => {
+  const first = touches.item(0);
+  const second = touches.item(1);
+  if (!first || !second) return 0;
+
+  return Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+};
+
+const getTouchCenter = (touches: TouchList) => {
+  const first = touches.item(0);
+  const second = touches.item(1);
+  if (!first || !second) return null;
+
+  return {
+    clientX: (first.clientX + second.clientX) / 2,
+    clientY: (first.clientY + second.clientY) / 2,
+  };
+};
+
+const getWheelZoomFactor = (event: WheelEvent) => {
+  const deltaModeMultiplier = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 80 : 1;
+  const normalizedDelta = Math.max(
+    -MAX_WHEEL_DELTA_PER_FRAME,
+    Math.min(MAX_WHEEL_DELTA_PER_FRAME, event.deltaY * deltaModeMultiplier),
+  );
+
+  return Math.exp(-normalizedDelta * WHEEL_ZOOM_SENSITIVITY);
+};
+
+export const useZoom = ({
+  baseScale,
+  maxZoom,
+  pageCursor,
+  pageSizes,
+  containerRef,
+  paperRefs,
+  size,
+  hasRulers = false,
+  initialZoomLevel = 1,
+  onZoomCommit,
+}: UseZoomProps) => {
+  const [zoomLevel, setZoomLevelState] = useState(initialZoomLevel);
+  const [zoomMode, setZoomModeState] = useState<ZoomMode>('manual');
+  const [displayScale, setDisplayScale] = useState(0);
+  const [renderScale, setRenderScale] = useState(0);
+
+  const zoomLevelRef = useRef(zoomLevel);
+  const zoomModeRef = useRef<ZoomMode>(zoomMode);
+  const displayScaleRef = useRef(displayScale);
+  const baseScaleRef = useRef(baseScale);
+  const pendingAnchorRef = useRef<ZoomAnchor | null>(null);
+  const pendingCommitCallbackRef = useRef(false);
+  const renderCommitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const queuedGestureRef = useRef<{ zoomLevel: number; anchor: ZoomAnchor | null } | null>(null);
+  const touchGestureRef = useRef<{ distance: number; zoomLevel: number } | null>(null);
+  const zoomContainerReady = displayScale > 0;
+
+  useEffect(() => {
+    baseScaleRef.current = baseScale;
+  }, [baseScale]);
+
+  useEffect(() => {
+    zoomLevelRef.current = zoomLevel;
+  }, [zoomLevel]);
+
+  useEffect(() => {
+    zoomModeRef.current = zoomMode;
+  }, [zoomMode]);
+
+  useEffect(() => {
+    displayScaleRef.current = displayScale;
+  }, [displayScale]);
+
+  const getAnchor = useCallback(
+    (point?: { clientX: number; clientY: number }) => {
+      const container = containerRef.current;
+      const paper = paperRefs.current[pageCursor];
+      if (!container || !paper) return null;
+
+      const containerRect = container.getBoundingClientRect();
+      const clientX = point?.clientX ?? containerRect.left + containerRect.width / 2;
+      const clientY = point?.clientY ?? containerRect.top + containerRect.height / 2;
+
+      return getZoomAnchor({
+        pageIndex: pageCursor,
+        paper,
+        clientX,
+        clientY,
+        scale: displayScaleRef.current,
+      });
+    },
+    [containerRef, pageCursor, paperRefs],
+  );
+
+  const markCommitted = useCallback(() => {
+    pendingCommitCallbackRef.current = true;
+  }, []);
+
+  const clearRenderCommitTimer = useCallback(() => {
+    if (renderCommitTimerRef.current) {
+      clearTimeout(renderCommitTimerRef.current);
+      renderCommitTimerRef.current = null;
+    }
+  }, []);
+
+  const commitRenderScale = useCallback(() => {
+    clearRenderCommitTimer();
+    const nextScale = displayScaleRef.current;
+    setRenderScale(nextScale);
+    markCommitted();
+  }, [clearRenderCommitTimer, markCommitted]);
+
+  const updateZoom = useCallback(
+    ({
+      nextZoomLevel,
+      mode,
+      anchor,
+      commitRender,
+    }: {
+      nextZoomLevel: number;
+      mode: ZoomMode;
+      anchor?: ZoomAnchor | null;
+      commitRender: boolean;
+    }) => {
+      const nextZoom = clampZoomLevel(nextZoomLevel, maxZoom);
+      const nextDisplayScale = baseScaleRef.current > 0 ? baseScaleRef.current * nextZoom : 0;
+
+      pendingAnchorRef.current = anchor ?? null;
+      zoomLevelRef.current = nextZoom;
+      zoomModeRef.current = mode;
+      displayScaleRef.current = nextDisplayScale;
+
+      setZoomModeState(mode);
+      setZoomLevelState(nextZoom);
+      setDisplayScale(nextDisplayScale);
+
+      if (commitRender) {
+        clearRenderCommitTimer();
+        setRenderScale(nextDisplayScale);
+        markCommitted();
+        return;
+      }
+
+      clearRenderCommitTimer();
+      renderCommitTimerRef.current = setTimeout(() => {
+        setRenderScale(displayScaleRef.current);
+        markCommitted();
+      }, ZOOM_RENDER_COMMIT_DELAY);
+    },
+    [clearRenderCommitTimer, markCommitted, maxZoom],
+  );
+
+  const queueGestureZoom = useCallback(
+    (nextZoomLevel: number, anchor: ZoomAnchor | null) => {
+      queuedGestureRef.current = { zoomLevel: nextZoomLevel, anchor };
+      if (animationFrameRef.current !== null) return;
+
+      animationFrameRef.current = window.requestAnimationFrame(() => {
+        animationFrameRef.current = null;
+        const queued = queuedGestureRef.current;
+        queuedGestureRef.current = null;
+        if (!queued) return;
+
+        updateZoom({
+          nextZoomLevel: queued.zoomLevel,
+          mode: 'manual',
+          anchor: queued.anchor,
+          commitRender: false,
+        });
+      });
+    },
+    [updateZoom],
+  );
+
+  const setZoomLevel = useCallback(
+    (nextZoomLevel: number) => {
+      updateZoom({
+        nextZoomLevel,
+        mode: 'manual',
+        anchor: getAnchor(),
+        commitRender: true,
+      });
+    },
+    [getAnchor, updateZoom],
+  );
+
+  const fitZoom = useCallback(
+    (mode: Exclude<ZoomMode, 'manual'>) => {
+      const nextZoomLevel = getFitZoomLevel({
+        mode,
+        pageSize: pageSizes[pageCursor],
+        container: containerRef.current,
+        baseScale: baseScaleRef.current,
+        maxZoom,
+        hasRulers,
+      });
+      updateZoom({
+        nextZoomLevel,
+        mode,
+        anchor: getAnchor(),
+        commitRender: true,
+      });
+    },
+    [containerRef, getAnchor, hasRulers, maxZoom, pageCursor, pageSizes, updateZoom],
+  );
+
+  useEffect(() => {
+    if (baseScale <= 0) {
+      setDisplayScale(0);
+      setRenderScale(0);
+      return;
+    }
+
+    const nextZoomLevel =
+      zoomModeRef.current === 'manual'
+        ? clampZoomLevel(zoomLevelRef.current, maxZoom)
+        : getFitZoomLevel({
+            mode: zoomModeRef.current,
+            pageSize: pageSizes[pageCursor],
+            container: containerRef.current,
+            baseScale,
+            maxZoom,
+            hasRulers,
+          });
+    const nextDisplayScale = baseScale * nextZoomLevel;
+
+    zoomLevelRef.current = nextZoomLevel;
+    displayScaleRef.current = nextDisplayScale;
+    setZoomLevelState(nextZoomLevel);
+    setDisplayScale(nextDisplayScale);
+    setRenderScale(nextDisplayScale);
+    markCommitted();
+  }, [
+    baseScale,
+    containerRef,
+    hasRulers,
+    markCommitted,
+    maxZoom,
+    pageCursor,
+    pageSizes,
+    size.height,
+    size.width,
+  ]);
+
+  useLayoutEffect(() => {
+    const anchor = pendingAnchorRef.current;
+    if (anchor) {
+      restoreZoomAnchor({
+        container: containerRef.current,
+        paper: paperRefs.current[anchor.pageIndex],
+        anchor,
+        scale: displayScale,
+      });
+      pendingAnchorRef.current = null;
+    }
+
+    if (pendingCommitCallbackRef.current && Math.abs(displayScale - renderScale) < Number.EPSILON) {
+      pendingCommitCallbackRef.current = false;
+      onZoomCommit?.();
+    }
+  }, [containerRef, displayScale, onZoomCommit, paperRefs, renderScale]);
+
+  useEffect(() => {
+    if (!zoomContainerReady) return undefined;
+
+    const node = containerRef.current;
+    if (!node) return undefined;
+
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey) return;
+
+      event.preventDefault();
+      const anchor = getAnchor({ clientX: event.clientX, clientY: event.clientY });
+      const nextZoomLevel = zoomLevelRef.current * getWheelZoomFactor(event);
+      queueGestureZoom(nextZoomLevel, anchor);
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length !== 2) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      touchGestureRef.current = {
+        distance: getTouchDistance(event.touches),
+        zoomLevel: zoomLevelRef.current,
+      };
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 2 || !touchGestureRef.current) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      const center = getTouchCenter(event.touches);
+      const distance = getTouchDistance(event.touches);
+      if (!center || distance <= 0 || touchGestureRef.current.distance <= 0) return;
+
+      const anchor = getAnchor(center);
+      const ratio = distance / touchGestureRef.current.distance;
+      const dampedRatio = Math.pow(ratio, TOUCH_ZOOM_SENSITIVITY);
+      queueGestureZoom(touchGestureRef.current.zoomLevel * dampedRatio, anchor);
+    };
+
+    const onTouchEnd = (event: TouchEvent) => {
+      if (event.touches.length >= 2) return;
+
+      touchGestureRef.current = null;
+      commitRenderScale();
+    };
+
+    node.addEventListener('wheel', onWheel, { passive: false });
+    node.addEventListener('touchstart', onTouchStart, { passive: false });
+    node.addEventListener('touchmove', onTouchMove, { passive: false });
+    node.addEventListener('touchend', onTouchEnd);
+    node.addEventListener('touchcancel', onTouchEnd);
+
+    return () => {
+      node.removeEventListener('wheel', onWheel);
+      node.removeEventListener('touchstart', onTouchStart);
+      node.removeEventListener('touchmove', onTouchMove);
+      node.removeEventListener('touchend', onTouchEnd);
+      node.removeEventListener('touchcancel', onTouchEnd);
+    };
+  }, [commitRenderScale, containerRef, getAnchor, queueGestureZoom, zoomContainerReady]);
+
+  useEffect(
+    () => () => {
+      clearRenderCommitTimer();
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+    },
+    [clearRenderCommitTimer],
+  );
+
+  return {
+    displayScale,
+    renderScale,
+    zoomLevel,
+    zoomMode,
+    setZoomLevel,
+    fitWidth: () => fitZoom('fit-width'),
+    fitHeight: () => fitZoom('fit-height'),
   };
 };
 

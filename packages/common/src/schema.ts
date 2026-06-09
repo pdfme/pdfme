@@ -33,6 +33,10 @@ export const Dict = z.object({
   addPageAfter: z.string(),
   removePage: z.string(),
   removePageConfirm: z.string(),
+  zoomIn: z.string(),
+  zoomOut: z.string(),
+  fitWidth: z.string(),
+  fitHeight: z.string(),
   // --------------------validation-------------------
   'validation.uniqueName': z.string(),
   'validation.hexColor': z.string(),

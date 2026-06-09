@@ -17,7 +17,7 @@ import ErrorScreen from './ErrorScreen.js';
 import CtlBar from './CtlBar.js';
 import Paper from './Paper.js';
 import Renderer from './Renderer.js';
-import { useUIPreProcessor, useScrollPageCursor } from '../hooks.js';
+import { useUIPreProcessor, useScrollPageCursor, useZoom } from '../hooks.js';
 import { FontContext, OptionsContext } from '../contexts.js';
 import {
   template2SchemasList,
@@ -65,15 +65,26 @@ const Preview = ({
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
-  const [zoomLevel, setZoomLevel] = useState(options.zoomLevel ?? 1);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
-  const { backgrounds, pageSizes, scale, error, refresh } = useUIPreProcessor({
+  const { backgrounds, pageSizes, baseScale, error, refresh } = useUIPreProcessor({
     template,
     size,
-    zoomLevel,
+    zoomLevel: 1,
     maxZoom,
   });
+  const { displayScale, renderScale, zoomLevel, zoomMode, setZoomLevel, fitWidth, fitHeight } =
+    useZoom({
+      baseScale,
+      maxZoom,
+      pageCursor,
+      pageSizes,
+      containerRef,
+      paperRefs,
+      size,
+      initialZoomLevel: options.zoomLevel ?? 1,
+    });
+  const previousOptionsZoomLevelRef = useRef(options.zoomLevel);
 
   const isForm = Boolean(onChangeInput);
 
@@ -127,10 +138,15 @@ const Preview = ({
   }, []);
 
   useEffect(() => {
+    if (previousOptionsZoomLevelRef.current === options.zoomLevel) {
+      return;
+    }
+
+    previousOptionsZoomLevelRef.current = options.zoomLevel;
     if (typeof options.zoomLevel === 'number') {
       setZoomLevel(options.zoomLevel);
     }
-  }, [options.zoomLevel]);
+  }, [options.zoomLevel, setZoomLevel]);
 
   useEffect(() => {
     if (unitCursor > inputs.length - 1) {
@@ -143,7 +159,7 @@ const Preview = ({
   useScrollPageCursor({
     ref: containerRef,
     pageSizes,
-    scale,
+    scale: displayScale,
     pageCursor,
     onChangePageCursor: (p) => {
       setPageCursor(p);
@@ -218,14 +234,14 @@ const Preview = ({
   }
 
   return (
-    <Root size={size} scale={scale}>
+    <Root size={size} scale={displayScale}>
       <CtlBar
         size={size}
         pageCursor={pageCursor}
         pageNum={schemasList.length}
         setPageCursor={(p) => {
           if (!containerRef.current) return;
-          containerRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, scale);
+          containerRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, p, displayScale);
           setPageCursor(p);
           if (onPageChange) {
             onPageChange({ currentPage: p, totalPages: schemasList.length });
@@ -233,6 +249,9 @@ const Preview = ({
         }}
         zoomLevel={zoomLevel}
         setZoomLevel={setZoomLevel}
+        zoomMode={zoomMode}
+        fitWidth={fitWidth}
+        fitHeight={fitHeight}
       />
       <UnitPager
         size={size}
@@ -243,7 +262,7 @@ const Preview = ({
       <div ref={containerRef} style={{ ...size, position: 'relative', overflow: 'auto' }}>
         <Paper
           paperRefs={paperRefs}
-          scale={scale}
+          scale={displayScale}
           size={size}
           schemasList={schemasList}
           pageSizes={pageSizes}
@@ -275,14 +294,14 @@ const Preview = ({
                 outline={
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
                 }
-                scale={scale}
+                scale={renderScale}
               />
             );
           }}
           renderPaper={({ index }) => (
             <StaticSchema
               template={template}
-              scale={scale}
+              scale={renderScale}
               input={input}
               totalPages={schemasList.length}
               currentPage={index + 1}
