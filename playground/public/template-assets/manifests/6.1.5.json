@@ -907,7 +907,7 @@
       "path": "nenkin-shougai-limb-shindansho/template.json",
       "thumbnailPath": "nenkin-shougai-limb-shindansho/thumbnail.png",
       "pageCount": 2,
-      "fieldCount": 191,
+      "fieldCount": 527,
       "schemaTypes": [
         "circleMark",
         "text"
