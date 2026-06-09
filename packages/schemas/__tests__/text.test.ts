@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { afterEach, vi } from 'vitest';
 import type { Font as FontKitFont } from 'fontkit';
 import { Font, getDefaultFont, mm2pt } from '@pdfme/common';
 import type { BasePdf, PropPanelSchema, PropPanelWidgetProps } from '@pdfme/common';
@@ -45,6 +46,10 @@ import type { MultiVariableTextSchema } from '../src/multiVariableText/types.js'
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const sansData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSansJP.ttf`));
 const serifData = readFileSync(path.join(__dirname, `/assets/fonts/SauceHanSerifJP.ttf`));
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 const createMockFont = (
   advanceWidth: number,
@@ -810,6 +815,59 @@ describe('getSplittedLines test with real font width calculations', () => {
       const result = getSplittedLines('thiswillnotbecut', fontWidthCalcs);
       expect(result).toEqual(['thiswillnotbecut']);
     });
+  });
+});
+
+describe('getFontKitFont remote font cache', () => {
+  const font: Font = {
+    RemoteSans: {
+      fallback: true,
+      data: 'https://example.com/fonts/remote-sans.ttf',
+    },
+  };
+  const createFontResponse = (init?: ResponseInit) => new Response(new Uint8Array(sansData), init);
+
+  it('shares an in-flight remote font load across concurrent calls', async () => {
+    const fetchMock = vi.fn(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      return createFontResponse();
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const _cache = new Map();
+    const fontKitFonts = await Promise.all(
+      Array.from({ length: 20 }, () => getFontKitFont('RemoteSans', font, _cache)),
+    );
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(new Set(fontKitFonts).size).toBe(1);
+
+    const cachedFont = await getFontKitFont('RemoteSans', font, _cache);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(cachedFont).toBe(fontKitFonts[0]);
+  });
+
+  it('clears a failed in-flight remote font load so it can be retried', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(createFontResponse({ status: 500 }))
+      .mockResolvedValueOnce(createFontResponse());
+    vi.stubGlobal('fetch', fetchMock);
+
+    const _cache = new Map();
+    await expect(
+      Promise.all([
+        getFontKitFont('RemoteSans', font, _cache),
+        getFontKitFont('RemoteSans', font, _cache),
+      ]),
+    ).rejects.toThrow('HTTP 500');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(_cache.size).toBe(0);
+
+    await expect(getFontKitFont('RemoteSans', font, _cache)).resolves.toBeTruthy();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(_cache.size).toBe(1);
   });
 });
 

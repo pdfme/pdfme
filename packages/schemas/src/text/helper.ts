@@ -136,6 +136,7 @@ const getFallbackFont = (font: Font) => {
 };
 
 const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
+type FontKitFontCacheValue = fontkit.Font | Promise<fontkit.Font>;
 
 export const fetchRemoteFontData = async (url: string): Promise<ArrayBuffer> => {
   if (!isUrlSafeToFetch(url)) {
@@ -164,31 +165,44 @@ export const getFontKitFont = async (
 ) => {
   const fntNm = fontName || getFallbackFontName(font);
   const cacheKey = getCacheKey(fntNm);
-  if (_cache.has(cacheKey)) {
-    return _cache.get(cacheKey) as fontkit.Font;
+  const fontCache = _cache as Map<string | number, FontKitFontCacheValue>;
+  const cachedFont = fontCache.get(cacheKey);
+  if (cachedFont) {
+    return await cachedFont;
   }
 
   const currentFont = font[fntNm] || getFallbackFont(font) || getDefaultFont()[DEFAULT_FONT_NAME];
-  let fontData = currentFont.data;
-  if (typeof fontData === 'string') {
-    if (fontData.startsWith('http')) {
-      fontData = await fetchRemoteFontData(fontData);
-    } else {
-      fontData = b64toUint8Array(fontData);
+  const fontKitFontPromise = (async () => {
+    let fontData = currentFont.data;
+    if (typeof fontData === 'string') {
+      if (fontData.startsWith('http')) {
+        fontData = await fetchRemoteFontData(fontData);
+      } else {
+        fontData = b64toUint8Array(fontData);
+      }
     }
-  }
 
-  // Convert fontData to Buffer if it's not already a Buffer
-  let fontDataBuffer: Buffer;
-  if (fontData instanceof Buffer) {
-    fontDataBuffer = fontData;
-  } else {
-    fontDataBuffer = Buffer.from(fontData as ArrayBufferLike);
-  }
-  const fontKitFont = fontkit.create(fontDataBuffer) as fontkit.Font;
-  _cache.set(cacheKey, fontKitFont);
+    // Convert fontData to Buffer if it's not already a Buffer
+    let fontDataBuffer: Buffer;
+    if (fontData instanceof Buffer) {
+      fontDataBuffer = fontData;
+    } else {
+      fontDataBuffer = Buffer.from(fontData as ArrayBufferLike);
+    }
+    return fontkit.create(fontDataBuffer) as fontkit.Font;
+  })();
+  fontCache.set(cacheKey, fontKitFontPromise);
 
-  return fontKitFont;
+  try {
+    const fontKitFont = await fontKitFontPromise;
+    fontCache.set(cacheKey, fontKitFont);
+    return fontKitFont;
+  } catch (error) {
+    if (fontCache.get(cacheKey) === fontKitFontPromise) {
+      fontCache.delete(cacheKey);
+    }
+    throw error;
+  }
 };
 
 const isTextExceedingBoxWidth = (text: string, calcValues: FontWidthCalcValues) => {
