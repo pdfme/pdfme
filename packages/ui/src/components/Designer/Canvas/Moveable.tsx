@@ -29,6 +29,7 @@ type Props = {
 };
 
 const baseClassName = 'pdfme-moveable';
+const MoveableView = MoveableComponent as unknown as React.ElementType;
 
 const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   const { token } = theme.useToken();
@@ -49,7 +50,7 @@ const Moveable = (props: Props, ref: Ref<MoveableComponent>) => {
   }, [props.target, token.colorPrimary, uniqueClassName]);
 
   return (
-    <MoveableComponent
+    <MoveableView
       className={uniqueClassName}
       rootContainer={document ? document.body : undefined}
       snappable

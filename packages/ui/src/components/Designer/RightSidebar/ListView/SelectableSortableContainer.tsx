@@ -4,6 +4,8 @@ import {
   closestCorners,
   DndContext,
   DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensors,
@@ -85,7 +87,7 @@ const SelectableSortableContainer = (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCorners}
-      onDragStart={({ active }) => {
+      onDragStart={({ active }: DragStartEvent) => {
         setActiveId(String(active.id));
         setClonedItems(schemas);
 
@@ -103,7 +105,7 @@ const SelectableSortableContainer = (
           );
         }
       }}
-      onDragEnd={({ active, over }) => {
+      onDragEnd={({ active, over }: DragEndEvent) => {
         const overId = over?.id || '';
 
         const activeIndex = schemas.map((i) => i.id).indexOf(String(active.id));

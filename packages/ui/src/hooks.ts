@@ -183,7 +183,7 @@ type UseZoomProps = {
   maxZoom: number;
   pageCursor: number;
   pageSizes: Size[];
-  containerRef: RefObject<HTMLDivElement>;
+  containerRef: RefObject<HTMLDivElement | null>;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   size: Size;
   hasRulers?: boolean;
@@ -544,7 +544,7 @@ export const useZoom = ({
 };
 
 type ScrollPageCursorProps = {
-  ref: RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement | null>;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   pageSizes: Size[];
   scale: number;

@@ -6,6 +6,8 @@ import SelectoComponent, {
 import { SELECTABLE_CLASSNAME } from '../../../constants.js';
 import { theme } from 'antd';
 
+const SelectoView = SelectoComponent as unknown as React.ElementType;
+
 type Props = {
   container: HTMLElement | null;
   continueSelect: boolean;
@@ -27,7 +29,7 @@ const Selecto = (props: Props) => {
   }, [props.container, token.colorPrimary, token.colorPrimaryBorder]);
 
   return (
-    <SelectoComponent
+    <SelectoView
       className={className}
       selectFromInside={false}
       selectByClick

@@ -19,7 +19,7 @@ import {
   isBlankPdf,
   px2mm,
 } from '@pdfme/common';
-import { DndContext } from '@dnd-kit/core';
+import { DndContext, type DragEndEvent } from '@dnd-kit/core';
 import RightSidebar from './RightSidebar/index.js';
 import LeftSidebar from './LeftSidebar.js';
 import Canvas from './Canvas/index.js';
@@ -439,7 +439,7 @@ const TemplateEditor = ({
   return (
     <Root size={size} scale={displayScale}>
       <DndContext
-        onDragEnd={(event) => {
+        onDragEnd={(event: DragEndEvent) => {
           // Triggered after a schema is dragged & dropped from the left sidebar.
           if (!event.active) return;
           const active = event.active;
