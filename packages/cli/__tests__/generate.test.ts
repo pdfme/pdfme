@@ -12,7 +12,6 @@ const OFFLINE_PRELOAD = pathToFileURL(join(__dirname, 'fixtures', 'offline-fetch
 const FAILING_PRELOAD = pathToFileURL(join(__dirname, 'fixtures', 'failing-fetch-loader.mjs')).href;
 const FIXTURE_PRELOAD = pathToFileURL(join(__dirname, 'fixtures', 'fetch-fixture-loader.mjs')).href;
 const TMP = join(__dirname, '..', '.test-tmp-generate');
-const ASSETS_DIR = resolve(__dirname, '..', '..', '..', 'playground', 'public', 'template-assets');
 const FONT_FIXTURES_DIR = resolve(
   __dirname,
   '..',
@@ -50,8 +49,6 @@ function createFixtureEnv(rootDir: string): NodeJS.ProcessEnv {
   return {
     ...process.env,
     HOME: join(rootDir, 'home'),
-    PDFME_EXAMPLES_BASE_URL: 'https://fixtures.example.com/template-assets',
-    PDFME_TEST_ASSETS_DIR: ASSETS_DIR,
     PDFME_TEST_FONT_FIXTURES_DIR: FONT_FIXTURES_DIR,
   };
 }

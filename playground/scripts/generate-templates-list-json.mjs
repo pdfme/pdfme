@@ -1,18 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDFME_VERSION } from '@pdfme/common';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
-const manifestFilePath = path.join(templatesDir, 'manifest.json');
-const versionedManifestDir = path.join(templatesDir, 'manifests');
 
 function generateTemplatesListJson() {
-  const cliVersion = PDFME_VERSION;
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
   const metadataByTemplate = loadTemplateMetadata();
   const templateDirs = items
@@ -34,35 +30,8 @@ function generateTemplatesListJson() {
     })
     .sort(compareTemplateEntries);
 
-  const manifest = {
-    schemaVersion: 1,
-    cliVersion,
-    templates: result,
-  };
-
-  if (!fs.existsSync(versionedManifestDir)) {
-    fs.mkdirSync(versionedManifestDir, { recursive: true });
-  }
-
-  for (const entry of fs.readdirSync(versionedManifestDir, { withFileTypes: true })) {
-    if (!entry.isFile() || !entry.name.endsWith('.json')) {
-      continue;
-    }
-
-    const manifestPath = path.join(versionedManifestDir, entry.name);
-    if (entry.name !== `${cliVersion}.json`) {
-      fs.rmSync(manifestPath);
-    }
-  }
-
   fs.writeFileSync(indexFilePath, JSON.stringify(result, null, 2));
-  fs.writeFileSync(manifestFilePath, JSON.stringify(manifest, null, 2));
-  fs.writeFileSync(
-    path.join(versionedManifestDir, `${cliVersion}.json`),
-    JSON.stringify(manifest, null, 2),
-  );
   console.log(`Generated index.json with templates: ${result.map((t) => t.name).join(', ')}`);
-  console.log(`Generated manifest.json for CLI version ${cliVersion}`);
 }
 
 function loadTemplateMetadata() {

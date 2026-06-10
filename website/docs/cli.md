@@ -39,8 +39,6 @@ npx @pdfme/cli generate --help
   - convert an existing PDF into page images
 - `pdfme pdf2size`
   - inspect PDF page sizes in millimeters
-- `pdfme examples`
-  - list or export official example templates
 
 ## `pdfme generate`
 
@@ -288,39 +286,6 @@ Human-readable output includes standard size labels such as `A4 portrait` when d
 }
 ```
 
-## `pdfme examples`
-
-List or export official example templates from the playground asset manifest.
-
-Examples:
-
-```bash
-# List templates
-pdfme examples --list
-
-# Listing is also the default when no name is provided
-pdfme examples
-
-# Print a template to stdout
-pdfme examples invoice
-
-# Write a template to a file
-pdfme examples invoice -o template.json
-
-# Export a unified job with sample inputs
-pdfme examples invoice --withInputs -o job.json
-
-# Machine-readable manifest output
-pdfme examples --list --json
-```
-
-Behavior:
-
-- the command fetches the manifest and template assets from `https://playground.pdfme.com/template-assets`
-- you can override that base URL with the `PDFME_EXAMPLES_BASE_URL` environment variable
-- `--withInputs` adds sample inputs and includes `options.font` when the example depends on official hosted fonts
-- `--json` list mode returns manifest metadata such as template names, schema types, font names, and page counts
-
 ## Fonts
 
 The CLI treats fonts as an explicit source contract.
@@ -364,10 +329,9 @@ Current exit-code categories:
 
 ## Typical Workflows
 
-Start from an official example, diagnose it, then generate images for visual review:
+Start from a unified job file, diagnose it, then generate images for visual review:
 
 ```bash
-pdfme examples invoice --withInputs -o job.json
 pdfme doctor job.json --json
 pdfme generate job.json -o out.pdf --image --grid
 ```

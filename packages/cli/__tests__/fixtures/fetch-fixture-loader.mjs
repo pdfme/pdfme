@@ -1,17 +1,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const ASSETS_DIR = process.env.PDFME_TEST_ASSETS_DIR;
 const FONT_FIXTURES_DIR = process.env.PDFME_TEST_FONT_FIXTURES_DIR;
-const BASE_URL = (process.env.PDFME_EXAMPLES_BASE_URL ?? 'https://fixtures.example.com/template-assets').replace(
-  /\/$/,
-  '',
-);
 const AUTO_NOTO_SANS_JP_URL =
   'https://github.com/google/fonts/raw/main/ofl/notosansjp/NotoSansJP%5Bwght%5D.ttf';
 
-if (!ASSETS_DIR || !FONT_FIXTURES_DIR) {
-  throw new Error('Fixture fetch shim requires PDFME_TEST_ASSETS_DIR and PDFME_TEST_FONT_FIXTURES_DIR.');
+if (!FONT_FIXTURES_DIR) {
+  throw new Error('Fixture fetch shim requires PDFME_TEST_FONT_FIXTURES_DIR.');
 }
 
 const fontFixtures = {
@@ -40,14 +35,6 @@ function getUrl(input) {
   return input.url;
 }
 
-function buildResponse(filePath) {
-  const contentType = filePath.endsWith('.json') ? 'application/json' : 'application/octet-stream';
-  return new Response(readFileSync(filePath), {
-    status: 200,
-    headers: { 'content-type': contentType },
-  });
-}
-
 globalThis.fetch = async (input, init) => {
   const url = getUrl(input);
 
@@ -60,15 +47,6 @@ globalThis.fetch = async (input, init) => {
       status: 200,
       headers: { 'content-type': 'font/ttf' },
     });
-  }
-
-  if (url.startsWith(`${BASE_URL}/`)) {
-    const relativePath = url.slice(BASE_URL.length + 1);
-    const filePath = join(ASSETS_DIR, relativePath);
-    if (!existsSync(filePath)) {
-      throw new Error(`Fixture not found for URL: ${url}`);
-    }
-    return buildResponse(filePath);
   }
 
   return originalFetch(input, init);

@@ -44,10 +44,8 @@ jobs:
             test_files: __tests__/generate.test.ts
           - suite: doctor
             test_files: __tests__/doctor.test.ts
-          - suite: examples-integration
-            test_files: __tests__/examples.integration.test.ts
           - suite: rest
-            test_files: __tests__ --exclude __tests__/validate.test.ts --exclude __tests__/generate.test.ts --exclude __tests__/doctor.test.ts --exclude __tests__/examples.integration.test.ts
+            test_files: __tests__ --exclude __tests__/validate.test.ts --exclude __tests__/generate.test.ts --exclude __tests__/doctor.test.ts
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js 24

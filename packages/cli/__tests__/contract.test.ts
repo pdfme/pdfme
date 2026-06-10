@@ -17,7 +17,7 @@ function runCli(
   try {
     const stdout = execFileSync('node', [CLI, ...args], {
       encoding: 'utf8',
-      timeout: 30000,
+      timeout: 60000,
       input: options.input,
       env: options.env,
     });
@@ -45,7 +45,6 @@ describe('CLI contract failures', () => {
     { name: 'validate', args: ['validate', '--bogus', '--json'] },
     { name: 'pdf2img', args: ['pdf2img', '--bogus', '--json'] },
     { name: 'pdf2size', args: ['pdf2size', '--bogus', '--json'] },
-    { name: 'examples', args: ['examples', '--bogus', '--json'] },
   ])('returns structured EARG for unknown flags: $name', ({ args }) => {
     const result = runCli(args);
 

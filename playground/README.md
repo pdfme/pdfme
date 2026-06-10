@@ -96,12 +96,10 @@ npm run generate-template-assets
 This command:
 
 - generates JSX/md2pdf starter `template.json` files,
-- regenerates `index.json` and `manifest.json`,
-- creates or updates `thumbnail.png` for each template,
-- keeps only the current versioned manifest under `template-assets/manifests/`.
+- regenerates `index.json`,
+- creates or updates `thumbnail.png` for each template.
 
 `npm run dev` and `npm run build` also run this command automatically.
 
-Before committing, include the updated template directory, metadata files, generated
-`manifest.json`, and versioned manifest. The generated `index.json`, thumbnail PNGs, and hash-map
-cache files are intentionally ignored.
+Before committing, include the updated template directory and metadata files. The generated
+`index.json`, thumbnail PNGs, and hash-map cache files are intentionally ignored.
