@@ -248,13 +248,19 @@ export const arrayBufferToBase64 = (arrayBuffer: ArrayBuffer): string => {
   // Detect the MIME type
   const mimeType = detectMimeType(arrayBuffer);
 
-  // Convert ArrayBuffer to raw Base64
+  // Convert ArrayBuffer to raw Base64. Convert in chunks instead of byte by
+  // byte: per-byte string concatenation generates a huge number of
+  // intermediate strings, which can exhaust memory on mobile devices when
+  // encoding multi-megabyte page background images.
   const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  const chunkSize = 0x8000;
+  const chunks: string[] = [];
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    chunks.push(
+      String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as unknown as number[]),
+    );
   }
-  const base64String = btoa(binary);
+  const base64String = btoa(chunks.join(''));
 
   // Optionally prepend a data: URL if a known MIME type is found;
   // otherwise just return the raw Base64.

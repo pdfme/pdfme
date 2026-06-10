@@ -58,6 +58,10 @@ const scaleDragPosAdjustment = (adjustment: number, scale: number): number => {
   return 0;
 };
 
+// Minimum canvas width (px) that should remain visible next to an open
+// right sidebar for the Designer to stay usable.
+const MIN_CANVAS_WIDTH = 100;
+
 const TemplateEditor = ({
   template,
   size,
@@ -86,18 +90,26 @@ const TemplateEditor = ({
   const options = useContext(OptionsContext);
   const maxZoom = useMaxZoom();
 
+  const canvasWidth = size.width - LEFT_SIDEBAR_WIDTH;
+
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(options.sidebarOpen ?? true);
+  // Close the sidebar by default on narrow viewports (e.g. smartphones) where
+  // it would not leave any usable canvas width.
+  const [sidebarOpen, setSidebarOpen] = useState(
+    options.sidebarOpen ?? canvasWidth - RIGHT_SIDEBAR_WIDTH >= MIN_CANVAS_WIDTH,
+  );
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
 
-  const canvasWidth = size.width - LEFT_SIDEBAR_WIDTH;
   const sizeExcSidebars = useMemo(
     () => ({
-      width: sidebarOpen ? canvasWidth - RIGHT_SIDEBAR_WIDTH : canvasWidth,
+      // Never let the width go negative; on narrow viewports the open sidebar
+      // can be wider than the screen, which previously produced a negative
+      // base scale and left the Designer stuck on the loading spinner.
+      width: Math.max(sidebarOpen ? canvasWidth - RIGHT_SIDEBAR_WIDTH : canvasWidth, 0),
       height: size.height,
     }),
     [canvasWidth, sidebarOpen, size.height],
