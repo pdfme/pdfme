@@ -2,9 +2,7 @@ import { createPlaygroundTemplateRouteFromSearchParams } from '../src/lib/playgr
 
 describe('playground template routes', () => {
   it('creates a Form/Viewer route for a workspace template', () => {
-    const searchParams = new URLSearchParams([
-      ['workspace', 'nenkin-shougai-seishin-shindansho'],
-    ]);
+    const searchParams = new URLSearchParams([['workspace', 'nenkin-shougai-seishin-shindansho']]);
 
     expect(createPlaygroundTemplateRouteFromSearchParams('form-viewer', searchParams)).toBe(
       '/form-viewer?workspace=nenkin-shougai-seishin-shindansho',

@@ -12,7 +12,7 @@ import {
   type PlaygroundProjectStorage,
 } from '../src/lib/playgroundProjects';
 
-const clone = <T,>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
 class MemoryPlaygroundProjectStorage implements PlaygroundProjectStorage {
   protected activeProjectId: string | null = null;

@@ -22,12 +22,9 @@ describe('project thumbnail inputs', () => {
     expect(getProjectThumbnailInputs(project('template'))).toBeUndefined();
   });
 
-  it.each(['jsx', 'md2pdf'] as const)(
-    'keeps generated inputs for %s projects',
-    (kind) => {
-      const sourceProject = project(kind);
+  it.each(['jsx', 'md2pdf'] as const)('keeps generated inputs for %s projects', (kind) => {
+    const sourceProject = project(kind);
 
-      expect(getProjectThumbnailInputs(sourceProject)).toBe(sourceProject.inputs);
-    },
-  );
+    expect(getProjectThumbnailInputs(sourceProject)).toBe(sourceProject.inputs);
+  });
 });

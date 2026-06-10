@@ -41,9 +41,7 @@ export type PdfmeAgentHost = {
   getSelectedSchemas?: () => PdfmeAgentSelectedSchema[];
   getSelection?: () => PdfmeAgentSelection | null;
   getTemplateContext?: () => PdfmeAgentTemplateContext;
-  onChangeSelection?: (
-    cb: (selection: PdfmeAgentSelection | null) => void,
-  ) => (() => void) | void;
+  onChangeSelection?: (cb: (selection: PdfmeAgentSelection | null) => void) => (() => void) | void;
 };
 
 declare global {

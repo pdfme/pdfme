@@ -37,6 +37,5 @@ export const createTemplateThumbnailDataUrl = async (
   return blobToDataUrl(new Blob([thumbnail], { type: 'image/png' }));
 };
 
-export const getProjectThumbnailInputs = (
-  project: Pick<PlaygroundProject, 'inputs' | 'kind'>,
-) => (project.kind === 'template' ? undefined : project.inputs);
+export const getProjectThumbnailInputs = (project: Pick<PlaygroundProject, 'inputs' | 'kind'>) =>
+  project.kind === 'template' ? undefined : project.inputs;

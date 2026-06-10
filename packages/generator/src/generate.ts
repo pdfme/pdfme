@@ -1,5 +1,11 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, GeneratorOptions, Schema, PDFRenderProps, Template } from '@pdfme/common';
+import type {
+  GenerateProps,
+  GeneratorOptions,
+  Schema,
+  PDFRenderProps,
+  Template,
+} from '@pdfme/common';
 import {
   checkGenerateProps,
   applyInternalLinkAnnotations,
