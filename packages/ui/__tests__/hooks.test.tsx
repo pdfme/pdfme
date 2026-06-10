@@ -71,6 +71,54 @@ test('useUIPreProcessor runs pdf sizing and imaging in parallel with isolated bu
   await waitFor(() => expect(result.current.pageSizes).toEqual([PAGE_SIZE_PRESETS.A4]));
 });
 
+test('useUIPreProcessor passes a canvas pixel budget to pdf2img', async () => {
+  const pdf2sizeMock = vi.mocked(converter.pdf2size);
+  const pdf2imgMock = vi.mocked(converter.pdf2img);
+
+  pdf2sizeMock.mockResolvedValue([PAGE_SIZE_PRESETS.A4]);
+  pdf2imgMock.mockResolvedValue([new Uint8Array([137, 80, 78, 71]).buffer]);
+
+  const { result } = renderHook(() =>
+    useUIPreProcessor({
+      template: createTemplate(),
+      size: { width: 1200, height: 1200 },
+      zoomLevel: 1,
+      maxZoom: 5,
+    }),
+  );
+
+  await waitFor(() => expect(result.current.backgrounds.length).toBe(1));
+
+  expect(pdf2imgMock).toHaveBeenCalledWith(
+    expect.anything(),
+    expect.objectContaining({ scale: 5, maxCanvasPixels: 4096 * 4096 }),
+  );
+});
+
+test('useUIPreProcessor keeps a positive base scale on narrow viewports', async () => {
+  const pdf2sizeMock = vi.mocked(converter.pdf2size);
+  const pdf2imgMock = vi.mocked(converter.pdf2img);
+
+  pdf2sizeMock.mockResolvedValue([PAGE_SIZE_PRESETS.A4]);
+  pdf2imgMock.mockResolvedValue([new Uint8Array([137, 80, 78, 71]).buffer]);
+
+  // Simulates a smartphone viewport where the open sidebars consume more
+  // width than the screen provides.
+  const { result } = renderHook(() =>
+    useUIPreProcessor({
+      template: createTemplate(),
+      size: { width: -55, height: 600 },
+      zoomLevel: 1,
+      maxZoom: 2,
+    }),
+  );
+
+  await waitFor(() => expect(result.current.backgrounds.length).toBe(1));
+
+  expect(result.current.baseScale).toBeGreaterThan(0);
+  expect(result.current.scale).toBeGreaterThan(0);
+});
+
 test('useInitEvents paste ignores missing DOM nodes instead of storing null active elements', () => {
   vi.useFakeTimers();
 
