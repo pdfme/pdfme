@@ -461,7 +461,6 @@ function DesignerApp() {
             getTemplateById(templateIdFromQuery),
             getTemplateMetadataById(templateIdFromQuery),
           ]);
-          checkTemplate(templateJson);
           template = templateJson;
           currentMetadataRef.current = metadata;
           setCurrentProjectTitle(metadata.title);
@@ -571,6 +570,7 @@ function DesignerApp() {
         projectRef.current = null;
         setActiveFileWorkspaceEntry(null, null);
         console.error(error);
+        toast.error(getErrorMessage(error));
         return null;
       }
     },
@@ -724,7 +724,9 @@ function DesignerApp() {
         if (nextMetadata) {
           const currentEntry = fileWorkspaceEntryRef.current;
           if (!currentEntry) {
-            throw new Error('AI metadata update was not saved because the mounted template closed.');
+            throw new Error(
+              'AI metadata update was not saved because the mounted template closed.',
+            );
           }
           const updatedEntry = await writeTemplateEntryMetadata(currentEntry, nextMetadata);
           fileWorkspaceEntryRef.current = updatedEntry;
@@ -1144,7 +1146,8 @@ function DesignerApp() {
             onClick={async (e) => {
               const output = e.altKey ? 'form' : 'pdf';
               const startTimer = performance.now();
-              await generatePDF(designer.current, output);
+              const generated = await generatePDF(designer.current, output);
+              if (!generated) return;
               const endTimer = performance.now();
               toast.info(
                 `Generated ${output === 'form' ? 'Form' : 'PDF'} in ${Math.round(

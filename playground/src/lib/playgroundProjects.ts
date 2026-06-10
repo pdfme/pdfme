@@ -37,6 +37,8 @@ export type PlaygroundProjectStorage = {
   clearActiveProjectId: () => Promise<void>;
   deleteProject: (projectId: string) => Promise<void>;
   getActiveProjectId: () => Promise<string | null>;
+  /** Optional fast path for single-project lookups; falls back to readProjects. */
+  getProject?: (projectId: string) => Promise<unknown>;
   putProject: (project: PlaygroundProject) => Promise<void>;
   readProjects: () => Promise<unknown[]>;
   setActiveProjectId: (projectId: string) => Promise<void>;
@@ -235,6 +237,15 @@ const defaultProjectStorage: PlaygroundProjectStorage = {
       db.close();
     }
   },
+  getProject: async (projectId: string) => {
+    const db = await openProjectsDb();
+    try {
+      const transaction = db.transaction(PROJECTS_STORE_NAME, 'readonly');
+      return await idbRequest<unknown>(transaction.objectStore(PROJECTS_STORE_NAME).get(projectId));
+    } finally {
+      db.close();
+    }
+  },
   putProject: async (project: PlaygroundProject) => {
     const db = await openProjectsDb();
     try {
@@ -251,9 +262,7 @@ const defaultProjectStorage: PlaygroundProjectStorage = {
     const db = await openProjectsDb();
     try {
       const transaction = db.transaction(PROJECTS_STORE_NAME, 'readonly');
-      return await idbRequest<unknown[]>(
-        transaction.objectStore(PROJECTS_STORE_NAME).getAll(),
-      );
+      return await idbRequest<unknown[]>(transaction.objectStore(PROJECTS_STORE_NAME).getAll());
     } finally {
       db.close();
     }
@@ -295,8 +304,21 @@ export const readPlaygroundProjects = async (
 export const getPlaygroundProject = async (
   projectId: string,
   storage: PlaygroundProjectStorage = defaultProjectStorage,
-): Promise<PlaygroundProject | null> =>
-  (await readPlaygroundProjects(storage)).find((project) => project.id === projectId) ?? null;
+): Promise<PlaygroundProject | null> => {
+  if (storage.getProject) {
+    try {
+      const project = parseProject(await storage.getProject(projectId));
+      return project?.id === projectId ? project : null;
+    } catch (error) {
+      console.error(error);
+      return null;
+    }
+  }
+
+  return (
+    (await readPlaygroundProjects(storage)).find((project) => project.id === projectId) ?? null
+  );
+};
 
 export const savePlaygroundProject = async (
   input: SavePlaygroundProjectInput,
@@ -304,8 +326,7 @@ export const savePlaygroundProject = async (
 ): Promise<PlaygroundProject> => {
   checkTemplate(input.template);
 
-  const projects = await readPlaygroundProjects(storage);
-  const existing = input.id ? projects.find((project) => project.id === input.id) : undefined;
+  const existing = input.id ? await getPlaygroundProject(input.id, storage) : null;
   const now = Date.now();
   let savedProject: PlaygroundProject = {
     createdAt: existing?.createdAt ?? now,
@@ -350,8 +371,7 @@ export const renamePlaygroundProject = async (
   title: string,
   storage: PlaygroundProjectStorage = defaultProjectStorage,
 ) => {
-  const projects = await readPlaygroundProjects(storage);
-  const project = projects.find((item) => item.id === projectId);
+  const project = await getPlaygroundProject(projectId, storage);
   if (!project) return null;
 
   const updatedProject: PlaygroundProject = {

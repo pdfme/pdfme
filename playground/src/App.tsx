@@ -1,11 +1,14 @@
 import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import Designer from './routes/Designer';
-import FormAndViewer from './routes/FormAndViewer';
-import Templates, { WorkspaceApp } from './routes/Templates';
 import Header from './components/Header';
 
+const Designer = lazy(() => import('./routes/Designer'));
+const FormAndViewer = lazy(() => import('./routes/FormAndViewer'));
+const Templates = lazy(() => import('./routes/Templates'));
+const WorkspaceApp = lazy(() =>
+  import('./routes/Templates').then((module) => ({ default: module.WorkspaceApp })),
+);
 const JsxPlayground = lazy(() => import('./routes/JsxPlayground'));
 const Md2Pdf = lazy(() => import('./routes/Md2Pdf'));
 

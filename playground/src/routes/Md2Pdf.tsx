@@ -217,10 +217,12 @@ export default function Md2Pdf() {
     const startTimer = performance.now();
     setIsGeneratingPdf(true);
     try {
-      await generatePDF(viewerRef.current);
-      const duration = Math.round(performance.now() - startTimer);
-      setPdfDuration(duration);
-      toast.info(`Generated PDF in ${duration}ms`);
+      const generated = await generatePDF(viewerRef.current);
+      if (generated) {
+        const duration = Math.round(performance.now() - startTimer);
+        setPdfDuration(duration);
+        toast.info(`Generated PDF in ${duration}ms`);
+      }
     } finally {
       setIsGeneratingPdf(false);
     }

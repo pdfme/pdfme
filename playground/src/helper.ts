@@ -8,6 +8,8 @@ import {
 } from '@pdfme/common';
 import { Form, Viewer, Designer } from '@pdfme/ui';
 import { generate, generateForm } from '@pdfme/generator';
+import { toast } from 'react-toastify';
+import { getErrorMessage } from './lib/errors';
 import { getPlugins } from './plugins';
 
 const templateAssetSourceKinds = ['designer', 'jsx', 'md2pdf'] as const;
@@ -49,22 +51,25 @@ const getFormFontsData = (): Font =>
     ]),
   );
 
-export const readFile = (file: File | null, type: 'text' | 'dataURL' | 'arrayBuffer') => {
-  return new Promise<string | ArrayBuffer>((r) => {
+export const readFile = (file: File, type: 'text' | 'dataURL' | 'arrayBuffer') => {
+  return new Promise<string | ArrayBuffer>((resolve, reject) => {
     const fileReader = new FileReader();
-    fileReader.addEventListener('load', (e) => {
-      if (e && e.target && e.target.result && file !== null) {
-        r(e.target.result);
+    fileReader.addEventListener('load', () => {
+      if (fileReader.result != null) {
+        resolve(fileReader.result);
+      } else {
+        reject(new Error(`Failed to read file "${file.name}"`));
       }
     });
-    if (file !== null) {
-      if (type === 'text') {
-        fileReader.readAsText(file);
-      } else if (type === 'dataURL') {
-        fileReader.readAsDataURL(file);
-      } else if (type === 'arrayBuffer') {
-        fileReader.readAsArrayBuffer(file);
-      }
+    fileReader.addEventListener('error', () => {
+      reject(fileReader.error ?? new Error(`Failed to read file "${file.name}"`));
+    });
+    if (type === 'text') {
+      fileReader.readAsText(file);
+    } else if (type === 'dataURL') {
+      fileReader.readAsDataURL(file);
+    } else {
+      fileReader.readAsArrayBuffer(file);
     }
   });
 };
@@ -100,8 +105,8 @@ export const translations: { label: string; value: string }[] = [
 export const generatePDF = async (
   currentRef: Designer | Form | Viewer | null,
   output: 'pdf' | 'form' = 'pdf',
-) => {
-  if (!currentRef) return;
+): Promise<boolean> => {
+  if (!currentRef) return false;
   const template = currentRef.getTemplate();
   const options = currentRef.getOptions();
   const inputs =
@@ -122,11 +127,18 @@ export const generatePDF = async (
       plugins: getPlugins(),
     });
 
-    const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
-    window.open(URL.createObjectURL(blob));
+    // Copy into a fresh Uint8Array so the Blob never picks up extra bytes
+    // when the result is a view over a larger ArrayBuffer.
+    const blob = new Blob([new Uint8Array(pdf)], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    window.open(url);
+    // Release the object URL once the new tab has had time to load it.
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    return true;
   } catch (e) {
-    alert(e + '\n\nCheck the console for full stack trace');
-    throw e;
+    console.error(e);
+    toast.error(`${getErrorMessage(e)} (check the console for the full stack trace)`);
+    return false;
   }
 };
 
@@ -151,11 +163,14 @@ export const getBlankTemplate = () =>
   }) as Template;
 
 export const getTemplateById = async (templateId: string): Promise<Template> => {
-  const template = await fetch(`/template-assets/${templateId}/template.json`).then((res) =>
-    res.json(),
-  );
+  const response = await fetch(`/template-assets/${templateId}/template.json`);
+  if (!response.ok) {
+    throw new Error(`Failed to load template "${templateId}": ${response.statusText}`);
+  }
+
+  const template = (await response.json()) as Template;
   checkTemplate(template);
-  return template as Template;
+  return template;
 };
 
 export const getTemplateMetadataById = async (
