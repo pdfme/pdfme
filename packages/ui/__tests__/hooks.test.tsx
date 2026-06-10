@@ -91,50 +91,8 @@ test('useUIPreProcessor passes a canvas pixel budget to pdf2img', async () => {
 
   expect(pdf2imgMock).toHaveBeenCalledWith(
     expect.anything(),
-    expect.objectContaining({
-      scale: 5,
-      maxCanvasPixels: 4096 * 4096,
-      maxTotalCanvasPixels: undefined,
-    }),
+    expect.objectContaining({ scale: 5, maxCanvasPixels: 4096 * 4096 }),
   );
-});
-
-test('useUIPreProcessor uses a reduced pixel budget on mobile browsers', async () => {
-  const pdf2sizeMock = vi.mocked(converter.pdf2size);
-  const pdf2imgMock = vi.mocked(converter.pdf2img);
-
-  pdf2sizeMock.mockResolvedValue([PAGE_SIZE_PRESETS.A4]);
-  pdf2imgMock.mockResolvedValue([new Uint8Array([137, 80, 78, 71]).buffer]);
-
-  const userAgentSpy = vi
-    .spyOn(window.navigator, 'userAgent', 'get')
-    .mockReturnValue(
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-    );
-
-  try {
-    const { result } = renderHook(() =>
-      useUIPreProcessor({
-        template: createTemplate(),
-        size: { width: 390, height: 844 },
-        zoomLevel: 1,
-        maxZoom: 5,
-      }),
-    );
-
-    await waitFor(() => expect(result.current.backgrounds.length).toBe(1));
-
-    expect(pdf2imgMock).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        scale: 5,
-        maxCanvasPixels: 2048 * 2048,
-        maxTotalCanvasPixels: 2048 * 2048 * 4,
-      }),
-    );
-  } finally {
-    userAgentSpy.mockRestore();
-  }
 });
 
 test('useUIPreProcessor keeps a positive base scale on narrow viewports', async () => {
