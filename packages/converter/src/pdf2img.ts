@@ -26,6 +26,14 @@ export interface Pdf2ImgOptions {
    * canvases around 16.7M pixels).
    */
   maxCanvasPixels?: number;
+  /**
+   * Upper bound for the summed canvas area (width * height) across all
+   * rendered pages. When rendering at `scale` would exceed this limit, the
+   * scale of every page is reduced uniformly so the total stays within it.
+   * This bounds the total image memory regardless of page count, which
+   * matters on memory-constrained mobile browsers.
+   */
+  maxTotalCanvasPixels?: number;
 }
 
 export async function pdf2img(
@@ -34,7 +42,8 @@ export async function pdf2img(
   env: Environment,
 ): Promise<ArrayBuffer[]> {
   try {
-    const { scale = 1, imageType = 'jpeg', range = {}, maxCanvasPixels } = options;
+    const { scale = 1, imageType = 'jpeg', range = {}, maxCanvasPixels, maxTotalCanvasPixels } =
+      options;
     const { start = 0, end = Infinity } = range;
 
     const { getDocument, destroyDocument, createCanvas, canvasToArrayBuffer } = env;
@@ -46,19 +55,39 @@ export async function pdf2img(
       const startPage = Math.max(start + 1, 1);
       const endPage = Math.min(end + 1, numPages);
 
-      const results: ArrayBuffer[] = [];
-
+      const pages = [];
       for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
-        const page = await pdfDoc.getPage(pageNum);
-        let renderScale = scale;
-        if (maxCanvasPixels && maxCanvasPixels > 0) {
-          const baseViewport = page.getViewport({ scale: 1 });
-          const baseArea = baseViewport.width * baseViewport.height;
-          if (baseArea > 0) {
-            renderScale = Math.min(scale, Math.sqrt(maxCanvasPixels / baseArea));
+        pages.push(await pdfDoc.getPage(pageNum));
+      }
+
+      const baseAreas = pages.map((page) => {
+        const { width, height } = page.getViewport({ scale: 1 });
+        return width * height;
+      });
+      const renderScales = baseAreas.map((baseArea) => {
+        if (maxCanvasPixels && maxCanvasPixels > 0 && baseArea > 0) {
+          return Math.min(scale, Math.sqrt(maxCanvasPixels / baseArea));
+        }
+        return scale;
+      });
+      if (maxTotalCanvasPixels && maxTotalCanvasPixels > 0) {
+        const totalArea = renderScales.reduce(
+          (acc, renderScale, i) => acc + baseAreas[i] * renderScale * renderScale,
+          0,
+        );
+        if (totalArea > maxTotalCanvasPixels) {
+          const shrink = Math.sqrt(maxTotalCanvasPixels / totalArea);
+          for (let i = 0; i < renderScales.length; i++) {
+            renderScales[i] *= shrink;
           }
         }
-        const viewport = page.getViewport({ scale: renderScale });
+      }
+
+      const results: ArrayBuffer[] = [];
+
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        const viewport = page.getViewport({ scale: renderScales[i] });
 
         const canvas = createCanvas(viewport.width, viewport.height);
         if (!canvas) {
