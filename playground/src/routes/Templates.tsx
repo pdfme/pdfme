@@ -94,6 +94,10 @@ type AuthoringPreset = {
 // Constants
 const DEVIN_AI_AUTHOR = 'Devin AI';
 const DEVIN_INVITE_URL = 'https://app.devin.ai/invite/KyOTXVPrlFl2TjcT';
+
+// GitHub serves user/org avatars at this URL, so no rate-limited API call is needed.
+const getAuthorAvatarUrl = (author: string) =>
+  author === DEVIN_AI_AUTHOR ? '/imgs/devin.svg' : `https://github.com/${author}.png?size=56`;
 const tagSortOrder = [
   'Invoice',
   'Quote',
@@ -716,7 +720,6 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
   const fileWorkspaceSupported = isFileWorkspaceSupported();
 
   const [templates, setTemplates] = useState<TemplateData[]>([]);
-  const [avatarUrlMap, setAvatarUrlMap] = useState<{ [key: string]: string }>({});
   const [projects, setProjects] = useState<PlaygroundProject[]>([]);
   const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [mountedCollection, setMountedCollection] = useState<FileWorkspaceCollection | null>(null);
@@ -882,34 +885,23 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
     );
   }, [mountedCollection?.rootHandle, shouldSkipMountedCollectionRefresh, showWorkspace]);
 
-  // Fetch templates and author avatars
+  // Fetch templates
   useEffect(() => {
     if (!showTemplateGallery) return;
 
     fetch('/template-assets/index.json')
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to load templates: ${response.statusText}`);
+        }
+        return response.json();
+      })
       .then((data: TemplateData[]) => {
         setTemplates(data);
-
-        const authors = new Set(data.map(({ author }) => author));
-        const avatarUrlMap: { [key: string]: string } = {};
-
-        Promise.all(
-          Array.from(authors).map((author) => {
-            if (author === DEVIN_AI_AUTHOR) {
-              avatarUrlMap[author] = '/imgs/devin.svg';
-              return Promise.resolve();
-            } else {
-              return fetch(`https://api.github.com/users/${author}`)
-                .then((res) => res.json())
-                .then((ghData) => {
-                  avatarUrlMap[author] = ghData.avatar_url;
-                });
-            }
-          }),
-        ).then(() => {
-          setAvatarUrlMap(avatarUrlMap);
-        });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error(error instanceof Error ? error.message : 'Failed to load templates');
       });
   }, [showTemplateGallery]);
 
@@ -1118,18 +1110,13 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
       const draft = await createTemplateFromPdfFile(file);
       const thumbnail = await createTemplateThumbnailDataUrl(draft.template).catch(() => undefined);
       const { nextCollection, nextEntry } = await runMountedCollectionWrite(async () => {
-        const entry = await createTemplateEntryFromTemplate(
-          collection,
-          draft.template,
-          title,
-          {
-            description: `A template created from ${draft.fileName}.`,
-            sourceKind: 'designer',
-            sourcePdf: file,
-            tags: ['PDF', 'Designer'],
-            thumbnailDataUrl: thumbnail,
-          },
-        );
+        const entry = await createTemplateEntryFromTemplate(collection, draft.template, title, {
+          description: `A template created from ${draft.fileName}.`,
+          sourceKind: 'designer',
+          sourcePdf: file,
+          tags: ['PDF', 'Designer'],
+          thumbnailDataUrl: thumbnail,
+        });
         const collectionAfterCreate = await refreshTemplateCollection({
           ...collection,
           selectedTemplateName: entry.name,
@@ -1458,8 +1445,8 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
                 </div>
                 {!fileWorkspaceSupported && (
                   <div className="mt-4 rounded-md border border-dashed border-green-300 bg-white px-4 py-4 text-sm text-green-900">
-                    Folder workspaces need a Chromium browser in a secure context. Browser
-                    projects, JSON import, and JSON download are still available.
+                    Folder workspaces need a Chromium browser in a secure context. Browser projects,
+                    JSON import, and JSON download are still available.
                   </div>
                 )}
                 {mountedCollection && (
@@ -1560,149 +1547,151 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
         )}
         {showTemplateGallery && (
           <section>
-          <div className="border-b border-dashed border-gray-200 pb-2">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Templates</h2>
-              <p className="mt-2 max-w-3xl text-sm text-gray-600">
-                Choose a Designer sample, JSX starter, or md2pdf starter from the same gallery.
-              </p>
-            </div>
-          </div>
-          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0 flex-1 space-y-3">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <span className="w-24 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Type
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {generationFilters.map((filter) => (
-                      <PlaygroundButton
-                        key={filter.value}
-                        className="px-2 py-1 text-xs sm:px-2"
-                        variant={generationFilter === filter.value ? 'primary' : 'secondary'}
-                        onClick={() => setGenerationFilter(filter.value)}
-                      >
-                        {filter.label}
-                      </PlaygroundButton>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
-                  <span className="w-24 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                    Tags
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    <PlaygroundButton
-                      className="px-2 py-1 text-xs sm:px-2"
-                      variant={tagFilter === 'all' ? 'primary' : 'secondary'}
-                      onClick={() => setTemplateTagFilter('all')}
-                    >
-                      All
-                    </PlaygroundButton>
-                    {tagOptions.map((tag) => (
-                      <PlaygroundButton
-                        key={tag}
-                        className="px-2 py-1 text-xs sm:px-2"
-                        variant={tagFilter === tag ? 'primary' : 'secondary'}
-                        onClick={() => setTemplateTagFilter(tag)}
-                      >
-                        {tag}
-                      </PlaygroundButton>
-                    ))}
-                  </div>
-                </div>
+            <div className="border-b border-dashed border-gray-200 pb-2">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Templates</h2>
+                <p className="mt-2 max-w-3xl text-sm text-gray-600">
+                  Choose a Designer sample, JSX starter, or md2pdf starter from the same gallery.
+                </p>
               </div>
-              {hasActiveTemplateFilter && (
-                <PlaygroundButton variant="ghost" onClick={clearTemplateFilters}>
-                  Clear
-                </PlaygroundButton>
-              )}
             </div>
-          </div>
-          <div className="mt-8 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
-            {filteredTemplates.map((template, index) => {
-              const { name, author } = template;
-              const authoringPreset = getAuthoringPreset(template);
-              const title = template.title;
-              const generation = getTemplateGeneration(template);
-              const tag = getGenerationLabel(generation);
-              const tags = getTemplateTags(template);
+            <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <span className="w-24 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      Type
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {generationFilters.map((filter) => (
+                        <PlaygroundButton
+                          key={filter.value}
+                          className="px-2 py-1 text-xs sm:px-2"
+                          variant={generationFilter === filter.value ? 'primary' : 'secondary'}
+                          onClick={() => setGenerationFilter(filter.value)}
+                        >
+                          {filter.label}
+                        </PlaygroundButton>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start">
+                    <span className="w-24 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      Tags
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      <PlaygroundButton
+                        className="px-2 py-1 text-xs sm:px-2"
+                        variant={tagFilter === 'all' ? 'primary' : 'secondary'}
+                        onClick={() => setTemplateTagFilter('all')}
+                      >
+                        All
+                      </PlaygroundButton>
+                      {tagOptions.map((tag) => (
+                        <PlaygroundButton
+                          key={tag}
+                          className="px-2 py-1 text-xs sm:px-2"
+                          variant={tagFilter === tag ? 'primary' : 'secondary'}
+                          onClick={() => setTemplateTagFilter(tag)}
+                        >
+                          {tag}
+                        </PlaygroundButton>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {hasActiveTemplateFilter && (
+                  <PlaygroundButton variant="ghost" onClick={clearTemplateFilters}>
+                    Clear
+                  </PlaygroundButton>
+                )}
+              </div>
+            </div>
+            <div className="mt-8 grid grid-cols-1 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-4 xl:gap-x-8">
+              {filteredTemplates.map((template, index) => {
+                const { name, author } = template;
+                const authoringPreset = getAuthoringPreset(template);
+                const title = template.title;
+                const generation = getTemplateGeneration(template);
+                const tag = getGenerationLabel(generation);
+                const tags = getTemplateTags(template);
 
-              return (
-                <React.Fragment key={name}>
-                  {index === 3 && (
-                    <div
-                      data-ea-publisher="pdfmecom"
-                      data-ea-type="image"
-                      style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
-                    />
-                  )}
-                  <GalleryCard
-                    tag={tag}
-                    title={title}
-                    tags={tags}
-                    description={
-                      <div className="space-y-3">
-                        <p>{template.description}</p>
-                        <p className="flex items-center gap-2 text-xs text-gray-500">
-                          by{' '}
-                          {avatarUrlMap[author] && (
+                return (
+                  <React.Fragment key={name}>
+                    {index === 3 && (
+                      <div
+                        data-ea-publisher="pdfmecom"
+                        data-ea-type="image"
+                        style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                      />
+                    )}
+                    <GalleryCard
+                      tag={tag}
+                      title={title}
+                      tags={tags}
+                      description={
+                        <div className="space-y-3">
+                          <p>{template.description}</p>
+                          <p className="flex items-center gap-2 text-xs text-gray-500">
+                            by{' '}
                             <img
-                              src={avatarUrlMap[author]}
+                              src={getAuthorAvatarUrl(author)}
                               alt={author}
+                              loading="lazy"
                               className="inline-block size-7 rounded-full bg-gray-100"
                             />
-                          )}
-                          <AuthorLink author={author} />
-                        </p>
-                      </div>
-                    }
-                    thumbnail={
-                      <img
-                        id={`template-img-${name}`}
-                        onClick={() =>
-                          authoringPreset
-                            ? navigateToAuthoringPreset(authoringPreset)
-                            : navigateTo(name, 'designer')
-                        }
-                        alt={title}
-                        src={`/template-assets/${name}/thumbnail.png`}
-                        className="h-72 w-full cursor-pointer object-contain"
-                      />
-                    }
-                    actions={
-                      authoringPreset ? (
-                        <PlaygroundButton
-                          fullWidth
-                          onClick={() => navigateToAuthoringPreset(authoringPreset)}
-                        >
-                          Open Starter
-                        </PlaygroundButton>
-                      ) : (
-                        <div className="space-y-2">
-                          <PlaygroundButton fullWidth onClick={() => navigateTo(name, 'designer')}>
-                            Designer
-                          </PlaygroundButton>
+                            <AuthorLink author={author} />
+                          </p>
+                        </div>
+                      }
+                      thumbnail={
+                        <img
+                          id={`template-img-${name}`}
+                          onClick={() =>
+                            authoringPreset
+                              ? navigateToAuthoringPreset(authoringPreset)
+                              : navigateTo(name, 'designer')
+                          }
+                          alt={title}
+                          src={`/template-assets/${name}/thumbnail.png`}
+                          className="h-72 w-full cursor-pointer object-contain"
+                        />
+                      }
+                      actions={
+                        authoringPreset ? (
                           <PlaygroundButton
                             fullWidth
-                            onClick={() => navigateTo(name, 'form-viewer')}
+                            onClick={() => navigateToAuthoringPreset(authoringPreset)}
                           >
-                            Form/Viewer
+                            Open Starter
                           </PlaygroundButton>
-                        </div>
-                      )
-                    }
-                  />
-                </React.Fragment>
-              );
-            })}
-            {filteredTemplates.length === 0 && (
-              <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-sm text-gray-600 sm:col-span-2 lg:col-span-4">
-                No templates match the selected filters.
-              </div>
-            )}
-          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() => navigateTo(name, 'designer')}
+                            >
+                              Designer
+                            </PlaygroundButton>
+                            <PlaygroundButton
+                              fullWidth
+                              onClick={() => navigateTo(name, 'form-viewer')}
+                            >
+                              Form/Viewer
+                            </PlaygroundButton>
+                          </div>
+                        )
+                      }
+                    />
+                  </React.Fragment>
+                );
+              })}
+              {filteredTemplates.length === 0 && (
+                <div className="rounded-lg border border-dashed border-gray-300 bg-white p-6 text-sm text-gray-600 sm:col-span-2 lg:col-span-4">
+                  No templates match the selected filters.
+                </div>
+              )}
+            </div>
           </section>
         )}
       </div>

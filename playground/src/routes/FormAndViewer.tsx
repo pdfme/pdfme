@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Pencil } from 'lucide-react';
-import { Template, checkTemplate, getInputFromTemplate, Lang } from '@pdfme/common';
+import { Template, getInputFromTemplate, Lang } from '@pdfme/common';
 import { Form, Viewer } from '@pdfme/ui';
 import {
   getFontsData,
@@ -16,10 +16,8 @@ import {
 import { getPlugins } from '../plugins';
 import PlaygroundButton from '../components/PlaygroundButton';
 import { NavItem, NavBar } from '../components/NavBar';
-import {
-  getActivePlaygroundProject,
-  getPlaygroundProject,
-} from '../lib/playgroundProjects';
+import { getErrorMessage } from '../lib/errors';
+import { getActivePlaygroundProject, getPlaygroundProject } from '../lib/playgroundProjects';
 import {
   FileWorkspaceTemplateDeletedError,
   FileWorkspaceTemplateInvalidError,
@@ -47,7 +45,9 @@ function FormAndViewerApp() {
   const currentTemplateRef = useRef<Template | null>(null);
   const currentInputsRef = useRef<Record<string, string>[] | null>(null);
 
-  const [mode, setMode] = useState<Mode>((localStorage.getItem('mode') as Mode) ?? 'form');
+  const [mode, setMode] = useState<Mode>(() =>
+    localStorage.getItem('mode') === 'viewer' ? 'viewer' : 'form',
+  );
   const [fileWorkspaceEntry, setFileWorkspaceEntry] = useState<FileWorkspaceTemplateEntry | null>(
     null,
   );
@@ -125,9 +125,7 @@ function FormAndViewerApp() {
           diskVersionRef.current = null;
           setFileWorkspaceEntry(null);
           setFileWorkspaceStatus(null);
-          const templateJson = await getTemplateById(templateIdFromQuery);
-          checkTemplate(templateJson);
-          template = templateJson;
+          template = await getTemplateById(templateIdFromQuery);
         } else {
           fileWorkspaceEntryRef.current = null;
           diskVersionRef.current = null;
@@ -176,6 +174,7 @@ function FormAndViewerApp() {
         currentTemplateRef.current = null;
         currentInputsRef.current = null;
         console.error(error);
+        toast.error(getErrorMessage(error));
       }
     },
     [destroyCurrentUi, searchParams],
@@ -345,7 +344,8 @@ function FormAndViewerApp() {
           onClick={async (e) => {
             const output = e.altKey ? 'form' : 'pdf';
             const startTimer = performance.now();
-            await generatePDF(ui.current, output);
+            const generated = await generatePDF(ui.current, output);
+            if (!generated) return;
             const endTimer = performance.now();
             toast.info(
               `Generated ${output === 'form' ? 'Form' : 'PDF'} in ${Math.round(

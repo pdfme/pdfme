@@ -372,12 +372,12 @@ export default function JsxPlayground() {
     const startTimer = performance.now();
     setIsGeneratingPdf(true);
     try {
-      await generatePDF(previewRef.current);
-      const duration = Math.round(performance.now() - startTimer);
-      setPdfDuration(duration);
-      toast.info(`Generated PDF in ${duration}ms`);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
+      const generated = await generatePDF(previewRef.current);
+      if (generated) {
+        const duration = Math.round(performance.now() - startTimer);
+        setPdfDuration(duration);
+        toast.info(`Generated PDF in ${duration}ms`);
+      }
     } finally {
       setIsGeneratingPdf(false);
     }
