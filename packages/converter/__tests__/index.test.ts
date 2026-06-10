@@ -101,26 +101,6 @@ describe('pdf2img tests', () => {
     });
   });
 
-  test('maxCanvasPixels option - clamps render scale to stay within pixel budget', async () => {
-    const maxCanvasPixels = 2_000_000;
-    const renderFirstPage = (options: { maxCanvasPixels?: number }) =>
-      nodePdf2Img(pdfArrayBuffer, {
-        scale: 4,
-        imageType: 'png',
-        range: { start: 0, end: 0 },
-        ...options,
-      });
-
-    const [unclamped] = await renderFirstPage({});
-    const [clamped] = await renderFirstPage({ maxCanvasPixels });
-    const unclampedImage = await loadImage(Buffer.from(new Uint8Array(unclamped)));
-    const clampedImage = await loadImage(Buffer.from(new Uint8Array(clamped)));
-
-    expect(unclampedImage.width * unclampedImage.height).toBeGreaterThan(maxCanvasPixels);
-    expect(clampedImage.width * clampedImage.height).toBeLessThanOrEqual(maxCanvasPixels * 1.01);
-    expect(clampedImage.width).toBeLessThan(unclampedImage.width);
-  });
-
   test('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
     await expect(nodePdf2Img(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');

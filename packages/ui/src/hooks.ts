@@ -54,11 +54,6 @@ const getScale = (n: number, paper: number) =>
 // a scale of 0 or below would leave the UI stuck on the loading spinner.
 const MIN_BASE_SCALE = 0.01;
 
-// Per-page canvas area limit for background rendering. iOS Safari fails or
-// crashes with canvases above roughly 16.7M pixels (4096 x 4096), so cap the
-// render scale to keep each page background within that budget.
-const MAX_BACKGROUND_CANVAS_PIXELS = 4096 * 4096;
-
 type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number; maxZoom: number };
 
 export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreProcessorProps) => {
@@ -102,10 +97,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
         const [pageSizeBuffer, imageBuffer] = [createPdfArrayBuffer(), createPdfArrayBuffer()];
         const [_pages, imgBuffers] = await Promise.all([
           pdf2size(pageSizeBuffer),
-          pdf2img(imageBuffer, {
-            scale: maxZoom,
-            maxCanvasPixels: MAX_BACKGROUND_CANVAS_PIXELS,
-          }),
+          pdf2img(imageBuffer, { scale: maxZoom }),
         ]);
         _pageSizes = _pages;
         paperWidth = _pageSizes[0].width * ZOOM;
