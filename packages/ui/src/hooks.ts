@@ -54,36 +54,6 @@ const getScale = (n: number, paper: number) =>
 // a scale of 0 or below would leave the UI stuck on the loading spinner.
 const MIN_BASE_SCALE = 0.01;
 
-// Mobile browsers (iOS Safari in particular) kill the page well before
-// desktop-class canvas/image memory usage is reached. Detect them so the
-// background rendering budget can be reduced accordingly.
-const isMobileBrowser = () => {
-  if (typeof navigator === 'undefined') return false;
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) return true;
-  // iPadOS 13+ reports a macOS user agent but still exposes multi-touch.
-  return /Mac/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
-};
-
-// Canvas area budgets for background rendering. Desktop keeps each page
-// within iOS Safari's historical per-canvas limit (~16.7M pixels = 4096 x
-// 4096); mobile devices crash from overall memory pressure long before that,
-// so they get a much smaller per-page budget plus a total budget across all
-// pages (RGBA decode cost: 16.7M px = ~67MB per page; 2048 x 2048 = ~17MB).
-const MAX_BACKGROUND_CANVAS_PIXELS_DESKTOP = 4096 * 4096;
-const MAX_BACKGROUND_CANVAS_PIXELS_MOBILE = 2048 * 2048;
-const MAX_TOTAL_BACKGROUND_CANVAS_PIXELS_MOBILE = MAX_BACKGROUND_CANVAS_PIXELS_MOBILE * 4;
-
-const getBackgroundPixelBudget = () =>
-  isMobileBrowser()
-    ? {
-        maxCanvasPixels: MAX_BACKGROUND_CANVAS_PIXELS_MOBILE,
-        maxTotalCanvasPixels: MAX_TOTAL_BACKGROUND_CANVAS_PIXELS_MOBILE,
-      }
-    : {
-        maxCanvasPixels: MAX_BACKGROUND_CANVAS_PIXELS_DESKTOP,
-        maxTotalCanvasPixels: undefined,
-      };
-
 type UIPreProcessorProps = { template: Template; size: Size; zoomLevel: number; maxZoom: number };
 
 export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreProcessorProps) => {
@@ -127,10 +97,7 @@ export const useUIPreProcessor = ({ template, size, zoomLevel, maxZoom }: UIPreP
         const [pageSizeBuffer, imageBuffer] = [createPdfArrayBuffer(), createPdfArrayBuffer()];
         const [_pages, imgBuffers] = await Promise.all([
           pdf2size(pageSizeBuffer),
-          pdf2img(imageBuffer, {
-            scale: maxZoom,
-            ...getBackgroundPixelBudget(),
-          }),
+          pdf2img(imageBuffer, { scale: maxZoom }),
         ]);
         _pageSizes = _pages;
         paperWidth = _pageSizes[0].width * ZOOM;

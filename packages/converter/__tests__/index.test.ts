@@ -101,52 +101,6 @@ describe('pdf2img tests', () => {
     });
   });
 
-  test('maxCanvasPixels option - clamps render scale to stay within pixel budget', async () => {
-    const maxCanvasPixels = 2_000_000;
-    const renderFirstPage = (options: { maxCanvasPixels?: number }) =>
-      nodePdf2Img(pdfArrayBuffer, {
-        scale: 4,
-        imageType: 'png',
-        range: { start: 0, end: 0 },
-        ...options,
-      });
-
-    const [unclamped] = await renderFirstPage({});
-    const [clamped] = await renderFirstPage({ maxCanvasPixels });
-    const unclampedImage = await loadImage(Buffer.from(new Uint8Array(unclamped)));
-    const clampedImage = await loadImage(Buffer.from(new Uint8Array(clamped)));
-
-    expect(unclampedImage.width * unclampedImage.height).toBeGreaterThan(maxCanvasPixels);
-    expect(clampedImage.width * clampedImage.height).toBeLessThanOrEqual(maxCanvasPixels * 1.01);
-    expect(clampedImage.width).toBeLessThan(unclampedImage.width);
-  });
-
-  test('maxTotalCanvasPixels option - clamps scale uniformly across pages', async () => {
-    const maxTotalCanvasPixels = 8_000_000;
-    const unclamped = await nodePdf2Img(pdfArrayBuffer, { scale: 4, imageType: 'png' });
-    const clamped = await nodePdf2Img(pdfArrayBuffer, {
-      scale: 4,
-      imageType: 'png',
-      maxTotalCanvasPixels,
-    });
-
-    expect(clamped.length).toBe(unclamped.length);
-
-    const sizesOf = (buffers: ArrayBuffer[]) =>
-      Promise.all(buffers.map((b) => loadImage(Buffer.from(new Uint8Array(b)))));
-    const unclampedImages = await sizesOf(unclamped);
-    const clampedImages = await sizesOf(clamped);
-
-    const totalArea = (images: Awaited<ReturnType<typeof sizesOf>>) =>
-      images.reduce((acc, img) => acc + img.width * img.height, 0);
-
-    expect(totalArea(unclampedImages)).toBeGreaterThan(maxTotalCanvasPixels);
-    expect(totalArea(clampedImages)).toBeLessThanOrEqual(maxTotalCanvasPixels * 1.01);
-    clampedImages.forEach((img, i) => {
-      expect(img.width).toBeLessThan(unclampedImages[i].width);
-    });
-  });
-
   test('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
     await expect(nodePdf2Img(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
