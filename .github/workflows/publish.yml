@@ -63,9 +63,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Refresh template manifests
-        run: node playground/scripts/generate-templates-list-json.mjs
-
       - name: Test
         run: npm run test
         env:

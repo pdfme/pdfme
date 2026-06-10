@@ -1,6 +1,6 @@
 ## @pdfme/cli
 
-This package provides the `pdfme` command-line interface for JSON-first pdfme workflows, including PDF generation, validation, diagnostics, example export, and PDF conversion utilities.
+This package provides the `pdfme` command-line interface for JSON-first pdfme workflows, including PDF generation, validation, diagnostics, and PDF conversion utilities.
 
 Node.js 20 or later is required.
 

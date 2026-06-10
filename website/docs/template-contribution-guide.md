@@ -70,7 +70,7 @@ Reference: https://github.com/pdfme/pdfme/tree/main/playground/public/template-a
    npm --prefix playground run generate-template-assets
    ```
 
-   This updates the generated template manifest used by the playground and CLI.
+   This updates the generated template index used by the playground.
 
 ### 4. Commit Changes
 1. **[Record Changes]**  

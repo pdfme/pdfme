@@ -58,7 +58,6 @@ For agentic workflows, local verification, or JSON-first template iteration, use
 - `pdfme validate`: validate template or unified job JSON before generation
 - `pdfme doctor`: diagnose runtime, font, `basePdf`, and output-path issues before `generate`
 - `pdfme generate --image --grid`: generate PDFs and inspect layout via rendered page images
-- `pdfme examples --withInputs`: export official example assets as a unified job you can edit and regenerate
 
 ## Examples Using pdfme
 
