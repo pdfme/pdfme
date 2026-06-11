@@ -1,0 +1,47 @@
+{
+  "title": "障害年金 受診状況等証明書",
+  "description": "日本年金機構の障害年金 受診状況等証明書をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "日本年金機構",
+  "sourceLabel": "障害年金 受診状況等証明書 PDF",
+  "sourceUrl": "https://www.nenkin.go.jp/shinsei/jukyu/shougai/shindansho/20140421-20.files/0000012239XWI83snsjt.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T05:41:14.242Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "医療",
+          "診療",
+          "傷病",
+          "障害年金",
+          "障害",
+          "受診状況等証明書",
+          "初診年月日",
+          "発病年月日",
+          "終診年月日",
+          "年金機構",
+          "日本年金機構",
+          "nenkin",
+          "shougai",
+          "shindansho",
+          "jushin",
+          "jokyo",
+          "shomeisho"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}

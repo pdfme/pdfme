@@ -1,0 +1,36 @@
+{
+  "title": "健康診断個人票（雇入時）",
+  "description": "兵庫労働局の健康診断個人票（雇入時）をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "兵庫労働局",
+  "sourceLabel": "健康診断個人票（雇入時） PDF",
+  "sourceUrl": "https://jsite.mhlw.go.jp/hyogo-roudoukyoku/content/contents/001044419.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T05:40:20.369Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "健康診断",
+          "健康診断個人票",
+          "雇入時",
+          "個人票",
+          "健診",
+          "労働安全衛生"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}

@@ -1,0 +1,1030 @@
+{
+  "schemas": [
+    [
+      {
+        "name": "name",
+        "position": {
+          "x": 38.45,
+          "y": 26.11
+        },
+        "width": 38.81,
+        "height": 10.23,
+        "type": "text",
+        "content": "山田 太郎",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "birth_year",
+        "position": {
+          "x": 99.48,
+          "y": 26.11
+        },
+        "width": 10.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "6",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "birth_month",
+        "position": {
+          "x": 115.01,
+          "y": 26.11
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "4",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "birth_day",
+        "position": {
+          "x": 124.53,
+          "y": 26.11
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "1",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "exam_year",
+        "position": {
+          "x": 158.75,
+          "y": 26.11
+        },
+        "width": 11.29,
+        "height": 4.23,
+        "type": "text",
+        "content": "6",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "exam_month",
+        "position": {
+          "x": 174.98,
+          "y": 26.11
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "4",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "exam_day",
+        "position": {
+          "x": 184.5,
+          "y": 26.11
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "10",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "sex_male",
+        "position": {
+          "x": 103.72,
+          "y": 31.75
+        },
+        "width": 6.7,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "sex_female",
+        "position": {
+          "x": 122.77,
+          "y": 31.75
+        },
+        "width": 6.7,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "age",
+        "position": {
+          "x": 158.4,
+          "y": 32.1
+        },
+        "width": 30.69,
+        "height": 4.23,
+        "type": "text",
+        "content": "35",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "business_history",
+        "position": {
+          "x": 48.68,
+          "y": 38.1
+        },
+        "width": 52.21,
+        "height": 9.52,
+        "type": "text",
+        "content": "事務職 5年",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "medical_history",
+        "position": {
+          "x": 48.68,
+          "y": 49.74
+        },
+        "width": 52.21,
+        "height": 15.52,
+        "type": "text",
+        "content": "既往歴なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "subjective_symptoms",
+        "position": {
+          "x": 48.68,
+          "y": 67.03
+        },
+        "width": 52.21,
+        "height": 15.88,
+        "type": "text",
+        "content": "自覚症状なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "objective_symptoms",
+        "position": {
+          "x": 48.68,
+          "y": 84.67
+        },
+        "width": 52.21,
+        "height": 18.34,
+        "type": "text",
+        "content": "他覚症状なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "height_cm",
+        "position": {
+          "x": 48.68,
+          "y": 104.78
+        },
+        "width": 52.21,
+        "height": 4.23,
+        "type": "text",
+        "content": "170.0",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "weight_kg",
+        "position": {
+          "x": 48.68,
+          "y": 110.77
+        },
+        "width": 52.21,
+        "height": 4.23,
+        "type": "text",
+        "content": "65.0",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "bmi",
+        "position": {
+          "x": 48.68,
+          "y": 116.42
+        },
+        "width": 52.21,
+        "height": 4.23,
+        "type": "text",
+        "content": "22.5",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "abdominal_circumference_cm",
+        "position": {
+          "x": 48.68,
+          "y": 122.41
+        },
+        "width": 52.21,
+        "height": 4.23,
+        "type": "text",
+        "content": "80.0",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "vision_right_uncorrected",
+        "position": {
+          "x": 48.68,
+          "y": 128.06
+        },
+        "width": 24.69,
+        "height": 4.23,
+        "type": "text",
+        "content": "1.0",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "vision_right_corrected",
+        "position": {
+          "x": 76.55,
+          "y": 128.06
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "1.2",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "vision_left_uncorrected",
+        "position": {
+          "x": 48.68,
+          "y": 133.7
+        },
+        "width": 24.69,
+        "height": 4.23,
+        "type": "text",
+        "content": "1.0",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "vision_left_corrected",
+        "position": {
+          "x": 76.55,
+          "y": 133.7
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "1.2",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "hearing_right_1000hz_normal",
+        "position": {
+          "x": 52.56,
+          "y": 138.71
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_right_1000hz_abnormal",
+        "position": {
+          "x": 76.55,
+          "y": 138.71
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_right_4000hz_normal",
+        "position": {
+          "x": 52.56,
+          "y": 142.94
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_right_4000hz_abnormal",
+        "position": {
+          "x": 76.55,
+          "y": 142.94
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_left_1000hz_normal",
+        "position": {
+          "x": 52.56,
+          "y": 147.18
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_left_1000hz_abnormal",
+        "position": {
+          "x": 76.55,
+          "y": 147.18
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_left_4000hz_normal",
+        "position": {
+          "x": 52.56,
+          "y": 151.41
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "hearing_left_4000hz_abnormal",
+        "position": {
+          "x": 76.55,
+          "y": 151.41
+        },
+        "width": 5.29,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "chest_xray_direct",
+        "position": {
+          "x": 52.92,
+          "y": 156
+        },
+        "width": 12.35,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "chest_xray_indirect",
+        "position": {
+          "x": 84.67,
+          "y": 156
+        },
+        "width": 12.35,
+        "height": 4.8,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "chest_xray_year",
+        "position": {
+          "x": 64.91,
+          "y": 160.87
+        },
+        "width": 7.41,
+        "height": 4.23,
+        "type": "text",
+        "content": "6",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "chest_xray_month",
+        "position": {
+          "x": 76.91,
+          "y": 160.87
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "4",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "chest_xray_day",
+        "position": {
+          "x": 86.43,
+          "y": 160.87
+        },
+        "width": 4.94,
+        "height": 4.23,
+        "type": "text",
+        "content": "10",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "chest_xray_result",
+        "position": {
+          "x": 48.68,
+          "y": 166.86
+        },
+        "width": 52.21,
+        "height": 11.64,
+        "type": "text",
+        "content": "異常なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "chest_xray_film_no",
+        "position": {
+          "x": 60.33,
+          "y": 180.27
+        },
+        "width": 40.57,
+        "height": 4.94,
+        "type": "text",
+        "content": "12345",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "remarks",
+        "position": {
+          "x": 48.68,
+          "y": 186.97
+        },
+        "width": 52.21,
+        "height": 12.7,
+        "type": "text",
+        "content": "特記事項なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "blood_pressure_mmhg",
+        "position": {
+          "x": 173.21,
+          "y": 38.1
+        },
+        "width": 21.17,
+        "height": 3.88,
+        "type": "text",
+        "content": "120/80",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "hemoglobin_g_dl",
+        "position": {
+          "x": 173.21,
+          "y": 43.74
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "14.2",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "red_blood_cells",
+        "position": {
+          "x": 173.21,
+          "y": 49.74
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "450",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "got_iu_l",
+        "position": {
+          "x": 173.21,
+          "y": 55.39
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "22",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "gpt_iu_l",
+        "position": {
+          "x": 173.21,
+          "y": 61.38
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "20",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "gamma_gtp_iu_l",
+        "position": {
+          "x": 173.21,
+          "y": 67.03
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "25",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "ldl_cholesterol_mg_dl",
+        "position": {
+          "x": 173.21,
+          "y": 73.02
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "110",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "hdl_cholesterol_mg_dl",
+        "position": {
+          "x": 173.21,
+          "y": 79.02
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "60",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "triglyceride_mg_dl",
+        "position": {
+          "x": 173.21,
+          "y": 84.67
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "90",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "blood_glucose_mg_dl",
+        "position": {
+          "x": 173.21,
+          "y": 90.31
+        },
+        "width": 21.17,
+        "height": 4.23,
+        "type": "text",
+        "content": "95",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "center",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "urine_sugar_negative",
+        "position": {
+          "x": 172.75,
+          "y": 96.31
+        },
+        "width": 4.8,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "urine_sugar_positive",
+        "position": {
+          "x": 177.25,
+          "y": 96.31
+        },
+        "width": 4.8,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "urine_protein_negative",
+        "position": {
+          "x": 172.75,
+          "y": 103.72
+        },
+        "width": 4.8,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "urine_protein_positive",
+        "position": {
+          "x": 177.25,
+          "y": 103.72
+        },
+        "width": 4.8,
+        "height": 4.94,
+        "type": "circleMark",
+        "content": "false",
+        "color": "#000000",
+        "borderWidth": 0.4,
+        "opacity": 0.6
+      },
+      {
+        "name": "ecg_result",
+        "position": {
+          "x": 158.4,
+          "y": 110.77
+        },
+        "width": 36.34,
+        "height": 9.88,
+        "type": "text",
+        "content": "異常なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "other_statutory_tests",
+        "position": {
+          "x": 158.4,
+          "y": 122.41
+        },
+        "width": 36.34,
+        "height": 9.88,
+        "type": "text",
+        "content": "異常なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "other_tests",
+        "position": {
+          "x": 158.4,
+          "y": 134.06
+        },
+        "width": 36.34,
+        "height": 4.23,
+        "type": "text",
+        "content": "なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "doctor_diagnosis",
+        "position": {
+          "x": 158.4,
+          "y": 139.7
+        },
+        "width": 36.34,
+        "height": 6.7,
+        "type": "text",
+        "content": "異常なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "exam_doctor_name",
+        "position": {
+          "x": 158.4,
+          "y": 148.17
+        },
+        "width": 36.34,
+        "height": 2.82,
+        "type": "text",
+        "content": "医師 太郎",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "doctor_opinion",
+        "position": {
+          "x": 158.4,
+          "y": 152.4
+        },
+        "width": 36.34,
+        "height": 7.06,
+        "type": "text",
+        "content": "通常勤務可",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "opinion_doctor_name",
+        "position": {
+          "x": 158.4,
+          "y": 160.87
+        },
+        "width": 36.34,
+        "height": 4.59,
+        "type": "text",
+        "content": "医師 太郎",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "dental_diagnosis",
+        "position": {
+          "x": 158.4,
+          "y": 166.86
+        },
+        "width": 36.34,
+        "height": 9.88,
+        "type": "text",
+        "content": "異常なし",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "dental_doctor_name",
+        "position": {
+          "x": 158.4,
+          "y": 178.51
+        },
+        "width": 36.34,
+        "height": 7.06,
+        "type": "text",
+        "content": "歯科医師 太郎",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "dental_doctor_opinion",
+        "position": {
+          "x": 158.4,
+          "y": 186.97
+        },
+        "width": 36.34,
+        "height": 7.06,
+        "type": "text",
+        "content": "通常勤務可",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      },
+      {
+        "name": "dental_opinion_doctor_name",
+        "position": {
+          "x": 158.4,
+          "y": 195.44
+        },
+        "width": 36.34,
+        "height": 4.23,
+        "type": "text",
+        "content": "歯科医師 太郎",
+        "readOnly": false,
+        "fontName": "NotoSansJP",
+        "fontSize": 8,
+        "alignment": "left",
+        "verticalAlignment": "middle",
+        "lineHeight": 1.2
+      }
+    ]
+  ],
+  "basePdf": "data:application/pdf;base64,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"
+}

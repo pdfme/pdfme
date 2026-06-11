@@ -1,0 +1,38 @@
+{
+  "title": "障害年金 診断書 精神の障害用（更新）",
+  "description": "日本年金機構の障害年金 診断書 精神の障害用（更新）をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "日本年金機構",
+  "sourceLabel": "障害年金 診断書 精神の障害用（更新） PDF",
+  "sourceUrl": "https://www.nenkin.go.jp/shinsei/jukyu/shougai/shindansho/20140421-23.files/04-s.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T05:41:01.230Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "診断書",
+          "障害年金",
+          "障害",
+          "年金機構",
+          "日本年金機構",
+          "精神の障害",
+          "nenkin",
+          "shougai",
+          "shindansho"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}
