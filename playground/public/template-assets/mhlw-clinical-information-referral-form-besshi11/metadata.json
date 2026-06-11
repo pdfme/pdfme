@@ -1,0 +1,42 @@
+{
+  "title": "診療情報提供書 別紙様式11",
+  "description": "厚生労働省の診療情報提供書 別紙様式11/11の2をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "厚生労働省",
+  "sourceLabel": "PDF 25-26ページ（別紙様式11、別紙様式11の2）",
+  "sourcePages": "25-26",
+  "sourceUrl": "https://www.mhlw.go.jp/content/12400000/001697757.pdf#page=25",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T04:49:21.774Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "医療",
+          "診療",
+          "患者",
+          "病院",
+          "保険医療機関",
+          "傷病",
+          "処方",
+          "診療情報提供書",
+          "紹介先医療機関",
+          "紹介元医療機関",
+          "生年月日"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "title": "精神科訪問看護指示書 別紙様式17",
+  "description": "厚生労働省の精神科訪問看護指示書 別紙様式17/17の2をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "厚生労働省",
+  "sourceLabel": "PDF 38-39ページ（別紙様式17、別紙様式17の2）",
+  "sourcePages": "38-39",
+  "sourceUrl": "https://www.mhlw.go.jp/content/12400000/001697757.pdf#page=38",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T04:57:17Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "医療",
+          "患者",
+          "訪問看護",
+          "精神科訪問看護指示書",
+          "訪問看護指示期間",
+          "特別訪問看護指示期間",
+          "在宅患者訪問点滴注射指示期間",
+          "傷病",
+          "看護",
+          "点滴",
+          "生年月日"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}
