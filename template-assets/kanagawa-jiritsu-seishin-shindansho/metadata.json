@@ -1,0 +1,43 @@
+{
+  "title": "自立支援医療（精神通院）診断書（神奈川県代表）",
+  "description": "神奈川県の自立支援医療（精神通院）診断書をPDF-backed pdfme templateとして編集できるサンプル。",
+  "sourceKind": "designer",
+  "tags": [
+    "Government",
+    "Healthcare",
+    "CJK",
+    "Form"
+  ],
+  "publisher": "神奈川県",
+  "sourceLabel": "自立支援医療（精神通院）診断書 PDF",
+  "sourceUrl": "https://www.pref.kanagawa.jp/documents/11515/sindansyop.pdf",
+  "pdfmeAgent": {
+    "domainRuleSkillIds": [
+      "medical-form-rules"
+    ],
+    "domainRuleSource": "auto",
+    "domainRuleUpdatedAt": "2026-06-11T05:55:10.655Z",
+    "domainRuleEvidence": [
+      {
+        "matchedKeywords": [
+          "医師",
+          "医療",
+          "診療",
+          "診断書",
+          "訪問看護",
+          "看護",
+          "投薬",
+          "障害",
+          "初診年月日",
+          "病歴",
+          "精神障害",
+          "精神保健指定医",
+          "精神科",
+          "shindansho"
+        ],
+        "skillId": "medical-form-rules"
+      }
+    ],
+    "suppressDomainRuleAutoDetection": false
+  }
+}
