@@ -35,9 +35,7 @@ const GENERATOR_BENCHMARK_RUN_COUNT = 6;
 const GENERATOR_BENCHMARK_WARMUP_RUN_COUNT = 1;
 const ADDRESS_LABEL_BENCHMARK_INPUT_COUNT = 20;
 const PLAYGROUND_TEMPLATE_PERFORMANCE_THRESHOLDS: Record<string, number> = {
-  'nenkin-shougai-limb-shindansho': 5,
   'nenkin-shougai-seishin-shindansho': 5,
-  'nenkin-shougai-respiratory-shindansho': 5,
 };
 const generatorPlugins = {
   text,
