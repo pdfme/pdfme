@@ -1,5 +1,6 @@
 {
   "title": "定期健康診断個人票",
+  "status": "draft",
   "description": "兵庫労働局の定期健康診断個人票をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

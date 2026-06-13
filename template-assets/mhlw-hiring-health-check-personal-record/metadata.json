@@ -1,5 +1,6 @@
 {
   "title": "健康診断個人票（雇入時）",
+  "status": "draft",
   "description": "兵庫労働局の健康診断個人票（雇入時）をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [
