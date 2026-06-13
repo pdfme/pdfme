@@ -138,8 +138,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const pivotPoint = { x: x + width / 2, y: pageHeight - mm2pt(schema.position.y) - height / 2 };
 
-  drawTextBoxDecoration({ page, schema, colorType, x, y, width, height, rotate, pivotPoint });
   if (!value) return;
+  drawTextBoxDecoration({ page, schema, colorType, x, y, width, height, rotate, pivotPoint });
 
   const fontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);

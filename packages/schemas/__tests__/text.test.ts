@@ -39,6 +39,7 @@ import { mergeTextLineRangeValue } from '../src/text/measure.js';
 import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
 import { propPanel as textPropPanel } from '../src/text/propPanel.js';
 import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
+import { pdfRender } from '../src/text/pdfRender.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 import type { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
@@ -123,6 +124,26 @@ const getOverflowOptionValues = (schema: Record<string, PropPanelSchema>) => {
   };
   return overflow.props.options.map((option) => option.value);
 };
+
+describe('text pdfRender', () => {
+  it('does not draw background decoration for empty values', async () => {
+    const drawRectangle = vi.fn();
+    const schema = getTextSchema();
+
+    await pdfRender({
+      value: '',
+      schema,
+      pdfDoc: {} as never,
+      pdfLib: {} as never,
+      page: { getHeight: () => mm2pt(297), drawRectangle } as never,
+      options: { font: getSampleFont() },
+      basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] },
+      _cache: new Map(),
+    });
+
+    expect(drawRectangle).not.toHaveBeenCalled();
+  });
+});
 
 describe('parseInlineMarkdown', () => {
   it('parses supported inline markdown styles', () => {
