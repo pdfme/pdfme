@@ -1,5 +1,6 @@
 {
   "title": "自立支援医療（精神通院）診断書（神奈川県代表）",
+  "status": "draft",
   "description": "神奈川県の自立支援医療（精神通院）診断書をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

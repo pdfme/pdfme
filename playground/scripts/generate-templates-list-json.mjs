@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const templatesDir = path.join(__dirname, '..', 'public', 'template-assets');
 const indexFilePath = path.join(templatesDir, 'index.json');
+const templateAssetStatuses = ['published', 'draft'];
 
 function generateTemplatesListJson() {
   const items = fs.readdirSync(templatesDir, { withFileTypes: true });
@@ -22,7 +23,12 @@ function generateTemplatesListJson() {
 
   validateTemplateMetadata(metadataByTemplate, templateDirs);
 
-  const result = templateDirs
+  const galleryTemplateDirs = templateDirs.filter(
+    (name) => normalizeMetadata(metadataByTemplate[name]).status !== 'draft',
+  );
+  const draftTemplateDirs = templateDirs.filter((name) => !galleryTemplateDirs.includes(name));
+
+  const result = galleryTemplateDirs
     .map((name) => {
       const templateJsonPath = path.join(templatesDir, name, 'template.json');
       const templateJson = JSON.parse(fs.readFileSync(templateJsonPath, 'utf8'));
@@ -32,6 +38,9 @@ function generateTemplatesListJson() {
 
   fs.writeFileSync(indexFilePath, JSON.stringify(result, null, 2));
   console.log(`Generated index.json with templates: ${result.map((t) => t.name).join(', ')}`);
+  if (draftTemplateDirs.length > 0) {
+    console.log(`Skipped draft templates: ${draftTemplateDirs.join(', ')}`);
+  }
 }
 
 function loadTemplateMetadata() {
@@ -66,6 +75,9 @@ function normalizeMetadata(rawMetadata) {
   if (typeof rawMetadata.order === 'number' && Number.isFinite(rawMetadata.order)) {
     metadata.order = rawMetadata.order;
   }
+  if (templateAssetStatuses.includes(rawMetadata.status)) {
+    metadata.status = rawMetadata.status;
+  }
   if (['designer', 'jsx', 'md2pdf'].includes(rawMetadata.sourceKind)) {
     metadata.sourceKind = rawMetadata.sourceKind;
   }
@@ -98,6 +110,11 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
 
   for (const [name, rawMetadata] of Object.entries(metadataByTemplate)) {
     const metadata = normalizeMetadata(rawMetadata);
+    if (rawMetadata.status != null && !templateAssetStatuses.includes(rawMetadata.status)) {
+      throw new Error(
+        `template asset metadata entry "${name}" has unsupported status "${rawMetadata.status}".`,
+      );
+    }
     if (!metadata.title) {
       throw new Error(`template asset metadata entry "${name}" must include title.`);
     }
@@ -121,7 +138,7 @@ function validateTemplateMetadata(metadataByTemplate, templateDirs) {
 
   const orderedEntries = Object.entries(metadataByTemplate)
     .map(([name, rawMetadata]) => [name, normalizeMetadata(rawMetadata)])
-    .filter(([, metadata]) => metadata.order != null);
+    .filter(([, metadata]) => metadata.order != null && metadata.status !== 'draft');
   const seenOrders = new Map();
   for (const [name, metadata] of orderedEntries) {
     const existingName = seenOrders.get(metadata.order);

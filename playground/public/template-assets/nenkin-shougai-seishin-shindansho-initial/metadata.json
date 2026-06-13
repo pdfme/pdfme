@@ -1,5 +1,6 @@
 {
   "title": "障害年金 診断書 精神の障害用（初回）",
+  "status": "draft",
   "description": "日本年金機構の障害年金 診断書 精神の障害用（初回）をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

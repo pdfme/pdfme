@@ -1,5 +1,6 @@
 {
   "title": "診療情報提供書 別紙様式11",
+  "status": "draft",
   "description": "厚生労働省の診療情報提供書 別紙様式11/11の2をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

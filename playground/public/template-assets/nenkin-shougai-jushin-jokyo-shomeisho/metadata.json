@@ -1,5 +1,6 @@
 {
   "title": "障害年金 受診状況等証明書",
+  "status": "draft",
   "description": "日本年金機構の障害年金 受診状況等証明書をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

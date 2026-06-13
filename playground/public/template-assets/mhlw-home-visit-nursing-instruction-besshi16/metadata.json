@@ -1,5 +1,6 @@
 {
   "title": "訪問看護指示書 別紙様式16",
+  "status": "draft",
   "description": "厚生労働省の訪問看護指示書 別紙様式16をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

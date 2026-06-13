@@ -55,6 +55,9 @@ Supported metadata fields:
 - `description`: short card description shown in the template gallery.
 - `tags`: filter tags shown on the card and in the gallery filter.
 - `sourceKind`: optional generation kind. Use `"designer"`, `"jsx"`, or `"md2pdf"`. Normal `template.json` samples can omit this; they default to `"designer"`.
+- `status`: optional publish status. Use `"draft"` to keep the template files available by direct
+  URL while excluding the template from the gallery `index.json`; omit it or use `"published"` for
+  gallery templates.
 
 Template metadata is validated during asset generation. Every template directory with a
 `template.json` must have metadata, and metadata entries without a matching template directory fail

@@ -1,5 +1,6 @@
 {
   "title": "介護保険 主治医意見書",
+  "status": "draft",
   "description": "厚生労働省の介護保険 主治医意見書をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [

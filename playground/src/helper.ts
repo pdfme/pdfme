@@ -13,19 +13,25 @@ import { getErrorMessage } from './lib/errors';
 import { getPlugins } from './plugins';
 
 const templateAssetSourceKinds = ['designer', 'jsx', 'md2pdf'] as const;
+const templateAssetStatuses = ['published', 'draft'] as const;
 
 type TemplateAssetSourceKind = (typeof templateAssetSourceKinds)[number];
+type TemplateAssetStatus = (typeof templateAssetStatuses)[number];
 
 export type TemplateAssetMetadata = {
   description: string;
   order?: number;
   sourceKind: TemplateAssetSourceKind;
+  status?: TemplateAssetStatus;
   tags: string[];
   title: string;
 };
 
 const isTemplateAssetSourceKind = (value: unknown): value is TemplateAssetSourceKind =>
   templateAssetSourceKinds.includes(value as TemplateAssetSourceKind);
+
+const isTemplateAssetStatus = (value: unknown): value is TemplateAssetStatus =>
+  templateAssetStatuses.includes(value as TemplateAssetStatus);
 
 export const getFontsData = (): Font => ({
   ...getDefaultFont(),
@@ -191,6 +197,9 @@ export const getTemplateMetadataById = async (
   if (!isTemplateAssetSourceKind(metadata.sourceKind)) {
     throw new Error(`Template metadata "${templateId}" must include sourceKind.`);
   }
+  if (metadata.status != null && !isTemplateAssetStatus(metadata.status)) {
+    throw new Error(`Template metadata "${templateId}" has unsupported status.`);
+  }
   if (!metadata.tags || metadata.tags.length === 0) {
     throw new Error(`Template metadata "${templateId}" must include tags.`);
   }
@@ -199,6 +208,7 @@ export const getTemplateMetadataById = async (
     description: metadata.description,
     order: metadata.order,
     sourceKind: metadata.sourceKind,
+    status: metadata.status,
     tags: metadata.tags,
     title: metadata.title.trim(),
   };

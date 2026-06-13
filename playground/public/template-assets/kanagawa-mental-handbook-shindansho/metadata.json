@@ -1,5 +1,6 @@
 {
   "title": "精神障害者保健福祉手帳診断書（神奈川県代表）",
+  "status": "draft",
   "description": "神奈川県の精神障害者保健福祉手帳診断書をPDF-backed pdfme templateとして編集できるサンプル。",
   "sourceKind": "designer",
   "tags": [
