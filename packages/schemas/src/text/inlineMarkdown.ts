@@ -12,7 +12,8 @@ const sameStyle = (a: InlineStyle, b: InlineStyle) =>
   Boolean(a.italic) === Boolean(b.italic) &&
   Boolean(a.strikethrough) === Boolean(b.strikethrough) &&
   Boolean(a.code) === Boolean(b.code) &&
-  a.href === b.href;
+  a.href === b.href &&
+  a.fontSize === b.fontSize;
 
 const appendRun = (runs: RichTextRun[], text: string, style: InlineStyle) => {
   if (!text) return;
@@ -30,6 +31,7 @@ const appendRun = (runs: RichTextRun[], text: string, style: InlineStyle) => {
     ...(style.strikethrough ? { strikethrough: true } : {}),
     ...(style.code ? { code: true } : {}),
     ...(style.href ? { href: style.href } : {}),
+    ...(style.fontSize !== undefined ? { fontSize: style.fontSize } : {}),
   });
 };
 
