@@ -63,6 +63,8 @@ const getDelimiter = (value: string, index: number) => {
   if (value.startsWith('**', index)) return '**';
   if (value.startsWith('~~', index)) return '~~';
   if (value[index] === '*') return '*';
+  const sizeMatch = value.slice(index).match(/^\{\+(\d+)\}/);
+  if (sizeMatch) return sizeMatch[0];
   return '';
 };
 
@@ -138,6 +140,10 @@ const mergeStyle = (style: InlineStyle, delimiter: string): InlineStyle => {
   }
   if (delimiter === '~~') {
     return { ...style, strikethrough: true };
+  }
+  const sizeMatch = delimiter.match(/^\{\+(\d+)\}$/);
+  if (sizeMatch) {
+    return { ...style, fontSize: Number(sizeMatch[1]) };
   }
   return style;
 };
