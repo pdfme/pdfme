@@ -1,36 +1,37 @@
-import type { SchemaForUI, Plugin } from '@pdfme/common';
-import { getBarcodeValue, barcoder } from './barcoder.js';
+import { PDFRenderProps } from '@pdfme/common';
+import { convertForPdfLayoutProps } from '../utils.js';
+import type { BarcodeSchema } from './types.js';
+import { createBarCode, validateBarcodeInput } from './helper.js';
+import { PDFImage } from '@pdfme/pdf-lib';
 
-const drawBarcode = async (
-  arg: { schema: SchemaForUI; input: string; pdfDoc: any; page: any },
-  rootElement: any
-) => {
-  const {
-    schema: { type, includeText },
-  } = arg;
-  const { input } = rootElement;
-
-  // BWIPP expects bwipp_setanycolor to be defined globally when includeText is true.
-  // Provide a default no-op if missing to avoid ReferenceError.
-  if (typeof (globalThis as any).bwipp_setanycolor === 'undefined') {
-    (globalThis as any).bwipp_setanycolor = () => {};
-  }
-
-  try {
-    if (type === 'qrcode') {
-      // QR code rendering
-      const barcodeValue = getBarcodeValue(input, type);
-      const bw = barcoder(barcodeValue, type);
-      // ... rest of qrcode rendering
-    } else {
-      // other barcode types
-      const barcodeValue = getBarcodeValue(input, type);
-      const bw = barcoder(barcodeValue, type, { includeText });
-      // ... rest of rendering
-    }
-  } catch (error) {
-    console.error('Barcode rendering error:', error);
-  }
+const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
+  return `${schema.type}${schema.backgroundColor}${schema.barColor}${schema.textColor}${value}${schema.includetext}`;
 };
 
-export default drawBarcode;
+export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
+  const { value, schema, pdfDoc, page, _cache } = arg;
+  if (!validateBarcodeInput(schema.type, value)) return;
+
+  const inputBarcodeCacheKey = getBarcodeCacheKey(schema, value);
+  let image = _cache.get(inputBarcodeCacheKey) as PDFImage | undefined;
+  if (!image) {
+    const imageBuf = await createBarCode({
+      ...schema,
+      type: schema.type,
+      input: value,
+    });
+    image = await pdfDoc.embedPng(imageBuf);
+    _cache.set(inputBarcodeCacheKey, image);
+  }
+
+  const pageHeight = page.getHeight();
+  const {
+    width,
+    height,
+    rotate,
+    position: { x, y },
+    opacity,
+  } = convertForPdfLayoutProps({ schema, pageHeight });
+
+  page.drawImage(image, { x, y, rotate, width, height, opacity });
+};
