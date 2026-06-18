@@ -63,7 +63,7 @@ describe('pdf2img tests', () => {
   });
 
   test('Node.js version - rendered image is not blank', async () => {
-    const images = await nodePdf2Img(pdfArrayBuffer, { scale: 1, imageType: 'png' });
+    const images = await nodePdf2Img(pdfArrayBuffer, { scale: 1 });
     const image = await loadImage(Buffer.from(new Uint8Array(images[0])));
     const canvas = createCanvas(image.width, image.height);
     const context = canvas.getContext('2d');
@@ -103,18 +103,19 @@ describe('pdf2img tests', () => {
 
   test('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
-    await expect(nodePdf2Img(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
+    await expect(nodePdf2Img(invalidBuffer, { scale: 1 })).rejects.toThrow(
+      'Input is not a valid PDF or is corrupted',
+    );
   });
 
   test('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(nodePdf2Img(emptyBuffer, { scale: 1 })).rejects.toThrow(
-      'The PDF file is empty, i.e. its size is zero by',
+      'Input is not a valid PDF or is corrupted',
     );
   });
 });
 describe('img2pdf tests', () => {
-  let jpegImage: ArrayBuffer;
   let pngImage: ArrayBuffer;
 
   beforeAll(async () => {
@@ -139,24 +140,23 @@ describe('img2pdf tests', () => {
       inputs: [{ field1: 'hello-1' }],
     });
     const images = await nodePdf2Img(new Uint8Array(pdf.buffer), { scale: 1 });
-    jpegImage = images[0];
-    pngImage = images[0]; // Using same image for both tests
+    pngImage = images[0];
   });
 
   test('converts single image to PDF', async () => {
-    const pdf = await img2pdf([jpegImage]);
+    const pdf = await img2pdf([pngImage]);
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
 
   test('converts multiple images to single PDF', async () => {
-    const pdf = await img2pdf([jpegImage, pngImage]);
+    const pdf = await img2pdf([pngImage, pngImage]);
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
 
   test('handles scale option', async () => {
-    const pdf = await img2pdf([jpegImage], { scale: 0.5 });
+    const pdf = await img2pdf([pngImage], { scale: 0.5 });
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
 
@@ -171,14 +171,14 @@ describe('img2pdf tests', () => {
 
   test('handles size option', async () => {
     const customSize = { width: 100, height: 150 }; // in millimeters
-    const pdf = await img2pdf([jpegImage], { size: customSize });
+    const pdf = await img2pdf([pngImage], { size: customSize });
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
 
   test('handles margin option', async () => {
     const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
-    const pdf = await img2pdf([jpegImage], { margin: margins });
+    const pdf = await img2pdf([pngImage], { margin: margins });
     expect(pdf).toBeInstanceOf(ArrayBuffer);
     expect(pdf.byteLength).toBeGreaterThan(0);
   });
@@ -186,7 +186,7 @@ describe('img2pdf tests', () => {
   test('handles both size and margin options', async () => {
     const customSize = { width: 100, height: 150 }; // in millimeters
     const margins: [number, number, number, number] = [10, 20, 30, 40]; // in millimeters [top, right, bottom, left]
-    const pdf = await img2pdf([jpegImage], {
+    const pdf = await img2pdf([pngImage], {
       size: customSize,
       margin: margins,
     });
@@ -196,13 +196,13 @@ describe('img2pdf tests', () => {
 
   test('uses default margin [0,0,0,0] when margin is omitted', async () => {
     // This test verifies the default behavior is maintained
-    const pdf1 = await img2pdf([jpegImage]);
-    const pdf2 = await img2pdf([jpegImage], {
+    const pdf1 = await img2pdf([pngImage]);
+    const pdf2 = await img2pdf([pngImage], {
       margin: [0, 0, 0, 0] as [number, number, number, number],
     });
 
-    const [rendered1] = await nodePdf2Img(pdf1, { imageType: 'png' });
-    const [rendered2] = await nodePdf2Img(pdf2, { imageType: 'png' });
+    const [rendered1] = await nodePdf2Img(pdf1);
+    const [rendered2] = await nodePdf2Img(pdf2);
     const image1 = await loadImage(Buffer.from(new Uint8Array(rendered1)));
     const image2 = await loadImage(Buffer.from(new Uint8Array(rendered2)));
 
@@ -272,13 +272,15 @@ describe('pdf2size tests', () => {
 
   test('invalid PDF input - should throw error', async () => {
     const invalidBuffer = new ArrayBuffer(10);
-    await expect(nodePdf2Size(invalidBuffer, { scale: 1 })).rejects.toThrow('Invalid PDF');
+    await expect(nodePdf2Size(invalidBuffer, { scale: 1 })).rejects.toThrow(
+      'Input is not a valid PDF or is corrupted',
+    );
   });
 
   test('empty buffer input - should throw error', async () => {
     const emptyBuffer = new ArrayBuffer(0);
     await expect(nodePdf2Size(emptyBuffer, { scale: 1 })).rejects.toThrow(
-      'The PDF file is empty, i.e. its size is zero by',
+      'Input is not a valid PDF or is corrupted',
     );
   });
 });

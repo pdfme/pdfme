@@ -97,7 +97,7 @@ describe('doctor command', () => {
     expect(result.stderr).toContain('Template pages: 1');
   });
 
-  it('rejects invalid imageFormat even for environment-only doctor runs', () => {
+  it('rejects removed imageFormat option even for environment-only doctor runs', () => {
     const result = runCli(['doctor', '--imageFormat', 'gif', '--json']);
 
     expect(result.exitCode).toBe(1);
@@ -1417,8 +1417,6 @@ describe('doctor command', () => {
       '-o',
       outputPath,
       '--image',
-      '--imageFormat',
-      'jpeg',
       '--json',
     ]);
 
@@ -1438,9 +1436,9 @@ describe('doctor command', () => {
     );
     expect(parsed.diagnosis.runtime.imageOutputs).toEqual({
       enabled: true,
-      format: 'jpeg',
+      format: 'png',
       directory: join(workDir, 'artifacts'),
-      paths: [join(workDir, 'artifacts', 'out-1.jpg'), join(workDir, 'artifacts', 'out-2.jpg')],
+      paths: [join(workDir, 'artifacts', 'out-1.png'), join(workDir, 'artifacts', 'out-2.png')],
     });
   });
 
@@ -1642,8 +1640,6 @@ describe('doctor command', () => {
         '-o',
         'output.pdf',
         '--image',
-        '--imageFormat',
-        'jpeg',
         '--json',
       ],
       { cwd: workDir },
@@ -1657,7 +1653,7 @@ describe('doctor command', () => {
     expect(parsed.issues).toEqual([]);
   });
 
-  it('rejects invalid imageFormat for doctor fonts as an argument error', () => {
+  it('rejects removed imageFormat option for doctor fonts as an argument error', () => {
     const workDir = join(TMP, 'doctor-fonts-invalid-image-format');
     const file = join(workDir, 'job.json');
     mkdirSync(workDir, { recursive: true });

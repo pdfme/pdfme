@@ -58,13 +58,6 @@ describe('parsePageRange', () => {
 
 describe('getImageOutputPaths', () => {
   it('generates png paths', () => {
-    expect(getImageOutputPaths('/tmp/out.pdf', 2, 'png')).toEqual([
-      '/tmp/out-1.png',
-      '/tmp/out-2.png',
-    ]);
-  });
-
-  it('generates jpg paths', () => {
-    expect(getImageOutputPaths('/tmp/out.pdf', 1, 'jpeg')).toEqual(['/tmp/out-1.jpg']);
+    expect(getImageOutputPaths('/tmp/out.pdf', 2)).toEqual(['/tmp/out-1.png', '/tmp/out-2.png']);
   });
 });

@@ -427,7 +427,7 @@ async function generatePdf(page: Page, browser: Browser): Promise<Buffer> {
 
 async function pdfToImages(pdf: Buffer): Promise<Buffer[]> {
   const pdfBytes = new Uint8Array(pdf.buffer, pdf.byteOffset, pdf.byteLength);
-  const arrayBuffers = await pdf2img(pdfBytes, { imageType: 'png' });
+  const arrayBuffers = await pdf2img(pdfBytes);
   return arrayBuffers.map((buf: ArrayBuffer) => Buffer.from(new Uint8Array(buf)));
 }
 

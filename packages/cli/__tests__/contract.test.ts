@@ -90,7 +90,7 @@ describe('CLI contract failures', () => {
     expect(parsed.error.message).toContain('No input provided');
   });
 
-  it('rejects invalid image format enum for generate', () => {
+  it('rejects removed image format option for generate', () => {
     const jobPath = join(TMP, 'invalid-image-format.json');
     writeFileSync(
       jobPath,

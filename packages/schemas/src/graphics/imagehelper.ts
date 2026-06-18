@@ -113,10 +113,10 @@ const typeHandlers = {
   png: PNG,
 };
 
-type imageType = keyof typeof typeHandlers;
+type ImageKind = keyof typeof typeHandlers;
 
-function detector(input: Uint8Array): imageType | undefined {
-  const firstBytes: { [byte: number]: imageType } = {
+function detector(input: Uint8Array): ImageKind | undefined {
+  const firstBytes: { [byte: number]: ImageKind } = {
     0x89: 'png',
     0xff: 'jpg',
   };
@@ -128,8 +128,8 @@ function detector(input: Uint8Array): imageType | undefined {
     }
   }
 
-  const keys = Object.keys(typeHandlers) as imageType[];
-  return keys.find((key: imageType) => typeHandlers[key].validate(input));
+  const keys = Object.keys(typeHandlers) as ImageKind[];
+  return keys.find((key: ImageKind) => typeHandlers[key].validate(input));
 }
 
 export const getImageDimension = (value: string): { height: number; width: number } => {

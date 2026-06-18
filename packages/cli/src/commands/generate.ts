@@ -7,7 +7,6 @@ import type { Font, GenerateProps, Template } from '@pdfme/common';
 import {
   assertNoUnknownFlags,
   fail,
-  parseEnumArg,
   parsePositiveNumberArg,
   printJson,
   runWithContract,
@@ -49,7 +48,6 @@ const generateArgs = {
     description: 'Also output PNG images per page',
     default: false,
   },
-  imageFormat: { type: 'string' as const, description: 'Image format: png | jpeg', default: 'png' },
   scale: { type: 'string' as const, description: 'Image render scale', default: '1' },
   grid: {
     type: 'boolean' as const,
@@ -81,7 +79,6 @@ export default defineCommand({
     return runWithContract({ json: Boolean(args.json) }, async () => {
       assertNoUnknownFlags(rawArgs, generateArgs);
 
-      const imageFormat = parseEnumArg('imageFormat', args.imageFormat, ['png', 'jpeg']);
       const scale = parsePositiveNumberArg('scale', args.scale);
       const gridSize = parsePositiveNumberArg('gridSize', args.gridSize);
 
@@ -159,7 +156,7 @@ export default defineCommand({
         console.error(
           `Images: ${
             args.image || args.grid
-              ? `enabled (${imageFormat}, scale=${scale}, grid=${args.grid ? `${gridSize}mm` : 'disabled'})`
+              ? `enabled (png, scale=${scale}, grid=${args.grid ? `${gridSize}mm` : 'disabled'})`
               : 'disabled'
           }`,
         );
@@ -192,8 +189,8 @@ export default defineCommand({
       };
 
       if (args.image || args.grid) {
-        const images = await pdf2img(pdf, { scale, imageType: imageFormat });
-        const imagePaths = getImageOutputPaths(args.output, images.length, imageFormat);
+        const images = await pdf2img(pdf, { scale });
+        const imagePaths = getImageOutputPaths(args.output, images.length);
 
         if (args.grid) {
           const renderedPageSizes = await pdf2size(pdf);
@@ -217,7 +214,6 @@ export default defineCommand({
               gridSize,
               size.width,
               size.height,
-              imageFormat,
             );
             writeOutput(imagePaths[i], gridImage);
           }
