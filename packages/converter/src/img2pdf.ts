@@ -1,10 +1,8 @@
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { mm2pt } from '@pdfme/common';
-import type { ImageType } from './types.js';
 
 interface Img2PdfOptions {
   scale?: number;
-  imageType?: ImageType;
   size?: { height: number; width: number }; // in millimeters
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }

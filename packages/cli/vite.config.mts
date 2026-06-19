@@ -21,7 +21,7 @@ const packageDependencies = [
 ];
 
 // Also externalize transitive native deps that must not be bundled
-const alwaysExternal = ['@napi-rs/canvas', 'pdfjs-dist', 'fontkit', '@pdfme/pdf-lib'];
+const alwaysExternal = ['@napi-rs/canvas', 'clawpdf', 'fontkit', '@pdfme/pdf-lib'];
 
 const isExternal = (id: string) =>
   builtinModuleSet.has(id) ||

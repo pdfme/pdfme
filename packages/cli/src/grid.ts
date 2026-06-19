@@ -7,8 +7,6 @@ interface Schema {
   [key: string]: unknown;
 }
 
-type ImageFormat = 'png' | 'jpeg';
-
 const schemaColorCache = new Map<string, string>();
 
 function hashString(value: string): number {
@@ -200,7 +198,6 @@ export async function drawGridOnImage(
   gridSizeMm: number,
   pageWidthMm: number,
   pageHeightMm: number,
-  imageType: ImageFormat,
 ): Promise<ArrayBuffer> {
   const { canvas, ctx, img } = await loadAndPrepareCanvas(imageBuffer);
   const pxPerMm = img.width / pageWidthMm;
@@ -208,8 +205,7 @@ export async function drawGridOnImage(
   drawGridLines(ctx, pxPerMm, pageWidthMm, pageHeightMm, img.width, img.height, gridSizeMm, false);
   drawSchemaOverlays(ctx, schemas, pxPerMm);
 
-  const mimeType = imageType === 'jpeg' ? 'image/jpeg' : 'image/png';
-  return bufferToArrayBuffer(canvas.toBuffer(mimeType));
+  return bufferToArrayBuffer(canvas.toBuffer('image/png'));
 }
 
 /**
@@ -221,13 +217,11 @@ export async function drawGridOnPdfImage(
   gridSizeMm: number,
   pageWidthMm: number,
   pageHeightMm: number,
-  imageType: ImageFormat,
 ): Promise<ArrayBuffer> {
   const { canvas, ctx, img } = await loadAndPrepareCanvas(imageBuffer);
   const pxPerMm = img.width / pageWidthMm;
 
   drawGridLines(ctx, pxPerMm, pageWidthMm, pageHeightMm, img.width, img.height, gridSizeMm, true);
 
-  const mimeType = imageType === 'jpeg' ? 'image/jpeg' : 'image/png';
-  return bufferToArrayBuffer(canvas.toBuffer(mimeType));
+  return bufferToArrayBuffer(canvas.toBuffer('image/png'));
 }

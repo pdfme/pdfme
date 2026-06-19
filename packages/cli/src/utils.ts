@@ -131,15 +131,10 @@ export function resolveBasePdf(
   return template;
 }
 
-export function getImageOutputPaths(
-  pdfOutputPath: string,
-  pageCount: number,
-  imageFormat: string,
-): string[] {
+export function getImageOutputPaths(pdfOutputPath: string, pageCount: number): string[] {
   const dir = dirname(pdfOutputPath);
   const base = basename(pdfOutputPath, extname(pdfOutputPath));
-  const ext = imageFormat === 'jpeg' ? 'jpg' : 'png';
-  return Array.from({ length: pageCount }, (_, i) => join(dir, `${base}-${i + 1}.${ext}`));
+  return Array.from({ length: pageCount }, (_, i) => join(dir, `${base}-${i + 1}.png`));
 }
 
 export function writeOutput(filePath: string, data: Uint8Array | ArrayBuffer): void {

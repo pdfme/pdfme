@@ -20,19 +20,18 @@
 npm install @pdfme/converter
 ```
 
-Node.js で `pdf2img` を使うために追加の install は不要です。`@pdfme/converter` には必要な Node 向け canvas 実装として `@napi-rs/canvas` がすでに含まれています。
+Node.js で `pdf2img` を使うために追加の install は不要です。PDFium を `clawpdf` 経由で使用するため、Node.js で使う場合は Node.js 20 以降が必要です。
 
 ## 機能
 
 ### pdf2img
-PDFページを画像（JPEGまたはPNG形式）に変換します。
+PDFページをPNG画像に変換します。
 
 ```ts
 import { pdf2img } from '@pdfme/converter';
 
 const pdf = new ArrayBuffer(...); // ソースPDF
 const images = await pdf2img(pdf, {
-  imageType: 'png',
   scale: 1,
   range: { start: 0, end: 1 },
 });
@@ -61,7 +60,6 @@ const image1 = new ArrayBuffer(...); // 1枚目の画像
 const image2 = new ArrayBuffer(...); // 2枚目の画像
 const pdf = await img2pdf([image1, image2], {
   scale: 1,
-  imageType: 'jpeg',
   size: { width: 210, height: 297 },
   margin: [10, 10, 10, 10],
 });
@@ -169,8 +167,6 @@ const pdf = await generate({
 ```ts
 import type { BlankPdf, PageOrientation, PageSize } from '@pdfme/common';
 
-type ImageType = 'jpeg' | 'png';
-
 interface PageRange {
   start?: number;
   end?: number;
@@ -178,7 +174,6 @@ interface PageRange {
 
 interface Pdf2ImgOptions {
   scale?: number;
-  imageType?: ImageType;
   range?: PageRange;
 }
 
@@ -188,7 +183,6 @@ interface Pdf2SizeOptions {
 
 interface Img2PdfOptions {
   scale?: number;
-  imageType?: ImageType;
   size?: { height: number, width: number }; // ミリメートル単位
   margin?: [number, number, number, number]; // ミリメートル単位 [上, 右, 下, 左]
 }

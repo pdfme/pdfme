@@ -55,10 +55,9 @@
     "test": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^1.0.0",
     "@pdfme/common": "*",
     "@pdfme/pdf-lib": "*",
-    "pdfjs-dist": "^6.0.227",
+    "clawpdf": "^0.3.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
     "unified": "^11.0.5"
@@ -67,5 +66,8 @@
     "@pdfme/generator": "*",
     "@pdfme/schemas": "*",
     "@types/mdast": "^4.0.4"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

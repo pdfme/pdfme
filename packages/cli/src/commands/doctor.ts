@@ -3,13 +3,7 @@ import { dirname } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
 import { defineCommand } from 'citty';
 import { checkGenerateProps, DEFAULT_FONT_NAME } from '@pdfme/common';
-import {
-  assertNoUnknownFlags,
-  fail,
-  parseEnumArg,
-  printJson,
-  runWithContract,
-} from '../contract.js';
+import { assertNoUnknownFlags, fail, printJson, runWithContract } from '../contract.js';
 import { detectCJKInInputs, detectCJKInTemplate } from '../cjk-detect.js';
 import {
   collectInputHints,
@@ -67,11 +61,6 @@ const doctorArgs = {
     type: 'boolean' as const,
     description: 'Simulate generate --image when previewing runtime output paths',
     default: false,
-  },
-  imageFormat: {
-    type: 'string' as const,
-    description: 'Image format to use when previewing runtime output paths: png | jpeg',
-    default: 'png',
   },
 };
 
@@ -162,7 +151,6 @@ interface RuntimeOptions {
   output: string;
   force: boolean;
   image: boolean;
-  imageFormat: 'png' | 'jpeg';
   rawArgs: string[];
 }
 
@@ -176,7 +164,7 @@ interface RuntimeDiagnosis {
   output: OutputPathDiagnosis;
   imageOutputs: {
     enabled: boolean;
-    format: 'png' | 'jpeg';
+    format: 'png';
     paths: string[];
     directory: string;
   };
@@ -210,7 +198,6 @@ export default defineCommand({
       assertNoUnknownFlags(rawArgs, doctorArgs);
 
       const invocation = resolveDoctorInvocation(args);
-      const imageFormat = parseEnumArg('imageFormat', args.imageFormat, ['png', 'jpeg']);
       const environment = getEnvironmentReport();
 
       if (invocation.target === 'environment') {
@@ -256,7 +243,6 @@ export default defineCommand({
           output: args.output,
           force: Boolean(args.force),
           image: Boolean(args.image),
-          imageFormat,
           rawArgs,
         },
       });
@@ -578,10 +564,8 @@ function diagnoseRuntime(
     output,
     imageOutputs: {
       enabled: options.image,
-      format: options.imageFormat,
-      paths: options.image
-        ? getImageOutputPaths(options.output, estimatedPages, options.imageFormat)
-        : [],
+      format: 'png',
+      paths: options.image ? getImageOutputPaths(options.output, estimatedPages) : [],
       directory: dirname(output.resolvedPath),
     },
   };

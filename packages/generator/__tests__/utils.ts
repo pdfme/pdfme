@@ -44,7 +44,7 @@ export const getFont = (): Font => ({
   },
 });
 export const pdfToImages = async (pdf: ArrayBuffer | Uint8Array): Promise<Buffer[]> => {
-  const arrayBuffers = await pdf2img(pdf, { imageType: 'png' });
+  const arrayBuffers = await pdf2img(pdf);
   return arrayBuffers.map((buf) => Buffer.from(new Uint8Array(buf)));
 };
 

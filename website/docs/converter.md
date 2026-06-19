@@ -20,19 +20,18 @@ Planned conversion features include:
 npm install @pdfme/converter
 ```
 
-`pdf2img` works in Node.js without any extra install step. `@pdfme/converter` already includes the required Node canvas implementation via `@napi-rs/canvas`.
+`pdf2img` works in Node.js without any extra install step. It uses PDFium through `clawpdf`, so Node.js 20 or later is required for Node.js usage.
 
 ## Features
 
 ### pdf2img
-Converts PDF pages into images (JPEG or PNG format).
+Converts PDF pages into PNG images.
 
 ```ts
 import { pdf2img } from '@pdfme/converter';
 
 const pdf = new ArrayBuffer(...); // Source PDF
 const images = await pdf2img(pdf, {
-  imageType: 'png',
   scale: 1,
   range: { start: 0, end: 1 },
 });
@@ -61,7 +60,6 @@ const image1 = new ArrayBuffer(...); // First image
 const image2 = new ArrayBuffer(...); // Second image
 const pdf = await img2pdf([image1, image2], {
   scale: 1,
-  imageType: 'jpeg',
   size: { width: 210, height: 297 },
   margin: [10, 10, 10, 10],
 });
@@ -169,8 +167,6 @@ All functions throw descriptive errors when invalid parameters are provided:
 ```ts
 import type { BlankPdf, PageOrientation, PageSize } from '@pdfme/common';
 
-type ImageType = 'jpeg' | 'png';
-
 interface PageRange {
   start?: number;
   end?: number;
@@ -178,7 +174,6 @@ interface PageRange {
 
 interface Pdf2ImgOptions {
   scale?: number;
-  imageType?: ImageType;
   range?: PageRange;
 }
 
@@ -188,7 +183,6 @@ interface Pdf2SizeOptions {
 
 interface Img2PdfOptions {
   scale?: number;
-  imageType?: ImageType;
   size?: { height: number, width: number }; // in millimeters
   margin?: [number, number, number, number]; // in millimeters [top, right, bottom, left]
 }

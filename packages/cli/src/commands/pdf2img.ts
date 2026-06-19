@@ -6,7 +6,6 @@ import { pdf2img, pdf2size } from '@pdfme/converter';
 import {
   assertNoUnknownFlags,
   fail,
-  parseEnumArg,
   parsePositiveNumberArg,
   printJson,
   runWithContract,
@@ -20,7 +19,6 @@ const pdf2imgArgs = {
   grid: { type: 'boolean' as const, description: 'Overlay mm grid on images', default: false },
   gridSize: { type: 'string' as const, description: 'Grid spacing in mm', default: '10' },
   scale: { type: 'string' as const, description: 'Render scale', default: '1' },
-  imageFormat: { type: 'string' as const, description: 'Image format: png | jpeg', default: 'png' },
   pages: { type: 'string' as const, description: 'Page range (e.g., 1-3, 1,3,5)' },
   verbose: { type: 'boolean' as const, alias: 'v', description: 'Verbose output', default: false },
   json: {
@@ -46,7 +44,6 @@ export default defineCommand({
 
       const scale = parsePositiveNumberArg('scale', args.scale);
       const gridSize = parsePositiveNumberArg('gridSize', args.gridSize);
-      const imageFormat = parseEnumArg('imageFormat', args.imageFormat, ['png', 'jpeg']);
       const pdfData = readPdfFile(args.file);
       const sizes = await pdf2size(pdfData);
 
@@ -56,11 +53,9 @@ export default defineCommand({
 
       const allImages = await pdf2img(pdfData, {
         scale,
-        imageType: imageFormat,
       });
 
       const inputBase = basename(args.file, extname(args.file));
-      const ext = imageFormat === 'jpeg' ? 'jpg' : 'png';
       let outputDir = '.';
 
       if (args.output) {
@@ -82,7 +77,7 @@ export default defineCommand({
         console.error(`Pages: ${sizes.length}`);
         console.error(`Selected pages: ${pageIndices.map((pageIdx) => pageIdx + 1).join(', ')}`);
         console.error(`Output: ${outputDir}`);
-        console.error(`Image format: ${imageFormat}`);
+        console.error('Image format: png');
         console.error(`Scale: ${scale}`);
         console.error(`Grid: ${args.grid ? `enabled (${gridSize}mm)` : 'disabled'}`);
       }
@@ -99,16 +94,10 @@ export default defineCommand({
         const size = sizes[pageIdx] ?? PAGE_SIZE_PRESETS.A4;
 
         if (args.grid) {
-          imageData = await drawGridOnPdfImage(
-            imageData,
-            gridSize,
-            size.width,
-            size.height,
-            imageFormat,
-          );
+          imageData = await drawGridOnPdfImage(imageData, gridSize, size.width, size.height);
         }
 
-        const outputPath = join(outputDir, `${inputBase}-${pageIdx + 1}.${ext}`);
+        const outputPath = join(outputDir, `${inputBase}-${pageIdx + 1}.png`);
         writeOutput(outputPath, imageData);
 
         const paperSize = detectPaperSize(size.width, size.height);

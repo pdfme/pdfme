@@ -11,24 +11,10 @@ const builtinModuleSet = new Set([
   ...builtinModules,
   ...builtinModules.map((moduleName) => `node:${moduleName}`),
 ]);
-const pdfjsWorkerCompatBanner = [
-  'const pdfmeUint8ArrayPrototype = Uint8Array.prototype;',
-  'if (!pdfmeUint8ArrayPrototype.toHex) {',
-  "  Object.defineProperty(Uint8Array.prototype, 'toHex', {",
-  '    configurable: true,',
-  '    value() {',
-  "      let result = '';",
-  '      for (let i = 0; i < this.length; i += 1) {',
-  '        const hex = this[i].toString(16);',
-  '        result += hex.length === 1 ? `0${hex}` : hex;',
-  '      }',
-  '      return result;',
-  '    },',
-  '    writable: true,',
-  '  });',
-  '}',
-].join('\n');
-const isExternal = (id: string) => builtinModuleSet.has(id);
+const externalDependencies = ['@pdfme/converter'];
+const isExternal = (id: string) =>
+  builtinModuleSet.has(id) ||
+  externalDependencies.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
 
 export default defineConfig(({ mode }) => {
   return {
@@ -48,16 +34,11 @@ export default defineConfig(({ mode }) => {
       target: 'es2020',
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'pdfjs-dist', 'antd'],
+      include: ['react', 'react-dom', 'antd'],
       exclude: ['@pdfme/common', '@pdfme/schemas', '@pdfme/converter'],
     },
     worker: {
       format: 'es',
-      rollupOptions: {
-        output: {
-          banner: pdfjsWorkerCompatBanner,
-        },
-      },
     },
   };
 });

@@ -80,7 +80,6 @@ export async function createThumbnailFromTemplateObject(template, thumbnailPath)
   });
 
   const images = await pdf2img(pdf.buffer, {
-    imageType: 'png',
     range: { end: 1 },
   });
 

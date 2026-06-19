@@ -163,8 +163,8 @@ describe('generate command', () => {
     expect(result.stderr).not.toContain('TypeError');
   });
 
-  it('writes actual jpeg bytes when grid output is requested in jpeg mode', () => {
-    const workDir = join(TMP, 'grid-jpeg');
+  it('writes actual PNG bytes when grid output is requested', () => {
+    const workDir = join(TMP, 'grid-png');
     mkdirSync(workDir, { recursive: true });
 
     writeFileSync(
@@ -194,16 +194,12 @@ describe('generate command', () => {
       '-o',
       join(workDir, 'out.pdf'),
       '--grid',
-      '--imageFormat',
-      'jpeg',
       '--json',
     ]);
 
     expect(result.exitCode).toBe(0);
-    const output = readFileSync(join(workDir, 'out-1.jpg'));
-    expect(output[0]).toBe(0xff);
-    expect(output[1]).toBe(0xd8);
-    expect(output[2]).toBe(0xff);
+    const output = readFileSync(join(workDir, 'out-1.png'));
+    expect(Array.from(output.subarray(0, 8))).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   });
 
   it('returns structured JSON for argument validation failures', () => {
