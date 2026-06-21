@@ -110,6 +110,14 @@ const getTop = (element: Element | null) => {
   return Number.parseFloat(element.style.top);
 };
 
+const getSelectableElement = (container: HTMLElement, title: string) => {
+  const element = Array.from(container.getElementsByClassName(SELECTABLE_CLASSNAME)).find(
+    (element) => element.getAttribute('title') === title,
+  );
+  if (!(element instanceof HTMLElement)) throw new Error(`${title} element was not found`);
+  return element;
+};
+
 test('Preview(as Viewer) snapshot', async () => {
   setupUIMock();
   let container: HTMLElement = document.createElement('a');
@@ -167,6 +175,57 @@ test('Preview(as Form) snapshot', async () => {
     expect(renderedElements.length).toBe(selectableElements.length);
   });
   expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
+});
+
+test('Preview(as Form) highlights the active editable renderer', async () => {
+  setupUIMock();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getSampleTemplate()}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={vi.fn()}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    const selectableElements = container.getElementsByClassName(SELECTABLE_CLASSNAME);
+    const renderedElements = container.querySelectorAll('[data-pdfme-render-ready="true"]');
+    expect(selectableElements.length).toBeGreaterThan(0);
+    expect(renderedElements.length).toBe(selectableElements.length);
+  });
+
+  const field1 = getSelectableElement(container, 'field1');
+  const field2 = getSelectableElement(container, 'field2');
+
+  expect(field1.style.boxShadow).toBe('');
+  expect(field2.style.boxShadow).toBe('');
+
+  fireEvent.click(field1);
+
+  await waitFor(() => {
+    expect(field1.style.boxShadow).not.toBe('');
+    expect(field2.style.boxShadow).toBe('');
+  });
+
+  fireEvent.click(field2);
+
+  await waitFor(() => {
+    expect(field1.style.boxShadow).toBe('');
+    expect(field2.style.boxShadow).not.toBe('');
+  });
+
+  fireEvent.pointerDown(getScrollContainer(container));
+
+  await waitFor(() => {
+    expect(field2.style.boxShadow).toBe('');
+  });
 });
 
 test('Preview(as Form) pushes lower schemas after list height changes for blank PDFs', async () => {

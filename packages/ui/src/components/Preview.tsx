@@ -19,6 +19,7 @@ import Paper from './Paper.js';
 import Renderer from './Renderer.js';
 import { useUIPreProcessor, useScrollPageCursor, useZoom } from '../hooks.js';
 import { FontContext, OptionsContext } from '../contexts.js';
+import { SELECTABLE_CLASSNAME } from '../constants.js';
 import {
   template2SchemasList,
   getPagesScrollTopByIndex,
@@ -65,6 +66,7 @@ const Preview = ({
 
   const [unitCursor, setUnitCursor] = useState(0);
   const [pageCursor, setPageCursor] = useState(0);
+  const [activeSchemaId, setActiveSchemaId] = useState<string | null>(null);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
 
   const { backgrounds, pageSizes, baseScale, error, refresh } = useUIPreProcessor({
@@ -155,6 +157,10 @@ const Preview = ({
     }
     init(template);
   }, [init, inputs, size, template, unitCursor]);
+
+  useEffect(() => {
+    setActiveSchemaId(null);
+  }, [unitCursor]);
 
   useScrollPageCursor({
     ref: containerRef,
@@ -260,7 +266,17 @@ const Preview = ({
         unitNum={inputs.length}
         setUnitCursor={setUnitCursor}
       />
-      <div ref={containerRef} style={{ ...size, position: 'relative', overflow: 'auto' }}>
+      <div
+        ref={containerRef}
+        onPointerDown={(event) => {
+          if (!isForm) return;
+          const target = event.target;
+          if (!(target instanceof Element) || !target.closest(`.${SELECTABLE_CLASSNAME}`)) {
+            setActiveSchemaId(null);
+          }
+        }}
+        style={{ ...size, position: 'relative', overflow: 'auto' }}
+      >
         <Paper
           paperRefs={paperRefs}
           scale={displayScale}
@@ -296,6 +312,8 @@ const Preview = ({
                   isForm && !schema.readOnly ? `1px dashed ${token.colorPrimary}` : 'transparent'
                 }
                 scale={renderScale}
+                isActive={isForm && activeSchemaId === schema.id}
+                onChangeActiveSchemaId={isForm ? setActiveSchemaId : undefined}
               />
             );
           }}

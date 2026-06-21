@@ -23,7 +23,9 @@ type RendererProps = Omit<
   value: string;
   outline: string;
   onChangeHoveringSchemaId?: (id: string | null) => void;
+  onChangeActiveSchemaId?: (id: string | null) => void;
   scale: number;
+  isActive?: boolean;
   selectable?: boolean;
 };
 
@@ -59,44 +61,68 @@ const Wrapper = ({
   children,
   outline,
   onChangeHoveringSchemaId,
+  onChangeActiveSchemaId,
   schema,
+  mode,
+  isActive = false,
   selectable = true,
-}: RendererProps & { children: ReactNode }) => (
-  <div
-    title={schema.name}
-    onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
-    onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
-    className={selectable ? SELECTABLE_CLASSNAME : ''}
-    id={schema.id}
-    style={{
-      position: 'absolute',
-      cursor: schema.readOnly ? 'initial' : 'pointer',
-      height: schema.height * ZOOM,
-      width: schema.width * ZOOM,
-      top: schema.position.y * ZOOM,
-      left: schema.position.x * ZOOM,
-      transform: `rotate(${schema.rotate ?? 0}deg)`,
-      opacity: schema.opacity ?? 1,
-      outline,
-    }}
-  >
-    {schema.required && (
-      <span
-        style={{
-          color: 'red',
-          position: 'absolute',
-          top: -12,
-          left: -12,
-          fontSize: 18,
-          fontWeight: 700,
-        }}
-      >
-        *
-      </span>
-    )}
-    {children}
-  </div>
-);
+}: RendererProps & { children: ReactNode }) => {
+  const { token } = antdTheme.useToken();
+  const isFormEditable = mode === 'form' && !schema.readOnly;
+  const activateSchema = () => {
+    if (isFormEditable) onChangeActiveSchemaId?.(schema.id);
+  };
+
+  return (
+    <div
+      title={schema.name}
+      onMouseEnter={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(schema.id)}
+      onMouseLeave={() => onChangeHoveringSchemaId && onChangeHoveringSchemaId(null)}
+      onPointerDownCapture={activateSchema}
+      onClickCapture={activateSchema}
+      onFocusCapture={activateSchema}
+      onBlurCapture={(event) => {
+        const nextTarget = event.relatedTarget;
+        if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+          onChangeActiveSchemaId?.(null);
+        }
+      }}
+      className={selectable ? SELECTABLE_CLASSNAME : ''}
+      id={schema.id}
+      style={{
+        position: 'absolute',
+        cursor: schema.readOnly ? 'initial' : 'pointer',
+        height: schema.height * ZOOM,
+        width: schema.width * ZOOM,
+        top: schema.position.y * ZOOM,
+        left: schema.position.x * ZOOM,
+        transform: `rotate(${schema.rotate ?? 0}deg)`,
+        opacity: schema.opacity ?? 1,
+        outline,
+        boxShadow: isActive
+          ? `0 0 0 2px ${token.colorPrimary}, 0 0 0 4px ${token.colorPrimaryBg}`
+          : undefined,
+        zIndex: isActive ? 1 : undefined,
+      }}
+    >
+      {schema.required && (
+        <span
+          style={{
+            color: 'red',
+            position: 'absolute',
+            top: -12,
+            left: -12,
+            fontSize: 18,
+            fontWeight: 700,
+          }}
+        >
+          *
+        </span>
+      )}
+      {children}
+    </div>
+  );
+};
 
 const Renderer = (props: RendererProps) => {
   const { schema, basePdf, value, mode, onChange, stopEditing, tabIndex, placeholder, scale } =
