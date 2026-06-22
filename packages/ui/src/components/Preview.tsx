@@ -134,7 +134,9 @@ const Preview = ({
           return;
         }
         setSchemasList(sl);
-        await currentRefresh(dynamicTemplate);
+        if (dynamicTemplate !== template) {
+          await currentRefresh(dynamicTemplate);
+        }
       })
       .catch((err) => console.error(`[@pdfme/ui] `, err));
   }, []);

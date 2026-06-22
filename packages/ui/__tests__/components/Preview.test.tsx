@@ -3,6 +3,7 @@ import { render, act, fireEvent, waitFor } from '@testing-library/react';
 import Preview from '../../src/components/Preview';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
+import * as hooks from '../../src/hooks';
 import { SELECTABLE_CLASSNAME } from '../../src/constants';
 import {
   CUSTOM_A4_PDF,
@@ -226,6 +227,40 @@ test('Preview(as Form) highlights the active editable renderer', async () => {
   await waitFor(() => {
     expect(field2.style.boxShadow).toBe('');
   });
+});
+
+test('Preview skips background refresh when dynamic template is unchanged', async () => {
+  const refresh = vi.fn(() => Promise.resolve());
+  vi.spyOn(hooks, 'useUIPreProcessor').mockImplementation(() => ({
+    backgrounds: ['data:image/png;base64,a...'],
+    pageSizes: [PAGE_SIZE_PRESETS.A4],
+    baseScale: 1,
+    scale: 1,
+    error: null,
+    refresh,
+  }));
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={{ ...getSampleTemplate(), basePdf: CUSTOM_A4_PDF }}
+            inputs={[{ field1: 'field1', field2: 'field2' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  expect(refresh).not.toHaveBeenCalled();
 });
 
 test('Preview(as Form) pushes lower schemas after list height changes for blank PDFs', async () => {
