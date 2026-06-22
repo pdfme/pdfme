@@ -377,6 +377,51 @@ test('Preview does not reapply options.zoomLevel when changing pages', async () 
   });
 });
 
+test('Preview toolbar can wrap controls on narrow viewports', async () => {
+  setupUIMock(2);
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getTwoPageTemplate()}
+            inputs={[
+              {
+                field1: 'field1',
+                field2: 'field2',
+                field1Page2: 'field1Page2',
+                field2Page2: 'field2Page2',
+              },
+            ]}
+            size={{ width: 220, height: 640 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  const controlBar = container.querySelector('.pdfme-ui-control-bar') as HTMLElement;
+  const toolbarWrapper = controlBar.parentElement as HTMLElement;
+  const zoomGroup = container.querySelector('.pdfme-ui-zoom > div') as HTMLElement;
+  const zoomLabel = container.querySelector('.pdfme-ui-zoom .ant-typography') as HTMLElement;
+  const prevButton = container.querySelector('.pdfme-ui-page-prev') as HTMLElement;
+
+  expect(toolbarWrapper.style.boxSizing).toBe('border-box');
+  expect(controlBar.style.maxWidth).toBe('100%');
+  expect(controlBar.style.flexWrap).toBe('wrap');
+  expect(controlBar.style.minHeight).toBe('40px');
+  expect(controlBar.style.height).toBe('');
+  expect(zoomGroup.style.flexWrap).toBe('wrap');
+  expect(zoomLabel.style.whiteSpace).toBe('nowrap');
+  expect(prevButton.style.width).toBe('32px');
+});
+
 test('Preview toolbar fit width updates the zoom level', async () => {
   setupUIMock();
   restoreClientSizeMock = mockClientSizeFromStyle();

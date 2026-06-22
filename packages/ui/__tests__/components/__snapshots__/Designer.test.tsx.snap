@@ -119,21 +119,23 @@ exports[`Designer snapshot 1`] = `
       style="position: absolute; width: 1155px; margin-left: 45px;"
     >
       <div
-        style="position: absolute; top: auto; bottom: 6%; width: 755px; display: flex; justify-content: center; pointer-events: none;"
+        style="position: absolute; top: auto; bottom: 6%; width: 755px; display: flex; justify-content: center; box-sizing: border-box; padding: 0px 8px; pointer-events: none;"
       >
         <div
           class="pdfme-ui-control-bar"
-          style="display: inline-flex; align-items: center; justify-content: center; position: relative; z-index: 1; height: 40px; box-sizing: border-box; padding: 12px; gap: 8px; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45); pointer-events: auto;"
+          style="display: inline-flex; align-items: center; justify-content: center; position: relative; z-index: 1; min-height: 40px; max-width: 100%; box-sizing: border-box; padding: 4px 12px; column-gap: 8px; row-gap: 4px; flex-wrap: wrap; border-radius: 6px; background-color: rgba(0, 0, 0, 0.45); pointer-events: auto;"
         >
           <div
             class="pdfme-ui-zoom"
+            style="min-width: 0px;"
           >
             <div
-              style="display: flex; align-items: center;"
+              style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; row-gap: 0px;"
             >
               <button
                 aria-label="Zoom out"
                 class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-zoom-out"
+                style="width: 32px; min-width: 32px; height: 32px; padding: 0px;"
                 title="Zoom out"
                 type="button"
               >
@@ -141,7 +143,7 @@ exports[`Designer snapshot 1`] = `
               </button>
               <span
                 class="ant-typography"
-                style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px;"
+                style="color: rgb(255, 255, 255); font-size: 14px; margin: 8px; min-width: 44px; text-align: center; white-space: nowrap;"
               >
                 <strong>
                   100
@@ -151,6 +153,7 @@ exports[`Designer snapshot 1`] = `
               <button
                 aria-label="Zoom in"
                 class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-zoom-in"
+                style="width: 32px; min-width: 32px; height: 32px; padding: 0px;"
                 title="Zoom in"
                 type="button"
               >
@@ -162,6 +165,7 @@ exports[`Designer snapshot 1`] = `
               <button
                 aria-label="Fit width"
                 class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-fit-width"
+                style="width: 32px; min-width: 32px; height: 32px; padding: 0px;"
                 title="Fit width"
                 type="button"
               >
@@ -170,6 +174,7 @@ exports[`Designer snapshot 1`] = `
               <button
                 aria-label="Fit height"
                 class="ant-btn ant-btn-text ant-btn-color-default ant-btn-variant-text pdfme-ui-fit-height"
+                style="width: 32px; min-width: 32px; height: 32px; padding: 0px;"
                 title="Fit height"
                 type="button"
               >

@@ -21,6 +21,16 @@ import { UI_CLASSNAME } from '../constants.js';
 const { Text } = Typography;
 
 type TextStyle = { color: string; fontSize: number; margin: number };
+const CONTROL_BUTTON_SIZE = 32;
+
+const getControlButtonStyle = (active?: boolean): React.CSSProperties => ({
+  width: CONTROL_BUTTON_SIZE,
+  minWidth: CONTROL_BUTTON_SIZE,
+  height: CONTROL_BUTTON_SIZE,
+  padding: 0,
+  ...(active ? { backgroundColor: 'rgba(255, 255, 255, 0.18)' } : {}),
+});
+
 type ZoomProps = {
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
@@ -59,7 +69,7 @@ const ToolbarButton = ({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      style={active ? { backgroundColor: 'rgba(255, 255, 255, 0.18)' } : undefined}
+      style={getControlButtonStyle(active)}
     >
       {children}
     </Button>
@@ -87,7 +97,15 @@ const Zoom = ({
   const iconProps = { size: 16, color: style.textStyle.color };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexWrap: 'wrap',
+        rowGap: 0,
+      }}
+    >
       <ToolbarButton
         className={UI_CLASSNAME + 'zoom-out'}
         label={labels.zoomOut}
@@ -96,7 +114,15 @@ const Zoom = ({
       >
         <Minus {...iconProps} />
       </ToolbarButton>
-      <Text strong style={style.textStyle}>
+      <Text
+        strong
+        style={{
+          ...style.textStyle,
+          minWidth: 44,
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+        }}
+      >
         {Math.round(zoomLevel * 100)}%
       </Text>
       <ToolbarButton
@@ -143,10 +169,19 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         type="text"
         disabled={pageCursor <= 0}
         onClick={() => setPageCursor(pageCursor - 1)}
+        style={getControlButtonStyle()}
       >
         <ChevronLeft size={16} color={style.textStyle.color} />
       </Button>
-      <Text strong style={style.textStyle}>
+      <Text
+        strong
+        style={{
+          ...style.textStyle,
+          minWidth: 36,
+          textAlign: 'center',
+          whiteSpace: 'nowrap',
+        }}
+      >
         {pageCursor + 1}/{pageNum}
       </Text>
       <Button
@@ -154,6 +189,7 @@ const Pager = ({ pageCursor, pageNum, setPageCursor, style }: PagerProps) => {
         type="text"
         disabled={pageCursor + 1 >= pageNum}
         onClick={() => setPageCursor(pageCursor + 1)}
+        style={getControlButtonStyle()}
       >
         <ChevronRight size={16} color={style.textStyle.color} />
       </Button>
@@ -167,7 +203,11 @@ type ContextMenuProps = {
 };
 const ContextMenu = ({ items, style }: ContextMenuProps) => (
   <Dropdown menu={{ items }} placement="top" arrow trigger={['click']}>
-    <Button className={UI_CLASSNAME + 'context-menu'} type="text">
+    <Button
+      className={UI_CLASSNAME + 'context-menu'}
+      type="text"
+      style={getControlButtonStyle()}
+    >
       <Ellipsis size={16} color={style.textStyle.color} />
     </Button>
   </Dropdown>
@@ -234,6 +274,8 @@ const CtlBar = (props: CtlBarProps) => {
         width: size.width,
         display: 'flex',
         justifyContent: 'center',
+        boxSizing: 'border-box',
+        padding: `0 ${token.paddingXS}px`,
         pointerEvents: 'none',
       }}
     >
@@ -245,17 +287,20 @@ const CtlBar = (props: CtlBarProps) => {
           justifyContent: 'center',
           position: 'relative',
           zIndex: 1,
-          height: 40,
+          minHeight: 40,
+          maxWidth: '100%',
           boxSizing: 'border-box',
-          padding: token.paddingSM,
-          gap: token.marginXS,
+          padding: `${token.paddingXXS}px ${token.paddingSM}px`,
+          columnGap: token.marginXS,
+          rowGap: token.marginXXS,
+          flexWrap: 'wrap',
           borderRadius: token.borderRadius,
           backgroundColor: token.colorBgMask,
           pointerEvents: 'auto',
         }}
       >
         {pageNum > 1 && (
-          <div className={UI_CLASSNAME + 'pager'}>
+          <div className={UI_CLASSNAME + 'pager'} style={{ flexShrink: 0 }}>
             <Pager
               style={{ textStyle }}
               pageCursor={pageCursor}
@@ -264,7 +309,7 @@ const CtlBar = (props: CtlBarProps) => {
             />
           </div>
         )}
-        <div className={UI_CLASSNAME + 'zoom'}>
+        <div className={UI_CLASSNAME + 'zoom'} style={{ minWidth: 0 }}>
           <Zoom
             style={{ textStyle }}
             zoomLevel={zoomLevel}
