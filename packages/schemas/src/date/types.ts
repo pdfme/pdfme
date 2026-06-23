@@ -1,9 +1,11 @@
 import { Schema } from '@pdfme/common';
-import { ALIGNMENT } from '../text/types.js';
+import { ALIGNMENT, FONT_WEIGHT, FONT_STYLE } from '../text/types.js';
 
 export interface DateSchema extends Schema {
   format: string;
   fontName?: string;
+  fontWeight?: FONT_WEIGHT;
+  fontStyle?: FONT_STYLE;
   alignment: ALIGNMENT;
   fontSize: number;
   characterSpacing: number;

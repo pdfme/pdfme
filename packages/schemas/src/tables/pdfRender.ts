@@ -30,6 +30,8 @@ async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
       width: cell.width,
       height: cell.height,
       fontName: cell.styles.fontName,
+      fontWeight: cell.styles.fontWeight,
+      fontStyle: cell.styles.fontStyle,
       alignment: cell.styles.alignment,
       verticalAlignment: cell.styles.verticalAlignment,
       fontSize: cell.styles.fontSize,
