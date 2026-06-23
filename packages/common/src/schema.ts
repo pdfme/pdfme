@@ -146,6 +146,7 @@ export const Schema = z
     opacity: z.number().optional(),
     readOnly: z.boolean().optional(),
     required: z.boolean().optional(),
+    editableInDesigner: z.boolean().optional(),
     __splitRange: DynamicLayoutSplitRange.optional(),
     __isSplit: z.boolean().optional(),
   })
