@@ -28,8 +28,14 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   let numVariables = schema.variables.length;
   const renderResolvedValue = schema.readOnly === true && mode !== 'designer';
 
+  // A read-only MVT renders its already-resolved snapshot, passed in as `value` (the schema's
+  // content). When the field has no variables that snapshot is just the empty variables map
+  // (e.g. "{}"), so render the static template text instead — otherwise the field shows "{}"
+  // rather than its text (issue #1523).
   const renderValue = renderResolvedValue
-    ? value
+    ? numVariables > 0
+      ? value
+      : text
     : isInlineMarkdownTextSchema(schema)
       ? substituteVariablesAsInlineMarkdownLiterals(text, value)
       : substituteVariables(text, value);
@@ -63,7 +69,9 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 
   if (mode === 'designer') {
     textBlock.addEventListener('keyup', (event: KeyboardEvent) => {
-      text = textBlock.textContent || '';
+      // Read innerText (not textContent) so line breaks survive. textContent collapses
+      // <br>/<div> boundaries, which dropped newlines when a variable was removed (issue #1523).
+      text = readEditableText(textBlock);
       if (keyPressShouldBeChecked(event)) {
         const newNumVariables = countUniqueVariableNames(text);
         if (numVariables !== newNumVariables) {
@@ -671,6 +679,21 @@ const renderInlineMarkdownVariableSpans = (arg: {
       font,
     });
   });
+};
+
+/**
+ * Read the plain text of a contenteditable while preserving its line breaks. Mirrors the
+ * parent text renderer's blur handler: innerText keeps newlines, and contenteditable appends
+ * a trailing newline that we trim.
+ */
+const readEditableText = (element: HTMLElement): string => {
+  // innerText keeps the contenteditable's visual line breaks; textContent collapses
+  // <br>/<div> boundaries. Fall back to textContent where innerText is unavailable.
+  let text = element.innerText ?? element.textContent ?? '';
+  if (text.endsWith('\n')) {
+    text = text.slice(0, -1);
+  }
+  return text;
 };
 
 /**

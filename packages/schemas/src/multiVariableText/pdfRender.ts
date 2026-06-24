@@ -12,7 +12,11 @@ export const pdfRender = async (arg: PDFRenderProps<MultiVariableTextSchema>) =>
   const { value, schema, ...rest } = arg;
 
   if (schema.readOnly) {
-    await parentPdfRender({ value, schema, ...rest });
+    // A read-only MVT renders its already-resolved snapshot (value === content). When it has no
+    // variables that snapshot is just the empty variables map (e.g. "{}"), so fall back to the
+    // static template text to avoid rendering "{}" (issue #1523).
+    const readOnlyValue = schema.variables.length > 0 ? value : schema.text || '';
+    await parentPdfRender({ value: readOnlyValue, schema, ...rest });
     return;
   }
 
