@@ -1,6 +1,5 @@
 import React from 'react';
 import { ColorPicker, Input, Space } from 'antd';
-import type { Color } from 'antd/es/color-picker';
 
 // form-render passes these props to a field widget. We override the built-in
 // `color` widget because form-render's bundled `rc-color-picker` relies on
