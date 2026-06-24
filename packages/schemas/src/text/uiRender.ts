@@ -31,6 +31,7 @@ import {
   splitTextToSize,
 } from './helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
+import { attachInlineMarkdownToolbar } from './inlineMarkdownToolbar.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
 import {
@@ -168,6 +169,11 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     return;
   }
 
+  if (mode === 'designer' && enableInlineMarkdown) {
+    renderInlineMarkdownDesignerEditor(arg, textBlock, fontKitFont, enableDynamicFontSize);
+    return;
+  }
+
   makeElementPlainTextContentEditable(textBlock);
   textBlock.tabIndex = tabIndex || 0;
   textBlock.innerText = mode === 'designer' ? value : processedText;
@@ -231,6 +237,73 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       }
     });
   }
+};
+
+const renderInlineMarkdownDesignerEditor = (
+  arg: UIRenderProps<TextSchema>,
+  textBlock: HTMLDivElement,
+  fontKitFont: FontKitFont,
+  enableDynamicFontSize: boolean,
+) => {
+  const { schema, value, onChange, stopEditing, tabIndex } = arg;
+  const container = textBlock.parentElement;
+  if (!container) return;
+
+  const textarea = document.createElement('textarea');
+  textarea.id = textBlock.id;
+  textarea.value = value;
+  textarea.tabIndex = tabIndex || 0;
+  if (arg.placeholder) textarea.placeholder = arg.placeholder;
+  const style = textBlock.style;
+  Object.assign(textarea.style, {
+    fontFamily: style.fontFamily,
+    color: style.color,
+    fontSize: style.fontSize,
+    letterSpacing: style.letterSpacing,
+    lineHeight: style.lineHeight,
+    textAlign: style.textAlign,
+    width: '100%',
+    height: '100%',
+    margin: '0',
+    padding: '0',
+    border: 'none',
+    outline: 'none',
+    resize: 'none',
+    backgroundColor: 'transparent',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
+  } satisfies Partial<CSSStyleDeclaration>);
+
+  container.replaceChild(textarea, textBlock);
+
+  textarea.addEventListener('blur', () => {
+    if (onChange) onChange({ key: 'content', value: textarea.value });
+    if (stopEditing) stopEditing();
+  });
+
+  if (enableDynamicFontSize) {
+    let dynamicFontSize: number | undefined = undefined;
+    textarea.addEventListener('input', () => {
+      if (!textarea.value) return;
+      dynamicFontSize = calculateDynamicFontSize({
+        textSchema: schema,
+        fontKitFont,
+        value: stripInlineMarkdown(textarea.value),
+        startingFontSize: dynamicFontSize,
+      });
+      textarea.style.fontSize = `${dynamicFontSize}pt`;
+    });
+  }
+
+  setTimeout(() => {
+    textarea.focus();
+    const end = textarea.value.length;
+    textarea.setSelectionRange(end, end);
+  });
+
+  attachInlineMarkdownToolbar({ textarea, i18n: arg.i18n, theme: arg.theme });
 };
 
 const renderInlineMarkdownReadOnly = async (arg: {
