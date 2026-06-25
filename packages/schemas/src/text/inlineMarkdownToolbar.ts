@@ -126,6 +126,7 @@ export const attachInlineMarkdownToolbar = (arg: AttachArg) => {
   const label = (key: string, fallback: string) => i18n(key) || fallback;
 
   const toolbar = document.createElement('div');
+  toolbar.dataset.pdfmeInlineMarkdownUi = '1';
   Object.assign(toolbar.style, {
     position: 'fixed',
     zIndex: '9999',
@@ -147,17 +148,36 @@ export const attachInlineMarkdownToolbar = (arg: AttachArg) => {
     toolbar.style.display = 'none';
   };
 
-  // Parse the selection together with any delimiters touching it, so combined formats like
-  // "***foo***" resolve to a single run carrying every active style.
+  // Parse the selection together with any delimiters touching it, keeping only an expansion whose
+  // delimiters wrap exactly this selection so it never leaks into an adjacent span.
   const getContext = () => {
     const { selectionStart: start, selectionEnd: end, value } = textarea;
     if (start === end) return null;
+    const selected = value.slice(start, end);
+
+    let maxLead = 0;
+    while (start - maxLead > 0 && DELIMITER_CHARS.has(value[start - maxLead - 1])) maxLead += 1;
+    let maxTrail = 0;
+    while (end + maxTrail < value.length && DELIMITER_CHARS.has(value[end + maxTrail])) maxTrail += 1;
+
     let outerStart = start;
-    while (outerStart > 0 && DELIMITER_CHARS.has(value[outerStart - 1])) outerStart -= 1;
     let outerEnd = end;
-    while (outerEnd < value.length && DELIMITER_CHARS.has(value[outerEnd])) outerEnd += 1;
-    const runs = parseInlineMarkdown(value.slice(outerStart, outerEnd));
-    return { start, end, value, selected: value.slice(start, end), outerStart, outerEnd, runs };
+    let bestSpan = -1;
+    let runs = parseInlineMarkdown(selected);
+    for (let lead = maxLead; lead >= 0; lead -= 1) {
+      for (let trail = maxTrail; trail >= 0; trail -= 1) {
+        if (lead + trail <= bestSpan) continue;
+        const candidate = parseInlineMarkdown(value.slice(start - lead, end + trail));
+        if (candidate.length === 1 && candidate[0].text === selected) {
+          outerStart = start - lead;
+          outerEnd = end + trail;
+          bestSpan = lead + trail;
+          runs = candidate;
+        }
+      }
+    }
+
+    return { start, end, value, selected, outerStart, outerEnd, runs };
   };
 
   const replaceRange = (from: number, to: number, text: string, selectFrom: number) => {
@@ -183,21 +203,133 @@ export const attachInlineMarkdownToolbar = (arg: AttachArg) => {
     replaceRange(start, end, `${format.delimiter}${selected}${format.delimiter}`, start);
   };
 
+  // In-page URL dialog, since window.prompt() is silently suppressed in cross-origin iframes.
+  const promptForUrl = (defaultUrl: string): Promise<string | null> =>
+    new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.dataset.pdfmeInlineMarkdownUi = '1';
+      Object.assign(overlay.style, {
+        position: 'fixed',
+        inset: '0',
+        zIndex: '10000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(0, 0, 0, 0.25)',
+      } satisfies Partial<CSSStyleDeclaration>);
+
+      const card = document.createElement('div');
+      Object.assign(card.style, {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        width: 'min(320px, calc(100vw - 32px))',
+        padding: '16px',
+        background: theme.colorWhite || '#ffffff',
+        border: '1px solid rgba(0, 0, 0, 0.12)',
+        borderRadius: '8px',
+        boxShadow: '0 6px 24px rgba(0, 0, 0, 0.2)',
+        boxSizing: 'border-box',
+      } satisfies Partial<CSSStyleDeclaration>);
+
+      const promptLabel = document.createElement('label');
+      promptLabel.textContent = label('schemas.text.linkUrlPrompt', 'Enter URL');
+      Object.assign(promptLabel.style, { fontSize: '13px', fontWeight: '600', color: '#333333' });
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = defaultUrl;
+      Object.assign(input.style, {
+        width: '100%',
+        padding: '6px 8px',
+        border: '1px solid rgba(0, 0, 0, 0.2)',
+        borderRadius: '4px',
+        fontSize: '13px',
+        outline: 'none',
+        boxSizing: 'border-box',
+      } satisfies Partial<CSSStyleDeclaration>);
+
+      const actions = document.createElement('div');
+      Object.assign(actions.style, { display: 'flex', justifyContent: 'flex-end', gap: '8px' });
+
+      let settled = false;
+      const close = (result: string | null) => {
+        if (settled) return;
+        settled = true;
+        overlay.remove();
+        resolve(result);
+      };
+      const submit = () => close(input.value);
+      const cancel = () => close(null);
+
+      const makeButton = (text: string, primary: boolean, onClick: () => void) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = text;
+        Object.assign(btn.style, {
+          padding: '5px 12px',
+          fontSize: '13px',
+          borderRadius: '4px',
+          cursor: 'pointer',
+          border: primary ? 'none' : '1px solid rgba(0, 0, 0, 0.2)',
+          background: primary ? theme.colorPrimary || '#1677ff' : 'transparent',
+          color: primary ? '#ffffff' : '#333333',
+        } satisfies Partial<CSSStyleDeclaration>);
+        btn.addEventListener('click', onClick);
+        return btn;
+      };
+
+      input.addEventListener('keydown', (e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submit();
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          cancel();
+        }
+      });
+      overlay.addEventListener('mousedown', (e) => {
+        if (e.target === overlay) {
+          e.preventDefault();
+          cancel();
+        }
+      });
+
+      actions.append(
+        makeButton(label('cancel', 'Cancel'), false, cancel),
+        makeButton(label('set', 'Set'), true, submit),
+      );
+      card.append(promptLabel, input, actions);
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      input.focus();
+      input.select();
+    });
+
   const applyLink = () => {
     const { selectionStart: start, selectionEnd: end, value } = textarea;
     if (start === end) return;
     const selected = value.slice(start, end);
-    const url = window.prompt(label('schemas.text.linkUrlPrompt', 'Enter URL'), 'https://');
-    if (url === null) return;
-    const trimmed = url.trim();
-    if (!trimmed) return;
-    const labelText = escapeInlineMarkdown(selected || trimmed);
-    const markdown = `[${labelText}](${escapeInlineMarkdown(trimmed)})`;
-    textarea.value = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
-    textarea.setSelectionRange(start + 1, start + 1 + labelText.length);
-    textarea.focus();
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
-    refresh();
+    void promptForUrl('https://').then((url) => {
+      const restoreSelection = () => {
+        textarea.focus();
+        textarea.setSelectionRange(start, end);
+        refresh();
+      };
+      const trimmed = url?.trim();
+      if (!trimmed) {
+        restoreSelection();
+        return;
+      }
+      const labelText = escapeInlineMarkdown(selected || trimmed);
+      const markdown = `[${labelText}](${escapeInlineMarkdown(trimmed)})`;
+      textarea.value = `${value.slice(0, start)}${markdown}${value.slice(end)}`;
+      textarea.focus();
+      textarea.setSelectionRange(start + 1, start + 1 + labelText.length);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      refresh();
+    });
   };
 
   const positionToolbar = () => {
