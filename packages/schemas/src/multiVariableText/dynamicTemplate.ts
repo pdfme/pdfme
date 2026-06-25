@@ -26,9 +26,6 @@ export const getDynamicLayoutForMultiVariableText = async (
     return { heights: [schema.height] };
   }
 
-  // A read-only MVT measures its already-resolved snapshot (value === content). Without variables
-  // that snapshot is just the empty variables map (e.g. "{}"), so measure the static template
-  // text instead to avoid sizing against "{}" (issue #1523).
   let renderValue = schema.readOnly && schema.variables.length === 0 ? schema.text || '' : value;
   if (!schema.readOnly) {
     if (!validateVariables(value, schema)) {
