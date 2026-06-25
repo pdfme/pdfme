@@ -31,7 +31,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const renderValue = renderResolvedValue
     ? numVariables > 0
       ? value
-      : text
+      : text || ''
     : isInlineMarkdownTextSchema(schema)
       ? substituteVariablesAsInlineMarkdownLiterals(text, value)
       : substituteVariables(text, value);
