@@ -84,6 +84,12 @@ export const Dict = z.object({
   'schemas.text.variantFallback': z.string(),
   'schemas.text.synthetic': z.string(),
   'schemas.text.error': z.string(),
+  'schemas.text.bold': z.string(),
+  'schemas.text.italic': z.string(),
+  'schemas.text.strikethrough': z.string(),
+  'schemas.text.code': z.string(),
+  'schemas.text.link': z.string(),
+  'schemas.text.linkUrlPrompt': z.string(),
   'schemas.radius': z.string(),
 
   'schemas.mvt.typingInstructions': z.string(),
