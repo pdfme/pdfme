@@ -26,7 +26,7 @@ export const getDynamicLayoutForMultiVariableText = async (
     return { heights: [schema.height] };
   }
 
-  let renderValue = value;
+  let renderValue = schema.readOnly && schema.variables.length === 0 ? schema.text || '' : value;
   if (!schema.readOnly) {
     if (!validateVariables(value, schema)) {
       return { heights: [schema.height] };
