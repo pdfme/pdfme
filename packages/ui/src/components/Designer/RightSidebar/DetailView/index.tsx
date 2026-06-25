@@ -20,6 +20,8 @@ import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
 import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
+import ColorWidget from './ColorWidget.js';
+import type { ColorWidgetProps } from './ColorWidget.js';
 import { expandSameTypeBulkUpdateChanges } from './schemaChangeHelpers.js';
 import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
 import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '../layout.js';
@@ -108,6 +110,8 @@ const DetailView = (props: DetailViewProps) => {
           options={options}
         />
       ),
+      // Override form-render's built-in `color` widget
+      color: (p) => <ColorWidget {...(p as unknown as ColorWidgetProps)} />,
     };
     for (const plugin of pluginsRegistry.values()) {
       const pluginWidgets = (plugin.propPanel.widgets ?? {}) as Record<
