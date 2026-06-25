@@ -65,7 +65,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 
   if (mode === 'designer') {
     textBlock.addEventListener('keyup', (event: KeyboardEvent) => {
-      text = textBlock.textContent || '';
+      text = textBlock.innerText || '';
       if (keyPressShouldBeChecked(event)) {
         const newNumVariables = countUniqueVariableNames(text);
         if (numVariables !== newNumVariables) {
