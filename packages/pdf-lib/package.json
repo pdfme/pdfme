@@ -59,7 +59,7 @@
     "@pdf-lib/upng": "^1.0.1",
     "color": "^5.0.3",
     "node-html-better-parser": "^1.5.8",
-    "pako": "^2.1.0"
+    "pako": "^3.0.0"
   },
   "devDependencies": {
     "@pdf-lib/fontkit": "^1.1.0",
