@@ -21,8 +21,8 @@
     "@docusaurus/plugin-client-redirects": "^3.10.1",
     "@docusaurus/plugin-google-gtag": "^3.10.1",
     "@docusaurus/preset-classic": "^3.10.1",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "react-github-btn": "^1.2.1"
   },
   "devDependencies": {

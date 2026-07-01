@@ -49,7 +49,7 @@
     "test:run": "vitest run --config ../../vitest.config.ts"
   },
   "dependencies": {
-    "@napi-rs/canvas": "^1.0.0",
+    "@napi-rs/canvas": "^1.0.1",
     "@pdfme/common": "*",
     "@pdfme/converter": "*",
     "@pdfme/generator": "*",
