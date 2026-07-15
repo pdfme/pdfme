@@ -595,7 +595,9 @@ export const filterEnd = (lines: string[], forbiddenChars: string[]): string[] =
       const chartAtEnd = trimmedLine.slice(-1);
 
       if (forbiddenChars.includes(chartAtEnd)) {
-        if (trimmedLine.length === 1) {
+        // Fully-trimmed length: a line like "  (" is still just one character
+        // of content, and moving it would leave a whitespace-only line behind.
+        if (line.trim().length === 1) {
           filtered.push(line);
           charToPrepend = null;
         } else {

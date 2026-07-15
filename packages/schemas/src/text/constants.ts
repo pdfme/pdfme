@@ -125,12 +125,13 @@ export const LINE_END_FORBIDDEN_CHARS = [
   '“',
   '｟',
   '«',
-  // 欧文の始め括弧・約物（Latin opening punctuation）
+  // 欧文の始め括弧・約物（Latin opening punctuation）. Straight ASCII quotes are
+  // deliberately NOT here for the same reason they are excluded from the
+  // universal set below: they are open/close-ambiguous and ' marks possessives,
+  // so a mixed JP+Latin line ending in "IBM's" must keep its apostrophe.
   '(',
   '[',
   '{',
-  '"',
-  "'",
   '„',
   '¿',
   '¡',

@@ -1231,6 +1231,21 @@ describe('universal punctuation kinsoku (script-independent, non-CJK text)', () 
       ).toEqual(['delivered in March ', '(see appendix A)']);
     });
 
+    it('keeps a possessive apostrophe intact on the Japanese path too (mixed JP+Latin)', () => {
+      // The JP set is used for the whole batch when any line contains Japanese.
+      // Straight quotes must not be in that set either, or "IBM's" at a line
+      // end loses its apostrophe to the next line.
+      const input = ["これはIBM's", 'obligations'];
+      expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(input);
+    });
+
+    it('leaves a line whose only content is a forbidden char intact, even with leading whitespace', () => {
+      // "  (" is one character of content; moving it would leave a
+      // whitespace-only line behind.
+      const input = ['  (', 'bar'];
+      expect(filterEnd(input, LINE_END_FORBIDDEN_UNIVERSAL)).toEqual(input);
+    });
+
     it('does NOT treat a straight apostrophe as an opener (possessives stay intact)', () => {
       const input = ["companies'", 'obligations'];
       expect(filterEnd(input, LINE_END_FORBIDDEN_UNIVERSAL)).toEqual(input);
