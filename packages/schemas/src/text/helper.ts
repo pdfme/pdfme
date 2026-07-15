@@ -25,6 +25,8 @@ import {
   VERTICAL_ALIGN_TOP,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
+  LINE_END_FORBIDDEN_UNIVERSAL,
+  LINE_START_FORBIDDEN_UNIVERSAL,
 } from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
@@ -501,11 +503,13 @@ const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValu
     }
   }
 
-  if (lines.some(containsJapanese)) {
-    return adjustEndOfLine(filterEndJP(filterStartJP(lines)));
-  } else {
-    return adjustEndOfLine(lines);
-  }
+  // Anti-orphan kinsoku filtering. The full Japanese kinsoku set is only
+  // meaningful for CJK text, but the universal set (Latin brackets, closing
+  // punctuation, etc.) applies to every script, so it runs unconditionally.
+  const hasJapanese = lines.some(containsJapanese);
+  const startForbidden = hasJapanese ? LINE_START_FORBIDDEN_CHARS : LINE_START_FORBIDDEN_UNIVERSAL;
+  const endForbidden = hasJapanese ? LINE_END_FORBIDDEN_CHARS : LINE_END_FORBIDDEN_UNIVERSAL;
+  return adjustEndOfLine(filterEnd(filterStart(lines, startForbidden), endForbidden));
 };
 
 // add a newline if the line is the end of the paragraph
@@ -527,8 +531,9 @@ function containsJapanese(text: string): boolean {
 //
 // https://www.morisawa.co.jp/blogs/MVP/8760
 //
-// 行頭禁則
-export const filterStartJP = (lines: string[]): string[] => {
+// 行頭禁則 — a line must not start with any of forbiddenChars; such a
+// character is moved to the tail of the previous line.
+export const filterStart = (lines: string[], forbiddenChars: string[]): string[] => {
   const filtered: string[] = [];
   let charToAppend: string | null = null;
 
@@ -540,7 +545,7 @@ export const filterStartJP = (lines: string[]): string[] => {
         filtered.push('');
       } else {
         const charAtStart: string = line.charAt(0);
-        if (LINE_START_FORBIDDEN_CHARS.includes(charAtStart)) {
+        if (forbiddenChars.includes(charAtStart)) {
           if (line.trim().length === 1) {
             filtered.push(line);
             charToAppend = null;
@@ -574,8 +579,11 @@ export const filterStartJP = (lines: string[]): string[] => {
   }
 };
 
-// 行末禁則
-export const filterEndJP = (lines: string[]): string[] => {
+// 行末禁則 — a line must not end with any of forbiddenChars; such a character
+// is moved to the head of the next line. The end is inspected after trimEnd()
+// because the word packer can leave trailing whitespace after a stranded
+// opener (e.g. "... 2026 ( "), which would otherwise hide the forbidden char.
+export const filterEnd = (lines: string[], forbiddenChars: string[]): string[] => {
   const filtered: string[] = [];
   let charToPrepend: string | null = null;
 
@@ -583,17 +591,18 @@ export const filterEndJP = (lines: string[]): string[] => {
     if (line.trim().length === 0) {
       filtered.push('');
     } else {
-      const chartAtEnd = line.slice(-1);
+      const trimmedLine = line.trimEnd();
+      const chartAtEnd = trimmedLine.slice(-1);
 
-      if (LINE_END_FORBIDDEN_CHARS.includes(chartAtEnd)) {
-        if (line.trim().length === 1) {
+      if (forbiddenChars.includes(chartAtEnd)) {
+        if (trimmedLine.length === 1) {
           filtered.push(line);
           charToPrepend = null;
         } else {
           if (charToPrepend) {
-            filtered.push(charToPrepend + line.slice(0, -1));
+            filtered.push(charToPrepend + trimmedLine.slice(0, -1));
           } else {
-            filtered.push(line.slice(0, -1));
+            filtered.push(trimmedLine.slice(0, -1));
           }
           charToPrepend = chartAtEnd;
         }

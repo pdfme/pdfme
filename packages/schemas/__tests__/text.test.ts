@@ -11,8 +11,9 @@ import {
   getFontDescentInPt,
   getFontKitFont,
   getSplittedLines,
-  filterStartJP,
-  filterEndJP,
+  filterStart,
+  filterEnd,
+  splitTextToSize,
   widthOfTextAtSize,
 } from '../src/text/helper.js';
 import {
@@ -31,6 +32,8 @@ import {
 import {
   LINE_START_FORBIDDEN_CHARS,
   LINE_END_FORBIDDEN_CHARS,
+  LINE_START_FORBIDDEN_UNIVERSAL,
+  LINE_END_FORBIDDEN_UNIVERSAL,
   TEXT_OVERFLOW_EXPAND,
   TEXT_OVERFLOW_VISIBLE,
 } from '../src/text/constants.js';
@@ -1093,39 +1096,39 @@ describe('getBrowserVerticalFontAdjustments test', () => {
   });
 });
 
-describe('filterStartJP', () => {
+describe('filterStart (Japanese kinsoku set)', () => {
   test('空の配列を渡すと空の配列を返す', () => {
-    expect(filterStartJP([])).toEqual([]);
+    expect(filterStart([], LINE_START_FORBIDDEN_CHARS)).toEqual([]);
   });
 
   test('禁則文字を含まない行はそのまま返す', () => {
     const input = ['これは', '普通の', '文章です。'];
-    expect(filterStartJP(input)).toEqual(input);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(input);
   });
 
   test('行頭の禁則文字を前の行の末尾に移動する', () => {
     const input = ['これは', '。文章', 'です'];
     const expected = ['これは。', '文章', 'です'];
-    expect(filterStartJP(input)).toEqual(expected);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('複数の禁則文字を正しく処理する', () => {
     const input = ['これは', '。とても', '、長い', '」文章', 'です'];
     const expected = ['これは。', 'とても、', '長い」', '文章', 'です'];
-    expect(filterStartJP(input)).toEqual(expected);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('空の行を保持する', () => {
     const input = ['これは', '', '。文章', 'です'];
     const expected = ['これは。', '', '文章', 'です'];
-    expect(filterStartJP(input)).toEqual(expected);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('1文字の行（禁則文字のみ）はそのまま保持する', () => {
     const input = ['これは', '。', '文章', 'です'];
     // const expected = ['これは。', '文章', 'です'];
     const expected = ['これは', '。', '文章', 'です'];
-    expect(filterStartJP(input)).toEqual(expected);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('すべての禁則文字を正しく処理する', () => {
@@ -1134,43 +1137,43 @@ describe('filterStartJP', () => {
       'この' + char,
       '文字',
     ]).flat();
-    expect(filterStartJP(input)).toEqual(expected);
+    expect(filterStart(input, LINE_START_FORBIDDEN_CHARS)).toEqual(expected);
   });
 });
 
-describe('filterEndJP', () => {
+describe('filterEnd (Japanese kinsoku set)', () => {
   test('空の配列を渡すと空の配列を返す', () => {
-    expect(filterEndJP([])).toEqual([]);
+    expect(filterEnd([], LINE_END_FORBIDDEN_CHARS)).toEqual([]);
   });
 
   test('禁則文字を含まない行はそのまま返す', () => {
     const input = ['これは', '普通の', '文章です。'];
-    expect(filterEndJP(input)).toEqual(input);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(input);
   });
 
   test('行末の禁則文字を次の行の先頭に移動する', () => {
     const input = ['これは「', '文章', 'です。'];
     const expected = ['これは', '「文章', 'です。'];
-    expect(filterEndJP(input)).toEqual(expected);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('複数の禁則文字を正しく処理する', () => {
     const input = ['これは「', '長い『', '文章（', 'です。'];
     const expected = ['これは', '「長い', '『文章', '（です。'];
-    expect(filterEndJP(input)).toEqual(expected);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   // Cant understand purpose of this test...
   // test('空の行を保持する', () => {
   //   const input = ['これは「', '', '文章', 'です。'];
   //   const expected = ['これは', '「', '', '文章', 'です。'];
-  //   expect(filterEndJP(input)).toEqual(expected);
+  //   expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
   // });
 
   test('1文字の行（禁則文字のみ）はそのまま保持する', () => {
     const input = ['これは', '「', '文章', 'です。'];
     const expected = ['これは', '「', '文章', 'です。'];
-    expect(filterEndJP(input)).toEqual(expected);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('すべての禁則文字を正しく処理する', () => {
@@ -1179,12 +1182,86 @@ describe('filterEndJP', () => {
       'これは',
       char + '文章',
     ]).flat();
-    expect(filterEndJP(input)).toEqual(expected);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
   });
 
   test('最後の行の禁則文字は移動しない', () => {
     const input = ['これは「', '文章「', 'です「'];
     const expected = ['これは', '「文章', '「です「'];
-    expect(filterEndJP(input)).toEqual(expected);
+    expect(filterEnd(input, LINE_END_FORBIDDEN_CHARS)).toEqual(expected);
+  });
+});
+
+describe('universal punctuation kinsoku (script-independent, non-CJK text)', () => {
+  // A mock font where every glyph is exactly 1pt wide at fontSize 12, so a
+  // boxWidthInPt of N fits N characters per line (mirrors the mock used by the
+  // getSplitPosition tests above).
+  const mockedAdvanceWidth = 1000 / 12;
+  const mockedFont = {
+    unitsPerEm: 1000,
+    layout: (text: string) => ({
+      glyphs: Array.from(text, () => ({ advanceWidth: mockedAdvanceWidth })),
+    }),
+  } as unknown as FontKitFont;
+  const wrap = (value: string, boxWidthInPt: number) =>
+    splitTextToSize({ value, characterSpacing: 0, fontSize: 12, fontKitFont: mockedFont, boxWidthInPt });
+
+  describe('filterStart', () => {
+    it('moves closing punctuation off the start of a line onto the previous line', () => {
+      expect(filterStart(['foo', ',bar'], LINE_START_FORBIDDEN_UNIVERSAL)).toEqual(['foo,', 'bar']);
+      expect(filterStart(['see', ')more'], LINE_START_FORBIDDEN_UNIVERSAL)).toEqual(['see)', 'more']);
+    });
+
+    it('leaves ordinary leading characters untouched', () => {
+      const input = ['plain', 'english', 'text'];
+      expect(filterStart(input, LINE_START_FORBIDDEN_UNIVERSAL)).toEqual(input);
+    });
+  });
+
+  describe('filterEnd', () => {
+    it('moves an opening bracket off the end of a line onto the next line', () => {
+      expect(filterEnd(['foo (', 'bar'], LINE_END_FORBIDDEN_UNIVERSAL)).toEqual(['foo ', '(bar']);
+    });
+
+    it('detects an opener even when the packer left trailing whitespace', () => {
+      // The word segmenter emits "(" as its own segment, so the previous line
+      // can end with "... 2026 ( " — the opener is only visible after trimEnd().
+      expect(
+        filterEnd(['delivered in March ( ', 'see appendix A)'], LINE_END_FORBIDDEN_UNIVERSAL),
+      ).toEqual(['delivered in March ', '(see appendix A)']);
+    });
+
+    it('does NOT treat a straight apostrophe as an opener (possessives stay intact)', () => {
+      const input = ["companies'", 'obligations'];
+      expect(filterEnd(input, LINE_END_FORBIDDEN_UNIVERSAL)).toEqual(input);
+    });
+
+    it('does NOT treat a straight double quote as an opener', () => {
+      const input = ['titled "Q1 Results"', 'and was approved.'];
+      expect(filterEnd(input, LINE_END_FORBIDDEN_UNIVERSAL)).toEqual(input);
+    });
+  });
+
+  describe('end-to-end via splitTextToSize', () => {
+    it('does not strand an opening parenthesis at the end of a wrapped Latin line', () => {
+      // Without the universal filter the packer yields ['one (', 'two'].
+      expect(wrap('one (two', 5)).toEqual(['one', '(two\n']);
+    });
+
+    it('keeps a possessive apostrophe at a line end instead of tearing it off', () => {
+      // "companies'" ends the first line. If a straight apostrophe were treated
+      // as an opener it would be moved, yielding ['companies', "'obligations"].
+      expect(wrap("companies' obligations", 11)).toEqual(["companies'", 'obligations\n']);
+    });
+
+    it('leaves a short line untouched', () => {
+      expect(wrap("it's", 20)).toEqual(["it's\n"]);
+    });
+
+    it('still applies Japanese kinsoku (behaviour unchanged for CJK)', () => {
+      // '「' must not be stranded at the end of a wrapped Japanese line.
+      const lines = wrap('あ「いうえ', 2);
+      expect(lines.some((line) => line.trimEnd().endsWith('「'))).toBe(false);
+    });
   });
 });
