@@ -44,14 +44,14 @@ const useRenderKey = (arg: ReRenderCheckProps) => {
   const { font, ...optionsWithoutFont } = options;
   const _options: UIOptions = cloneDeep(optionsWithoutFont);
   if (options.font) {
-    let font: Font = {};
+    let fontForKey: Font = {};
     Object.entries(options.font).forEach(([fontName, fontObj]) => {
-      font[fontName] = {
+      fontForKey[fontName] = {
         ...fontObj,
         data: '...'
       };
     });
-    _options.font = font;
+    _options.font = fontForKey;
   }
   const optionStr = JSON.stringify(_options);
 
