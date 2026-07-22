@@ -339,8 +339,22 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
   const onClickMoveable = () => {
-    // Just set editing to true without trying to access event properties
-    setEditing(true);
+    // Clicking an already-selected element (no drag) only makes sense to enter
+    // "editing" mode for schema types that actually support inline text editing
+    // (text / multiVariableText). Entering editing hides the Moveable control
+    // box entirely (`!editing && <Moveable ... />` below) with no replacement UI
+    // for non-text types (image, rectangle, icon, etc.) — leaving the element
+    // stuck with no visible resize/drag handles until the selection is cleared
+    // and re-made from scratch.
+    const selectedSchemas = (schemasList[pageCursor] || []).filter((s) =>
+      activeElements.map((ae) => ae.id).includes(s.id),
+    );
+    const allEditable =
+      selectedSchemas.length > 0 &&
+      selectedSchemas.every((s) => s.type === 'text' || s.type === 'multiVariableText');
+    if (allEditable) {
+      setEditing(true);
+    }
   };
 
   const rotatable = useMemo(() => {
