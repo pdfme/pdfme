@@ -83,10 +83,10 @@
 *.wmv binary
 
 # Lockfiles
-package-lock.json binary
-yarn.lock binary
-pnpm-lock.yaml binary
-bun.lock binary
+package-lock.json text -diff
+yarn.lock text -diff
+pnpm-lock.yaml text -diff
+bun.lock text -diff
 
 # Source maps — suppress noisy diffs (Web.gitattributes)
 *.map text -diff
