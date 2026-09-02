@@ -12,7 +12,8 @@ export const pdfRender = async (arg: PDFRenderProps<MultiVariableTextSchema>) =>
   const { value, schema, ...rest } = arg;
 
   if (schema.readOnly) {
-    await parentPdfRender({ value, schema, ...rest });
+    const readOnlyValue = schema.variables.length > 0 ? value : schema.text || '';
+    await parentPdfRender({ value: readOnlyValue, schema, ...rest });
     return;
   }
 
