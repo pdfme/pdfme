@@ -339,8 +339,44 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     guides[index] && guides[index].getGuides().map((g) => g * ZOOM);
 
   const onClickMoveable = () => {
-    // Just set editing to true without trying to access event properties
-    setEditing(true);
+    // Clicking an already-selected element (no drag) only makes sense to enter
+    // "editing" mode for schema types that actually support inline text editing.
+    // Entering editing hides the Moveable control box entirely
+    // (`!editing && <Moveable ... />` below) with no replacement UI for
+    // non-text types (image, rectangle, icon, etc.) — leaving the element
+    // stuck with no visible resize/drag handles until the selection is cleared
+    // and re-made from scratch.
+    //
+    // Schema types are an open-ended string (custom plugins can register any
+    // type name), so we can't hardcode a type-name allowlist here without
+    // breaking custom editable plugins. Instead, mirror the `rotatable`
+    // capability check just below: inspect each matching plugin's
+    // propPanel.defaultSchema for `dynamicFontSize`, a key only text-rendering
+    // plugins declare (text's default schema declares it directly;
+    // multiVariableText and any custom plugin built on top of it inherit it
+    // by spreading text's defaultSchema). Any plugin that wants this
+    // click-to-edit behavior can opt in the same way.
+    const selectedSchemas = (schemasList[pageCursor] || []).filter((s) =>
+      activeElements.map((ae) => ae.id).includes(s.id),
+    );
+    const uniqueSchemaTypes = [...new Set(selectedSchemas.map((s) => s.type))];
+
+    const defaultSchemas: Record<string, unknown>[] = [];
+    pluginsRegistry.entries().forEach(([, plugin]) => {
+      if (plugin.propPanel.defaultSchema) {
+        defaultSchemas.push(plugin.propPanel.defaultSchema as Record<string, unknown>);
+      }
+    });
+
+    const allEditable =
+      uniqueSchemaTypes.length > 0 &&
+      uniqueSchemaTypes.every((type) => {
+        const matchingSchema = defaultSchemas.find((ds) => ds && 'type' in ds && ds.type === type);
+        return matchingSchema && 'dynamicFontSize' in matchingSchema;
+      });
+    if (allEditable) {
+      setEditing(true);
+    }
   };
 
   const rotatable = useMemo(() => {
