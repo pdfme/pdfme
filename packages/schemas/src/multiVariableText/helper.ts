@@ -34,8 +34,9 @@ export const substituteVariables = (
     });
   }
 
-  // Remove any variables that were not substituted from inputs
-  substitutedText = substitutedText.replace(/{[^{}]+}/g, '');
+  // Remove any variables that were not substituted from inputs, but preserve
+  // inline markdown delimiters ({+N}, {/}, {#color}) which are valid syntax.
+  substitutedText = substitutedText.replace(/{(?![+#/}])[^{}]+}/g, '');
 
   return substitutedText;
 };
