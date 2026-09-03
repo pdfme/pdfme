@@ -502,3 +502,44 @@ describe('list UI rendering', () => {
     });
   });
 });
+
+describe('editableInDesigner on list schema', () => {
+  it('hides edit controls and uses default cursor when editableInDesigner is false in designer mode', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: listValue(['Item one', 'Item two']),
+      schema: getListSchema({ editableInDesigner: false }),
+      rootElement,
+      mode: 'designer',
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    const rows = Array.from(rootElement.children) as HTMLDivElement[];
+    expect(rows.length).toBeGreaterThan(0);
+    // No add/remove buttons when not editable
+    expect(rootElement.querySelector('button')).toBeNull();
+    const firstRow = rows[0];
+    expect((firstRow.children[1] as HTMLElement).style.cursor).toBe('default');
+  });
+
+  it('shows edit controls when editableInDesigner is omitted in designer mode', async () => {
+    const rootElement = document.createElement('div');
+
+    await uiRender({
+      value: listValue(['Item one']),
+      schema: getListSchema(),
+      rootElement,
+      mode: 'designer',
+      options: { font },
+      _cache: getCache(),
+      theme: { colorPrimary: '#1677ff' },
+      i18n,
+    } as Parameters<typeof uiRender>[0]);
+
+    expect(rootElement.querySelector('button')).not.toBeNull();
+  });
+});
