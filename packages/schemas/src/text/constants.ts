@@ -61,6 +61,7 @@ export const LINE_START_FORBIDDEN_CHARS = [
   '】',
   '>',
   '≫',
+  '»',
   ']',
 
   // 記号
@@ -124,4 +125,28 @@ export const LINE_END_FORBIDDEN_CHARS = [
   '“',
   '｟',
   '«',
+  // 欧文の始め括弧・約物（Latin opening punctuation）. Straight ASCII quotes are
+  // deliberately NOT here for the same reason they are excluded from the
+  // universal set below: they are open/close-ambiguous and ' marks possessives,
+  // so a mixed JP+Latin line ending in "IBM's" must keep its apostrophe.
+  '(',
+  '[',
+  '{',
+  '„',
+  '¿',
+  '¡',
 ];
+
+// Universal (script-independent) kinsoku sets. Unlike LINE_*_FORBIDDEN_CHARS,
+// these are applied to every line regardless of whether it contains Japanese,
+// so ordinary Latin text is protected from stranded punctuation as well.
+
+// A line must not START with these closing/trailing marks.
+export const LINE_START_FORBIDDEN_UNIVERSAL = [')', ']', '}', '»', ',', '.', ';', ':', '!', '?'];
+
+// A line must not END with these opening marks. Straight ASCII quotes (" and ')
+// are deliberately excluded: the same glyph both opens and closes a quotation,
+// and ' also marks a possessive, so treating a line-final one as an opener
+// corrupts routine English text (e.g. "companies' obligations" would split into
+// "companies" / "'obligations"). Curly quotes are excluded for the same reason.
+export const LINE_END_FORBIDDEN_UNIVERSAL = ['(', '[', '{', '«', '„', '¿', '¡'];
