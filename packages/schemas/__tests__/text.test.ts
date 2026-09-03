@@ -14,6 +14,8 @@ import {
   filterStartJP,
   filterEndJP,
   widthOfTextAtSize,
+  resolveVariantFontName,
+  fontWeightToNumeric,
 } from '../src/text/helper.js';
 import {
   escapeInlineMarkdown,
@@ -1186,5 +1188,147 @@ describe('filterEndJP', () => {
     const input = ['これは「', '文章「', 'です「'];
     const expected = ['これは', '「文章', '「です「'];
     expect(filterEndJP(input)).toEqual(expected);
+  });
+});
+
+describe('resolveVariantFontName', () => {
+  const font: Font = {
+    Roboto: { data: sansData, fallback: true },
+    Roboto_700: { data: serifData },
+    Roboto_900: { data: serifData },
+    Roboto_bold: { data: serifData },
+    Roboto_italic: { data: serifData },
+    Roboto_italic_700: { data: serifData },
+    Roboto_italic_bold: { data: serifData },
+  };
+
+  it('resolves numeric weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 700, font)).toEqual({ name: 'Roboto_700', styleResolved: false, weightResolved: true });
+  });
+
+  it('resolves keyword weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 'bold', font)).toEqual({ name: 'Roboto_bold', styleResolved: false, weightResolved: true });
+  });
+
+  it('resolves italic style variant (default weight)', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 400, font)).toEqual({ name: 'Roboto_italic', styleResolved: true, weightResolved: false });
+  });
+
+  it('resolves composite italic + numeric weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 700, font)).toEqual({ name: 'Roboto_italic_700', styleResolved: true, weightResolved: true });
+  });
+
+  it('resolves composite italic + keyword weight variant', () => {
+    expect(resolveVariantFontName('Roboto', 'italic', 'bold', font)).toEqual({ name: 'Roboto_italic_bold', styleResolved: true, weightResolved: true });
+  });
+
+  it('falls back to base font when variant not registered', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 300, font)).toEqual({ name: 'Roboto', styleResolved: false, weightResolved: false });
+  });
+
+  it('falls back to style-only variant when composite is not registered — style resolved, weight not', () => {
+    // Roboto_italic_300 is not registered, but Roboto_italic is — should prefer Roboto_italic
+    // styleResolved=true (italic encoded by file), weightResolved=false (300 needs CSS synthesis)
+    expect(resolveVariantFontName('Roboto', 'italic', 300, font)).toEqual({ name: 'Roboto_italic', styleResolved: true, weightResolved: false });
+  });
+
+  it('falls back to weight-only variant when composite and style-only are not registered — weight resolved, style not', () => {
+    const fontWithWeightOnly: Font = {
+      Roboto: { data: sansData, fallback: true },
+      Roboto_700: { data: serifData },
+    };
+    // Roboto_italic_700 and Roboto_italic are not registered, but Roboto_700 is
+    // styleResolved=false (italic needs CSS synthesis), weightResolved=true (700 encoded by file)
+    expect(resolveVariantFontName('Roboto', 'italic', 700, fontWithWeightOnly)).toEqual({ name: 'Roboto_700', styleResolved: false, weightResolved: true });
+  });
+
+  it('falls back to base font when composite and all intermediate variants are not registered', () => {
+    const baseOnly: Font = { Roboto: { data: sansData, fallback: true } };
+    expect(resolveVariantFontName('Roboto', 'italic', 300, baseOnly)).toEqual({ name: 'Roboto', styleResolved: false, weightResolved: false });
+  });
+
+  it('returns base font for default weight 400 and normal style', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 400, font)).toEqual({ name: 'Roboto', styleResolved: false, weightResolved: false });
+  });
+
+  it('returns base font for keyword normal weight', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 'normal', font)).toEqual({ name: 'Roboto', styleResolved: false, weightResolved: false });
+  });
+
+  it('returns undefined name when fontName is undefined', () => {
+    expect(resolveVariantFontName(undefined, 'normal', 400, font)).toEqual({ name: undefined, styleResolved: false, weightResolved: false });
+  });
+
+  it('treats undefined style the same as normal', () => {
+    expect(resolveVariantFontName('Roboto', undefined, 700, font)).toEqual({ name: 'Roboto_700', styleResolved: false, weightResolved: true });
+    expect(resolveVariantFontName('Roboto', undefined, 400, font)).toEqual({ name: 'Roboto', styleResolved: false, weightResolved: false });
+  });
+
+  it('resolves 900 variant', () => {
+    expect(resolveVariantFontName('Roboto', 'normal', 900, font)).toEqual({ name: 'Roboto_900', styleResolved: false, weightResolved: true });
+  });
+
+  it('partial coverage: style-only match does not suppress CSS weight synthesis', () => {
+    // Roboto_italic only — italic is covered by the file, but 700 weight must still be applied via CSS
+    const styleOnly: Font = {
+      Roboto: { data: sansData, fallback: true },
+      Roboto_italic: { data: serifData },
+    };
+    const result = resolveVariantFontName('Roboto', 'italic', 700, styleOnly);
+    expect(result).toEqual({ name: 'Roboto_italic', styleResolved: true, weightResolved: false });
+  });
+
+  it('partial coverage: weight-only match does not suppress CSS style synthesis', () => {
+    // Roboto_700 only — weight is covered by the file, but italic style must still be applied via CSS
+    const weightOnly: Font = {
+      Roboto: { data: sansData, fallback: true },
+      Roboto_700: { data: serifData },
+    };
+    const result = resolveVariantFontName('Roboto', 'italic', 700, weightOnly);
+    expect(result).toEqual({ name: 'Roboto_700', styleResolved: false, weightResolved: true });
+  });
+});
+
+describe('fontWeightToNumeric', () => {
+  it('passes through numeric weights unchanged', () => {
+    expect(fontWeightToNumeric(700)).toBe(700);
+    expect(fontWeightToNumeric(400)).toBe(400);
+  });
+
+  it('maps keyword weights to numeric values', () => {
+    expect(fontWeightToNumeric('bold')).toBe(700);
+    expect(fontWeightToNumeric('normal')).toBe(400);
+    expect(fontWeightToNumeric('light')).toBe(300);
+    expect(fontWeightToNumeric('black')).toBe(900);
+  });
+});
+
+describe('propPanel fontWeight and fontStyle', () => {
+  it('includes fontWeight field with all 9 weight options', () => {
+    const schema = getTextPropPanelSchema();
+    expect(schema).toHaveProperty('fontWeight');
+    const fw = schema.fontWeight as PropPanelSchema & {
+      props: { options: Array<{ value: number }> };
+    };
+    expect(fw.props.options.map((o) => o.value)).toEqual([
+      100, 200, 300, 400, 500, 600, 700, 800, 900,
+    ]);
+  });
+
+  it('defaultSchema has fontWeight 400', () => {
+    expect(textPropPanel.defaultSchema.fontWeight).toBe(400);
+  });
+
+  it('includes fontStyle field with normal and italic options', () => {
+    const schema = getTextPropPanelSchema();
+    expect(schema).toHaveProperty('fontStyle');
+    const fs = schema.fontStyle as PropPanelSchema & {
+      props: { options: Array<{ value: string }> };
+    };
+    expect(fs.props.options.map((o) => o.value)).toEqual(['normal', 'italic']);
+  });
+
+  it('defaultSchema has fontStyle normal', () => {
+    expect(textPropPanel.defaultSchema.fontStyle).toBe('normal');
   });
 });

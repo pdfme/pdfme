@@ -19,6 +19,11 @@ import type {
 } from './types.js';
 import { Cell, Column, Row, Table } from './classes.js';
 import { getTableBodyRange } from '../splitRange.js';
+import {
+  DEFAULT_FONT_WEIGHT,
+  DEFAULT_FONT_STYLE,
+} from '../text/constants.js';
+import type { FONT_WEIGHT } from '../text/types.js';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
 
@@ -133,6 +138,8 @@ function cellStyles(
 
   const defaultStyle = {
     fontName: fallbackFontName,
+    fontWeight: DEFAULT_FONT_WEIGHT as FONT_WEIGHT,
+    fontStyle: DEFAULT_FONT_STYLE,
     backgroundColor: '',
     textColor: '#000000',
     lineHeight: 1,
@@ -152,6 +159,8 @@ function cellStyles(
 function mapCellStyle(style: CellStyle): Partial<Styles> {
   return {
     fontName: style.fontName,
+    fontWeight: style.fontWeight,
+    fontStyle: style.fontStyle,
     alignment: style.alignment,
     verticalAlignment: style.verticalAlignment,
     fontSize: style.fontSize,

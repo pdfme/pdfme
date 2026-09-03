@@ -19,6 +19,7 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_FONT_WEIGHT,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -28,6 +29,7 @@ import {
   fetchRemoteFontData,
   widthOfTextAtSize,
   splitTextToSize,
+  resolveVariantFontName,
 } from './helper.js';
 import { stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange } from './measure.js';
@@ -141,7 +143,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   drawTextBoxDecoration({ page, schema, colorType, x, y, width, height, rotate, pivotPoint });
   if (!value) return;
 
-  const fontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
+  const baseFontName = schema.fontName ? schema.fontName : getFallbackFontName(font);
+  const fontName = resolveVariantFontName(baseFontName, schema.fontStyle, schema.fontWeight ?? DEFAULT_FONT_WEIGHT, font).name ?? baseFontName;
   const enableInlineMarkdown = isInlineMarkdownTextSchema(schema);
   const contentArea = getBoxContentArea(schema);
   const contentX = x + mm2pt(contentArea.leftInset);
@@ -158,7 +161,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
         _cache,
       });
   const fontKitFont = await getFontKitFont(
-    schema.fontName,
+    fontName,
     font,
     _cache as Map<string, FontKitFont>,
   );

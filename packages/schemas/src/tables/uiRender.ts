@@ -64,6 +64,8 @@ const cellUiRender = cell.ui;
 
 const convertToCellStyle = (styles: Styles): CellStyle => ({
   fontName: styles.fontName,
+  fontWeight: styles.fontWeight,
+  fontStyle: styles.fontStyle,
   alignment: styles.alignment,
   verticalAlignment: styles.verticalAlignment,
   fontSize: styles.fontSize,
