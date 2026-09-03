@@ -127,6 +127,13 @@ export const barCodeType2Bcid = (type: BarcodeTypes) =>
 export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
   color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
+const ensureBwippSetAnyColor = () => {
+  const globalScope = globalThis as typeof globalThis & { bwipp_setanycolor?: () => void };
+  if (typeof globalScope.bwipp_setanycolor !== 'function') {
+    globalScope.bwipp_setanycolor = () => {};
+  }
+};
+
 export const createBarCode = async (arg: {
   type: BarcodeTypes;
   input: string;
@@ -163,6 +170,7 @@ export const createBarCode = async (arg: {
   if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
   if (textColor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textColor);
+  if (includetext) ensureBwippSetAnyColor();
 
   let res: Buffer;
 
