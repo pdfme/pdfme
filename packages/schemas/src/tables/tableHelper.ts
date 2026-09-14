@@ -18,6 +18,7 @@ import type {
   Section,
 } from './types.js';
 import { Cell, Column, Row, Table } from './classes.js';
+import { createBoxDimension } from '../box.js';
 import { getTableBodyRange } from '../splitRange.js';
 
 type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
@@ -140,9 +141,9 @@ function cellStyles(
     alignment: 'left',
     verticalAlignment: 'middle',
     fontSize: 10,
-    cellPadding: 5,
+    cellPadding: createBoxDimension(5),
     lineColor: '#000000',
-    lineWidth: 0,
+    lineWidth: createBoxDimension(0),
     minCellHeight: 0,
     minCellWidth: 0,
   };
@@ -150,7 +151,7 @@ function cellStyles(
 }
 
 function mapCellStyle(style: CellStyle): Partial<Styles> {
-  return {
+  const mapping: Partial<Styles> = {
     fontName: style.fontName,
     alignment: style.alignment,
     verticalAlignment: style.verticalAlignment,
@@ -164,6 +165,9 @@ function mapCellStyle(style: CellStyle): Partial<Styles> {
     lineWidth: style.borderWidth,
     cellPadding: style.padding,
   };
+  return Object.fromEntries(
+    Object.entries(mapping).filter(([, value]) => value !== undefined),
+  ) as Partial<Styles>;
 }
 
 function getTableOptions(schema: TableSchema, body: string[][]): UserOptions {
