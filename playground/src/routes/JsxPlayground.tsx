@@ -5,6 +5,7 @@ import type { RenderResult } from '@pdfme/jsx';
 import { Viewer } from '@pdfme/ui';
 import { Copy, Download, ExternalLink, PencilRuler, Save } from 'lucide-react';
 import { toast } from 'react-toastify';
+import * as typeScriptLanguage from 'monaco-editor/languages/features/typescript/register';
 import CodeEditor from '../components/CodeEditor';
 import PlaygroundButton from '../components/PlaygroundButton';
 import ProjectSavedToast from '../components/ProjectSavedToast';
@@ -53,10 +54,7 @@ type PendingRender = {
   timeoutId: number;
 };
 
-const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = (monaco) => {
-  const typeScriptLanguage = monaco.languages.typescript;
-  if (!typeScriptLanguage) return;
-
+const configureJsxEditor: Parameters<typeof CodeEditor>[0]['beforeMount'] = () => {
   typeScriptLanguage.typescriptDefaults.setCompilerOptions({
     allowNonTsExtensions: true,
     jsx: typeScriptLanguage.JsxEmit.React,

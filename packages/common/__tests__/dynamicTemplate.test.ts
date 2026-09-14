@@ -222,6 +222,73 @@ describe('getDynamicTemplate', () => {
   });
 
   describe('Edge cases', () => {
+    test.each([25, 0])(
+      'clamps an overlapping element after shrinking to %s without mutating inputs',
+      async (actualHeight) => {
+        const overlappingTemplate: Template = {
+          basePdf: { width: 210, height: 297, padding: [15, 15, 15, 15] },
+          schemas: [
+            [
+              {
+                name: 'table',
+                type: 'table',
+                content: '',
+                position: { x: 15, y: 19.91 },
+                width: 150,
+                height: 52.932,
+              },
+              {
+                name: 'caption',
+                type: 'text',
+                content: '',
+                position: { x: 15, y: 20 },
+                width: 70,
+                height: 9,
+              },
+              {
+                name: 'following',
+                type: 'text',
+                content: '',
+                position: { x: 15, y: 90 },
+                width: 70,
+                height: 9,
+              },
+            ],
+          ],
+        };
+        const input = {
+          table: '[]',
+          caption: 'CAPTION',
+          following: 'FOLLOWING',
+        };
+        const original = structuredClone({
+          template: overlappingTemplate,
+          input,
+        });
+        const result = await getDynamicTemplate({
+          template: overlappingTemplate,
+          input,
+          options,
+          _cache: new Map(),
+          getDynamicHeights: async (_, { schema }) => [
+            schema.name === 'table' ? actualHeight : schema.height,
+          ],
+        });
+
+        expect(result.schemas).toHaveLength(1);
+        expect(result.schemas[0].map((schema) => schema.name)).toEqual([
+          'table',
+          'caption',
+          'following',
+        ]);
+        expect(result.schemas[0][0].height).toBe(actualHeight);
+        expect(result.schemas[0][1].position.y).toBe(15);
+        // The following element retains its gap after the clamped caption.
+        expect(result.schemas[0][2].position.y).toBe(85);
+        expect({ template: overlappingTemplate, input }).toEqual(original);
+      },
+    );
+
     test('should preserve explicit blank pages', async () => {
       const blankTemplate: Template = {
         schemas: [[]],

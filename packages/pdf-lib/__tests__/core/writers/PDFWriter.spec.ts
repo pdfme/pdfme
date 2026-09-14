@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate } from 'pako';
 import {
   mergeIntoTypedArray,
   PDFContext,
@@ -16,7 +16,7 @@ const contentStreamText = `
   ET
 `;
 
-const encodedContentStream = pako.deflate(typedArrayFor(contentStreamText));
+const encodedContentStream = deflate(typedArrayFor(contentStreamText));
 
 const pdfBytes = mergeIntoTypedArray(
   `%PDF-1.7
@@ -25,7 +25,7 @@ const pdfBytes = mergeIntoTypedArray(
 9000 0 obj
 <<
 /Filter /FlateDecode
-/Length 67
+/Length 70
 >>
 stream
 `,
@@ -78,10 +78,10 @@ xref
 0000000000 65535 f 
 9000 5
 0000000016 00000 n 
-0000000158 00000 n 
-0000000270 00000 n 
-0000000411 00000 n 
-0000000477 00000 n 
+0000000161 00000 n\x20
+0000000273 00000 n\x20
+0000000414 00000 n\x20
+0000000480 00000 n\x20
 
 trailer
 <<
@@ -90,7 +90,7 @@ trailer
 >>
 
 startxref
-533
+536
 %%EOF`,
 );
 
