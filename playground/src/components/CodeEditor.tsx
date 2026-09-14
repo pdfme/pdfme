@@ -1,5 +1,7 @@
 import Editor, { loader, type BeforeMount, type OnMount } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor/editor';
+// Register editor contributions and their services before the first editor is created.
+import 'monaco-editor/features/register.all';
 import editorWorker from 'monaco-editor/editor/editor.worker.js?worker';
 import jsonWorker from 'monaco-editor/language/json/json.worker.js?worker';
 import tsWorker from 'monaco-editor/language/typescript/ts.worker.js?worker';
