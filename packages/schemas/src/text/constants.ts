@@ -5,6 +5,10 @@ import {
   TEXT_FORMAT,
   TEXT_OVERFLOW,
   FONT_VARIANT_FALLBACK,
+  FONT_WEIGHT,
+  FONT_WEIGHT_NUMERIC,
+  FONT_WEIGHT_KEYWORD,
+  FONT_STYLE,
 } from './types.js';
 
 export const DEFAULT_FONT_SIZE = 13;
@@ -32,6 +36,31 @@ export const FONT_VARIANT_FALLBACK_SYNTHETIC = 'synthetic' as const satisfies FO
 export const FONT_VARIANT_FALLBACK_PLAIN = 'plain' as const satisfies FONT_VARIANT_FALLBACK;
 export const FONT_VARIANT_FALLBACK_ERROR = 'error' as const satisfies FONT_VARIANT_FALLBACK;
 export const DEFAULT_FONT_VARIANT_FALLBACK = FONT_VARIANT_FALLBACK_SYNTHETIC;
+export const DEFAULT_FONT_WEIGHT: FONT_WEIGHT = 400;
+export const FONT_WEIGHTS: FONT_WEIGHT_NUMERIC[] = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+export const FONT_WEIGHT_KEYWORD_TO_NUMERIC: Record<FONT_WEIGHT_KEYWORD, number> = {
+  thin: 100,
+  extralight: 200,
+  light: 300,
+  normal: 400,
+  medium: 500,
+  semibold: 600,
+  bold: 700,
+  extrabold: 800,
+  black: 900,
+};
+export const DEFAULT_FONT_STYLE: FONT_STYLE = 'normal';
+export const FONT_WEIGHT_LABEL: Record<number, string> = {
+  100: 'Thin (100)',
+  200: 'Extra Light (200)',
+  300: 'Light (300)',
+  400: 'Regular (400)',
+  500: 'Medium (500)',
+  600: 'Semi Bold (600)',
+  700: 'Bold (700)',
+  800: 'Extra Bold (800)',
+  900: 'Black (900)',
+};
 export const SYNTHETIC_BOLD_OFFSET_RATIO = 0.03;
 export const SYNTHETIC_BOLD_PDF_EXTRA_DRAWS = 2;
 export const SYNTHETIC_BOLD_CSS_TEXT_SHADOW = '0.025em 0 0 currentColor';

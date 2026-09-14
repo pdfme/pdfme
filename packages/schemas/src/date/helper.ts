@@ -50,6 +50,10 @@ import {
   DEFAULT_LINE_HEIGHT,
   DEFAULT_CHARACTER_SPACING,
   DEFAULT_FONT_COLOR,
+  DEFAULT_FONT_WEIGHT,
+  DEFAULT_FONT_STYLE,
+  FONT_WEIGHTS,
+  FONT_WEIGHT_LABEL,
 } from '../text/constants.js';
 import { DateSchema } from './types.js';
 import { getExtraFormatterSchema, Formatter } from '../text/extraFormatter.js';
@@ -464,6 +468,29 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
             props: { options: fontNames.map((name) => ({ label: name, value: name })) },
             span: 12,
           },
+          fontWeight: {
+            title: i18n('schemas.text.fontWeight'),
+            type: 'number',
+            widget: 'select',
+            default: DEFAULT_FONT_WEIGHT,
+            props: {
+              options: FONT_WEIGHTS.map((w) => ({ label: FONT_WEIGHT_LABEL[w], value: w })),
+            },
+            span: 8,
+          },
+          fontStyle: {
+            title: i18n('schemas.text.fontStyle'),
+            type: 'string',
+            widget: 'select',
+            default: DEFAULT_FONT_STYLE,
+            props: {
+              options: [
+                { label: i18n('schemas.text.fontStyleNormal'), value: 'normal' },
+                { label: i18n('schemas.text.fontStyleItalic'), value: 'italic' },
+              ],
+            },
+            span: 4,
+          },
           fontSize: {
             title: i18n('schemas.text.size'),
             type: 'number',
@@ -534,6 +561,8 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
         characterSpacing: DEFAULT_CHARACTER_SPACING,
         fontColor: DEFAULT_FONT_COLOR,
         fontName: undefined,
+        fontWeight: DEFAULT_FONT_WEIGHT,
+        fontStyle: DEFAULT_FONT_STYLE,
         backgroundColor: '',
         locale: undefined,
         opacity: DEFAULT_OPACITY,

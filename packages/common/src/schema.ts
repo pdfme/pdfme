@@ -61,6 +61,10 @@ export const Dict = z.object({
   'schemas.padding': z.string(),
 
   'schemas.text.fontName': z.string(),
+  'schemas.text.fontWeight': z.string(),
+  'schemas.text.fontStyle': z.string(),
+  'schemas.text.fontStyleNormal': z.string(),
+  'schemas.text.fontStyleItalic': z.string(),
   'schemas.text.size': z.string(),
   'schemas.text.spacing': z.string(),
   'schemas.text.textAlign': z.string(),

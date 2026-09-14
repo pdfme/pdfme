@@ -12,7 +12,7 @@ import {
   isUrlSafeToFetch,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import type { TextSchema, FontWidthCalcValues } from './types.js';
+import type { TextSchema, FontWidthCalcValues, FONT_WEIGHT, FONT_STYLE } from './types.js';
 import { getBoxContentArea } from '../box.js';
 import {
   DEFAULT_FONT_SIZE,
@@ -25,6 +25,7 @@ import {
   VERTICAL_ALIGN_TOP,
   LINE_END_FORBIDDEN_CHARS,
   LINE_START_FORBIDDEN_CHARS,
+  FONT_WEIGHT_KEYWORD_TO_NUMERIC,
 } from './constants.js';
 
 export const getBrowserVerticalFontAdjustments = (
@@ -128,6 +129,54 @@ export const widthOfTextAtSize = (
   cache.set(cacheKey, width);
 
   return width;
+};
+
+export const fontWeightToNumeric = (weight: FONT_WEIGHT): number => {
+  if (typeof weight === 'number') return weight;
+  return FONT_WEIGHT_KEYWORD_TO_NUMERIC[weight] ?? 400;
+};
+
+export type ResolvedVariantFont = {
+  name: string | undefined;
+  styleResolved: boolean;
+  weightResolved: boolean;
+};
+
+export const resolveVariantFontName = (
+  fontName: string | undefined,
+  style: FONT_STYLE | undefined,
+  weight: FONT_WEIGHT,
+  font: Font,
+): ResolvedVariantFont => {
+  if (!fontName) return { name: undefined, styleResolved: false, weightResolved: false };
+  const isDefaultStyle = !style || style === 'normal';
+  const isDefaultWeight = fontWeightToNumeric(weight) === 400;
+
+  if (isDefaultStyle && isDefaultWeight) return { name: fontName, styleResolved: false, weightResolved: false };
+
+  if (!isDefaultStyle && !isDefaultWeight) {
+    // Try composite first, then each single-axis variant, then base
+    const composite = `${fontName}_${style}_${weight}`;
+    if (font[composite]) return { name: composite, styleResolved: true, weightResolved: true };
+    const styleOnly = `${fontName}_${style}`;
+    if (font[styleOnly]) return { name: styleOnly, styleResolved: true, weightResolved: false };
+    const weightOnly = `${fontName}_${weight}`;
+    if (font[weightOnly]) return { name: weightOnly, styleResolved: false, weightResolved: true };
+    return { name: fontName, styleResolved: false, weightResolved: false };
+  }
+
+  if (isDefaultStyle) {
+    const candidate = `${fontName}_${weight}`;
+    return font[candidate]
+      ? { name: candidate, styleResolved: false, weightResolved: true }
+      : { name: fontName, styleResolved: false, weightResolved: false };
+  }
+
+  // Only style is non-default
+  const candidate = `${fontName}_${style}`;
+  return font[candidate]
+    ? { name: candidate, styleResolved: true, weightResolved: false }
+    : { name: fontName, styleResolved: false, weightResolved: false };
 };
 
 const getFallbackFont = (font: Font) => {
