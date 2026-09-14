@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@tsconfig/docusaurus": "^2.0.9",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   },
   "overrides": {
     "copy-webpack-plugin": "^14.0.0",

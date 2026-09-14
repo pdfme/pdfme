@@ -14,7 +14,7 @@ declare global {
 
 type Props = WrapperProps<typeof TOCType>;
 
-export default function TOCWrapper(props: Props): JSX.Element {
+export default function TOCWrapper(props: Props): React.JSX.Element {
 
   useEffect(() => {
     if (window.ethicalads && typeof window.ethicalads.load === "function") {
