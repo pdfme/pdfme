@@ -1,13 +1,13 @@
 {
   // This file is not used in compilation. It is here just for a nice editor experience.
   "extends": "@tsconfig/docusaurus/tsconfig.json",
-  "target": "ES2020",
   "include": [
     "src/"
   ],
   "compilerOptions": {
-    "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "target": "ES2020",
+    "baseUrl": null,
+    "paths": { "@site/*": ["./*"] },
     "skipLibCheck": true
   }
 }
