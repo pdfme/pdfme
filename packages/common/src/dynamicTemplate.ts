@@ -110,7 +110,7 @@ function placeUnitsOnPages(
 ): number {
   const dynamicHeights = dynamicLayout.heights;
   let currentUnitIndex = 0;
-  let currentPageIndex = Math.floor(startGlobalY / contentHeight);
+  let currentPageIndex = Math.max(0, Math.floor(startGlobalY / contentHeight));
   let currentYInPage = startGlobalY % contentHeight;
 
   if (currentYInPage < 0) currentYInPage = 0;

@@ -49,9 +49,9 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
-    "acorn": "^8.17.0",
+    "acorn": "^8.18.0",
     "buffer": "^6.0.3",
-    "zod": "^4.4.3"
+    "zod": "^4.5.2"
   },
   "devDependencies": {
     "@types/estree": "^1.0.9"
