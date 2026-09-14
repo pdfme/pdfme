@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate } from 'pako';
 
 import PDFHeader from './document/PDFHeader';
 import { UnexpectedObjectTypeError } from './errors';
@@ -212,7 +212,7 @@ class PDFContext {
   }
 
   flateStream(contents: string | Uint8Array, dict: LiteralObject = {}): PDFRawStream {
-    return this.stream(pako.deflate(typedArrayFor(contents)), {
+    return this.stream(deflate(typedArrayFor(contents)), {
       ...dict,
       Filter: 'FlateDecode',
     });

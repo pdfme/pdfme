@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate } from 'pako';
 
 import {
   mergeIntoTypedArray,
@@ -130,7 +130,7 @@ describe(`PDFCrossRefStream`, () => {
       1,  2,  88,    0,    0,
       2,  0,  10,    0,    1,
     ]);
-    const encodedEntries = pako.deflate(expectedEntries);
+    const encodedEntries = deflate(expectedEntries);
 
     expect(stream.copyBytesInto(buffer, 2)).toBe(135);
     expect(buffer).toEqual(

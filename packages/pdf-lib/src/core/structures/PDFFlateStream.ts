@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate } from 'pako';
 
 import { MethodNotImplementedError } from '../errors';
 import PDFDict from '../objects/PDFDict';
@@ -21,7 +21,7 @@ class PDFFlateStream extends PDFStream {
 
   computeContents = (): Uint8Array => {
     const unencodedContents = this.getUnencodedContents();
-    return this.encode ? pako.deflate(unencodedContents) : unencodedContents;
+    return this.encode ? deflate(unencodedContents) : unencodedContents;
   };
 
   getContents(): Uint8Array {
