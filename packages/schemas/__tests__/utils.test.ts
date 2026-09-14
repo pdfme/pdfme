@@ -6,6 +6,7 @@ import {
   hex2RgbColor,
   hex2PrintingColor,
   createSvgStr,
+  isEditable,
 } from '../src/utils.js';
 import { SquareCheck, IconNode } from 'lucide';
 
@@ -300,5 +301,36 @@ describe('createSvgStr', () => {
     expect(() =>
       createSvgStr([['script', { d: 'M0 0' }]] as unknown as IconNode),
     ).toThrow('Invalid SVG tag name: script');
+  });
+});
+
+describe('isEditable', () => {
+  const base: Schema = {
+    name: 'f',
+    type: 'text',
+    position: { x: 0, y: 0 },
+    width: 10,
+    height: 10,
+  };
+
+  it('is true for designer mode by default', () => {
+    expect(isEditable('designer', base)).toBe(true);
+  });
+
+  it('is false in designer mode when editableInDesigner is false', () => {
+    expect(isEditable('designer', { ...base, editableInDesigner: false })).toBe(false);
+  });
+
+  it('is true in designer mode when editableInDesigner is true', () => {
+    expect(isEditable('designer', { ...base, editableInDesigner: true })).toBe(true);
+  });
+
+  it('is true in form mode regardless of editableInDesigner', () => {
+    expect(isEditable('form', { ...base, editableInDesigner: false })).toBe(true);
+  });
+
+  it('is false in viewer mode regardless of editableInDesigner', () => {
+    expect(isEditable('viewer', { ...base, editableInDesigner: false })).toBe(false);
+    expect(isEditable('viewer', base)).toBe(false);
   });
 });
