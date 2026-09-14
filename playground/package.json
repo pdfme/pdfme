@@ -47,7 +47,7 @@
     "postcss": "^8.5.26",
     "puppeteer": "^25.9.0",
     "tailwindcss": "^4.2.4",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vite": "^8.0.3",
     "vite-plus": "^0.3.0",
     "vitest": "^4.1.10",
