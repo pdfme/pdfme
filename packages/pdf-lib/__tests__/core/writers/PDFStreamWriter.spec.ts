@@ -68,7 +68,8 @@ describe(`PDFStreamWriter`, () => {
       2,
     ).serializeToBuffer();
 
-    // Compression may change bytes and offsets while preserving the PDF objects.
+    expect(buffer).toEqual(expectedPdfBytes);
+    // Verify that compressed streams still decode to the expected PDF objects.
     const actual = await PDFDocument.load(buffer);
     const expected = await PDFDocument.load(expectedPdfBytes);
     expect(actual.getPageCount()).toBe(expected.getPageCount());
