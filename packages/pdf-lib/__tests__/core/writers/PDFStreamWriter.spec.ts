@@ -2,6 +2,9 @@ import fs from 'fs';
 
 import {
   PDFContext,
+  PDFDocument,
+  PDFRawStream,
+  decodePDFRawStream,
   PDFName,
   PDFRef,
   PDFStreamWriter,
@@ -65,7 +68,21 @@ describe(`PDFStreamWriter`, () => {
       2,
     ).serializeToBuffer();
 
-    expect(buffer.length).toBe(expectedPdfBytes.length);
     expect(buffer).toEqual(expectedPdfBytes);
+    // Verify that compressed streams still decode to the expected PDF objects.
+    const actual = await PDFDocument.load(buffer);
+    const expected = await PDFDocument.load(expectedPdfBytes);
+    expect(actual.getPageCount()).toBe(expected.getPageCount());
+    for (const [ref, object] of expected.context.enumerateIndirectObjects()) {
+      const actualObject = actual.context.lookup(ref);
+      if (object instanceof PDFRawStream) {
+        expect(actualObject).toBeInstanceOf(PDFRawStream);
+        expect(decodePDFRawStream(actualObject as PDFRawStream).decode()).toEqual(
+          decodePDFRawStream(object).decode(),
+        );
+      } else {
+        expect(actualObject?.toString()).toBe(object.toString());
+      }
+    }
   });
 });

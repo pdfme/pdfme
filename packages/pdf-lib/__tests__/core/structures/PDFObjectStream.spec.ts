@@ -1,4 +1,4 @@
-import pako from 'pako';
+import { deflate, inflate } from 'pako';
 
 import {
   mergeIntoTypedArray,
@@ -115,7 +115,8 @@ describe(`PDFObjectStream`, () => {
       'null\n' +
       '21\n' +
       '(Stuff and thingz)\n';
-    const encodedContents = pako.deflate(contents);
+    const encodedContents = deflate(contents);
+    expect(new TextDecoder().decode(inflate(encodedContents))).toBe(contents);
 
     const stream = PDFObjectStream.withContextAndObjects(
       context,
@@ -125,10 +126,10 @@ describe(`PDFObjectStream`, () => {
     const buffer = new Uint8Array(stream.sizeInBytes() + 3).fill(
       toCharCode(' '),
     );
-    expect(stream.copyBytesInto(buffer, 2)).toBe(195);
+    expect(stream.copyBytesInto(buffer, 2)).toBe(stream.sizeInBytes());
     expect(buffer).toEqual(
       mergeIntoTypedArray(
-        '  <<\n/Filter /FlateDecode\n/Type /ObjStm\n/N 9\n/First 42\n/Length 110\n>>\n',
+        `  <<\n/Filter /FlateDecode\n/Type /ObjStm\n/N 9\n/First 42\n/Length ${encodedContents.length}\n>>\n`,
         'stream\n',
         encodedContents,
         '\nendstream ',
