@@ -1,5 +1,6 @@
 import { Font, mm2pt, pt2mm } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
+import { getBoxContentArea, getBoxVerticalInset, type BoxStyleSchema } from '../box.js';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper.js';
 import type { Styles, TableInput, Settings, Section, StylesProps } from './types.js';
 
@@ -32,8 +33,7 @@ export class Cell {
   getContentHeight() {
     const lineCount = Array.isArray(this.text) ? this.text.length : 1;
     const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
-    const vPadding = this.padding('top') + this.padding('bottom');
-    const height = lineCount * lineHeight + vPadding;
+    const height = lineCount * lineHeight + getBoxVerticalInset(getCellBoxStyle(this));
     return Math.max(height, this.styles.minCellHeight);
   }
 
@@ -41,6 +41,11 @@ export class Cell {
     return this.styles.cellPadding[name];
   }
 }
+
+const getCellBoxStyle = (cell: Cell): BoxStyleSchema => ({
+  padding: cell.styles.cellPadding,
+  borderWidth: cell.styles.lineWidth,
+});
 
 export class Column {
   index: number;
@@ -270,10 +275,16 @@ async function fitContent(
       if (!cell) continue;
 
       const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
+      const contentArea = getBoxContentArea({
+        position: { x: 0, y: 0 },
+        width: cell.width,
+        height: cell.height,
+        ...getCellBoxStyle(cell),
+      });
       cell.text = splitTextToSize({
         value: cell.raw,
         characterSpacing: cell.styles.characterSpacing,
-        boxWidthInPt: mm2pt(cell.width),
+        boxWidthInPt: mm2pt(contentArea.width),
         fontSize: cell.styles.fontSize,
         fontKitFont,
       });
