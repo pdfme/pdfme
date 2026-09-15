@@ -29,7 +29,9 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const renderResolvedValue = schema.readOnly === true && mode !== 'designer';
 
   const renderValue = renderResolvedValue
-    ? value
+    ? numVariables > 0
+      ? value
+      : text || ''
     : isInlineMarkdownTextSchema(schema)
       ? substituteVariablesAsInlineMarkdownLiterals(text, value)
       : substituteVariables(text, value);
@@ -63,7 +65,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
 
   if (mode === 'designer') {
     textBlock.addEventListener('keyup', (event: KeyboardEvent) => {
-      text = textBlock.textContent || '';
+      text = textBlock.innerText || '';
       if (keyPressShouldBeChecked(event)) {
         const newNumVariables = countUniqueVariableNames(text);
         if (numVariables !== newNumVariables) {

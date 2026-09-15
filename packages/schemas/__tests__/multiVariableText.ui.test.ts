@@ -606,3 +606,113 @@ describe('multiVariableText inline markdown UI rendering', () => {
     });
   });
 });
+
+describe('multiVariableText without variables', () => {
+  const renderReadOnlyMvt = async (
+    mode: 'viewer' | 'form',
+    schemaOverrides: Partial<MultiVariableTextSchema> = {},
+  ) => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: 'Just static text',
+      variables: [],
+      // When the last variable is removed the prop panel marks the field read-only and
+      // resets content to the empty variables map.
+      readOnly: true,
+      content: '{}',
+      textFormat: 'plain',
+      ...schemaOverrides,
+    };
+
+    await uiRender({
+      value: schema.content,
+      schema,
+      rootElement,
+      mode,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    return rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+  };
+
+  it('renders the static text in viewer mode instead of the variables map', async () => {
+    const textBlock = await renderReadOnlyMvt('viewer');
+    expect(textBlock.textContent).toBe('Just static text');
+    expect(textBlock.textContent).not.toContain('{}');
+  });
+
+  it('renders the static text in form mode instead of the variables map', async () => {
+    const textBlock = await renderReadOnlyMvt('form');
+    expect(textBlock.textContent).toBe('Just static text');
+    expect(textBlock.textContent).not.toContain('{}');
+  });
+
+  it('renders the static text for inline markdown fields', async () => {
+    const textBlock = await renderReadOnlyMvt('viewer', {
+      text: '**bold** static',
+      textFormat: 'inline-markdown',
+    });
+    expect(textBlock.textContent).toBe('bold static');
+    expect(textBlock.textContent).not.toContain('{}');
+  });
+
+  it('renders the resolved content snapshot for a read-only field that still has variables', async () => {
+    // A read-only MVT can keep its variables while content holds the already-substituted text
+    // (e.g. the jsx-invoice "locked" pattern). That snapshot must render, not the raw template.
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{company}\n{name}',
+      variables: ['company', 'name'],
+      readOnly: true,
+      content: 'Kumo Coffee\nAki Tanaka',
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: schema.content,
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.textContent).toBe('Kumo Coffee\nAki Tanaka');
+    expect(textBlock.textContent).not.toContain('{company}');
+  });
+
+  it('keeps line breaks when the last variable is removed in the designer', async () => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn();
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: 'Hello {name}\nWorld',
+      variables: ['name'],
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: JSON.stringify({ name: 'NAME' }),
+      schema,
+      rootElement,
+      mode: 'designer',
+      onChange,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    // Simulate the user deleting the `{name}` placeholder while keeping the hard line break.
+    textBlock.innerText = 'Hello \nWorld';
+    textBlock.dispatchEvent(new KeyboardEvent('keyup', { key: 'Backspace' }));
+
+    expect(onChange).toHaveBeenCalledWith({ key: 'text', value: 'Hello \nWorld' });
+  });
+});
