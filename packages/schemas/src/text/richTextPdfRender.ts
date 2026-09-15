@@ -29,16 +29,16 @@ import { getTextLineRange } from '../splitRange.js';
 type TextColor = ReturnType<typeof hex2PrintingColor>;
 
 const getSyntheticBoldWidth = (run: RichTextLineRun, fontSize: number) =>
-  run.syntheticBold ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS : 0;
+  run.syntheticBold ? (run.fontSize || fontSize) * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS : 0;
 
 const getSyntheticItalicWidth = (run: RichTextLineRun, fontSize: number) =>
   run.syntheticItalic
-    ? heightOfFontAtSize(run.fontKitFont, fontSize) *
+    ? heightOfFontAtSize(run.fontKitFont, run.fontSize || fontSize) *
       Math.tan((SYNTHETIC_ITALIC_SKEW_DEGREES * Math.PI) / 180)
     : 0;
 
 const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: number) =>
-  widthOfTextAtSize(run.text, run.fontKitFont, fontSize, characterSpacing) +
+  widthOfTextAtSize(run.text, run.fontKitFont, run.fontSize || fontSize, characterSpacing) +
   getSyntheticBoldWidth(run, fontSize) +
   getSyntheticItalicWidth(run, fontSize) +
   (run.code ? CODE_HORIZONTAL_PADDING * 2 : 0);
@@ -125,8 +125,9 @@ const getLinkAnnotationRect = (arg: {
   fontSize: number;
 }): LinkAnnotationRect => {
   const { run, x, y, width, rotate, pivotPoint, fontSize } = arg;
-  const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
-  const descent = getFontDescentInPt(run.fontKitFont, fontSize);
+  const runFontSize = run.fontSize || fontSize;
+  const textHeight = heightOfFontAtSize(run.fontKitFont, runFontSize);
+  const descent = getFontDescentInPt(run.fontKitFont, runFontSize);
   const rectY = y + descent;
   const rectHeight = textHeight - descent;
 
@@ -180,7 +181,8 @@ const drawRun = (arg: {
   const codePadding = run.code ? CODE_HORIZONTAL_PADDING : 0;
   const textX = x + codePadding;
   const textWidth = runWidth - codePadding * 2;
-  const textHeight = heightOfFontAtSize(run.fontKitFont, fontSize);
+  const runFontSize = run.fontSize || fontSize;
+  const textHeight = heightOfFontAtSize(run.fontKitFont, runFontSize);
 
   if (run.code) {
     const bgX = x;
@@ -208,7 +210,7 @@ const drawRun = (arg: {
       width: textWidth,
       rotate,
       pivotPoint,
-      fontSize,
+      fontSize: runFontSize,
       color,
       opacity,
     });
@@ -222,7 +224,7 @@ const drawRun = (arg: {
       width: textWidth,
       rotate,
       pivotPoint,
-      fontSize,
+      fontSize: runFontSize,
       color,
       opacity,
     });
@@ -235,9 +237,9 @@ const drawRun = (arg: {
       x: point.x,
       y: point.y,
       rotate,
-      size: fontSize,
+      size: runFontSize,
       color,
-      lineHeight: lineHeight * fontSize,
+      lineHeight: lineHeight * runFontSize,
       font: pdfFont,
       opacity,
       ...(run.syntheticItalic ? { ySkew: pdfLib.degrees(SYNTHETIC_ITALIC_SKEW_DEGREES) } : {}),
@@ -246,7 +248,7 @@ const drawRun = (arg: {
 
   drawAt(textX);
   if (run.syntheticBold) {
-    const offset = fontSize * SYNTHETIC_BOLD_OFFSET_RATIO;
+    const offset = runFontSize * SYNTHETIC_BOLD_OFFSET_RATIO;
     for (let i = 1; i <= SYNTHETIC_BOLD_PDF_EXTRA_DRAWS; i++) {
       drawAt(textX + offset * i);
     }
@@ -364,8 +366,11 @@ export const renderInlineMarkdownText = async (arg: {
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
 
     if (schema.strikethrough || schema.underline) {
+      const maxRunFontSize = Math.max(
+        ...line.runs.map((run) => run.fontSize || fontSize),
+      );
       const textHeight = Math.max(
-        ...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)),
+        ...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, run.fontSize || fontSize)),
       );
       if (schema.strikethrough) {
         drawDecorationLine({
@@ -375,7 +380,7 @@ export const renderInlineMarkdownText = async (arg: {
           width: textWidth,
           rotate,
           pivotPoint,
-          fontSize,
+          fontSize: maxRunFontSize,
           color,
           opacity,
         });
@@ -388,7 +393,7 @@ export const renderInlineMarkdownText = async (arg: {
           width: textWidth,
           rotate,
           pivotPoint,
-          fontSize,
+          fontSize: maxRunFontSize,
           color,
           opacity,
         });

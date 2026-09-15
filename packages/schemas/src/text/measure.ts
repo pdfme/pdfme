@@ -214,5 +214,5 @@ const measureRichTextLineHeights = (
 
 const getRichTextLineHeight = (line: RichTextLine, fontSize: number) => {
   if (line.runs.length === 0) return fontSize;
-  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)));
+  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, run.fontSize || fontSize)));
 };

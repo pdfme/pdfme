@@ -23,6 +23,7 @@ export type RichTextRun = {
   strikethrough?: boolean;
   code?: boolean;
   href?: string;
+  fontSize?: number;
 };
 
 export type FontWidthCalcValues = {

@@ -12,7 +12,8 @@ const sameStyle = (a: InlineStyle, b: InlineStyle) =>
   Boolean(a.italic) === Boolean(b.italic) &&
   Boolean(a.strikethrough) === Boolean(b.strikethrough) &&
   Boolean(a.code) === Boolean(b.code) &&
-  a.href === b.href;
+  a.href === b.href &&
+  a.fontSize === b.fontSize;
 
 const appendRun = (runs: RichTextRun[], text: string, style: InlineStyle) => {
   if (!text) return;
@@ -30,6 +31,7 @@ const appendRun = (runs: RichTextRun[], text: string, style: InlineStyle) => {
     ...(style.strikethrough ? { strikethrough: true } : {}),
     ...(style.code ? { code: true } : {}),
     ...(style.href ? { href: style.href } : {}),
+    ...(style.fontSize !== undefined ? { fontSize: style.fontSize } : {}),
   });
 };
 
@@ -61,6 +63,8 @@ const getDelimiter = (value: string, index: number) => {
   if (value.startsWith('**', index)) return '**';
   if (value.startsWith('~~', index)) return '~~';
   if (value[index] === '*') return '*';
+  const sizeMatch = value.slice(index).match(/^\{\+(\d+)\}/);
+  if (sizeMatch) return sizeMatch[0];
   return '';
 };
 
@@ -136,6 +140,10 @@ const mergeStyle = (style: InlineStyle, delimiter: string): InlineStyle => {
   }
   if (delimiter === '~~') {
     return { ...style, strikethrough: true };
+  }
+  const sizeMatch = delimiter.match(/^\{\+(\d+)\}$/);
+  if (sizeMatch) {
+    return { ...style, fontSize: Number(sizeMatch[1]) };
   }
   return style;
 };

@@ -160,15 +160,16 @@ const measureRunText = (
   fontSize: number,
   characterSpacing: number,
 ) => {
+  const effectiveFontSize = run.fontSize ?? fontSize;
   const syntheticBoldWidth = run.syntheticBold
-    ? fontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS
+    ? effectiveFontSize * SYNTHETIC_BOLD_OFFSET_RATIO * SYNTHETIC_BOLD_PDF_EXTRA_DRAWS
     : 0;
   const syntheticItalicWidth = run.syntheticItalic
-    ? heightOfFontAtSize(run.fontKitFont, fontSize) *
+    ? heightOfFontAtSize(run.fontKitFont, effectiveFontSize) *
       Math.tan((SYNTHETIC_ITALIC_SKEW_DEGREES * Math.PI) / 180)
     : 0;
   return (
-    widthOfTextAtSize(text, run.fontKitFont, fontSize, characterSpacing) +
+    widthOfTextAtSize(text, run.fontKitFont, effectiveFontSize, characterSpacing) +
     syntheticBoldWidth +
     syntheticItalicWidth +
     (run.code ? CODE_HORIZONTAL_PADDING * 2 : 0)
@@ -211,7 +212,8 @@ const canMergeRichTextRuns = (a: ResolvedRichTextRun, b: ResolvedRichTextRun) =>
   a.italic === b.italic &&
   a.strikethrough === b.strikethrough &&
   a.code === b.code &&
-  a.href === b.href;
+  a.href === b.href &&
+  a.fontSize === b.fontSize;
 
 const measurePiecesWidth = (
   pieces: RichTextRunPiece[],
@@ -432,7 +434,7 @@ const measureParagraphWidths = (
 
 const getLineHeightAtSize = (line: RichTextLine, fontSize: number) => {
   if (line.runs.length === 0) return fontSize;
-  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)));
+  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, run.fontSize || fontSize)));
 };
 
 export const calculateDynamicRichTextFontSize = async (arg: {
