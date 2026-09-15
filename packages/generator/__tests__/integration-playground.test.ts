@@ -177,6 +177,9 @@ describe('generate integration test(playground)', () => {
       checkPerformanceThreshold(key, execSeconds, PLAYGROUND_TEMPLATE_PERFORMANCE_THRESHOLDS[key]);
 
       const images = await pdfToImages(pdf);
+      if (key === 'invoice' || key === 'quotes') {
+        expect(images).toHaveLength(1);
+      }
       for (let i = 0; i < images.length; i++) {
         await expect(images[i]).toMatchImage(getImageSnapshotOptions(`${key}-${i + 1}`));
       }
