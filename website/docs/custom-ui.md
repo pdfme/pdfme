@@ -37,7 +37,7 @@ The label customization feature is not yet implemented.
 :::
 
 To change the language, modify `lang` in `options`. (The default for `lang` is `en`.)
-Currently, only `'en', 'ja', 'ar', 'th', 'pl', 'it'` are supported.
+Currently, `'en', 'zh', 'ja', 'ko', 'ar', 'th', 'tr', 'pl', 'it', 'de', 'es', 'fr'` are supported.
 To support additional languages, create an issue or send a pull request.
 
 To use custom labels instead of the provided ones, change `labels` in `options`.

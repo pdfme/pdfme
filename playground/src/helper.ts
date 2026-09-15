@@ -101,6 +101,7 @@ export const translations: { label: string; value: string }[] = [
   { value: 'ja', label: 'Japanese' },
   { value: 'ar', label: 'Arabic' },
   { value: 'th', label: 'Thai' },
+  { value: 'tr', label: 'Turkish' },
   { value: 'pl', label: 'Polish' },
   { value: 'it', label: 'Italian' },
   { value: 'de', label: 'German' },
