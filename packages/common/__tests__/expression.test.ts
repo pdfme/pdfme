@@ -164,6 +164,162 @@ describe('replacePlaceholders', () => {
     const regex = /^Chained: \d+\.\d+$/;
     expect(regex.test(result)).toBe(true);
   });
+
+  // ── Hyphenated field names ──────────────────────────────────────────────────
+
+  it('should replace a standalone hyphenated field name', () => {
+    const content = 'Value: {field-name}';
+    const variables = { 'field-name': 'hello' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: hello');
+  });
+
+  it('should replace multiple standalone hyphenated placeholders', () => {
+    const content = '{first-name} {last-name}';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('John Doe');
+  });
+
+  it('should handle whitespace inside braces around a hyphenated name', () => {
+    const content = 'Value: { field-name }';
+    const variables = { 'field-name': 'world' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: world');
+  });
+
+  it('should use schema content for a hyphenated field name', () => {
+    const content = 'Label: {my-field}';
+    const schemas = [
+      [
+        {
+          name: 'my-field',
+          type: 'text',
+          content: 'schema-value',
+          readOnly: true,
+        },
+      ],
+    ] as SchemaPageArray;
+    const result = replacePlaceholders({ content, variables: {}, schemas });
+    expect(result).toBe('Label: schema-value');
+  });
+
+  it('should concatenate two hyphenated fields in a compound expression', () => {
+    const content = 'Hello, {first-name + " " + last-name}!';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Hello, John Doe!');
+  });
+
+  it('should add a number to a hyphenated field value in a compound expression', () => {
+    const content = 'Next: {count-down + 1}';
+    const variables = { 'count-down': 4 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Next: 5');
+  });
+
+  it('should use || fallback with a hyphenated field in a compound expression', () => {
+    const content = 'Name: {nick-name || first-name}';
+    const variables = { 'nick-name': '', 'first-name': 'Alice' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Name: Alice');
+  });
+
+  it('should evaluate a ternary with a hyphenated field in a compound expression', () => {
+    const content = 'Status: {is-active ? "yes" : "no"}';
+    const variables = { 'is-active': true };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Status: yes');
+  });
+
+  it('should not corrupt a hyphen inside a string literal', () => {
+    const content = '{first-name + "-" + last-name}';
+    const variables = { 'first-name': 'John', 'last-name': 'Doe' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('John-Doe');
+  });
+
+  it('should treat {a-b} as arithmetic when neither "a-b" nor a longer key exists in context', () => {
+    const content = 'Result: {a-b}';
+    const variables = { a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 7');
+  });
+
+  it('should prefer the hyphenated key over arithmetic when it exists in context', () => {
+    // Context has both "a-b" as a key AND "a" and "b" as separate keys.
+    // The hyphenated key must win for the adjacent "{a-b}" form.
+    const content = 'Value: {a-b}';
+    const variables = { 'a-b': 'key-wins', a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: key-wins');
+  });
+
+  it('should fall back to arithmetic with spaced "{a - b}" even when "a-b" exists in context', () => {
+    // Spaces break the adjacent-token chain, so the expression is subtraction.
+    const content = 'Result: {a - b}';
+    const variables = { 'a-b': 'should-not-appear', a: 10, b: 3 };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 7');
+  });
+
+  it('should still evaluate math expressions not involving context keys', () => {
+    const content = 'Sum: {1 + 2}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Sum: 3');
+  });
+
+  it('should still resolve allowed globals when no hyphenated keys are involved', () => {
+    const content = 'Max: {Math.max(1, 2, 3)}';
+    const result = replacePlaceholders({ content, variables: {}, schemas: [] });
+    expect(result).toBe('Max: 3');
+  });
+
+  it('should resolve a three-part hyphenated key {a-b-c}', () => {
+    const content = 'Value: {a-b-c}';
+    const variables = { 'a-b-c': 'three-parts' };
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Value: three-parts');
+  });
+
+  it('should use empty string for a non-readOnly schema field with a hyphenated name', () => {
+    const content = 'Content: {my-field}';
+    const schemas = [
+      [
+        {
+          name: 'my-field',
+          type: 'text',
+          content: 'Should not be used',
+          readOnly: false,
+        },
+      ],
+    ] as SchemaPageArray;
+    const result = replacePlaceholders({ content, variables: {}, schemas });
+    expect(result).toBe('Content: ');
+  });
+
+  it('should not collide when a context key matches a safe identifier name', () => {
+    // Regression for toSafeIdentifier collision: an older encoding produced a safe id
+    // that could be identical to a literal context key (e.g. __k_firstu2dname__ for
+    // both "first-name" and a key literally named "__k_firstu2dname__"). The index-based
+    // scheme produces __pdfme_hk_0__ etc., which cannot appear in user-supplied keys
+    // without quoting and so is collision-free in practice.
+    const variables = { 'first-name': 'John', '__pdfme_hk_0__': 'WRONG' };
+    const content = 'Hello {first-name}';
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Hello John');
+  });
+
+  it('should evaluate {1+1} as arithmetic even when "1+1" is a context key', () => {
+    // Regression for over-broad fast-path: previously any context key matching
+    // the placeholder content short-circuited evaluation, so {1+1} with a context
+    // key "1+1" would return the key value instead of 2. Narrowing the fast-path
+    // to non-identifiers only restores correct arithmetic behaviour.
+    const variables = { '1+1': 'WRONG' };
+    const content = 'Result: {1+1}';
+    const result = replacePlaceholders({ content, variables, schemas: [] });
+    expect(result).toBe('Result: 2');
+  });
 });
 
 describe('replacePlaceholders - Security Tests', () => {
