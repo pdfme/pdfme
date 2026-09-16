@@ -92,6 +92,66 @@ export const getSampleTemplate = (): Template => ({
   ],
 });
 
+export const getUnbalancedPlaceholderTemplate = (readonlyContent = '{{1}'): Template => ({
+  basePdf: {
+    ...BLANK_A4_PDF,
+    staticSchema: [
+      {
+        name: 'staticLabel',
+        type: 'text',
+        content: 'static {1+1} {{1}',
+        position: { x: 10, y: 250 },
+        width: 120,
+        height: 10,
+        readOnly: true,
+        fontSize: 10,
+      },
+    ],
+  },
+  schemas: [
+    [
+      {
+        name: 'readonlyExpr',
+        type: 'text',
+        content: readonlyContent,
+        readOnly: true,
+        position: { x: 20, y: 20 },
+        width: 100,
+        height: 15,
+        alignment: 'left',
+        fontSize: 13,
+        characterSpacing: 0,
+        lineHeight: 1,
+      },
+      {
+        name: 'editableField',
+        type: 'text',
+        content: '{{1}',
+        position: { x: 20, y: 50 },
+        width: 100,
+        height: 15,
+        alignment: 'left',
+        fontSize: 13,
+        characterSpacing: 0,
+        lineHeight: 1,
+      },
+      {
+        name: 'validExpr',
+        type: 'text',
+        content: '{1+1}',
+        readOnly: true,
+        position: { x: 20, y: 80 },
+        width: 100,
+        height: 15,
+        alignment: 'left',
+        fontSize: 13,
+        characterSpacing: 0,
+        lineHeight: 1,
+      },
+    ],
+  ],
+});
+
 export const getTwoPageTemplate = (): Template => {
   const template = getSampleTemplate();
   const secondPage = template.schemas[0].map((schema) => ({

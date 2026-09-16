@@ -3,8 +3,9 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
-import { PDFDocument } from '@pdfme/pdf-lib';
+import { PDFDocument, PDFRawStream, decodePDFRawStream } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
+import { text } from '@pdfme/schemas';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -435,7 +436,7 @@ ERROR MESSAGE: Too small: expected array to have >=1 items
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] fallback flag is not found in font. true fallback flag must be only one.
-Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`,
       );
     }
   });
@@ -466,7 +467,7 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] 2 fallback flags found in font. true fallback flag must be only one.
-Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
+Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`,
       );
     }
   });
@@ -502,8 +503,122 @@ Check this document: https://pdfme.com/docs/custom-fonts#about-font-type`
     } catch (e: any) {
       expect(e.message).toEqual(
         `[@pdfme/common] DUMMY_FONT of template.schemas is not found in font.
-Check this document: https://pdfme.com/docs/custom-fonts`
+Check this document: https://pdfme.com/docs/custom-fonts`,
       );
     }
+  });
+});
+
+describe('malformed placeholders (#1309)', () => {
+  test('keeps unmatched braces as literals in schema, staticSchema, and dynamic layout values', async () => {
+    const rendered: Array<{ name: string; value: string }> = [];
+    const wrappingText: Plugin = {
+      ...text,
+      pdf: async (props) => {
+        rendered.push({ name: props.schema.name, value: props.value });
+        await text.pdf(props);
+        const font = await props.pdfDoc.embedFont(props.pdfLib.StandardFonts.Helvetica);
+        props.page.drawText(props.value, { x: 20, y: 20, size: 8, font });
+      },
+    };
+
+    const pdf = await generate({
+      template: {
+        basePdf: {
+          width: 210,
+          height: 297,
+          padding: [10, 10, 10, 10],
+          staticSchema: [
+            {
+              name: 'staticLabel',
+              type: 'text',
+              content: 'static {1+1} {{1}',
+              position: { x: 10, y: 250 },
+              width: 120,
+              height: 10,
+              readOnly: true,
+              fontSize: 10,
+            },
+          ],
+        },
+        schemas: [
+          [
+            {
+              name: 'broken',
+              type: 'text',
+              content: '{{1}',
+              readOnly: true,
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+              fontSize: 12,
+            },
+            {
+              name: 'valid',
+              type: 'text',
+              content: '{1+1}',
+              readOnly: true,
+              position: { x: 10, y: 25 },
+              width: 80,
+              height: 10,
+              fontSize: 12,
+            },
+            {
+              name: 'mixed',
+              type: 'text',
+              content: 'ok {1+1} bad {{1}',
+              readOnly: true,
+              position: { x: 10, y: 40 },
+              width: 80,
+              height: 10,
+              fontSize: 12,
+            },
+            {
+              name: 'body',
+              type: 'text',
+              content: '',
+              overflow: 'expand',
+              position: { x: 10, y: 55 },
+              width: 80,
+              height: 8,
+              fontSize: 12,
+            },
+          ],
+        ],
+      },
+      inputs: [{ body: 'expand me' }],
+      options: { font: getFont() },
+      plugins: { text: wrappingText },
+    });
+
+    const byName = Object.fromEntries(rendered.map((item) => [item.name, item.value]));
+    expect(byName.broken).toBe('{{1}');
+    expect(byName.valid).toBe('2');
+    expect(byName.mixed).toBe('ok 2 bad {{1}');
+    expect(byName.staticLabel).toBe('static 2 {{1}');
+    expect(byName.body).toBe('expand me');
+
+    const pdfDoc = await PDFDocument.load(pdf);
+    expect(pdfDoc.getPageCount()).toBeGreaterThan(0);
+    expect(pdf.byteLength).toBeGreaterThan(1000);
+
+    const decoded = pdfDoc.context
+      .enumerateIndirectObjects()
+      .map(([, object]) => {
+        if (!(object instanceof PDFRawStream)) return '';
+        try {
+          return Buffer.from(decodePDFRawStream(object).decode()).toString('latin1');
+        } catch {
+          return '';
+        }
+      })
+      .join('\n');
+    const hexDecoded = [...decoded.matchAll(/<([0-9A-Fa-f]+)>/g)]
+      .map(([, hex]) => (hex.length % 2 === 0 ? Buffer.from(hex, 'hex').toString('latin1') : ''))
+      .join('\n');
+    expect(hexDecoded).toContain('{{1}');
+    expect(hexDecoded).toContain('ok 2 bad {{1}');
+    expect(hexDecoded).toContain('static 2 {{1}');
+    expect(hexDecoded).toContain('expand me');
   });
 });

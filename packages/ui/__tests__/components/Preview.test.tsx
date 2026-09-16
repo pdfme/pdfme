@@ -18,6 +18,7 @@ import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
   getTwoPageTemplate,
+  getUnbalancedPlaceholderTemplate,
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
@@ -604,4 +605,55 @@ test('Preview zooms with two-finger touch but not one-finger touch', async () =>
   await waitFor(() => {
     expect(container).toHaveTextContent('149%');
   });
+});
+
+const renderPlaceholderPreview = (args: {
+  onChangeInput?: (arg: { index: number; value: string; name: string }) => void;
+  inputs?: Record<string, string>[];
+}) =>
+  render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={getUnbalancedPlaceholderTemplate()}
+            inputs={args.inputs ?? [{ editableField: '{{1}' }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={args.onChangeInput}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+const waitForPlaceholderPreview = async (container: HTMLElement) => {
+  await waitFor(() => {
+    expect(getSelectableElement(container, 'readonlyExpr')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+  await waitFor(() => {
+    expect(getSelectableElement(container, 'readonlyExpr')).toHaveTextContent('{{1}');
+    expect(getSelectableElement(container, 'validExpr')).toHaveTextContent('2');
+    expect(container.querySelector('[title="staticLabel"]')).toHaveTextContent('static 2 {{1}');
+  });
+};
+
+test('Preview(as Viewer) keeps unmatched braces as literals on readonly and staticSchema fields', async () => {
+  setupUIMock();
+  const { container } = renderPlaceholderPreview({});
+
+  await waitForPlaceholderPreview(container);
+  expect(getSelectableElement(container, 'editableField')).toHaveTextContent('{{1}');
+});
+
+test('Preview(as Form) keeps unmatched braces as literals on readonly and staticSchema fields', async () => {
+  setupUIMock();
+  const { container } = renderPlaceholderPreview({ onChangeInput: vi.fn() });
+
+  await waitForPlaceholderPreview(container);
+  const editableField = getSelectableElement(container, 'editableField');
+  expect(editableField.querySelector('[data-pdfme-render-ready="true"]')).toBeTruthy();
+  expect(editableField).toBeInTheDocument();
 });
