@@ -50,6 +50,13 @@ describe('date format normalization', () => {
     ]);
   });
 
+  it('resolves Traditional Chinese locale data', () => {
+    const zhTW = getAirDatepickerLocale('zh-TW');
+
+    expect(zhTW.label).toBe('Chinese (Traditional)');
+    expect(zhTW.formatLocale.code).toBe('zh-TW');
+  });
+
   it('backfills invalid dateTime formats in the prop panel', () => {
     const changeSchemas = vi.fn();
     const schema = dateTime.propPanel.schema as (arg: Record<string, unknown>) => unknown;
