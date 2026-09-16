@@ -119,7 +119,7 @@ const run = (command: string, args: string[], cwd: string): CommandResult => {
   };
 };
 
-const fail = (message: string): never => {
+const fail: (message: string) => never = (message) => {
   throw new Error(message);
 };
 
@@ -315,10 +315,11 @@ const runTsc = (
 const hasBlockingErrors = (diagnostics: ClassifiedDiagnostic[]): boolean =>
   diagnostics.some((diagnostic) => diagnostic.kind !== 'compiler-option');
 
-const runResolutionCase = (
+export const runResolutionCase = (
   consumerDir: string,
   typescriptVersion: string,
   resolutionCase: ResolutionCase,
+  compile: typeof runTsc = runTsc,
 ): void => {
   const source = resolutionCase.source === 'smoke' ? SMOKE_SOURCE : IMPORT_ONLY_SOURCE;
   const attempts: Array<Record<string, unknown>> = [
@@ -334,60 +335,31 @@ const runResolutionCase = (
   }
 
   let lastOutput = '';
-  let lastDiagnostics: ClassifiedDiagnostic[] = [];
-  let lastStatus = 1;
-
   for (const tsconfig of attempts) {
-    const result = runTsc(consumerDir, tsconfig, source);
+    const result = compile(consumerDir, tsconfig, source);
     lastOutput = result.output;
-    lastDiagnostics = result.diagnostics;
-    lastStatus = result.status;
-    const packageErrors = result.diagnostics.filter((diagnostic) => diagnostic.kind === 'package');
-    const consumerErrors = result.diagnostics.filter(
-      (diagnostic) => diagnostic.kind === 'consumer',
-    );
-    const otherErrors = result.diagnostics.filter((diagnostic) => diagnostic.kind === 'other');
-    const optionErrors = result.diagnostics.filter(
-      (diagnostic) => diagnostic.kind === 'compiler-option',
-    );
-
-    if (result.status === 0 && !hasBlockingErrors(result.diagnostics)) {
-      if (optionErrors.length > 0) {
-        console.log(
-          `[typescript@${typescriptVersion} ${resolutionCase.name}] ok (compiler option notes only)`,
-        );
-      } else {
-        console.log(`[typescript@${typescriptVersion} ${resolutionCase.name}] ok`);
-      }
+    if (result.status === 0 && result.diagnostics.length === 0) {
+      console.log(`[typescript@${typescriptVersion} ${resolutionCase.name}] ok`);
       return;
     }
 
+    // Option errors can stop TypeScript before it checks the package. Retry
+    // with compatible options; never infer usable declarations from that exit.
     if (
       resolutionCase.allowCompilerOptionErrors &&
-      packageErrors.length === 0 &&
-      consumerErrors.length === 0 &&
-      otherErrors.length === 0
+      result.diagnostics.length > 0 &&
+      !hasBlockingErrors(result.diagnostics)
     ) {
-      console.log(
-        `[typescript@${typescriptVersion} ${resolutionCase.name}] compiler option deprecation only; package types are usable`,
-      );
-      return;
+      continue;
     }
 
-    if (!resolutionCase.allowCompilerOptionErrors || hasBlockingErrors(result.diagnostics)) {
-      if (
-        !resolutionCase.allowCompilerOptionErrors ||
-        attempts.indexOf(tsconfig) === attempts.length - 1
-      ) {
-        fail(
-          `typescript@${typescriptVersion} ${resolutionCase.name} failed:\n${result.output}\npackage:\n${summarize(result.diagnostics, 'package')}\nconsumer:\n${summarize(result.diagnostics, 'consumer')}\ncompiler-option:\n${summarize(result.diagnostics, 'compiler-option')}\nother:\n${summarize(result.diagnostics, 'other')}`,
-        );
-      }
-    }
+    fail(
+      `typescript@${typescriptVersion} ${resolutionCase.name} failed (exit ${result.status}):\n${result.output}\npackage:\n${summarize(result.diagnostics, 'package')}\nconsumer:\n${summarize(result.diagnostics, 'consumer')}\ncompiler-option:\n${summarize(result.diagnostics, 'compiler-option')}\nother:\n${summarize(result.diagnostics, 'other')}`,
+    );
   }
 
-  fail(
-    `typescript@${typescriptVersion} ${resolutionCase.name} failed:\n${lastOutput}\n${summarize(lastDiagnostics, 'package')}\nstatus=${lastStatus}`,
+  console.log(
+    `[typescript@${typescriptVersion} ${resolutionCase.name}] skipped: compiler does not support these options; package types were not checked.\n${lastOutput.trim()}`,
   );
 };
 

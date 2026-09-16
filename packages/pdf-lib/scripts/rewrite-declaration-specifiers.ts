@@ -96,12 +96,31 @@ export const collectModuleSpecifierOccurrences = (text: string): ModuleSpecifier
   const scanner = createScanner(true);
   scanner.setText(text);
   const occurrences: ModuleSpecifierOccurrence[] = [];
+  const templateBraceDepths: number[] = [];
   let previousKind = SyntaxKind.Unknown;
   let previousPreviousKind = SyntaxKind.Unknown;
 
   for (;;) {
-    const kind = scanner.scan();
+    let kind = scanner.scan();
     if (kind === SyntaxKind.EndOfFile) break;
+
+    // A scanner alone treats template tails as ordinary tokens. Rescan them
+    // so literal text cannot look like an import or swallow later declarations.
+    if (kind === SyntaxKind.TemplateHead) {
+      templateBraceDepths.push(0);
+    } else if (templateBraceDepths.length > 0) {
+      const templateIndex = templateBraceDepths.length - 1;
+      if (kind === SyntaxKind.OpenBraceToken) {
+        templateBraceDepths[templateIndex]++;
+      } else if (kind === SyntaxKind.CloseBraceToken) {
+        if (templateBraceDepths[templateIndex] === 0) {
+          kind = scanner.reScanTemplateToken(false);
+          if (kind === SyntaxKind.TemplateTail) templateBraceDepths.pop();
+        } else {
+          templateBraceDepths[templateIndex]--;
+        }
+      }
+    }
 
     if (kind === SyntaxKind.StringLiteral) {
       const isFromSpecifier = previousKind === SyntaxKind.FromKeyword;

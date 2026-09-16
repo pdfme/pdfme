@@ -105,6 +105,23 @@ declare const example: './api';
     expect(rewritten).toContain("export * from './api/index.js';");
   });
 
+  test('preserves template literal text and finds imports inside and after templates', () => {
+    const root = createFixture({ 'real.d.ts': 'export type Value = string;\n' });
+    const source = [
+      'export type Text = `${string} from "./not-a-module"`;',
+      'export type Nested = `${`${string} from "./also-not-a-module"`}${keyof { x: string }}${import("./real").Value}`;',
+      'export * from "./real";',
+    ].join('\n');
+
+    expect(collectModuleSpecifierOccurrences(source).map(({ specifier }) => specifier)).toEqual([
+      './real',
+      './real',
+    ]);
+    expect(rewriteDeclarationText(join(root, 'index.d.ts'), source)).toBe(
+      source.replaceAll('"./real"', '"./real.js"'),
+    );
+  });
+
   test('is idempotent for already-normalized specifiers', () => {
     const root = createFixture({
       'api/index.d.ts': 'export const api = 1;\n',
