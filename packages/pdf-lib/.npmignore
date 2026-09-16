@@ -1,0 +1,6 @@
+node_modules
+__tests__/**
+scripts/**
+.DS_Store
+dist/typecheck
+dist/typecheck/**
