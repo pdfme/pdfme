@@ -27,10 +27,10 @@ describe('replacePlaceholders', () => {
     const date = new Date();
     const padZero = (num: number) => String(num).padStart(2, '0');
     const formattedDate = `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(
-      date.getDate()
+      date.getDate(),
     )}`;
     const formattedDateTime = `${formattedDate} ${padZero(date.getHours())}:${padZero(
-      date.getMinutes()
+      date.getMinutes(),
     )}`;
     expect(result).toBe(`Today is ${formattedDate} and now is ${formattedDateTime}.`);
   });
@@ -166,6 +166,90 @@ describe('replacePlaceholders', () => {
   });
 });
 
+describe('replacePlaceholders - unmatched braces (#1309)', () => {
+  const evaluate = (
+    content: string,
+    variables: Record<string, unknown> = {},
+    schemas: SchemaPageArray = [],
+  ) => replacePlaceholders({ content, variables, schemas });
+
+  it('keeps malformed placeholders as literal text instead of throwing', () => {
+    expect(evaluate('{{1}')).toBe('{{1}');
+    expect(evaluate('{{nested {1}')).toBe('{{nested {1}');
+    expect(evaluate('}}{{')).toBe('}}{{');
+  });
+
+  it('keeps input without a closing brace as literal text', () => {
+    expect(evaluate('{name')).toBe('{name');
+    expect(evaluate('{{')).toBe('{{');
+  });
+
+  it('evaluates valid placeholders before an unmatched opening brace and does not resume scanning', () => {
+    expect(evaluate('ok {1+1} bad {{1}')).toBe('ok 2 bad {{1}');
+    // The first `{` never finds a matching `}`, so the remainder is kept as-is.
+    // `{2+2}` after that unmatched opener is not evaluated.
+    expect(evaluate('{{1} tail {2+2}')).toBe('{{1} tail {2+2}');
+  });
+
+  it('keeps ordinary evaluation failures as the original placeholder', () => {
+    expect(evaluate('{notDefined.foo}')).toBe('{notDefined.foo}');
+    expect(evaluate('{1+}')).toBe('{1+}');
+  });
+
+  it('still evaluates valid expressions, variables, and object literals', () => {
+    expect(evaluate('{1+1}')).toBe('2');
+    expect(evaluate('Hello {name}', { name: 'Alice' })).toBe('Hello Alice');
+    expect(evaluate('{Object.keys({a:1})}')).toBe('a');
+  });
+
+  it('preserves existing results for extra braces, empty placeholders, and nested braces', () => {
+    expect(evaluate('{1+1}}')).toBe('2}');
+    expect(evaluate('{}')).toBe('{}');
+    expect(evaluate('{{1}}')).toBe('{{1}}');
+  });
+
+  it('does not throw when referenced or unreferenced variables contain malformed placeholders', () => {
+    expect(evaluate('{greeting}', { greeting: '{{1}' })).toBe('{{1}');
+    expect(evaluate('{1+1}', { unrelated: '{{1}' })).toBe('2');
+  });
+
+  it('does not throw when a readonly schema content value is malformed', () => {
+    const schemas = [
+      [
+        {
+          name: 'broken',
+          type: 'text',
+          content: '{{1}',
+          readOnly: true,
+        },
+        {
+          name: 'valid',
+          type: 'text',
+          content: '{1+1}',
+          readOnly: true,
+        },
+      ],
+    ] as SchemaPageArray;
+
+    expect(evaluate('broken:{broken} valid:{valid} sum:{1+1}', {}, schemas)).toBe(
+      'broken:{{1} valid:2 sum:2',
+    );
+  });
+
+  it('keeps cache hits for valid expressions and evaluation failures', () => {
+    expect(evaluate('{1+1}')).toBe('2');
+    expect(evaluate('{1+1}')).toBe('2');
+    expect(evaluate('{notDefined.foo}')).toBe('{notDefined.foo}');
+    expect(evaluate('{notDefined.foo}')).toBe('{notDefined.foo}');
+  });
+
+  it('can evaluate a valid expression after a malformed one', () => {
+    expect(evaluate('{{1}')).toBe('{{1}');
+    expect(evaluate('{1+1}')).toBe('2');
+    expect(evaluate('Hello {name}', { name: 'Alice' })).toBe('Hello Alice');
+  });
+});
+
 describe('replacePlaceholders - Security Tests', () => {
   it('should prevent access to __proto__ property', () => {
     const content = 'Proto: {__proto__}';
@@ -266,7 +350,7 @@ describe('replacePlaceholders - Security Tests', () => {
     const date = new Date();
     const padZero = (num: number) => String(num).padStart(2, '0');
     const dateFmt = `${date.getFullYear()}/${padZero(date.getMonth() + 1)}/${padZero(
-      date.getDate()
+      date.getDate(),
     )}`;
     expect(result).toBe(`Override: {date = "Hacked"} ${dateFmt}`);
   });
@@ -373,14 +457,16 @@ describe('replacePlaceholders - Comparison Operators Tests', () => {
 
 describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
   it('should prevent XSS via Object.getOwnPropertyDescriptor and Object.getPrototypeOf (CVE payload 1)', () => {
-    const content = '{ ((f, g) => f(g(Object), "constructor").value)(Object.getOwnPropertyDescriptor, Object.getPrototypeOf)("alert(location)")() }';
+    const content =
+      '{ ((f, g) => f(g(Object), "constructor").value)(Object.getOwnPropertyDescriptor, Object.getPrototypeOf)("alert(location)")() }';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     // The dangerous expression should not be evaluated and should return as-is
     expect(result).toBe(content);
   });
 
   it('should prevent XSS via object property assignment (CVE payload 2)', () => {
-    const content = '{ { f: Object.getOwnPropertyDescriptor }.f({ g: Object.getPrototypeOf }.g(Object), "constructor").value("alert(location)")() }';
+    const content =
+      '{ { f: Object.getOwnPropertyDescriptor }.f({ g: Object.getPrototypeOf }.g(Object), "constructor").value("alert(location)")() }';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     // The dangerous expression should not be evaluated and should return as-is
     expect(result).toBe(content);
@@ -443,17 +529,29 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
 
     // Test Object.values
     const valuesContent = '{ Object.values({ a: 1, b: 2 }) }';
-    const valuesResult = replacePlaceholders({ content: valuesContent, variables: {}, schemas: [] });
+    const valuesResult = replacePlaceholders({
+      content: valuesContent,
+      variables: {},
+      schemas: [],
+    });
     expect(valuesResult).toBe('1,2');
 
     // Test Object.entries
     const entriesContent = '{ Object.entries({ a: 1 })[0] }';
-    const entriesResult = replacePlaceholders({ content: entriesContent, variables: {}, schemas: [] });
+    const entriesResult = replacePlaceholders({
+      content: entriesContent,
+      variables: {},
+      schemas: [],
+    });
     expect(entriesResult).toBe('a,1');
 
     // Test safe Object.assign
     const assignContent = '{ Object.assign({}, { a: 1 }, { b: 2 }).a }';
-    const assignResult = replacePlaceholders({ content: assignContent, variables: {}, schemas: [] });
+    const assignResult = replacePlaceholders({
+      content: assignContent,
+      variables: {},
+      schemas: [],
+    });
     expect(assignResult).toBe('1'); // Safe assign should work
   });
 
@@ -472,7 +570,8 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
   });
 
   it('should prevent prototype pollution via Object.assign and __lookupGetter__', () => {
-    const content = '{ { assign: Object.assign }.assign({ f: {}.__lookupGetter__("__proto__") }.f(), { polluted: "yes" }) }';
+    const content =
+      '{ { assign: Object.assign }.assign({ f: {}.__lookupGetter__("__proto__") }.f(), { polluted: "yes" }) }';
     const result = replacePlaceholders({ content, variables: {}, schemas: [] });
     // The dangerous expression should not be evaluated due to __lookupGetter__ being blocked
     expect(result).toBe(content);
@@ -517,10 +616,14 @@ describe('replacePlaceholders - XSS Vulnerability Prevention Tests', () => {
     // Should execute but not pollute prototype
     expect(result).toBe('[object Object]');
     expect(({} as any).polluted).toBeUndefined();
-    
+
     // Test with constructor
     const constructorContent = '{ Object.assign({}, { "constructor": { polluted: "yes" } }) }';
-    const result2 = replacePlaceholders({ content: constructorContent, variables: {}, schemas: [] });
+    const result2 = replacePlaceholders({
+      content: constructorContent,
+      variables: {},
+      schemas: [],
+    });
     expect(result2).toBe('[object Object]');
     expect(({} as any).constructor.polluted).toBeUndefined();
   });

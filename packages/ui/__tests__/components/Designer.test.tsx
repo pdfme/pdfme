@@ -9,14 +9,58 @@ import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
   getTwoPageTemplate,
+  getUnbalancedPlaceholderTemplate,
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
 import { text, image } from '@pdfme/schemas';
+import * as uiHelper from '../../src/helper';
 
 const plugins = { text, image };
 
 let restoreClientSizeMock: (() => void) | undefined;
+let uuidSeq = 0;
+
+const mockStableUuids = () => {
+  uuidSeq = 0;
+  vi.spyOn(uiHelper, 'uuid').mockImplementation(() => `schema-${++uuidSeq}`);
+};
+
+const getSelectableByTitle = (container: HTMLElement, title: string) => {
+  const element = Array.from(container.getElementsByClassName(SELECTABLE_CLASSNAME)).find(
+    (candidate) => candidate.getAttribute('title') === title,
+  );
+  if (!(element instanceof HTMLElement)) {
+    throw new Error(`${title} element was not found`);
+  }
+  return element;
+};
+
+const renderDesigner = (template = getUnbalancedPlaceholderTemplate()) =>
+  render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+const waitForDesignerFields = async (container: HTMLElement) => {
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'readonlyExpr')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+};
 
 afterEach(() => {
   restoreClientSizeMock?.();
@@ -259,4 +303,86 @@ test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only
   await waitFor(() => {
     expect(sidebar.style.width).toBe('0px');
   });
+});
+
+test('Designer keeps rendering when readonly text has unmatched braces', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const { container } = renderDesigner();
+
+  await waitForDesignerFields(container);
+
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('{{1}');
+    expect(getSelectableByTitle(container, 'validExpr')).toHaveTextContent('2');
+    expect(getSelectableByTitle(container, 'editableField')).toHaveTextContent('{{1}');
+    expect(container.querySelector('[title="staticLabel"]')).toHaveTextContent('static 2 {{1}');
+  });
+
+  fireEvent.click(container.querySelector('.pdfme-ui-zoom-in')!);
+  await waitFor(() => {
+    expect(container).toHaveTextContent('125%');
+  });
+
+  const editableField = getSelectableByTitle(container, 'editableField');
+  fireEvent.mouseDown(editableField);
+  fireEvent.mouseUp(editableField);
+
+  await waitFor(() => {
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)).toBeInTheDocument();
+  });
+  expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('{{1}');
+});
+
+test('Designer can recover from unmatched braces through in-place editing', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const { container } = renderDesigner(getUnbalancedPlaceholderTemplate('{1+1}'));
+
+  await waitForDesignerFields(container);
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('2');
+  });
+
+  const originalElementFromPoint = document.elementFromPoint;
+  // jsdom has no layout hit testing; let Moveable recognize the clicked field.
+  document.elementFromPoint = () => getSelectableByTitle(container, 'readonlyExpr');
+  try {
+    for (const [content, expected] of [
+      ['{{1}', '{{1}'],
+      ['{1+1}', '2'],
+    ]) {
+      const field = getSelectableByTitle(container, 'readonlyExpr');
+      fireEvent.mouseDown(field);
+      fireEvent.mouseUp(field);
+      // On the first iteration select the field, then click again to edit it.
+      // On subsequent iterations it is already selected.
+      if (container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)) {
+        fireEvent.mouseDown(field);
+        fireEvent.mouseUp(field);
+      }
+
+      const editor = await waitFor(() => {
+        const element = Array.from(field.querySelectorAll('div')).find(
+          (node) => node.contentEditable === 'plaintext-only' || node.contentEditable === 'true',
+        );
+        expect(element).toBeInTheDocument();
+        return element!;
+      });
+      // jsdom does not implement innerText/contenteditable editing; supply the
+      // text that the real text plugin reads when its native blur handler runs.
+      editor.innerText = content;
+      fireEvent.blur(editor);
+
+      await waitFor(() => {
+        expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent(expected);
+        expect(editor).not.toBeInTheDocument();
+        expect(getSelectableByTitle(container, 'validExpr')).toHaveTextContent('2');
+        expect(getSelectableByTitle(container, 'editableField')).toHaveTextContent('{{1}');
+      });
+    }
+  } finally {
+    if (originalElementFromPoint) document.elementFromPoint = originalElementFromPoint;
+    else Reflect.deleteProperty(document, 'elementFromPoint');
+  }
 });
