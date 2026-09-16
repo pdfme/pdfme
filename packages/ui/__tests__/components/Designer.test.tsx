@@ -334,35 +334,55 @@ test('Designer keeps rendering when readonly text has unmatched braces', async (
   expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('{{1}');
 });
 
-test('Designer can recover from unmatched braces to a valid expression', async () => {
+test('Designer can recover from unmatched braces through in-place editing', async () => {
   setupUIMock();
   mockStableUuids();
-  const { container, rerender } = renderDesigner(getUnbalancedPlaceholderTemplate('{{1}'));
+  const { container } = renderDesigner(getUnbalancedPlaceholderTemplate('{1+1}'));
 
   await waitForDesignerFields(container);
   await waitFor(() => {
-    expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('{{1}');
-  });
-
-  rerender(
-    <I18nContext.Provider value={i18n}>
-      <FontContext.Provider value={getDefaultFont()}>
-        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
-          <Designer
-            template={getUnbalancedPlaceholderTemplate('{1+1}')}
-            onSaveTemplate={console.log}
-            onChangeTemplate={console.log}
-            size={{ width: 1200, height: 1200 }}
-            onPageCursorChange={() => undefined}
-          />
-        </PluginsRegistry.Provider>
-      </FontContext.Provider>
-    </I18nContext.Provider>,
-  );
-
-  await waitFor(() => {
     expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent('2');
-    expect(getSelectableByTitle(container, 'validExpr')).toHaveTextContent('2');
-    expect(getSelectableByTitle(container, 'editableField')).toHaveTextContent('{{1}');
   });
+
+  const originalElementFromPoint = document.elementFromPoint;
+  // jsdom has no layout hit testing; let Moveable recognize the clicked field.
+  document.elementFromPoint = () => getSelectableByTitle(container, 'readonlyExpr');
+  try {
+    for (const [content, expected] of [
+      ['{{1}', '{{1}'],
+      ['{1+1}', '2'],
+    ]) {
+      const field = getSelectableByTitle(container, 'readonlyExpr');
+      fireEvent.mouseDown(field);
+      fireEvent.mouseUp(field);
+      // On the first iteration select the field, then click again to edit it.
+      // On subsequent iterations it is already selected.
+      if (container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)) {
+        fireEvent.mouseDown(field);
+        fireEvent.mouseUp(field);
+      }
+
+      const editor = await waitFor(() => {
+        const element = Array.from(field.querySelectorAll('div')).find(
+          (node) => node.contentEditable === 'plaintext-only' || node.contentEditable === 'true',
+        );
+        expect(element).toBeInTheDocument();
+        return element!;
+      });
+      // jsdom does not implement innerText/contenteditable editing; supply the
+      // text that the real text plugin reads when its native blur handler runs.
+      editor.innerText = content;
+      fireEvent.blur(editor);
+
+      await waitFor(() => {
+        expect(getSelectableByTitle(container, 'readonlyExpr')).toHaveTextContent(expected);
+        expect(editor).not.toBeInTheDocument();
+        expect(getSelectableByTitle(container, 'validExpr')).toHaveTextContent('2');
+        expect(getSelectableByTitle(container, 'editableField')).toHaveTextContent('{{1}');
+      });
+    }
+  } finally {
+    if (originalElementFromPoint) document.elementFromPoint = originalElementFromPoint;
+    else Reflect.deleteProperty(document, 'elementFromPoint');
+  }
 });

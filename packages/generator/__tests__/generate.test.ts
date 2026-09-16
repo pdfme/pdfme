@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
-import { PDFDocument, PDFRawStream, decodePDFRawStream } from '@pdfme/pdf-lib';
+import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
 import { text } from '@pdfme/schemas';
 
@@ -517,8 +517,6 @@ describe('malformed placeholders (#1309)', () => {
       pdf: async (props) => {
         rendered.push({ name: props.schema.name, value: props.value });
         await text.pdf(props);
-        const font = await props.pdfDoc.embedFont(props.pdfLib.StandardFonts.Helvetica);
-        props.page.drawText(props.value, { x: 20, y: 20, size: 8, font });
       },
     };
 
@@ -602,23 +600,13 @@ describe('malformed placeholders (#1309)', () => {
     expect(pdfDoc.getPageCount()).toBeGreaterThan(0);
     expect(pdf.byteLength).toBeGreaterThan(1000);
 
-    const decoded = pdfDoc.context
-      .enumerateIndirectObjects()
-      .map(([, object]) => {
-        if (!(object instanceof PDFRawStream)) return '';
-        try {
-          return Buffer.from(decodePDFRawStream(object).decode()).toString('latin1');
-        } catch {
-          return '';
-        }
-      })
-      .join('\n');
-    const hexDecoded = [...decoded.matchAll(/<([0-9A-Fa-f]+)>/g)]
-      .map(([, hex]) => (hex.length % 2 === 0 ? Buffer.from(hex, 'hex').toString('latin1') : ''))
-      .join('\n');
-    expect(hexDecoded).toContain('{{1}');
-    expect(hexDecoded).toContain('ok 2 bad {{1}');
-    expect(hexDecoded).toContain('static 2 {{1}');
-    expect(hexDecoded).toContain('expand me');
+    // Inspect the real text plugin output; do not add test-only text to the PDF.
+    const images = await pdfToImages(pdf);
+    expect(images).toHaveLength(1);
+    await expect(images[0]).toMatchImage({
+      ...getImageSnapshotOptions('malformed-placeholders'),
+      // A short missing literal affects fewer pixels than the usual full-page tolerance.
+      allowedPixelRatio: 0,
+    });
   });
 });
