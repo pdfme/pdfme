@@ -5,14 +5,14 @@ import {
   Node,
   NodeType,
 } from 'node-html-better-parser';
-import { Color, colorString } from './colors';
-import { Degrees, degreesToRadians } from './rotations';
-import PDFFont from './PDFFont';
-import PDFPage from './PDFPage';
-import { PDFPageDrawSVGElementOptions } from './PDFPageOptions';
-import { LineCapStyle, LineJoinStyle, FillRule } from './operators';
-import { TransformationMatrix, identityMatrix } from '../types/matrix';
-import { Coordinates, Space } from '../types';
+import { Color, colorString } from './colors.js';
+import { Degrees, degreesToRadians } from './rotations.js';
+import PDFFont from './PDFFont.js';
+import PDFPage from './PDFPage.js';
+import { PDFPageDrawSVGElementOptions } from './PDFPageOptions.js';
+import { LineCapStyle, LineJoinStyle, FillRule } from './operators.js';
+import { TransformationMatrix, identityMatrix } from '../types/matrix.js';
+import { Coordinates, Space } from '../types/index.js';
 
 interface Position {
   x: number;

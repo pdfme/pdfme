@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { arrayAsString, isArrayEqual } from '../utils/arrays';
-import { stringAsByteArray } from '../utils/strings';
+import { arrayAsString, isArrayEqual } from '../utils/arrays.js';
+import { stringAsByteArray } from '../utils/strings.js';
 import PDFBool from './objects/PDFBool.js';
 import PDFDict from './objects/PDFDict.js';
 import PDFName from './objects/PDFName.js';
@@ -119,7 +119,7 @@ const calculateMD5 = (function calculateMD5Closure() {
     padded[i++] = 0;
     padded[i++] = 0;
     const w = new Int32Array(16);
-    for (i = 0; i < paddedLength; ) {
+    for (i = 0; i < paddedLength;) {
       for (j = 0; j < 16; ++j, i += 4) {
         w[j] = padded[i] | (padded[i + 1] << 8) | (padded[i + 2] << 16) | (padded[i + 3] << 24);
       }
@@ -330,7 +330,7 @@ const calculateSHA256 = (function calculateSHA256Closure() {
     padded[i++] = (length << 3) & 0xff;
     const w = new Uint32Array(64);
     // for each 512 bit block
-    for (i = 0; i < paddedLength; ) {
+    for (i = 0; i < paddedLength;) {
       for (j = 0; j < 16; ++j) {
         w[j] = (padded[i] << 24) | (padded[i + 1] << 16) | (padded[i + 2] << 8) | padded[i + 3];
         i += 4;
@@ -567,7 +567,7 @@ const calculateSHA512 = (function calculateSHA512Closure() {
     let tmp3;
 
     // for each 1024 bit block
-    for (i = 0; i < paddedLength; ) {
+    for (i = 0; i < paddedLength;) {
       for (j = 0; j < 16; ++j) {
         w[j].high =
           (padded[i] << 24) | (padded[i + 1] << 16) | (padded[i + 2] << 8) | padded[i + 3];

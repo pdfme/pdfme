@@ -1,9 +1,9 @@
-import { Coordinates } from '../../types';
-import { plus } from '../maths';
+import { Coordinates } from '../../types/index.js';
+import { plus } from '../maths.js';
 
-import GraphElement from './GraphElement';
-import Point from './Point';
-import Segment from './Segment';
+import GraphElement from './GraphElement.js';
+import Point from './Point.js';
+import Segment from './Segment.js';
 export default class Plot extends GraphElement {
   points: Coordinates[];
 

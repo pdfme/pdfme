@@ -1,8 +1,8 @@
-import { distance, isColinear, norm, scalar, vector, plus, times } from '../maths';
+import { distance, isColinear, norm, scalar, vector, plus, times } from '../maths.js';
 
-import GraphElement from './GraphElement';
-import Line from './Line';
-import Point from './Point';
+import GraphElement from './GraphElement.js';
+import Line from './Line.js';
+import Point from './Point.js';
 
 export default class Segment extends GraphElement {
   static type = 'Segment';

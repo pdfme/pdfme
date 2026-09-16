@@ -1,12 +1,12 @@
-import Arc from './elements/Arc';
-import Circle from './elements/Circle';
-import Ellipse from './elements/Ellipse';
-import Line from './elements/Line';
-import Plot from './elements/Plot';
-import Point from './elements/Point';
-import Rectangle from './elements/Rectangle';
-import Segment from './elements/Segment';
-import { Coordinates, GraphicElement } from '../types';
+import Arc from './elements/Arc.js';
+import Circle from './elements/Circle.js';
+import Ellipse from './elements/Ellipse.js';
+import Line from './elements/Line.js';
+import Plot from './elements/Plot.js';
+import Point from './elements/Point.js';
+import Rectangle from './elements/Rectangle.js';
+import Segment from './elements/Segment.js';
+import { Coordinates, GraphicElement } from '../types/index.js';
 import {
   distance,
   isColinear,
@@ -17,7 +17,7 @@ import {
   unitVector,
   vector,
   rotate,
-} from './maths';
+} from './maths.js';
 
 export function intersections(A: GraphicElement, B: GraphicElement): Coordinates[] {
   if (A instanceof Point || B instanceof Point) return [];

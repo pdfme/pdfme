@@ -17,6 +17,8 @@ At this point, to check if the build is done correctly, let's execute `npm run t
 [in pdfme dir] $ npm run test
 ```
 
+`packages/pdf-lib/src` uses explicit `.js` extensions for relative imports and exports, including `/index.js` for directory barrels. Its declaration build uses NodeNext resolution so invalid ESM references fail during the build; emitted declarations need no rewriting.
+
 To verify published `@pdfme/pdf-lib` declarations against a standalone Node ESM consumer (`moduleResolution: NodeNext`, `skipLibCheck: false`), run `npm run test:types:consumer` after a full build. The command packs the built package and type-checks it outside the workspace.
 
 ```cmd

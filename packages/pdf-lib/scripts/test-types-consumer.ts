@@ -4,12 +4,6 @@ import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import {
-  collectDeclarationFiles,
-  collectModuleSpecifierOccurrences,
-  isRelativeModuleSpecifier,
-  matchingKnownExtension,
-} from './rewrite-declaration-specifiers.ts';
 
 const require = createRequire(import.meta.url);
 const repoRoot = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
@@ -363,20 +357,6 @@ export const runResolutionCase = (
   );
 };
 
-const assertNoExtensionlessRelativeSpecifiers = (installedDist: string): void => {
-  for (const file of collectDeclarationFiles(installedDist)) {
-    const text = readFileSync(file, 'utf8');
-    for (const occurrence of collectModuleSpecifierOccurrences(text)) {
-      if (!isRelativeModuleSpecifier(occurrence.specifier)) continue;
-      if (!matchingKnownExtension(occurrence.specifier)) {
-        fail(
-          `Packed declaration still has extensionless specifier '${occurrence.specifier}' in ${file}`,
-        );
-      }
-    }
-  }
-};
-
 const runRuntime = (consumerDir: string): void => {
   writeFileSync(join(consumerDir, 'runtime.mjs'), RUNTIME_SOURCE);
   const result = run(process.execPath, [join(consumerDir, 'runtime.mjs')], consumerDir);
@@ -401,9 +381,6 @@ const main = (): void => {
       const consumerDir = join(tmpRoot, `ts-${typescriptVersion.replaceAll('.', '-')}`);
       mkdirSync(consumerDir, { recursive: true });
       installConsumer(consumerDir, tarballPath, typescriptVersion);
-      assertNoExtensionlessRelativeSpecifiers(
-        join(consumerDir, 'node_modules/@pdfme/pdf-lib/dist'),
-      );
       for (const resolutionCase of RESOLUTION_CASES) {
         runResolutionCase(consumerDir, typescriptVersion, resolutionCase);
       }

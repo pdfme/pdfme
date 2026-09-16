@@ -1,6 +1,6 @@
-import { distance } from '../maths';
+import { distance } from '../maths.js';
 
-import Point from './Point';
+import Point from './Point.js';
 
 export default abstract class GraphElement {
   abstract isEqual(element: GraphElement): boolean;

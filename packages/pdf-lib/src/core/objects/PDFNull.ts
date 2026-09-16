@@ -1,5 +1,5 @@
-import PDFObject from './PDFObject';
-import CharCodes from '../syntax/CharCodes';
+import PDFObject from './PDFObject.js';
+import CharCodes from '../syntax/CharCodes.js';
 
 class PDFNull extends PDFObject {
   asNull(): null {

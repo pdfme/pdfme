@@ -1,4 +1,4 @@
-import { Color, setFillingColor, setStrokingColor } from './colors';
+import { Color, setFillingColor, setStrokingColor } from './colors.js';
 import {
   beginText,
   closePath,
@@ -34,12 +34,12 @@ import {
   FillRule,
   fillEvenOdd,
   concatTransformationMatrix,
-} from './operators';
-import { Rotation, degrees, toRadians } from './rotations';
-import { svgPathToOperators } from './svgPath';
-import { PDFHexString, PDFName, PDFNumber, PDFOperator } from '../core';
-import { asNumber } from './objects';
-import type { Space, TransformationMatrix } from '../types';
+} from './operators.js';
+import { Rotation, degrees, toRadians } from './rotations.js';
+import { svgPathToOperators } from './svgPath.js';
+import { PDFHexString, PDFName, PDFNumber, PDFOperator } from '../core/index.js';
+import { asNumber } from './objects.js';
+import type { Space, TransformationMatrix } from '../types/index.js';
 
 export interface DrawTextOptions {
   color: Color;

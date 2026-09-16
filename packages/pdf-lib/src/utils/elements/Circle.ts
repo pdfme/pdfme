@@ -1,7 +1,7 @@
-import { distance, distanceCoords, isEqual, minus, plus, times, unitVector } from '../maths';
+import { distance, distanceCoords, isEqual, minus, plus, times, unitVector } from '../maths.js';
 
-import GraphElement from './GraphElement';
-import Point from './Point';
+import GraphElement from './GraphElement.js';
+import Point from './Point.js';
 export default class Circle extends GraphElement {
   O: Point;
   r: number;

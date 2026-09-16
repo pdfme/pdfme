@@ -1,9 +1,9 @@
 import { Encodings, Font, FontNames, EncodingType } from '@pdf-lib/standard-fonts';
 
-import PDFHexString from '../objects/PDFHexString';
-import PDFRef from '../objects/PDFRef';
-import PDFContext from '../PDFContext';
-import { toCodePoint, toHexString } from '../../utils';
+import PDFHexString from '../objects/PDFHexString.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFContext from '../PDFContext.js';
+import { toCodePoint, toHexString } from '../../utils/index.js';
 
 export interface Glyph {
   code: number;

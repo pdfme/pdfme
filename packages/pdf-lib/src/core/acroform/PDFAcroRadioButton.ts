@@ -1,10 +1,10 @@
-import PDFRef from '../objects/PDFRef';
-import PDFDict from '../objects/PDFDict';
-import PDFName from '../objects/PDFName';
-import PDFAcroButton from './PDFAcroButton';
-import PDFContext from '../PDFContext';
-import { AcroButtonFlags } from './flags';
-import { InvalidAcroFieldValueError } from '../errors';
+import PDFRef from '../objects/PDFRef.js';
+import PDFDict from '../objects/PDFDict.js';
+import PDFName from '../objects/PDFName.js';
+import PDFAcroButton from './PDFAcroButton.js';
+import PDFContext from '../PDFContext.js';
+import { AcroButtonFlags } from './flags.js';
+import { InvalidAcroFieldValueError } from '../errors.js';
 
 class PDFAcroRadioButton extends PDFAcroButton {
   static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroRadioButton(dict, ref);

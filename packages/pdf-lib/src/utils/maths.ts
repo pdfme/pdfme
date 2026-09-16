@@ -1,5 +1,5 @@
-import Point from './elements/Point';
-import { Coordinates } from '../types';
+import Point from './elements/Point.js';
+import { Coordinates } from '../types/index.js';
 
 /** This value represents the precision we accept for float values */
 export const FLOAT_APPROXIMATION = 0.000001;

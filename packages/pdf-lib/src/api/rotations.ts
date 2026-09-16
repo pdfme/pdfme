@@ -1,4 +1,4 @@
-import { assertIs, error } from '../utils';
+import { assertIs, error } from '../utils/index.js';
 
 export enum RotationTypes {
   Degrees = 'degrees',

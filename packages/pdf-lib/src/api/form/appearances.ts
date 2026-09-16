@@ -1,13 +1,13 @@
-import { PDFOperator, PDFWidgetAnnotation } from '../../core';
-import PDFFont from '../PDFFont';
-import PDFButton from '../form/PDFButton';
-import PDFCheckBox from '../form/PDFCheckBox';
-import PDFDropdown from '../form/PDFDropdown';
-import PDFField from '../form/PDFField';
-import PDFOptionList from '../form/PDFOptionList';
-import PDFRadioGroup from '../form/PDFRadioGroup';
-import PDFSignature from '../form/PDFSignature';
-import PDFTextField from '../form/PDFTextField';
+import { PDFOperator, PDFWidgetAnnotation } from '../../core/index.js';
+import PDFFont from '../PDFFont.js';
+import PDFButton from '../form/PDFButton.js';
+import PDFCheckBox from '../form/PDFCheckBox.js';
+import PDFDropdown from '../form/PDFDropdown.js';
+import PDFField from '../form/PDFField.js';
+import PDFOptionList from '../form/PDFOptionList.js';
+import PDFRadioGroup from '../form/PDFRadioGroup.js';
+import PDFSignature from '../form/PDFSignature.js';
+import PDFTextField from '../form/PDFTextField.js';
 import {
   drawCheckBox,
   rotateInPlace,
@@ -15,18 +15,18 @@ import {
   drawButton,
   drawTextField,
   drawOptionList,
-} from '../operations';
-import { rgb, componentsToColor, setFillingColor, grayscale, cmyk, Color } from '../colors';
-import { reduceRotation, adjustDimsForRotation } from '../rotations';
+} from '../operations.js';
+import { rgb, componentsToColor, setFillingColor, grayscale, cmyk, Color } from '../colors.js';
+import { reduceRotation, adjustDimsForRotation } from '../rotations.js';
 import {
   layoutMultilineText,
   layoutCombedText,
   TextPosition,
   layoutSinglelineText,
-} from '../text/layout';
-import { TextAlignment } from '../text/alignment';
-import { setFontAndSize } from '../operators';
-import { findLastMatch } from '../../utils';
+} from '../text/layout.js';
+import { TextAlignment } from '../text/alignment.js';
+import { setFontAndSize } from '../operators.js';
+import { findLastMatch } from '../../utils/index.js';
 
 /*********************** Appearance Provider Types ****************************/
 

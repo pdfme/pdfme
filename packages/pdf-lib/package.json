@@ -50,7 +50,7 @@
   },
   "scripts": {
     "dev": "vite build --watch",
-    "build": "vite build && tsc -p tsconfig.build.json && node --experimental-strip-types --disable-warning=ExperimentalWarning ./scripts/rewrite-declaration-specifiers.ts",
+    "build": "vite build && tsc -p tsconfig.build.json",
     "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
     "lint": "vp lint -c ../../.oxlintrc.json src scripts",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src scripts --write",
