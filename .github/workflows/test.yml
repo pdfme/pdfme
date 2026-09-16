@@ -27,6 +27,7 @@ jobs:
       - run: npm run typecheck
       - run: ./node_modules/.bin/vp run --filter '@pdfme/*' lint
       - run: npm run build
+      - run: npm run test:types:consumer
       - run: npm run test:packages
         env:
           CI: true

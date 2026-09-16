@@ -28,6 +28,8 @@
   },
   "files": [
     "dist",
+    "!dist/typecheck",
+    "!dist/typecheck/**",
     "README.md",
     "LICENSE.md"
   ],
@@ -50,9 +52,10 @@
     "dev": "vite build --watch",
     "build": "vite build && tsc -p tsconfig.build.json",
     "clean": "rimraf --glob dist \"src/**/*.d.ts\"",
-    "lint": "vp lint -c ../../.oxlintrc.json src",
-    "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
-    "test": "vitest run --config ../../vitest.config.ts"
+    "lint": "vp lint -c ../../.oxlintrc.json src scripts",
+    "fmt": "vp fmt -c ../../.oxfmtrc.json src scripts --write",
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:types:consumer": "tsc -p tsconfig.scripts.json && node ./scripts/dist/test-types-consumer.js"
   },
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",

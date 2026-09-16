@@ -77,7 +77,7 @@ export const charAtIndex = (text: string, index: number): [string, number] => {
 export const charSplit = (text: string) => {
   const chars: string[] = [];
 
-  for (let idx = 0, len = text.length; idx < len; ) {
+  for (let idx = 0, len = text.length; idx < len;) {
     const [c, cLen] = charAtIndex(text, idx);
     chars.push(c);
     idx += cLen;

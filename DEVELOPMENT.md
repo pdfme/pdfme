@@ -17,6 +17,15 @@ At this point, to check if the build is done correctly, let's execute `npm run t
 [in pdfme dir] $ npm run test
 ```
 
+`packages/pdf-lib/src` uses explicit `.js` extensions for relative imports and exports, including `/index.js` for directory barrels. Its declaration build uses NodeNext resolution so invalid ESM references fail during the build; emitted declarations need no rewriting.
+
+To verify published `@pdfme/pdf-lib` declarations against a standalone Node ESM consumer (`moduleResolution: NodeNext`, `skipLibCheck: false`), run `npm run test:types:consumer` after a full build. The command compiles its TypeScript runner to JavaScript (also runnable on Node 20), packs the built package, and type-checks it outside the workspace. It checks NodeNext, Node16, and Bundler with TypeScript 6.0.2 and the repo-locked compiler; legacy node10 resolution is checked only with 6.0.2 because TypeScript 7 removed it.
+
+```cmd
+[in pdfme dir] $ npm run build
+[in pdfme dir] $ npm run test:types:consumer
+```
+
 Then, run `npm run dev` on `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui`,
 and make sure that any changes are output to each packages `dist` folder.
 

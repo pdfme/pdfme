@@ -1,5 +1,5 @@
-import PDFObject from './PDFObject';
-import CharCodes from '../syntax/CharCodes';
+import PDFObject from './PDFObject.js';
+import CharCodes from '../syntax/CharCodes.js';
 import {
   copyStringIntoBuffer,
   padStart,
@@ -8,8 +8,8 @@ import {
   toCharCode,
   parseDate,
   hasUtf16BOM,
-} from '../../utils';
-import { InvalidPDFDateStringError } from '../errors';
+} from '../../utils/index.js';
+import { InvalidPDFDateStringError } from '../errors.js';
 
 class PDFString extends PDFObject {
   // The PDF spec allows newlines and parens to appear directly within a literal

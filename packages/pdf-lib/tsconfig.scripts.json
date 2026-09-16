@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "types": ["node"],
+    "skipLibCheck": true,
+    "rootDir": "./scripts",
+    "outDir": "./scripts/dist",
+    "noEmitOnError": true
+  },
+  "include": ["scripts/test-types-consumer.ts"]
+}

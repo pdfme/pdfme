@@ -1,9 +1,9 @@
-import PDFContext from '../PDFContext';
-import PDFRef from '../objects/PDFRef';
-import PDFDict from '../objects/PDFDict';
-import PDFName from '../objects/PDFName';
-import PDFAcroButton from './PDFAcroButton';
-import { InvalidAcroFieldValueError } from '../errors';
+import PDFContext from '../PDFContext.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFDict from '../objects/PDFDict.js';
+import PDFName from '../objects/PDFName.js';
+import PDFAcroButton from './PDFAcroButton.js';
+import { InvalidAcroFieldValueError } from '../errors.js';
 
 class PDFAcroCheckBox extends PDFAcroButton {
   static fromDict = (dict: PDFDict, ref: PDFRef) => new PDFAcroCheckBox(dict, ref);

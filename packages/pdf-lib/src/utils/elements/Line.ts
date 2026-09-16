@@ -1,9 +1,9 @@
-import { Coordinates } from '../../types';
-import { intersectionLine } from '../intersections';
-import { isColinear, isEqual, orthogonal, vector } from '../maths';
+import { Coordinates } from '../../types/index.js';
+import { intersectionLine } from '../intersections.js';
+import { isColinear, isEqual, orthogonal, vector } from '../maths.js';
 
-import GraphElement from './GraphElement';
-import Point from './Point';
+import GraphElement from './GraphElement.js';
+import Point from './Point.js';
 
 export default class Line extends GraphElement {
   origin(): Point {

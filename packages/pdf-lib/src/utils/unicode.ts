@@ -1,4 +1,4 @@
-import { toHexString } from './strings';
+import { toHexString } from './strings.js';
 
 /**
  * Encodes a string to UTF-8.
@@ -92,7 +92,7 @@ export const utf8Encode = (input: string, byteOrderMark = true): Uint8Array => {
 
   if (byteOrderMark) encoded.push(0xef, 0xbb, 0xbf);
 
-  for (let idx = 0, len = input.length; idx < len; ) {
+  for (let idx = 0, len = input.length; idx < len;) {
     const codePoint = input.codePointAt(idx)!;
 
     // One byte encoding
@@ -205,7 +205,7 @@ export const utf16Encode = (input: string, byteOrderMark = true): Uint16Array =>
 
   if (byteOrderMark) encoded.push(0xfeff);
 
-  for (let idx = 0, len = input.length; idx < len; ) {
+  for (let idx = 0, len = input.length; idx < len;) {
     const codePoint = input.codePointAt(idx)!;
 
     // Two byte encoding

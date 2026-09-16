@@ -1,5 +1,5 @@
-import { MethodNotImplementedError, DecompressionBombError } from '../errors';
-import Stream, { StreamType } from './Stream';
+import { MethodNotImplementedError, DecompressionBombError } from '../errors.js';
+import Stream, { StreamType } from './Stream.js';
 
 /*
  * Copyright 2012 Mozilla Foundation

@@ -3,32 +3,32 @@ import {
   PDFStreamParsingError,
   Position,
   UnbalancedParenthesisError,
-} from '../errors';
-import PDFArray from '../objects/PDFArray';
-import PDFBool from '../objects/PDFBool';
-import PDFDict, { DictMap } from '../objects/PDFDict';
-import PDFHexString from '../objects/PDFHexString';
-import PDFName from '../objects/PDFName';
-import PDFNull from '../objects/PDFNull';
-import PDFNumber from '../objects/PDFNumber';
-import PDFObject from '../objects/PDFObject';
-import PDFRawStream from '../objects/PDFRawStream';
-import PDFRef from '../objects/PDFRef';
-import PDFStream from '../objects/PDFStream';
-import PDFString from '../objects/PDFString';
-import BaseParser from './BaseParser';
-import ByteStream from './ByteStream';
-import PDFContext from '../PDFContext';
-import PDFCatalog from '../structures/PDFCatalog';
-import PDFPageLeaf from '../structures/PDFPageLeaf';
-import PDFPageTree from '../structures/PDFPageTree';
-import CharCodes from '../syntax/CharCodes';
-import { IsDelimiter } from '../syntax/Delimiters';
-import { Keywords } from '../syntax/Keywords';
-import { IsDigit, IsNumeric } from '../syntax/Numeric';
-import { IsWhitespace } from '../syntax/Whitespace';
-import { charFromCode } from '../../utils';
-import { CipherTransformFactory } from '../crypto';
+} from '../errors.js';
+import PDFArray from '../objects/PDFArray.js';
+import PDFBool from '../objects/PDFBool.js';
+import PDFDict, { DictMap } from '../objects/PDFDict.js';
+import PDFHexString from '../objects/PDFHexString.js';
+import PDFName from '../objects/PDFName.js';
+import PDFNull from '../objects/PDFNull.js';
+import PDFNumber from '../objects/PDFNumber.js';
+import PDFObject from '../objects/PDFObject.js';
+import PDFRawStream from '../objects/PDFRawStream.js';
+import PDFRef from '../objects/PDFRef.js';
+import PDFStream from '../objects/PDFStream.js';
+import PDFString from '../objects/PDFString.js';
+import BaseParser from './BaseParser.js';
+import ByteStream from './ByteStream.js';
+import PDFContext from '../PDFContext.js';
+import PDFCatalog from '../structures/PDFCatalog.js';
+import PDFPageLeaf from '../structures/PDFPageLeaf.js';
+import PDFPageTree from '../structures/PDFPageTree.js';
+import CharCodes from '../syntax/CharCodes.js';
+import { IsDelimiter } from '../syntax/Delimiters.js';
+import { Keywords } from '../syntax/Keywords.js';
+import { IsDigit, IsNumeric } from '../syntax/Numeric.js';
+import { IsWhitespace } from '../syntax/Whitespace.js';
+import { charFromCode } from '../../utils/index.js';
+import { CipherTransformFactory } from '../crypto.js';
 
 // TODO: Throw error if eof is reached before finishing object parse...
 class PDFObjectParser extends BaseParser {

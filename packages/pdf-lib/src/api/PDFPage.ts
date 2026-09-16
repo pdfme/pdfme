@@ -1,4 +1,4 @@
-import { Color, rgb } from './colors';
+import { Color, rgb } from './colors.js';
 import {
   drawImage,
   drawLine,
@@ -7,7 +7,7 @@ import {
   drawRectangle,
   drawSvgPath,
   drawEllipse,
-} from './operations';
+} from './operations.js';
 import {
   popGraphicsState,
   pushGraphicsState,
@@ -15,11 +15,11 @@ import {
   LineCapStyle,
   scale,
   FillRule,
-} from './operators';
-import PDFDocument from './PDFDocument';
-import PDFEmbeddedPage from './PDFEmbeddedPage';
-import PDFFont from './PDFFont';
-import PDFImage from './PDFImage';
+} from './operators.js';
+import PDFDocument from './PDFDocument.js';
+import PDFEmbeddedPage from './PDFEmbeddedPage.js';
+import PDFFont from './PDFFont.js';
+import PDFImage from './PDFImage.js';
 import {
   PDFPageDrawCircleOptions,
   PDFPageDrawEllipseOptions,
@@ -32,9 +32,9 @@ import {
   PDFPageDrawTextOptions,
   BlendMode,
   PDFPageDrawSVGElementOptions,
-} from './PDFPageOptions';
-import { degrees, Rotation, toDegrees } from './rotations';
-import { StandardFonts } from './StandardFonts';
+} from './PDFPageOptions.js';
+import { degrees, Rotation, toDegrees } from './rotations.js';
+import { StandardFonts } from './StandardFonts.js';
 import {
   PDFContentStream,
   PDFHexString,
@@ -44,7 +44,7 @@ import {
   PDFRef,
   PDFDict,
   PDFArray,
-} from '../core';
+} from '../core/index.js';
 import {
   assertEachIs,
   assertIs,
@@ -56,8 +56,8 @@ import {
   lineSplit,
   assertRangeOrUndefined,
   assertIsOneOfOrUndefined,
-} from '../utils';
-import { drawSvg } from './svg';
+} from '../utils/index.js';
+import { drawSvg } from './svg.js';
 
 /**
  * Represents a single page of a [[PDFDocument]].

@@ -1,1 +1,1 @@
-export * from './alignment';
+export * from './alignment.js';
