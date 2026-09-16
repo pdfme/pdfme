@@ -55,7 +55,7 @@
     "lint": "vp lint -c ../../.oxlintrc.json src scripts",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src scripts --write",
     "test": "vitest run --config ../../vitest.config.ts",
-    "test:types:consumer": "node --experimental-strip-types --disable-warning=ExperimentalWarning ./scripts/test-types-consumer.ts"
+    "test:types:consumer": "tsc -p tsconfig.scripts.json && node ./scripts/dist/test-types-consumer.js"
   },
   "dependencies": {
     "@pdf-lib/standard-fonts": "^1.0.0",
