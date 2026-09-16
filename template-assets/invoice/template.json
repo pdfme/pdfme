@@ -398,7 +398,7 @@
         "type": "text",
         "position": {
           "x": 20,
-          "y": 232.67
+          "y": 222.67
         },
         "content": "Payment Information",
         "width": 84.69,
@@ -421,7 +421,7 @@
         "content": "Briard Bank\nAccount Name: Samira Hadid\nAccount No.: 123-456-7890\nPay by: 5 July 2025",
         "position": {
           "x": 20,
-          "y": 242.83
+          "y": 232.83
         },
         "width": 84.95,
         "height": 34.07,
@@ -446,7 +446,7 @@
         "type": "text",
         "position": {
           "x": 119.33,
-          "y": 248.39
+          "y": 238.39
         },
         "content": "Samira Hadid",
         "width": 70.67,
@@ -468,7 +468,7 @@
         "type": "text",
         "position": {
           "x": 107.69,
-          "y": 256.9
+          "y": 246.9
         },
         "content": "123 Anywhere St., Any City, ST 12345",
         "width": 82.31,
