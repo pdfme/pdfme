@@ -17,6 +17,13 @@ At this point, to check if the build is done correctly, let's execute `npm run t
 [in pdfme dir] $ npm run test
 ```
 
+To verify published `@pdfme/pdf-lib` declarations against a standalone Node ESM consumer (`moduleResolution: NodeNext`, `skipLibCheck: false`), run `npm run test:types:consumer` after a full build. The command packs the built package and type-checks it outside the workspace.
+
+```cmd
+[in pdfme dir] $ npm run build
+[in pdfme dir] $ npm run test:types:consumer
+```
+
 Then, run `npm run dev` on `packages/common`, `packages/schemas`, `packages/generator`, and `packages/ui`,
 and make sure that any changes are output to each packages `dist` folder.
 

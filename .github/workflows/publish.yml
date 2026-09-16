@@ -63,6 +63,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Consumer types
+        run: npm run test:types:consumer
+
       - name: Test
         run: npm run test
         env:
