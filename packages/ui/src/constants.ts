@@ -16,6 +16,10 @@ export const BACKGROUND_COLOR = 'rgb(74, 74, 74)';
 
 export const DEFAULT_MAX_ZOOM = 2;
 
+// Keep the current page selected until less than this fraction of the
+// viewport still shows it. Stops high-zoom scroll from masking the tail.
+export const PAGE_SWITCH_REMAINING_RATIO = 0.25;
+
 export const DESIGNER_CLASSNAME = 'pdfme-designer-';
 
 export const UI_CLASSNAME = 'pdfme-ui-';

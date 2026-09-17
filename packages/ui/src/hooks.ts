@@ -32,6 +32,7 @@ import {
   getFitZoomLevel,
   getZoomAnchor,
   restoreZoomAnchor,
+  getStickyScrollPageIndex,
   type ZoomAnchor,
   type ZoomMode,
 } from './helper.js';
@@ -544,43 +545,6 @@ type ScrollPageCursorProps = {
   onChangePageCursor: (page: number) => void;
 };
 
-const getVisibleArea = (containerRect: DOMRect, elementRect: DOMRect) => {
-  const visibleWidth = Math.max(
-    0,
-    Math.min(containerRect.right, elementRect.right) -
-      Math.max(containerRect.left, elementRect.left),
-  );
-  const visibleHeight = Math.max(
-    0,
-    Math.min(containerRect.bottom, elementRect.bottom) -
-      Math.max(containerRect.top, elementRect.top),
-  );
-
-  return visibleWidth * visibleHeight;
-};
-
-const getMostVisiblePageIndex = (
-  container: HTMLElement,
-  paperRefs: MutableRefObject<HTMLDivElement[]>,
-  pageCursor: number,
-) => {
-  const containerRect = container.getBoundingClientRect();
-  let bestPageIndex = pageCursor;
-  let bestVisibleArea = 0;
-
-  paperRefs.current.forEach((paper, pageIndex) => {
-    if (!paper) return;
-
-    const visibleArea = getVisibleArea(containerRect, paper.getBoundingClientRect());
-    if (visibleArea > bestVisibleArea) {
-      bestVisibleArea = visibleArea;
-      bestPageIndex = pageIndex;
-    }
-  });
-
-  return bestVisibleArea > 0 ? bestPageIndex : pageCursor;
-};
-
 export const useScrollPageCursor = ({
   ref,
   paperRefs,
@@ -594,7 +558,7 @@ export const useScrollPageCursor = ({
       return;
     }
 
-    const _pageCursor = getMostVisiblePageIndex(ref.current, paperRefs, pageCursor);
+    const _pageCursor = getStickyScrollPageIndex(ref.current, paperRefs.current, pageCursor);
     if (_pageCursor !== pageCursor) {
       onChangePageCursor(_pageCursor);
     }
