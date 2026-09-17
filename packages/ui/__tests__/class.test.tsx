@@ -53,15 +53,35 @@ describe('measureUiContainerSize', () => {
       expected: { width: 640, height: 480 },
     },
     {
+      name: 'keeps both layout dimensions when only one axis is off-screen',
+      container: box(640, 480, { top: 700, left: -100, right: 540, bottom: 1180 }),
+      expected: { width: 640, height: 480 },
+    },
+    {
+      name: 'keeps layout height when the host sits exactly on the fold',
+      container: box(640, 480, { top: 600, left: 0, right: 640, bottom: 1080 }),
+      expected: { width: 640, height: 480 },
+    },
+    {
+      name: 'keeps layout height when only 1px is visible at the fold',
+      container: box(640, 480, { top: 599, left: 0, right: 640, bottom: 1079 }),
+      expected: { width: 640, height: 480 },
+    },
+    {
+      name: 'keeps layout height when 10px is visible at the fold',
+      container: box(640, 480, { top: 590, left: 0, right: 640, bottom: 1070 }),
+      expected: { width: 640, height: 480 },
+    },
+    {
       name: 'clips to the visible height when on-screen content is taller than the viewport',
       container: box(640, 800, { top: 0, left: 0, right: 640, bottom: 800 }),
       viewport: { width: 800, height: 400 },
       expected: { width: 640, height: 400 },
     },
     {
-      name: 'uses the smaller on-screen intersection when partially visible',
-      container: box(640, 600, { top: -100, left: 0, right: 640, bottom: 500 }),
-      expected: { width: 640, height: 500 },
+      name: 'keeps layout size when a fitting host is only partly in view',
+      container: box(640, 480, { top: -100, left: 0, right: 640, bottom: 380 }),
+      expected: { width: 640, height: 480 },
     },
   ])('$name', ({ container, viewport = VIEWPORT, expected }) => {
     expect(measureUiContainerSize(container, viewport)).toEqual(expected);
@@ -135,7 +155,7 @@ describe('BaseUIClass setSize', () => {
     const domContainer = document.createElement('div');
     Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: clientWidth });
     Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: clientHeight });
-    vi.spyOn(domContainer, 'getBoundingClientRect').mockReturnValue({
+    const rectSpy = vi.spyOn(domContainer, 'getBoundingClientRect').mockReturnValue({
       ...rect,
       width: rect.right - rect.left,
       height: rect.bottom - rect.top,
@@ -144,7 +164,7 @@ describe('BaseUIClass setSize', () => {
       toJSON: () => ({}),
     });
     document.body.appendChild(domContainer);
-    return domContainer;
+    return { domContainer, rectSpy };
   };
 
   beforeEach(() => {
@@ -169,7 +189,7 @@ describe('BaseUIClass setSize', () => {
   };
 
   test('does not collapse to 0 when the container is below the fold', () => {
-    const domContainer = createObservedContainer({
+    const { domContainer } = createObservedContainer({
       clientWidth: 640,
       clientHeight: 480,
       rect: { top: 700, left: 0, right: 640, bottom: 1180 },
@@ -187,7 +207,7 @@ describe('BaseUIClass setSize', () => {
 
   test('shrinks to the visible height when on-screen content is taller than the viewport', () => {
     vi.spyOn(window, 'innerHeight', 'get').mockReturnValue(400);
-    const domContainer = createObservedContainer({
+    const { domContainer } = createObservedContainer({
       clientWidth: 640,
       clientHeight: 800,
       rect: { top: 0, left: 0, right: 640, bottom: 800 },
@@ -197,6 +217,40 @@ describe('BaseUIClass setSize', () => {
       const ui = new TestUI({ domContainer, template } as UIProps);
       flushSetSize(ui);
       expect(ui.getSize()).toEqual({ width: 640, height: 400 });
+      ui.destroy();
+    } finally {
+      domContainer.remove();
+    }
+  });
+
+  test('keeps layout size when a 1px-visible host is later scrolled fully into view', () => {
+    const { domContainer, rectSpy } = createObservedContainer({
+      clientWidth: 640,
+      clientHeight: 480,
+      rect: { top: 599, left: 0, right: 640, bottom: 1079 },
+    });
+
+    try {
+      const ui = new TestUI({ domContainer, template } as UIProps);
+      flushSetSize(ui);
+      expect(ui.getSize()).toEqual({ width: 640, height: 480 });
+
+      rectSpy.mockReturnValue({
+        top: 0,
+        left: 0,
+        right: 640,
+        bottom: 480,
+        width: 640,
+        height: 480,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+
+      expect(ui.getSize()).toEqual({ width: 640, height: 480 });
+
+      flushSetSize(ui);
+      expect(ui.getSize()).toEqual({ width: 640, height: 480 });
       ui.destroy();
     } finally {
       domContainer.remove();
