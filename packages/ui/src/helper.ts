@@ -446,6 +446,19 @@ export const getVisibleOverlap = (containerRect: DOMRect, elementRect: DOMRect) 
   return { width, height, area: width * height };
 };
 
+const VERTICAL_SCROLL_EDGE_EPSILON = 1;
+
+const isAtVerticalScrollEdge = (container: HTMLElement) => {
+  const maxScrollTop = container.scrollHeight - container.clientHeight;
+  if (maxScrollTop <= 0) return false;
+
+  const { scrollTop } = container;
+  return (
+    scrollTop <= VERTICAL_SCROLL_EDGE_EPSILON ||
+    scrollTop >= maxScrollTop - VERTICAL_SCROLL_EDGE_EPSILON
+  );
+};
+
 export const getStickyScrollPageIndex = (
   container: HTMLElement,
   papers: Array<HTMLElement | null | undefined>,
@@ -457,6 +470,7 @@ export const getStickyScrollPageIndex = (
   let bestPageIndex = pageCursor;
   let bestVisibleArea = 0;
   let currentVisibleHeight = 0;
+  let currentVisibleArea = 0;
 
   papers.forEach((paper, pageIndex) => {
     if (!paper) return;
@@ -464,6 +478,7 @@ export const getStickyScrollPageIndex = (
     const { height, area } = getVisibleOverlap(containerRect, paper.getBoundingClientRect());
     if (pageIndex === pageCursor) {
       currentVisibleHeight = height;
+      currentVisibleArea = area;
     }
     if (area > bestVisibleArea) {
       bestVisibleArea = area;
@@ -472,8 +487,13 @@ export const getStickyScrollPageIndex = (
   });
 
   if (bestVisibleArea <= 0) return pageCursor;
-  if (currentVisibleHeight >= stickyHeight) return pageCursor;
-  return bestPageIndex;
+
+  const keepCurrentPage =
+    !isAtVerticalScrollEdge(container) &&
+    currentVisibleArea > 0 &&
+    currentVisibleHeight >= stickyHeight;
+
+  return keepCurrentPage ? pageCursor : bestPageIndex;
 };
 
 export type ZoomMode = 'manual' | 'fit-width' | 'fit-height';

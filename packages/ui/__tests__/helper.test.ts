@@ -825,9 +825,21 @@ describe('getStickyScrollPageIndex', () => {
   const setupPapers = (
     containerRect: DOMRect,
     paperRects: Array<{ left: number; top: number; width: number; height: number }>,
+    scroll?: { scrollTop: number; clientHeight: number; scrollHeight: number },
   ) => {
     const container = document.createElement('div');
     vi.spyOn(container, 'getBoundingClientRect').mockReturnValue(containerRect);
+    if (scroll) {
+      Object.defineProperty(container, 'clientHeight', {
+        configurable: true,
+        value: scroll.clientHeight,
+      });
+      Object.defineProperty(container, 'scrollHeight', {
+        configurable: true,
+        value: scroll.scrollHeight,
+      });
+      container.scrollTop = scroll.scrollTop;
+    }
     const papers = paperRects.map((rect) => {
       const paper = document.createElement('div');
       vi.spyOn(paper, 'getBoundingClientRect').mockReturnValue(mockRect(rect));
@@ -837,40 +849,163 @@ describe('getStickyScrollPageIndex', () => {
   };
 
   const viewport = mockRect({ left: 0, top: 0, width: 100, height: 100 });
+  const midScroll = { scrollTop: 80, clientHeight: 100, scrollHeight: 260 };
+  const tallViewport = mockRect({ left: 0, top: 0, width: 600, height: 700 });
+  const tallContentScroll = { clientHeight: 700, scrollHeight: 825 };
 
   test('keeps the current page while a quarter of the viewport still shows it', () => {
-    const { container, papers } = setupPapers(viewport, [
-      { left: 0, top: -60, width: 100, height: 100 },
-      { left: 0, top: 40, width: 100, height: 100 },
-    ]);
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 0, top: -60, width: 100, height: 100 },
+        { left: 0, top: 40, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
+  });
+
+  test('keeps the current page at exactly 25% remaining height', () => {
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 0, top: -75, width: 100, height: 100 },
+        { left: 0, top: 25, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
 
     expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
   });
 
   test('switches after the current page is mostly gone', () => {
-    const { container, papers } = setupPapers(viewport, [
-      { left: 0, top: -85, width: 100, height: 100 },
-      { left: 0, top: 15, width: 100, height: 100 },
-    ]);
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 0, top: -85, width: 100, height: 100 },
+        { left: 0, top: 15, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+
+  test('switches when remaining height is below 25%', () => {
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 0, top: -76, width: 100, height: 100 },
+        { left: 0, top: 24, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
 
     expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
   });
 
   test('keeps the current page when scrolling back while it still has a remainder', () => {
-    const { container, papers } = setupPapers(viewport, [
-      { left: 0, top: -30, width: 100, height: 100 },
-      { left: 0, top: 70, width: 100, height: 100 },
-    ]);
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 0, top: -30, width: 100, height: 100 },
+        { left: 0, top: 70, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
 
     expect(getStickyScrollPageIndex(container, papers, 1)).toBe(1);
   });
 
   test('does not change page when nothing is visible', () => {
-    const { container, papers } = setupPapers(viewport, [
-      { left: 200, top: 200, width: 100, height: 100 },
-      { left: 200, top: 320, width: 100, height: 100 },
-    ]);
+    const { container, papers } = setupPapers(
+      viewport,
+      [
+        { left: 200, top: 200, width: 100, height: 100 },
+        { left: 200, top: 320, width: 100, height: 100 },
+      ],
+      midScroll,
+    );
 
     expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
+  });
+
+  test('switches to the most visible last page at the bottom even if the previous page is still 25% visible', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: 0, top: -125, width: 500, height: 400 },
+        { left: 0, top: 300, width: 500, height: 400 },
+      ],
+      { ...tallContentScroll, scrollTop: 125 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+
+  test('switches to the most visible first page at the top even if the current page is still 25% visible', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: 0, top: 0, width: 500, height: 400 },
+        { left: 0, top: 425, width: 500, height: 400 },
+      ],
+      { ...tallContentScroll, scrollTop: 0 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 1)).toBe(0);
+  });
+
+  test('treats a fractional scrollTop near the bottom as the end', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: 0, top: -125, width: 500, height: 400 },
+        { left: 0, top: 300, width: 500, height: 400 },
+      ],
+      { ...tallContentScroll, scrollTop: 124.6 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+
+  test('does not treat a non-scrollable container as a scroll edge', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: 0, top: -125, width: 500, height: 400 },
+        { left: 0, top: 300, width: 500, height: 400 },
+      ],
+      { scrollTop: 0, clientHeight: 700, scrollHeight: 700 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
+  });
+
+  test('does not force the last page when it is not the most visible at the bottom', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: 0, top: -50, width: 500, height: 700 },
+        { left: 0, top: 670, width: 500, height: 50 },
+      ],
+      { scrollTop: 50, clientHeight: 700, scrollHeight: 750 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
+  });
+
+  test('switches when the current page has no horizontal overlap', () => {
+    const { container, papers } = setupPapers(
+      tallViewport,
+      [
+        { left: -600, top: -300, width: 500, height: 700 },
+        { left: -600, top: 425, width: 1200, height: 700 },
+      ],
+      { scrollTop: 300, clientHeight: 700, scrollHeight: 1125 },
+    );
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
   });
 });
