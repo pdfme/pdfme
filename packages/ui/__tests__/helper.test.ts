@@ -19,6 +19,7 @@ import {
   getDynamicHeightReflowChanges,
   restoreZoomAnchor,
   setFontNameRecursively,
+  getStickyScrollPageIndex,
 } from '../src/helper';
 import { text, image } from '@pdfme/schemas';
 
@@ -797,5 +798,79 @@ describe('zoom helpers', () => {
 
     expect(container.scrollLeft).toBe(120);
     expect(container.scrollTop).toBe(130);
+  });
+});
+
+describe('getStickyScrollPageIndex', () => {
+  const mockRect = ({
+    left,
+    top,
+    width,
+    height,
+  }: {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+  }) =>
+    ({
+      left,
+      top,
+      right: left + width,
+      bottom: top + height,
+      width,
+      height,
+    }) as DOMRect;
+
+  const setupPapers = (
+    containerRect: DOMRect,
+    paperRects: Array<{ left: number; top: number; width: number; height: number }>,
+  ) => {
+    const container = document.createElement('div');
+    vi.spyOn(container, 'getBoundingClientRect').mockReturnValue(containerRect);
+    const papers = paperRects.map((rect) => {
+      const paper = document.createElement('div');
+      vi.spyOn(paper, 'getBoundingClientRect').mockReturnValue(mockRect(rect));
+      return paper;
+    });
+    return { container, papers };
+  };
+
+  const viewport = mockRect({ left: 0, top: 0, width: 100, height: 100 });
+
+  test('keeps the current page while a quarter of the viewport still shows it', () => {
+    const { container, papers } = setupPapers(viewport, [
+      { left: 0, top: -60, width: 100, height: 100 },
+      { left: 0, top: 40, width: 100, height: 100 },
+    ]);
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
+  });
+
+  test('switches after the current page is mostly gone', () => {
+    const { container, papers } = setupPapers(viewport, [
+      { left: 0, top: -85, width: 100, height: 100 },
+      { left: 0, top: 15, width: 100, height: 100 },
+    ]);
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+
+  test('keeps the current page when scrolling back while it still has a remainder', () => {
+    const { container, papers } = setupPapers(viewport, [
+      { left: 0, top: -30, width: 100, height: 100 },
+      { left: 0, top: 70, width: 100, height: 100 },
+    ]);
+
+    expect(getStickyScrollPageIndex(container, papers, 1)).toBe(1);
+  });
+
+  test('does not change page when nothing is visible', () => {
+    const { container, papers } = setupPapers(viewport, [
+      { left: 200, top: 200, width: 100, height: 100 },
+      { left: 200, top: 320, width: 100, height: 100 },
+    ]);
+
+    expect(getStickyScrollPageIndex(container, papers, 0)).toBe(0);
   });
 });

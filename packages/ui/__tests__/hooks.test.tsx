@@ -190,7 +190,7 @@ const mockRect = ({
     toJSON: () => undefined,
   }) as DOMRect;
 
-test('useScrollPageCursor selects the page with the largest visible area', async () => {
+test('useScrollPageCursor keeps the current page until it is mostly gone', async () => {
   const container = document.createElement('div');
   const firstPaper = document.createElement('div');
   const secondPaper = document.createElement('div');
@@ -225,6 +225,15 @@ test('useScrollPageCursor selects the page with the largest visible area', async
 
   firstPaperRect = mockRect({ left: 0, top: -60, width: 100, height: 100 });
   secondPaperRect = mockRect({ left: 0, top: 40, width: 100, height: 100 });
+
+  act(() => {
+    container.dispatchEvent(new Event('scroll'));
+  });
+
+  expect(onChangePageCursor).not.toHaveBeenCalled();
+
+  firstPaperRect = mockRect({ left: 0, top: -85, width: 100, height: 100 });
+  secondPaperRect = mockRect({ left: 0, top: 15, width: 100, height: 100 });
 
   act(() => {
     container.dispatchEvent(new Event('scroll'));

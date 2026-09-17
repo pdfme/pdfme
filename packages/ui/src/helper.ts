@@ -13,7 +13,12 @@ import {
   PluginRegistry,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
-import { DEFAULT_MAX_ZOOM, PAGE_GAP, RULER_HEIGHT } from './constants.js';
+import {
+  DEFAULT_MAX_ZOOM,
+  PAGE_GAP,
+  PAGE_SWITCH_REMAINING_RATIO,
+  RULER_HEIGHT,
+} from './constants.js';
 import { OptionsContext } from './contexts.js';
 
 // Define a type for the hotkeys function with additional properties
@@ -424,6 +429,51 @@ export const getPagesScrollTopByIndex = (pageSizes: Size[], index: number, scale
   return pageSizes
     .slice(0, index)
     .reduce((acc, cur) => acc + (cur.height * ZOOM + RULER_HEIGHT * scale) * scale, 0);
+};
+
+export const getVisibleOverlap = (containerRect: DOMRect, elementRect: DOMRect) => {
+  const width = Math.max(
+    0,
+    Math.min(containerRect.right, elementRect.right) -
+      Math.max(containerRect.left, elementRect.left),
+  );
+  const height = Math.max(
+    0,
+    Math.min(containerRect.bottom, elementRect.bottom) -
+      Math.max(containerRect.top, elementRect.top),
+  );
+
+  return { width, height, area: width * height };
+};
+
+export const getStickyScrollPageIndex = (
+  container: HTMLElement,
+  papers: Array<HTMLElement | null | undefined>,
+  pageCursor: number,
+) => {
+  const containerRect = container.getBoundingClientRect();
+  const stickyHeight = containerRect.height * PAGE_SWITCH_REMAINING_RATIO;
+
+  let bestPageIndex = pageCursor;
+  let bestVisibleArea = 0;
+  let currentVisibleHeight = 0;
+
+  papers.forEach((paper, pageIndex) => {
+    if (!paper) return;
+
+    const { height, area } = getVisibleOverlap(containerRect, paper.getBoundingClientRect());
+    if (pageIndex === pageCursor) {
+      currentVisibleHeight = height;
+    }
+    if (area > bestVisibleArea) {
+      bestVisibleArea = area;
+      bestPageIndex = pageIndex;
+    }
+  });
+
+  if (bestVisibleArea <= 0) return pageCursor;
+  if (currentVisibleHeight >= stickyHeight) return pageCursor;
+  return bestPageIndex;
 };
 
 export type ZoomMode = 'manual' | 'fit-width' | 'fit-height';
