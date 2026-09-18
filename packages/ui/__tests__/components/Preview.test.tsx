@@ -17,14 +17,16 @@ import {
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
+  getStaticMvtTemplate,
   getTwoPageTemplate,
   getUnbalancedPlaceholderTemplate,
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image } from '@pdfme/schemas';
+import { text, image, multiVariableText } from '@pdfme/schemas';
 
 const plugins = pluginRegistry({ text, image });
+const mvtPlugins = pluginRegistry({ text, image, multiVariableText });
 
 const getScrollContainer = (container: HTMLElement) => {
   const scrollContainer = Array.from(container.querySelectorAll('div')).find(
@@ -639,6 +641,72 @@ const waitForPlaceholderPreview = async (container: HTMLElement) => {
     expect(container.querySelector('[title="staticLabel"]')).toHaveTextContent('static 2 {{1}');
   });
 };
+
+const renderStaticMvtPreview = (onChangeInput?: (arg: {
+  index: number;
+  value: string;
+  name: string;
+}) => void) =>
+  render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={mvtPlugins}>
+          <Preview
+            template={getStaticMvtTemplate()}
+            inputs={[{ pageMvt: JSON.stringify({ firstName: 'Ada', lastName: 'Lovelace' }) }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={onChangeInput}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+const waitForStaticMvtPreview = async (container: HTMLElement) => {
+  await waitFor(() => {
+    expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
+    expect(getSelectableElement(container, 'pageMvt')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+};
+
+test('Preview(as Viewer) renders staticSchema multiVariableText without throwing', async () => {
+  setupUIMock();
+  const { container, rerender } = renderStaticMvtPreview();
+
+  await waitForStaticMvtPreview(container);
+  const staticId = container.querySelector('[title="staticMvt"]')?.id;
+  expect(staticId).toBeTruthy();
+
+  rerender(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={mvtPlugins}>
+          <Preview
+            template={getStaticMvtTemplate()}
+            inputs={[{ pageMvt: JSON.stringify({ firstName: 'Ada', lastName: 'Lovelace' }) }]}
+            size={{ width: 1100, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelector('[title="staticMvt"]')?.id).toBe(staticId);
+  });
+});
+
+test('Preview(as Form) renders staticSchema multiVariableText without throwing', async () => {
+  setupUIMock();
+  const { container } = renderStaticMvtPreview(vi.fn());
+
+  await waitForStaticMvtPreview(container);
+  expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
+  expect(getSelectableElement(container, 'pageMvt')).toBeInTheDocument();
+});
 
 test('Preview(as Viewer) keeps unmatched braces as literals on readonly and staticSchema fields', async () => {
   setupUIMock();

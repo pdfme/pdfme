@@ -7,6 +7,7 @@ import {
   b64toUint8Array,
   Template,
   BasePdf,
+  Schema,
   SchemaForUI,
   Size,
   isBlankPdf,
@@ -51,6 +52,26 @@ export const uuid = () =>
     const r = (Math.random() * 16) | 0;
     const v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
+  });
+
+/**
+ * Assigns runtime UI ids that stay stable for a Designer/Viewer/Form session.
+ * Template save paths such as schemasList2template still strip ids.
+ */
+export const stabilizeSchemaIds = <T extends Schema>(
+  schemas: T[],
+  idMap: Map<string, string>,
+): (T & { id: string })[] =>
+  schemas.map((schema, index) => {
+    const key = schema.name || `index:${index}`;
+    const existingId = (schema as SchemaForUI).id || idMap.get(key);
+    if (existingId) {
+      idMap.set(key, existingId);
+      return { ...schema, id: existingId };
+    }
+    const id = uuid();
+    idMap.set(key, id);
+    return { ...schema, id };
   });
 
 const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {

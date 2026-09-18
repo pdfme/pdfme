@@ -152,6 +152,48 @@ export const getUnbalancedPlaceholderTemplate = (readonlyContent = '{{1}'): Temp
   ],
 });
 
+const getMultiVariableTextField = (name: string, y: number, content: string, text: string) => ({
+  name,
+  type: 'multiVariableText',
+  content,
+  text,
+  variables: ['firstName', 'lastName'],
+  position: { x: 20, y },
+  width: 100,
+  height: 15,
+  alignment: 'left' as const,
+  verticalAlignment: 'top' as const,
+  fontSize: 13,
+  characterSpacing: 0,
+  lineHeight: 1,
+  fontColor: '#000000',
+  backgroundColor: '',
+});
+
+export const getStaticMvtTemplate = (): Template => ({
+  basePdf: {
+    ...BLANK_A4_PDF,
+    staticSchema: [
+      getMultiVariableTextField(
+        'staticMvt',
+        10,
+        JSON.stringify({ firstName: 'John', lastName: 'Smith' }),
+        '{lastName}, {firstName}',
+      ),
+    ],
+  },
+  schemas: [
+    [
+      getMultiVariableTextField(
+        'pageMvt',
+        40,
+        JSON.stringify({ firstName: 'Ada', lastName: 'Lovelace' }),
+        '{firstName} {lastName}',
+      ),
+    ],
+  ],
+});
+
 export const getTwoPageTemplate = (): Template => {
   const template = getSampleTemplate();
   const secondPage = template.schemas[0].map((schema) => ({
