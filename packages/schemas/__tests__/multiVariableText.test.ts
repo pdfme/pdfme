@@ -178,6 +178,32 @@ describe('resolveReadOnlyMultiVariableText', () => {
     expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).not.toBe('Acme');
   });
 
+  it('keeps an empty-string snapshot instead of falling back to schema.text', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, '')).toBe('');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).toBe('');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).not.toBe('{payload}');
+  });
+
+  it('still substitutes Designer variable JSON when a value is an empty string', () => {
+    const designer = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":""}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(designer)).toBe('');
+    expect(resolveReadOnlyMultiVariableText(designer)).not.toBe('{payload}');
+  });
+
   it('renders schema.text when there are no variables', () => {
     const staticSchema = {
       ...fullNameSchema,

@@ -168,6 +168,25 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(schema?.content).not.toBe('Acme');
   });
 
+  it('keeps an empty payload snapshot instead of the placeholder text', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText text="{payload}" values={{ payload: '' }} />
+      </Page>,
+    );
+
+    const schema = result.template.schemas[0]?.[0];
+    expect(schema).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '',
+      contentSnapshot: true,
+    });
+    expect(schema?.content).not.toBe('{payload}');
+  });
+
   it('orders MultiVariableText variables from props, template placeholders, then values', async () => {
     const result = await renderToTemplate(
       <Page>

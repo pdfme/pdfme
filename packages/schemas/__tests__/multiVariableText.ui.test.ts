@@ -772,6 +772,33 @@ describe('multiVariableText without variables', () => {
     expect(textBlock.textContent).toBe('{}');
   });
 
+  it('renders an empty-string snapshot instead of the placeholder text', async () => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{payload}',
+      variables: ['payload'],
+      readOnly: true,
+      contentSnapshot: true,
+      content: '',
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: '',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.textContent).toBe('');
+    expect(textBlock.textContent).not.toBe('{payload}');
+  });
+
   it('renders the resolved content snapshot for a read-only field that still has variables', async () => {
     // A read-only MVT can keep its variables while content holds the already-substituted text
     // (e.g. the jsx-invoice "locked" pattern). That snapshot must render, not the raw template.

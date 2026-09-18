@@ -80,7 +80,7 @@ export const resolveReadOnlyMultiVariableText = (
   value?: string,
 ): string => {
   if (schema.contentSnapshot) {
-    return schema.content || value || schema.text || '';
+    return schema.content ?? value ?? schema.text ?? '';
   }
 
   if (!schema.variables?.length) {
