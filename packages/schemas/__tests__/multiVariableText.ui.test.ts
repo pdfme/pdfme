@@ -716,3 +716,38 @@ describe('multiVariableText without variables', () => {
     expect(onChange).toHaveBeenCalledWith({ key: 'text', value: 'Hello \nWorld' });
   });
 });
+
+describe('multiVariableText missing text block', () => {
+  const renderWithoutTextBlock = async (mode: 'viewer' | 'form' | 'designer') => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{name}',
+      variables: ['name'],
+      textFormat: 'plain',
+    };
+    const originalQuerySelector = rootElement.querySelector.bind(rootElement);
+    vi.spyOn(rootElement, 'querySelector').mockImplementation((selectors: string) => {
+      if (typeof selectors === 'string' && selectors.startsWith('#text-')) {
+        return null;
+      }
+      return originalQuerySelector(selectors);
+    });
+
+    await uiRender({
+      value: JSON.stringify({ name: 'Alice' }),
+      schema,
+      rootElement,
+      mode,
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+  };
+
+  it('does not throw in viewer, form, or designer when #text-{id} is missing', async () => {
+    await expect(renderWithoutTextBlock('viewer')).resolves.toBeUndefined();
+    await expect(renderWithoutTextBlock('form')).resolves.toBeUndefined();
+    await expect(renderWithoutTextBlock('designer')).resolves.toBeUndefined();
+  });
+});

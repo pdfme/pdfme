@@ -4,19 +4,28 @@ import Designer from '../../src/components/Designer/index.js';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
-import { getDefaultFont, PAGE_SIZE_PRESETS, pluginRegistry, ZOOM } from '@pdfme/common';
+import {
+  getDefaultFont,
+  isBlankPdf,
+  PAGE_SIZE_PRESETS,
+  pluginRegistry,
+  ZOOM,
+  type Template,
+} from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
+  getStaticMvtTemplate,
   getTwoPageTemplate,
   getUnbalancedPlaceholderTemplate,
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image } from '@pdfme/schemas';
+import { text, image, multiVariableText } from '@pdfme/schemas';
 import * as uiHelper from '../../src/helper';
 
 const plugins = { text, image };
+const mvtPlugins = { text, image, multiVariableText };
 
 let restoreClientSizeMock: (() => void) | undefined;
 let uuidSeq = 0;
@@ -303,6 +312,162 @@ test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only
   await waitFor(() => {
     expect(sidebar.style.width).toBe('0px');
   });
+});
+
+test('Designer renders staticSchema multiVariableText without throwing', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const onChangeTemplate = vi.fn();
+  const { container, rerender } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(mvtPlugins)}>
+          <Designer
+            template={getStaticMvtTemplate()}
+            onSaveTemplate={console.log}
+            onChangeTemplate={onChangeTemplate}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
+    expect(getSelectableByTitle(container, 'pageMvt')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  const staticId = container.querySelector('[title="staticMvt"]')?.id;
+  expect(staticId).toBeTruthy();
+
+  rerender(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(mvtPlugins)}>
+          <Designer
+            template={getStaticMvtTemplate()}
+            onSaveTemplate={console.log}
+            onChangeTemplate={onChangeTemplate}
+            size={{ width: 1200, height: 1100 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelector('[title="staticMvt"]')?.id).toBe(staticId);
+    expect(getSelectableByTitle(container, 'pageMvt')).toBeInTheDocument();
+  });
+});
+
+test('Designer does not throw when staticSchema MVT has a CSS-unsafe caller id', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const template = getStaticMvtTemplate();
+  if (!isBlankPdf(template.basePdf) || !template.basePdf.staticSchema?.[0]) {
+    throw new Error('Expected a blank PDF with staticSchema');
+  }
+  (template.basePdf.staticSchema[0] as { id?: string }).id = 'foo[';
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(mvtPlugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    const staticField = container.querySelector('[title="staticMvt"]');
+    expect(staticField).toBeInTheDocument();
+    expect(staticField?.id).toBeTruthy();
+    expect(staticField?.id).not.toBe('foo[');
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+});
+
+test('Designer keeps page-level multiVariableText inline editing', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const onChangeTemplate = vi.fn();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(mvtPlugins)}>
+          <Designer
+            template={getStaticMvtTemplate()}
+            onSaveTemplate={console.log}
+            onChangeTemplate={onChangeTemplate}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'pageMvt')).toBeInTheDocument();
+  });
+
+  const originalElementFromPoint = document.elementFromPoint;
+  document.elementFromPoint = () => getSelectableByTitle(container, 'pageMvt');
+  try {
+    const field = getSelectableByTitle(container, 'pageMvt');
+    fireEvent.mouseDown(field);
+    fireEvent.mouseUp(field);
+    if (container.querySelector(`.${DESIGNER_CLASSNAME}delete-button`)) {
+      fireEvent.mouseDown(field);
+      fireEvent.mouseUp(field);
+    }
+
+    const editor = await waitFor(() => {
+      const element = Array.from(field.querySelectorAll('div')).find(
+        (node) => node.contentEditable === 'plaintext-only' || node.contentEditable === 'true',
+      );
+      expect(element).toBeInTheDocument();
+      return element!;
+    });
+
+    editor.innerText = 'Hello {fullName}';
+    const editedText = editor.innerText;
+    vi.spyOn(window, 'getSelection').mockReturnValue({
+      focusOffset: editedText.length,
+      anchorOffset: editedText.length,
+    } as Selection);
+    editor.dispatchEvent(new KeyboardEvent('keyup', { key: '}', bubbles: true }));
+    fireEvent.blur(editor);
+
+    await waitFor(() => {
+      expect(onChangeTemplate).toHaveBeenCalled();
+      const lastTemplate = onChangeTemplate.mock.calls.at(-1)?.[0] as Template;
+      expect(lastTemplate.schemas[0].find((schema) => schema.name === 'pageMvt')).toMatchObject({
+        text: 'Hello {fullName}',
+      });
+      expect(getSelectableByTitle(container, 'pageMvt')).toHaveTextContent('Hello');
+      expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
+    });
+  } finally {
+    if (originalElementFromPoint) document.elementFromPoint = originalElementFromPoint;
+    else Reflect.deleteProperty(document, 'elementFromPoint');
+  }
 });
 
 test('Designer keeps rendering when readonly text has unmatched braces', async () => {

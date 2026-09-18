@@ -10,6 +10,7 @@ import {
 } from '@pdfme/common';
 import {
   uuid,
+  stabilizeSchemaIds,
   getUniqueSchemaName,
   schemasList2template,
   changeSchemas,
@@ -163,6 +164,39 @@ describe('getUniqSchemaName test', () => {
       stackUniqueSchemaNames: stackUniqSchemaNames,
     });
     expect(uniqSchemaName).toBe('a copy 11');
+  });
+});
+
+describe('stabilizeSchemaIds test', () => {
+  test('reuses the same id for the same schema name across calls', () => {
+    const idMap = new Map<string, string>();
+    const schema = { ...getSchema(), name: 'staticMvt' };
+
+    const first = stabilizeSchemaIds([schema], idMap);
+    const second = stabilizeSchemaIds([{ ...schema, content: 'changed' }], idMap);
+
+    expect(first[0].id).toBe(second[0].id);
+    expect(first[0].id).toBeTruthy();
+    expect(idMap.get('staticMvt')).toBe(first[0].id);
+  });
+
+  test('ignores a caller-supplied id and reuses the generated runtime id', () => {
+    const idMap = new Map<string, string>();
+    const schema = { ...getSchema(), name: 'header', id: 'foo[' } as SchemaForUI;
+
+    const [first] = stabilizeSchemaIds([schema], idMap);
+    const [second] = stabilizeSchemaIds([{ ...getSchema(), name: 'header', id: 'foo[' }], idMap);
+
+    expect(first.id).toBeTruthy();
+    expect(first.id).not.toBe('foo[');
+    expect(second.id).toBe(first.id);
+    expect(idMap.get('header')).toBe(first.id);
+  });
+
+  test('does not mutate the source schema', () => {
+    const schema = { ...getSchema(), name: 'footer' };
+    stabilizeSchemaIds([schema], new Map());
+    expect(schema).not.toHaveProperty('id');
   });
 });
 

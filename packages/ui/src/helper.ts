@@ -53,6 +53,26 @@ export const uuid = () =>
     return v.toString(16);
   });
 
+/**
+ * Assigns runtime UI ids that stay stable for a Designer/Viewer/Form session.
+ * Caller/template ids are ignored: Schema.passthrough() can carry values that
+ * break `#text-{id}` querySelector (e.g. `foo[`). Save paths still strip ids.
+ */
+export const stabilizeSchemaIds = <T extends { name: string; id?: string }>(
+  schemas: T[],
+  idMap: Map<string, string>,
+): (T & { id: string })[] =>
+  schemas.map((schema, index) => {
+    const key = schema.name || `index:${index}`;
+    const existingId = idMap.get(key);
+    if (existingId) {
+      return { ...schema, id: existingId };
+    }
+    const id = uuid();
+    idMap.set(key, id);
+    return { ...schema, id };
+  });
+
 const set = <T extends object>(obj: T, path: string | string[], value: unknown) => {
   path = Array.isArray(path) ? path : path.replace(/\[/g, '.').replace(/\]/g, '').split('.');
   let src: Record<string, unknown> = obj as Record<string, unknown>;
