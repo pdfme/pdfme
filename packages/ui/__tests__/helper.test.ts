@@ -180,15 +180,17 @@ describe('stabilizeSchemaIds test', () => {
     expect(idMap.get('staticMvt')).toBe(first[0].id);
   });
 
-  test('keeps an existing schema id and records it for later renders', () => {
+  test('ignores a caller-supplied id and reuses the generated runtime id', () => {
     const idMap = new Map<string, string>();
-    const schema = { ...getSchema(), name: 'header', id: 'existing-id' } as SchemaForUI;
+    const schema = { ...getSchema(), name: 'header', id: 'foo[' } as SchemaForUI;
 
-    const [withExisting] = stabilizeSchemaIds([schema], idMap);
-    const [withoutId] = stabilizeSchemaIds([{ ...getSchema(), name: 'header' }], idMap);
+    const [first] = stabilizeSchemaIds([schema], idMap);
+    const [second] = stabilizeSchemaIds([{ ...getSchema(), name: 'header', id: 'foo[' }], idMap);
 
-    expect(withExisting.id).toBe('existing-id');
-    expect(withoutId.id).toBe('existing-id');
+    expect(first.id).toBeTruthy();
+    expect(first.id).not.toBe('foo[');
+    expect(second.id).toBe(first.id);
+    expect(idMap.get('header')).toBe(first.id);
   });
 
   test('does not mutate the source schema', () => {

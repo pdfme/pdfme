@@ -55,7 +55,8 @@ export const uuid = () =>
 
 /**
  * Assigns runtime UI ids that stay stable for a Designer/Viewer/Form session.
- * Template save paths such as schemasList2template still strip ids.
+ * Caller/template ids are ignored: Schema.passthrough() can carry values that
+ * break `#text-{id}` querySelector (e.g. `foo[`). Save paths still strip ids.
  */
 export const stabilizeSchemaIds = <T extends { name: string; id?: string }>(
   schemas: T[],
@@ -63,9 +64,8 @@ export const stabilizeSchemaIds = <T extends { name: string; id?: string }>(
 ): (T & { id: string })[] =>
   schemas.map((schema, index) => {
     const key = schema.name || `index:${index}`;
-    const existingId = schema.id || idMap.get(key);
+    const existingId = idMap.get(key);
     if (existingId) {
-      idMap.set(key, existingId);
       return { ...schema, id: existingId };
     }
     const id = uuid();

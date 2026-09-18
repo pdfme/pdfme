@@ -4,7 +4,14 @@ import Designer from '../../src/components/Designer/index.js';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
-import { getDefaultFont, PAGE_SIZE_PRESETS, pluginRegistry, ZOOM } from '@pdfme/common';
+import {
+  getDefaultFont,
+  isBlankPdf,
+  PAGE_SIZE_PRESETS,
+  pluginRegistry,
+  ZOOM,
+  type Template,
+} from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
@@ -360,9 +367,46 @@ test('Designer renders staticSchema multiVariableText without throwing', async (
   });
 });
 
+test('Designer does not throw when staticSchema MVT has a CSS-unsafe caller id', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const template = getStaticMvtTemplate();
+  if (!isBlankPdf(template.basePdf) || !template.basePdf.staticSchema?.[0]) {
+    throw new Error('Expected a blank PDF with staticSchema');
+  }
+  (template.basePdf.staticSchema[0] as { id?: string }).id = 'foo[';
+
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(mvtPlugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    const staticField = container.querySelector('[title="staticMvt"]');
+    expect(staticField).toBeInTheDocument();
+    expect(staticField?.id).toBeTruthy();
+    expect(staticField?.id).not.toBe('foo[');
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+});
+
 test('Designer keeps page-level multiVariableText inline editing', async () => {
   setupUIMock();
   mockStableUuids();
+  const onChangeTemplate = vi.fn();
   const { container } = render(
     <I18nContext.Provider value={i18n}>
       <FontContext.Provider value={getDefaultFont()}>
@@ -370,7 +414,7 @@ test('Designer keeps page-level multiVariableText inline editing', async () => {
           <Designer
             template={getStaticMvtTemplate()}
             onSaveTemplate={console.log}
-            onChangeTemplate={console.log}
+            onChangeTemplate={onChangeTemplate}
             size={{ width: 1200, height: 1200 }}
             onPageCursorChange={() => undefined}
           />
@@ -403,11 +447,21 @@ test('Designer keeps page-level multiVariableText inline editing', async () => {
     });
 
     editor.innerText = 'Hello {fullName}';
+    const editedText = editor.innerText;
+    vi.spyOn(window, 'getSelection').mockReturnValue({
+      focusOffset: editedText.length,
+      anchorOffset: editedText.length,
+    } as Selection);
     editor.dispatchEvent(new KeyboardEvent('keyup', { key: '}', bubbles: true }));
     fireEvent.blur(editor);
 
     await waitFor(() => {
-      expect(getSelectableByTitle(container, 'pageMvt')).toBeInTheDocument();
+      expect(onChangeTemplate).toHaveBeenCalled();
+      const lastTemplate = onChangeTemplate.mock.calls.at(-1)?.[0] as Template;
+      expect(lastTemplate.schemas[0].find((schema) => schema.name === 'pageMvt')).toMatchObject({
+        text: 'Hello {fullName}',
+      });
+      expect(getSelectableByTitle(container, 'pageMvt')).toHaveTextContent('Hello');
       expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
     });
   } finally {
