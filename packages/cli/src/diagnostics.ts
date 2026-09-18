@@ -1,5 +1,5 @@
 import { dirname, resolve } from 'node:path';
-import { PAGE_SIZE_PRESETS, checkTemplate } from '@pdfme/common';
+import { PAGE_SIZE_PRESETS, checkTemplate, isBlankPdf, type BasePdf } from '@pdfme/common';
 import { fail } from './contract.js';
 import { schemaTypes } from './schema-plugins.js';
 import { detectPaperSize, readJsonFile, readJsonFromStdin } from './utils.js';
@@ -206,45 +206,52 @@ export function collectInputHints(template: Record<string, unknown>): FieldInput
   const hintMap = new Map<string, FieldInputHint>();
   const schemaPages = normalizeSchemaPages(template.schemas);
   const radioGroupMembers = collectRadioGroupMembers(schemaPages);
+  const pageCount = Math.max(schemaPages.length, 1);
+  const allPages = Array.from({ length: pageCount }, (_, index) => index + 1);
+
+  const addHint = (schema: Record<string, unknown>, pages: number[], fromStaticSchema: boolean) => {
+    if (!shouldCollectInputHint(schema, fromStaticSchema)) {
+      return;
+    }
+
+    const hint = buildFieldInputHint(schema, pages[0] ?? 1, radioGroupMembers);
+    hint.pages = [...pages];
+    const key = [
+      hint.name,
+      hint.type,
+      hint.expectedInput.kind,
+      JSON.stringify(hint.expectedInput.example ?? null),
+      hint.expectedInput.format ?? '',
+      hint.expectedInput.canonicalFormat ?? '',
+      hint.expectedInput.contentKind ?? '',
+      hint.expectedInput.rule ?? '',
+      (hint.expectedInput.variableNames ?? []).join('\u0000'),
+      (hint.expectedInput.allowedValues ?? []).join('\u0000'),
+      hint.expectedInput.groupName ?? '',
+      (hint.expectedInput.groupMemberNames ?? []).join('\u0000'),
+      String(hint.expectedInput.columnCount ?? ''),
+      (hint.expectedInput.columnHeaders ?? []).join('\u0000'),
+      hint.expectedInput.acceptsJsonString === true ? '1' : '0',
+    ].join('\u0001');
+    const existing = hintMap.get(key);
+
+    if (existing) {
+      existing.pages = [...new Set([...existing.pages, ...hint.pages])].sort((a, b) => a - b);
+      existing.required = existing.required || hint.required;
+      return;
+    }
+
+    hintMap.set(key, hint);
+  };
 
   for (let pageIdx = 0; pageIdx < schemaPages.length; pageIdx++) {
     for (const schema of schemaPages[pageIdx]) {
-      const name = typeof schema.name === 'string' ? schema.name : '';
-      const type = typeof schema.type === 'string' ? schema.type : '';
-      const readOnly = schema.readOnly === true;
-
-      if (!name || !type || readOnly) {
-        continue;
-      }
-
-      const hint = buildFieldInputHint(schema, pageIdx + 1, radioGroupMembers);
-      const key = [
-        hint.name,
-        hint.type,
-        hint.expectedInput.kind,
-        JSON.stringify(hint.expectedInput.example ?? null),
-        hint.expectedInput.format ?? '',
-        hint.expectedInput.canonicalFormat ?? '',
-        hint.expectedInput.contentKind ?? '',
-        hint.expectedInput.rule ?? '',
-        (hint.expectedInput.variableNames ?? []).join('\u0000'),
-        (hint.expectedInput.allowedValues ?? []).join('\u0000'),
-        hint.expectedInput.groupName ?? '',
-        (hint.expectedInput.groupMemberNames ?? []).join('\u0000'),
-        String(hint.expectedInput.columnCount ?? ''),
-        (hint.expectedInput.columnHeaders ?? []).join('\u0000'),
-        hint.expectedInput.acceptsJsonString === true ? '1' : '0',
-      ].join('\u0001');
-      const existing = hintMap.get(key);
-
-      if (existing) {
-        existing.pages = [...new Set([...existing.pages, pageIdx + 1])].sort((a, b) => a - b);
-        existing.required = existing.required || hint.required;
-        continue;
-      }
-
-      hintMap.set(key, hint);
+      addHint(schema, [pageIdx + 1], false);
     }
+  }
+
+  for (const schema of getStaticSchemas(template)) {
+    addHint(schema, allPages, true);
   }
 
   return [...hintMap.values()].sort(
@@ -375,6 +382,40 @@ export function normalizeSchemaPages(rawSchemas: unknown): Array<Array<Record<st
 
     return [];
   });
+}
+
+function getStaticSchemas(template: Record<string, unknown>): Record<string, unknown>[] {
+  const basePdf = template.basePdf as BasePdf | undefined;
+  if (!basePdf || !isBlankPdf(basePdf) || !Array.isArray(basePdf.staticSchema)) {
+    return [];
+  }
+
+  return basePdf.staticSchema
+    .filter((schema) => typeof schema === 'object' && schema !== null)
+    .map((schema) => schema as Record<string, unknown>);
+}
+
+function shouldCollectInputHint(
+  schema: Record<string, unknown>,
+  fromStaticSchema: boolean,
+): boolean {
+  const name = typeof schema.name === 'string' ? schema.name : '';
+  const type = typeof schema.type === 'string' ? schema.type : '';
+  if (!name || !type) {
+    return false;
+  }
+
+  // generate: editable static schemas still use content only.
+  if (fromStaticSchema) {
+    return type === 'table' && schema.readOnly === true;
+  }
+
+  // Page tables consume input[name] even when readOnly; other readOnly fields do not.
+  if (schema.readOnly === true) {
+    return type === 'table';
+  }
+
+  return true;
 }
 
 function buildFieldInputHint(

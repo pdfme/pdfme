@@ -23,10 +23,41 @@ import {
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image, multiVariableText } from '@pdfme/schemas';
+import { text, image, multiVariableText, table } from '@pdfme/schemas';
 
 const plugins = pluginRegistry({ text, image });
 const mvtPlugins = pluginRegistry({ text, image, multiVariableText });
+const tablePlugins = pluginRegistry({ text, image, table });
+
+const designerDefaultTableContent = JSON.stringify([
+  ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
+  ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
+]);
+const tableInputRows = [
+  ['Max', 'Cityname', 'he lives here'],
+  ['Angela', 'Othercityname', 'she used to live here'],
+];
+
+const getReadOnlyTableTemplate = (content: string, readOnly = true): Template => ({
+  basePdf: { width: 210, height: 297, padding: [20, 10, 20, 10] },
+  schemas: [
+    [
+      {
+        ...structuredClone(table.propPanel.defaultSchema),
+        name: 'table',
+        type: 'table',
+        readOnly,
+        content,
+        position: { x: 20, y: 40 },
+        width: 170,
+        height: 40,
+        showHead: true,
+        head: ['Name', 'City', 'Description'],
+        headWidthPercentages: [30, 30, 40],
+      },
+    ],
+  ],
+});
 
 const getScrollContainer = (container: HTMLElement) => {
   const scrollContainer = Array.from(container.querySelectorAll('div')).find(
@@ -642,11 +673,9 @@ const waitForPlaceholderPreview = async (container: HTMLElement) => {
   });
 };
 
-const renderStaticMvtPreview = (onChangeInput?: (arg: {
-  index: number;
-  value: string;
-  name: string;
-}) => void) =>
+const renderStaticMvtPreview = (
+  onChangeInput?: (arg: { index: number; value: string; name: string }) => void,
+) =>
   render(
     <I18nContext.Provider value={i18n}>
       <FontContext.Provider value={getDefaultFont()}>
@@ -724,4 +753,87 @@ test('Preview(as Form) keeps unmatched braces as literals on readonly and static
   const editableField = getSelectableElement(container, 'editableField');
   expect(editableField.querySelector('[data-pdfme-render-ready="true"]')).toBeTruthy();
   expect(editableField).toBeInTheDocument();
+});
+
+const renderReadOnlyTablePreview = (args: {
+  content: string;
+  inputs?: Record<string, string>[];
+  onChangeInput?: (arg: { index: number; value: string; name: string }) => void;
+  readOnly?: boolean;
+}) =>
+  render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={tablePlugins}>
+          <Preview
+            template={getReadOnlyTableTemplate(args.content, args.readOnly)}
+            inputs={args.inputs ?? [{ table: JSON.stringify(tableInputRows) }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={args.onChangeInput}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+const waitForReadOnlyTablePreview = async (container: HTMLElement) => {
+  await waitFor(() => {
+    expect(getSelectableElement(container, 'table')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+};
+
+test('Preview(as Form) uses input.table for a readOnly table with Designer sample content', async () => {
+  setupUIMock();
+  const { container } = renderReadOnlyTablePreview({ content: designerDefaultTableContent });
+
+  await waitForReadOnlyTablePreview(container);
+  expect(container).toHaveTextContent('Max');
+  expect(container).toHaveTextContent('Angela');
+  expect(container).not.toHaveTextContent('Alice');
+  expect(container).not.toHaveTextContent('Bob');
+});
+
+test('Preview(as Viewer) uses input.table when content is "{table}" without throwing', async () => {
+  setupUIMock();
+  const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+  const { container } = renderReadOnlyTablePreview({ content: '{table}' });
+
+  await waitForReadOnlyTablePreview(container);
+  expect(container).toHaveTextContent('Max');
+  expect(container).toHaveTextContent('Angela');
+  expect(consoleError).not.toHaveBeenCalledWith(
+    '[@pdfme/ui] ',
+    expect.objectContaining({ message: expect.stringContaining('JSON') }),
+  );
+  consoleError.mockRestore();
+});
+
+test('Preview keeps Designer sample rows when a readOnly table has no input', async () => {
+  setupUIMock();
+  const { container } = renderReadOnlyTablePreview({
+    content: designerDefaultTableContent,
+    inputs: [{}],
+  });
+
+  await waitForReadOnlyTablePreview(container);
+  expect(container).toHaveTextContent('Alice');
+  expect(container).toHaveTextContent('Bob');
+  expect(container).not.toHaveTextContent('Max');
+});
+
+test('Preview(as Form) leaves editable tables on input[name]', async () => {
+  setupUIMock();
+  const { container } = renderReadOnlyTablePreview({
+    content: designerDefaultTableContent,
+    readOnly: false,
+    onChangeInput: vi.fn(),
+  });
+
+  await waitForReadOnlyTablePreview(container);
+  expect(container).toHaveTextContent('Max');
+  expect(container).toHaveTextContent('Angela');
+  expect(container).not.toHaveTextContent('Alice');
 });

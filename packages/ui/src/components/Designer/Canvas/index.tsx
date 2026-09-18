@@ -501,7 +501,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
           const content = schema.content || '';
           let value = content;
 
-          if (mode !== 'designer' && schema.readOnly) {
+          if (mode !== 'designer' && schema.readOnly && schema.type !== 'table') {
             const variables = {
               ...schemasList.flat().reduce(
                 (acc, currSchema) => {
