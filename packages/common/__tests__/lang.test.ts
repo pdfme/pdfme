@@ -6,6 +6,11 @@ describe('Lang schema', () => {
     expect(UIOptions.parse({ lang: 'zh-TW' }).lang).toBe('zh-TW');
   });
 
+  test('accepts Turkish', () => {
+    expect(Lang.parse('tr')).toBe('tr');
+    expect(UIOptions.parse({ lang: 'tr' }).lang).toBe('tr');
+  });
+
   test('rejects unknown language codes', () => {
     expect(() => Lang.parse('zh-HK')).toThrow();
   });
