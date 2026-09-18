@@ -692,6 +692,57 @@ describe('multiVariableText without variables', () => {
     expect(viewerBlock.textContent).not.toContain('lastName');
   });
 
+  it('renders a JSON object snapshot instead of re-substituting schema.text', async () => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{payload}',
+      variables: ['payload'],
+      readOnly: true,
+      content: '{"name":"Acme"}',
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: 'name',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.textContent).toBe('{"name":"Acme"}');
+    expect(textBlock.textContent).not.toBe('Acme');
+  });
+
+  it('renders an empty JSON object snapshot instead of an empty substitution', async () => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{payload}',
+      variables: ['payload'],
+      readOnly: true,
+      content: '{}',
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: '{}',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.textContent).toBe('{}');
+  });
+
   it('renders the resolved content snapshot for a read-only field that still has variables', async () => {
     // A read-only MVT can keep its variables while content holds the already-substituted text
     // (e.g. the jsx-invoice "locked" pattern). That snapshot must render, not the raw template.

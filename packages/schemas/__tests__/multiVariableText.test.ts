@@ -125,6 +125,30 @@ describe('resolveReadOnlyMultiVariableText', () => {
     );
   });
 
+  it('keeps a JSON object snapshot that is not Designer variable data', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"name":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, 'name')).toBe('{"name":"Acme"}');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe('{"name":"Acme"}');
+  });
+
+  it('keeps an empty JSON object snapshot instead of substituting schema.text', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, '{}')).toBe('{}');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).toBe('{}');
+  });
+
   it('renders schema.text when there are no variables', () => {
     const staticSchema = {
       ...fullNameSchema,

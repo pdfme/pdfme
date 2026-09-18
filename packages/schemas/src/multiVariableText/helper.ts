@@ -25,6 +25,39 @@ export const tryParseVariableMap = (
   return undefined;
 };
 
+/** Designer variable JSON uses exactly the schema's variable names as keys. */
+export const isDesignerVariableMap = (
+  variables: Record<string, string>,
+  expectedNames: string[],
+): boolean => {
+  if (expectedNames.length === 0) {
+    return false;
+  }
+  const keys = Object.keys(variables);
+  if (keys.length !== expectedNames.length) {
+    return false;
+  }
+  return expectedNames.every((name) => Object.prototype.hasOwnProperty.call(variables, name));
+};
+
+const readDesignerVariableMap = (
+  source: string | Record<string, string> | undefined,
+  expectedNames: string[],
+): Record<string, string> | undefined => {
+  const parsed = tryParseVariableMap(source);
+  if (!parsed || !isDesignerVariableMap(parsed, expectedNames)) {
+    return undefined;
+  }
+  return parsed;
+};
+
+const isJsonObjectSnapshot = (source: string | undefined): boolean => {
+  if (!source) {
+    return false;
+  }
+  return tryParseVariableMap(source) !== undefined;
+};
+
 export const substituteVariables = (
   text: string,
   variablesIn: string | Record<string, string>,
@@ -71,8 +104,9 @@ export const substituteVariablesAsInlineMarkdownLiterals = (
 
 /**
  * Resolve a read-only MVT field to display text.
- * Designer templates store variable JSON in `content`. jsx locked fields store
- * already-substituted plaintext there. Never treat `content` as an expression.
+ * Designer templates store variable JSON in `content` (keys == schema.variables).
+ * jsx locked fields store an already-substituted snapshot there, including JSON
+ * that is not a Designer variable map. Never treat `content` as an expression.
  */
 export const resolveReadOnlyMultiVariableText = (
   schema: MultiVariableTextSchema,
@@ -82,11 +116,19 @@ export const resolveReadOnlyMultiVariableText = (
     return schema.text || '';
   }
 
-  const variableMap = tryParseVariableMap(schema.content) ?? tryParseVariableMap(value);
+  const variableMap =
+    readDesignerVariableMap(schema.content, schema.variables) ??
+    readDesignerVariableMap(value, schema.variables);
   if (variableMap) {
     return isInlineMarkdownTextSchema(schema)
       ? substituteVariablesAsInlineMarkdownLiterals(schema.text || '', variableMap)
       : substituteVariables(schema.text || '', variableMap);
+  }
+
+  // JSON that is not a Designer variable map is a pre-resolved snapshot (jsx).
+  // Keep `content` so an expression-evaluated value like "name" cannot replace it.
+  if (isJsonObjectSnapshot(schema.content) && schema.content) {
+    return schema.content;
   }
 
   if (typeof value === 'string' && value.length > 0) {
