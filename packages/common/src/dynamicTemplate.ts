@@ -69,7 +69,9 @@ export const getSchemaValue = (
     return getReadOnlyTableValue(schema, input);
   }
 
-  if (schema.type !== 'text' && schema.type !== 'multiVariableText') {
+  // Expressions are only for text. MVT `content` is variable JSON; other
+  // types keep their raw content (see #1299 / #1345).
+  if (schema.type !== 'text') {
     return schema.content || '';
   }
 

@@ -17,6 +17,7 @@ import {
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
 import {
   getSampleTemplate,
+  getReadOnlyMvtTemplate,
   getStaticMvtTemplate,
   getTwoPageTemplate,
   getUnbalancedPlaceholderTemplate,
@@ -735,6 +736,50 @@ test('Preview(as Form) renders staticSchema multiVariableText without throwing',
   await waitForStaticMvtPreview(container);
   expect(container.querySelector('[title="staticMvt"]')).toBeInTheDocument();
   expect(getSelectableElement(container, 'pageMvt')).toBeInTheDocument();
+});
+
+const renderReadOnlyMvtPreview = (onChangeInput?: (arg: {
+  index: number;
+  value: string;
+  name: string;
+}) => void) =>
+  render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={mvtPlugins}>
+          <Preview
+            template={getReadOnlyMvtTemplate()}
+            inputs={[{ info: JSON.stringify({ InvoiceNo: '12345', Date: '16 June 2025' }) }]}
+            size={{ width: 1200, height: 1200 }}
+            onChangeInput={onChangeInput}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+const waitForReadOnlyMvtPreview = async (container: HTMLElement) => {
+  await waitFor(() => {
+    expect(container.querySelector('[title="staticFullName"]')).toHaveTextContent('Smith, John');
+    expect(getSelectableElement(container, 'fullName')).toHaveTextContent('Smith, John');
+    expect(getSelectableElement(container, 'info')).toHaveTextContent('Invoice No.12345');
+  });
+  expect(container).not.toHaveTextContent('lastName');
+};
+
+test('Preview(as Viewer) substitutes read-only multiVariableText from schema.text', async () => {
+  setupUIMock();
+  const { container } = renderReadOnlyMvtPreview();
+
+  await waitForReadOnlyMvtPreview(container);
+});
+
+test('Preview(as Form) substitutes read-only multiVariableText from schema.text', async () => {
+  setupUIMock();
+  const { container } = renderReadOnlyMvtPreview(vi.fn());
+
+  await waitForReadOnlyMvtPreview(container);
+  expect(getSelectableElement(container, 'info')).toBeInTheDocument();
 });
 
 test('Preview(as Viewer) keeps unmatched braces as literals on readonly and staticSchema fields', async () => {

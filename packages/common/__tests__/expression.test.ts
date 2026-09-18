@@ -1,4 +1,4 @@
-import { replacePlaceholders } from '../src/expression.js';
+import { replacePlaceholders, resolveReadOnlyContent } from '../src/expression.js';
 import { SchemaPageArray } from '../src/index.js';
 
 describe('replacePlaceholders', () => {
@@ -163,6 +163,66 @@ describe('replacePlaceholders', () => {
     // Math.random() generates a random number, which is then converted to a string using toString()
     const regex = /^Chained: \d+\.\d+$/;
     expect(regex.test(result)).toBe(true);
+  });
+});
+
+describe('resolveReadOnlyContent', () => {
+  it('leaves multiVariableText content as variable JSON instead of evaluating it', () => {
+    const content = '{"lastName":"Smith","firstName":"John"}';
+    const result = resolveReadOnlyContent({
+      schema: {
+        name: 'fullName',
+        type: 'multiVariableText',
+        content,
+        position: { x: 0, y: 0 },
+        width: 80,
+        height: 10,
+        readOnly: true,
+      },
+      variables: {},
+      schemas: [],
+    });
+
+    expect(result).toBe(content);
+    expect(result).not.toBe('lastName');
+    expect(replacePlaceholders({ content, variables: {}, schemas: [] })).toBe('lastName');
+  });
+
+  it('still evaluates read-only text expressions', () => {
+    expect(
+      resolveReadOnlyContent({
+        schema: {
+          name: 'label',
+          type: 'text',
+          content: '{1+1}',
+          position: { x: 0, y: 0 },
+          width: 80,
+          height: 10,
+          readOnly: true,
+        },
+        variables: {},
+        schemas: [],
+      }),
+    ).toBe('2');
+  });
+
+  it('keeps table JSON going through replacePlaceholders', () => {
+    const content = '[["{1+1}"]]';
+    expect(
+      resolveReadOnlyContent({
+        schema: {
+          name: 'items',
+          type: 'table',
+          content,
+          position: { x: 0, y: 0 },
+          width: 80,
+          height: 10,
+          readOnly: true,
+        },
+        variables: {},
+        schemas: [],
+      }),
+    ).toBe(replacePlaceholders({ content, variables: {}, schemas: [] }));
   });
 });
 

@@ -12,7 +12,7 @@ import {
   getDynamicTemplate,
   getReadOnlyTableValue,
   isBlankPdf,
-  replacePlaceholders,
+  resolveReadOnlyContent,
   pt2mm,
   cloneDeep,
   mm2pt,
@@ -193,8 +193,8 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
             staticSchema.readOnly && staticSchema.type === 'table'
               ? getReadOnlyTableValue(staticSchema, input)
               : staticSchema.readOnly
-                ? replacePlaceholders({
-                    content: staticSchema.content || '',
+                ? resolveReadOnlyContent({
+                    schema: staticSchema,
                     variables,
                     schemas,
                   })
@@ -241,8 +241,8 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           schema.readOnly && schema.type === 'table'
             ? getReadOnlyTableValue(schema, input)
             : schema.readOnly
-              ? replacePlaceholders({
-                  content: schema.content || '',
+              ? resolveReadOnlyContent({
+                  schema,
                   variables,
                   schemas,
                 })

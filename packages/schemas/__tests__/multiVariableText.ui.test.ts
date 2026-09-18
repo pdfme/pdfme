@@ -659,6 +659,39 @@ describe('multiVariableText without variables', () => {
     expect(textBlock.textContent).not.toContain('{}');
   });
 
+  it('renders Designer variable JSON as substituted text in viewer and form', async () => {
+    const renderReadOnlyName = async (mode: 'viewer' | 'form') => {
+      const rootElement = document.createElement('div');
+      const schema: MultiVariableTextSchema = {
+        ...getSchema(),
+        text: '{lastName}, {firstName}',
+        variables: ['firstName', 'lastName'],
+        readOnly: true,
+        content: JSON.stringify({ lastName: 'Smith', firstName: 'John' }),
+        textFormat: 'plain',
+      };
+
+      await uiRender({
+        value: 'lastName',
+        schema,
+        rootElement,
+        mode,
+        options: { font: getSampleFont() },
+        _cache: new Map(),
+        theme: { colorPrimary: '#1677ff' },
+      } as Parameters<typeof uiRender>[0]);
+
+      return rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    };
+
+    const viewerBlock = await renderReadOnlyName('viewer');
+    const formBlock = await renderReadOnlyName('form');
+
+    expect(viewerBlock.textContent).toBe('Smith, John');
+    expect(formBlock.textContent).toBe('Smith, John');
+    expect(viewerBlock.textContent).not.toContain('lastName');
+  });
+
   it('renders the resolved content snapshot for a read-only field that still has variables', async () => {
     // A read-only MVT can keep its variables while content holds the already-substituted text
     // (e.g. the jsx-invoice "locked" pattern). That snapshot must render, not the raw template.

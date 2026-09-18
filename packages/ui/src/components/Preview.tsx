@@ -7,7 +7,7 @@ import {
   getDynamicTemplate,
   getReadOnlyTableValue,
   isBlankPdf,
-  replacePlaceholders,
+  resolveReadOnlyContent,
 } from '@pdfme/common';
 import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
 import { getTextLineRange, mergeTextLineRangeValue } from '@pdfme/schemas/texts';
@@ -295,8 +295,8 @@ const Preview = ({
               schema.readOnly && schema.type === 'table'
                 ? getReadOnlyTableValue(schema, input)
                 : schema.readOnly
-                  ? replacePlaceholders({
-                      content: schema.content || '',
+                  ? resolveReadOnlyContent({
+                      schema,
                       variables: {
                         ...input,
                         totalPages: schemasList.length,

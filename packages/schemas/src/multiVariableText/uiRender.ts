@@ -17,7 +17,11 @@ import { parseInlineMarkdown } from '../text/inlineMarkdown.js';
 import { measureTextLines } from '../text/measure.js';
 import { isInlineMarkdownTextSchema, resolveFontVariant } from '../text/richText.js';
 import type { RichTextRun } from '../text/types.js';
-import { substituteVariables, substituteVariablesAsInlineMarkdownLiterals } from './helper.js';
+import {
+  resolveReadOnlyMultiVariableText,
+  substituteVariables,
+  substituteVariablesAsInlineMarkdownLiterals,
+} from './helper.js';
 import { countUniqueVariableNames, visitVariables } from './variables.js';
 import { getTextLineRange } from '../splitRange.js';
 
@@ -29,9 +33,7 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
   const renderResolvedValue = schema.readOnly === true && mode !== 'designer';
 
   const renderValue = renderResolvedValue
-    ? numVariables > 0
-      ? value
-      : text || ''
+    ? resolveReadOnlyMultiVariableText(schema, value)
     : isInlineMarkdownTextSchema(schema)
       ? substituteVariablesAsInlineMarkdownLiterals(text, value)
       : substituteVariables(text, value);

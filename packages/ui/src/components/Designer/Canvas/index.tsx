@@ -18,7 +18,7 @@ import {
   ChangeSchemas,
   BasePdf,
   isBlankPdf,
-  replacePlaceholders,
+  resolveReadOnlyContent,
 } from '@pdfme/common';
 import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
@@ -514,7 +514,11 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
               currentPage: index + 1,
             };
 
-            value = replacePlaceholders({ content, variables, schemas: schemasList });
+            value = resolveReadOnlyContent({
+              schema,
+              variables,
+              schemas: schemasList,
+            });
           }
 
           return (

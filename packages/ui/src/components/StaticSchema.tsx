@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { getReadOnlyTableValue, isBlankPdf, replacePlaceholders, Template } from '@pdfme/common';
+import {
+  getReadOnlyTableValue,
+  isBlankPdf,
+  resolveReadOnlyContent,
+  Template,
+} from '@pdfme/common';
 import Renderer from './Renderer.js';
 import { stabilizeSchemaIds } from '../helper.js';
 
@@ -31,8 +36,8 @@ const StaticSchema = (props: {
             schema.readOnly && schema.type === 'table'
               ? getReadOnlyTableValue(schema, input)
               : schema.readOnly
-                ? replacePlaceholders({
-                    content: schema.content || '',
+                ? resolveReadOnlyContent({
+                    schema,
                     variables: { ...input, totalPages, currentPage },
                     schemas,
                   })

@@ -1,6 +1,8 @@
 import {
+  resolveReadOnlyMultiVariableText,
   substituteVariables,
   substituteVariablesAsInlineMarkdownLiterals,
+  tryParseVariableMap,
   validateVariables,
 } from '../src/multiVariableText/helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from '../src/text/inlineMarkdown.js';
@@ -85,6 +87,53 @@ describe('substituteVariables', () => {
       { text: ' uses ' },
       { text: 'PDF `42`', code: true },
     ]);
+  });
+});
+
+describe('resolveReadOnlyMultiVariableText', () => {
+  const fullNameSchema = {
+    name: 'fullName',
+    type: 'multiVariableText',
+    readOnly: true,
+    text: '{lastName}, {firstName}',
+    variables: ['firstName', 'lastName'],
+    content: JSON.stringify({ lastName: 'Smith', firstName: 'John' }),
+  } as MultiVariableTextSchema;
+
+  it('substitutes schema.text from Designer variable JSON in content', () => {
+    expect(resolveReadOnlyMultiVariableText(fullNameSchema, 'lastName')).toBe('Smith, John');
+  });
+
+  it('does not treat variable JSON as an expression result', () => {
+    expect(resolveReadOnlyMultiVariableText(fullNameSchema)).not.toBe('lastName');
+    expect(tryParseVariableMap(fullNameSchema.content)).toEqual({
+      lastName: 'Smith',
+      firstName: 'John',
+    });
+  });
+
+  it('keeps jsx locked plaintext content as the resolved snapshot', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      content: 'Kumo Coffee\nAki Tanaka',
+      text: '{company}\n{name}',
+      variables: ['company', 'name'],
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe(
+      'Kumo Coffee\nAki Tanaka',
+    );
+  });
+
+  it('renders schema.text when there are no variables', () => {
+    const staticSchema = {
+      ...fullNameSchema,
+      text: 'Just static text',
+      variables: [],
+      content: '{}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(staticSchema, '{}')).toBe('Just static text');
   });
 });
 

@@ -170,6 +170,46 @@ const getMultiVariableTextField = (name: string, y: number, content: string, tex
   backgroundColor: '',
 });
 
+export const getReadOnlyMvtTemplate = (): Template => ({
+  basePdf: {
+    ...BLANK_A4_PDF,
+    staticSchema: [
+      {
+        ...getMultiVariableTextField(
+          'staticFullName',
+          10,
+          JSON.stringify({ firstName: 'John', lastName: 'Smith' }),
+          '{lastName}, {firstName}',
+        ),
+        readOnly: true,
+      },
+    ],
+  },
+  schemas: [
+    [
+      {
+        ...getMultiVariableTextField(
+          'fullName',
+          40,
+          JSON.stringify({ firstName: 'John', lastName: 'Smith' }),
+          '{lastName}, {firstName}',
+        ),
+        readOnly: true,
+      },
+      {
+        ...getMultiVariableTextField(
+          'info',
+          70,
+          JSON.stringify({ InvoiceNo: '12345', Date: '16 June 2025' }),
+          'Invoice No.{InvoiceNo}',
+        ),
+        variables: ['InvoiceNo', 'Date'],
+        readOnly: false,
+      },
+    ],
+  ],
+});
+
 export const getStaticMvtTemplate = (): Template => ({
   basePdf: {
     ...BLANK_A4_PDF,

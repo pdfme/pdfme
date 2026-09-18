@@ -478,6 +478,40 @@ describe('getDynamicTemplate', () => {
       expect(observedValues).toEqual([designerDefault]);
     });
 
+    test('should not resolve placeholders for read-only multiVariableText content', async () => {
+      const content = JSON.stringify({ lastName: 'Smith', firstName: 'John' });
+      const observedValues: string[] = [];
+
+      await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'fullName',
+                content,
+                type: 'multiVariableText',
+                readOnly: true,
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input: {},
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          observedValues.push(value);
+          return [args.schema.height];
+        },
+      });
+
+      expect(observedValues).toEqual([content]);
+      expect(observedValues[0]).not.toBe('lastName');
+    });
+
     test('should apply schema-specific split patches without letting them override layout', async () => {
       const dynamicTemplate = await getDynamicTemplate({
         template: {
