@@ -5,6 +5,7 @@ import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../..
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
 import {
+  BLANK_A4_PDF,
   getDefaultFont,
   isBlankPdf,
   PAGE_SIZE_PRESETS,
@@ -21,11 +22,12 @@ import {
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image, multiVariableText } from '@pdfme/schemas';
+import { text, image, multiVariableText, table } from '@pdfme/schemas';
 import * as uiHelper from '../../src/helper';
 
 const plugins = { text, image };
 const mvtPlugins = { text, image, multiVariableText };
+const tablePlugins = { text, image, table };
 
 let restoreClientSizeMock: (() => void) | undefined;
 let uuidSeq = 0;
@@ -550,4 +552,78 @@ test('Designer can recover from unmatched braces through in-place editing', asyn
     if (originalElementFromPoint) document.elementFromPoint = originalElementFromPoint;
     else Reflect.deleteProperty(document, 'elementFromPoint');
   }
+});
+
+const getReadOnlyTableWithExprTemplate = (): Template => ({
+  basePdf: {
+    ...BLANK_A4_PDF,
+    staticSchema: [
+      {
+        ...structuredClone(table.propPanel.defaultSchema),
+        name: 'staticTable',
+        type: 'table',
+        readOnly: true,
+        content: JSON.stringify([['{1+1}', '{name}']]),
+        position: { x: 20, y: 200 },
+        width: 170,
+        height: 30,
+        showHead: true,
+        head: ['Expr', 'Name'],
+        headWidthPercentages: [50, 50],
+      },
+    ],
+  },
+  schemas: [
+    [
+      {
+        ...structuredClone(table.propPanel.defaultSchema),
+        name: 'table',
+        type: 'table',
+        readOnly: true,
+        content: JSON.stringify([['{1+1}', '{name}']]),
+        position: { x: 20, y: 40 },
+        width: 170,
+        height: 40,
+        showHead: true,
+        head: ['Expr', 'Name'],
+        headWidthPercentages: [50, 50],
+      },
+    ],
+  ],
+});
+
+test('Designer keeps {1+1} literal in readOnly table cells', async () => {
+  setupUIMock();
+  mockStableUuids();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(tablePlugins)}>
+          <Designer
+            template={getReadOnlyTableWithExprTemplate()}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'table')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  const pageTable = getSelectableByTitle(container, 'table');
+  expect(pageTable).toHaveTextContent('{1+1}');
+  expect(pageTable).toHaveTextContent('{name}');
+
+  const staticTable = container.querySelector('[title="staticTable"]');
+  expect(staticTable).toBeInTheDocument();
+  expect(staticTable).toHaveTextContent('{1+1}');
+  expect(staticTable).toHaveTextContent('{name}');
 });
