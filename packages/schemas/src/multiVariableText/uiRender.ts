@@ -58,9 +58,13 @@ export const uiRender = async (arg: UIRenderProps<MultiVariableTextSchema>) => {
     ...rest,
   });
 
-  const textBlock = rootElement.querySelector('#text-' + String(schema.id)) as HTMLDivElement;
+  const textBlock = rootElement.querySelector(
+    '#text-' + String(schema.id),
+  ) as HTMLDivElement | null;
   if (!textBlock) {
-    throw new Error('Text block not found. Ensure the text block has an id of "text-" + schema.id');
+    // Static overlays and interrupted rerenders can drop #text-{id}. Skip instead of
+    // throwing so Designer/Viewer/Form stay usable; designer keyup attaches next render.
+    return;
   }
 
   if (mode === 'designer') {
