@@ -40,14 +40,33 @@ interface LayoutItem {
 const getContentHeight = (basePdf: BlankPdf): number =>
   basePdf.height - basePdf.padding[0] - basePdf.padding[2];
 
+/**
+ * Resolve a readOnly table body.
+ * Uses input[schema.name] when present (array or JSON string) and never runs
+ * replacePlaceholders. Falls back to schema.content (Designer sample).
+ */
+export const getReadOnlyTableValue = (schema: Schema, input?: Record<string, unknown>): string => {
+  if (input && Object.prototype.hasOwnProperty.call(input, schema.name)) {
+    const value = input[schema.name];
+    if (value !== undefined && value !== null) {
+      return typeof value === 'string' ? value : JSON.stringify(value);
+    }
+  }
+  return schema.content || '';
+};
+
 /** Get the input value for a schema */
-const getSchemaValue = (
+export const getSchemaValue = (
   schema: Schema,
   input: Record<string, string>,
   schemas: Schema[][],
 ): string => {
   if (!schema.readOnly) {
     return input?.[schema.name] || '';
+  }
+
+  if (schema.type === 'table') {
+    return getReadOnlyTableValue(schema, input);
   }
 
   if (schema.type !== 'text' && schema.type !== 'multiVariableText') {

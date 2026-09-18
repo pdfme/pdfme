@@ -1,9 +1,16 @@
 import * as pdfLib from '@pdfme/pdf-lib';
-import type { GenerateProps, GeneratorOptions, Schema, PDFRenderProps, Template } from '@pdfme/common';
+import type {
+  GenerateProps,
+  GeneratorOptions,
+  Schema,
+  PDFRenderProps,
+  Template,
+} from '@pdfme/common';
 import {
   checkGenerateProps,
   applyInternalLinkAnnotations,
   getDynamicTemplate,
+  getReadOnlyTableValue,
   isBlankPdf,
   replacePlaceholders,
   pt2mm,
@@ -182,13 +189,16 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
           if (!render) {
             continue;
           }
-          const value = staticSchema.readOnly
-            ? replacePlaceholders({
-                content: staticSchema.content || '',
-                variables,
-                schemas,
-              })
-            : staticSchema.content || '';
+          const value =
+            staticSchema.readOnly && staticSchema.type === 'table'
+              ? getReadOnlyTableValue(staticSchema, input)
+              : staticSchema.readOnly
+                ? replacePlaceholders({
+                    content: staticSchema.content || '',
+                    variables,
+                    schemas,
+                  })
+                : staticSchema.content || '';
 
           const adjustedStaticSchema = getAdjustedSchema(
             staticSchema,
@@ -227,13 +237,16 @@ const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> 
         if (!render) {
           continue;
         }
-        const value: string = schema.readOnly
-          ? replacePlaceholders({
-              content: schema.content || '',
-              variables,
-              schemas,
-            })
-          : ((input[name] || '') as string);
+        const value: string =
+          schema.readOnly && schema.type === 'table'
+            ? getReadOnlyTableValue(schema, input)
+            : schema.readOnly
+              ? replacePlaceholders({
+                  content: schema.content || '',
+                  variables,
+                  schemas,
+                })
+              : ((input[name] || '') as string);
 
         const adjustedSchema = getAdjustedSchema(schema, boundingBoxLeft, boundingBoxBottom);
         registerSchemaAnchor(_cache, adjustedSchema, page);

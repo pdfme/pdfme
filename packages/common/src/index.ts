@@ -82,7 +82,7 @@ import {
   applyInternalLinkAnnotations,
 } from './helper.js';
 import { PAGE_SIZE_PRESETS, detectPaperSize, resolvePageSize } from './pageSize.js';
-import { getDynamicTemplate } from './dynamicTemplate.js';
+import { getDynamicTemplate, getReadOnlyTableValue, getSchemaValue } from './dynamicTemplate.js';
 import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './splitRange.js';
 import { replacePlaceholders } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
@@ -110,6 +110,8 @@ export {
   getInputFromTemplate,
   isBlankPdf,
   getDynamicTemplate,
+  getReadOnlyTableValue,
+  getSchemaValue,
   replacePlaceholders,
   checkFont,
   checkInputs,

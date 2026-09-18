@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { isBlankPdf, replacePlaceholders, Template } from '@pdfme/common';
+import { getReadOnlyTableValue, isBlankPdf, replacePlaceholders, Template } from '@pdfme/common';
 import Renderer from './Renderer.js';
 import { stabilizeSchemaIds } from '../helper.js';
 
@@ -28,13 +28,15 @@ const StaticSchema = (props: {
           schema={schema}
           basePdf={basePdf}
           value={
-            schema.readOnly
-              ? replacePlaceholders({
-                  content: schema.content || '',
-                  variables: { ...input, totalPages, currentPage },
-                  schemas,
-                })
-              : schema.content || ''
+            schema.readOnly && schema.type === 'table'
+              ? getReadOnlyTableValue(schema, input)
+              : schema.readOnly
+                ? replacePlaceholders({
+                    content: schema.content || '',
+                    variables: { ...input, totalPages, currentPage },
+                    schemas,
+                  })
+                : schema.content || ''
           }
           onChangeHoveringSchemaId={() => {
             void 0;

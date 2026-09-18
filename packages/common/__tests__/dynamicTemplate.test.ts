@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getDynamicTemplate } from '../src/dynamicTemplate.js';
+import {
+  getDynamicTemplate,
+  getReadOnlyTableValue,
+  getSchemaValue,
+} from '../src/dynamicTemplate.js';
 import { Template, Schema, Font } from '../src/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -398,6 +402,82 @@ describe('getDynamicTemplate', () => {
       expect(observedValues).toEqual([content]);
     });
 
+    test('should use input[name] for read-only tables when present', async () => {
+      const designerDefault = JSON.stringify([
+        ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
+        ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
+      ]);
+      const rows = [
+        ['Max', 'Cityname', 'he lives here'],
+        ['Angela', 'Othercityname', 'she used to live here'],
+      ];
+      const observedValues: string[] = [];
+
+      await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'table',
+                content: designerDefault,
+                type: 'table',
+                readOnly: true,
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input: { table: JSON.stringify(rows) },
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          observedValues.push(value);
+          return [args.schema.height];
+        },
+      });
+
+      expect(observedValues).toEqual([JSON.stringify(rows)]);
+    });
+
+    test('should keep Designer sample content when a read-only table has no input', async () => {
+      const designerDefault = JSON.stringify([
+        ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
+        ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
+      ]);
+      const observedValues: string[] = [];
+
+      await getDynamicTemplate({
+        template: {
+          schemas: [
+            [
+              {
+                name: 'table',
+                content: designerDefault,
+                type: 'table',
+                readOnly: true,
+                position: { x: 10, y: 10 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+          basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+        },
+        input: {},
+        options,
+        _cache: new Map(),
+        getDynamicHeights: async (value: string, args: { schema: Schema }) => {
+          observedValues.push(value);
+          return [args.schema.height];
+        },
+      });
+
+      expect(observedValues).toEqual([designerDefault]);
+    });
+
     test('should apply schema-specific split patches without letting them override layout', async () => {
       const dynamicTemplate = await getDynamicTemplate({
         template: {
@@ -612,5 +692,76 @@ describe('getDynamicTemplate', () => {
       // Text should be pushed down: original y=30 + (40-10) offset = 60
       expect(text!.position.y).toBe(60);
     });
+  });
+});
+
+describe('getSchemaValue / getReadOnlyTableValue (#1299)', () => {
+  const designerDefault = JSON.stringify([
+    ['Alice', 'New York', 'Alice is a freelance web designer and developer'],
+    ['Bob', 'Paris', 'Bob is a freelance illustrator and graphic designer'],
+  ]);
+  const rows = [
+    ['Max', 'Cityname', 'he lives here'],
+    ['Angela', 'Othercityname', 'she used to live here'],
+  ];
+  const tableSchema: Schema = {
+    name: 'table',
+    type: 'table',
+    readOnly: true,
+    content: designerDefault,
+    position: { x: 20, y: 40 },
+    width: 170,
+    height: 40,
+  };
+  const schemas = [[tableSchema]];
+
+  test('uses input[name] for a read-only table when the value is a JSON string', () => {
+    expect(getSchemaValue(tableSchema, { table: JSON.stringify(rows) }, schemas)).toBe(
+      JSON.stringify(rows),
+    );
+  });
+
+  test('passes an input array through as JSON without String(array)', () => {
+    expect(getReadOnlyTableValue(tableSchema, { table: rows })).toBe(JSON.stringify(rows));
+    expect(getReadOnlyTableValue(tableSchema, { table: rows })).not.toBe(String(rows));
+  });
+
+  test('does not evaluate content placeholders such as {table}', () => {
+    const schema = { ...tableSchema, content: '{table}' };
+    expect(getSchemaValue(schema, { table: JSON.stringify(rows) }, [[schema]])).toBe(
+      JSON.stringify(rows),
+    );
+    expect(getReadOnlyTableValue(schema, { table: rows })).toBe(JSON.stringify(rows));
+  });
+
+  test('keeps Designer sample content when input[name] is missing', () => {
+    expect(getSchemaValue(tableSchema, {}, schemas)).toBe(designerDefault);
+    expect(getReadOnlyTableValue(tableSchema, {})).toBe(designerDefault);
+  });
+
+  test('does not substitute {name} inside read-only table JSON cells', () => {
+    const content = JSON.stringify([['{name}']]);
+    const schema = { ...tableSchema, content };
+    expect(getSchemaValue(schema, { name: 'PDFme' }, [[schema]])).toBe(content);
+  });
+
+  test('leaves editable tables on input[name]', () => {
+    const schema = { ...tableSchema, readOnly: false };
+    expect(getSchemaValue(schema, { table: JSON.stringify(rows) }, [[schema]])).toBe(
+      JSON.stringify(rows),
+    );
+  });
+
+  test('still resolves placeholders for read-only text', () => {
+    const schema: Schema = {
+      name: 'label',
+      type: 'text',
+      readOnly: true,
+      content: 'Hello {name}',
+      position: { x: 10, y: 10 },
+      width: 80,
+      height: 10,
+    };
+    expect(getSchemaValue(schema, { name: 'PDFme' }, [[schema]])).toBe('Hello PDFme');
   });
 });

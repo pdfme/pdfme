@@ -5,6 +5,7 @@ import {
   PreviewProps,
   Size,
   getDynamicTemplate,
+  getReadOnlyTableValue,
   isBlankPdf,
   replacePlaceholders,
 } from '@pdfme/common';
@@ -290,13 +291,20 @@ const Preview = ({
             const hasInputValue = Boolean(
               input && Object.prototype.hasOwnProperty.call(input, schema.name),
             );
-            const value = schema.readOnly
-              ? replacePlaceholders({
-                  content: schema.content || '',
-                  variables: { ...input, totalPages: schemasList.length, currentPage: index + 1 },
-                  schemas: schemasList,
-                })
-              : String(hasInputValue ? (input?.[schema.name] ?? '') : '');
+            const value =
+              schema.readOnly && schema.type === 'table'
+                ? getReadOnlyTableValue(schema, input)
+                : schema.readOnly
+                  ? replacePlaceholders({
+                      content: schema.content || '',
+                      variables: {
+                        ...input,
+                        totalPages: schemasList.length,
+                        currentPage: index + 1,
+                      },
+                      schemas: schemasList,
+                    })
+                  : String(hasInputValue ? (input?.[schema.name] ?? '') : '');
             return (
               <Renderer
                 key={schema.id}
