@@ -764,6 +764,153 @@ describe('validate command', () => {
     );
   });
 
+  it('includes readOnly tables in input hints and EVALIDATE, including staticSchema', () => {
+    const tableSchema = {
+      name: 'table',
+      type: 'table',
+      readOnly: true,
+      content: JSON.stringify([
+        ['Alice', 'New York'],
+        ['Bob', 'Paris'],
+      ]),
+      head: ['Name', 'City'],
+      headWidthPercentages: [50, 50],
+      tableStyles: { borderWidth: 0.3, borderColor: '#000000' },
+      headStyles: {
+        fontSize: 10,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#ffffff',
+        backgroundColor: '#2980ba',
+        borderColor: '',
+        borderWidth: { top: 0, right: 0, bottom: 0, left: 0 },
+        padding: { top: 5, right: 5, bottom: 5, left: 5 },
+        alignment: 'left',
+        verticalAlignment: 'middle',
+      },
+      bodyStyles: {
+        fontSize: 10,
+        lineHeight: 1,
+        characterSpacing: 0,
+        fontColor: '#000000',
+        backgroundColor: '',
+        alternateBackgroundColor: '#f5f5f5',
+        borderColor: '#888888',
+        borderWidth: { top: 0.1, right: 0.1, bottom: 0.1, left: 0.1 },
+        padding: { top: 5, right: 5, bottom: 5, left: 5 },
+        alignment: 'left',
+        verticalAlignment: 'middle',
+      },
+      columnStyles: {},
+      position: { x: 20, y: 40 },
+      width: 170,
+      height: 40,
+    };
+    const readOnlyLabel = {
+      name: 'title',
+      type: 'text',
+      readOnly: true,
+      content: 'Invoice',
+      position: { x: 20, y: 20 },
+      width: 170,
+      height: 10,
+    };
+
+    const pageTableFile = join(TMP, 'job-readonly-table-page.json');
+    writeFileSync(
+      pageTableFile,
+      JSON.stringify({
+        template: {
+          basePdf: a4BasePdf(),
+          schemas: [[{ ...tableSchema }, readOnlyLabel]],
+        },
+        inputs: [{ table: '{table}' }],
+      }),
+    );
+
+    const pageResult = runCli(['validate', pageTableFile, '--json']);
+    expect(pageResult.exitCode).toBe(1);
+    const pageParsed = JSON.parse(pageResult.stdout);
+    expect(pageParsed.inputHints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'table',
+          type: 'table',
+          pages: [1],
+          expectedInput: expect.objectContaining({
+            kind: 'stringMatrix',
+            acceptsJsonString: true,
+            columnCount: 2,
+          }),
+        }),
+      ]),
+    );
+    expect(pageParsed.inputHints).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: 'title', type: 'text' })]),
+    );
+    expect(pageParsed.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('Field "table" (table)')]),
+    );
+
+    const missingInputFile = join(TMP, 'job-readonly-table-missing.json');
+    writeFileSync(
+      missingInputFile,
+      JSON.stringify({
+        template: {
+          basePdf: a4BasePdf(),
+          schemas: [[{ ...tableSchema }]],
+        },
+        inputs: [{}],
+      }),
+    );
+    const missingResult = runCli(['validate', missingInputFile, '--json']);
+    expect(missingResult.exitCode).toBe(0);
+
+    const staticTableFile = join(TMP, 'job-readonly-table-static.json');
+    writeFileSync(
+      staticTableFile,
+      JSON.stringify({
+        template: {
+          basePdf: {
+            ...a4BasePdf(),
+            staticSchema: [{ ...tableSchema, name: 'staticTable' }],
+          },
+          schemas: [
+            [
+              {
+                name: 'note',
+                type: 'text',
+                position: { x: 20, y: 20 },
+                width: 80,
+                height: 10,
+              },
+            ],
+          ],
+        },
+        inputs: [{ note: 'ok', staticTable: '{table}' }],
+      }),
+    );
+    const staticResult = runCli(['validate', staticTableFile, '--json']);
+    expect(staticResult.exitCode).toBe(1);
+    const staticParsed = JSON.parse(staticResult.stdout);
+    expect(staticParsed.inputHints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: 'staticTable',
+          type: 'table',
+          pages: [1],
+          expectedInput: expect.objectContaining({
+            kind: 'stringMatrix',
+            acceptsJsonString: true,
+          }),
+        }),
+      ]),
+    );
+    expect(staticParsed.errors).toEqual(
+      expect.arrayContaining([expect.stringContaining('Field "staticTable" (table)')]),
+    );
+  });
+
   it('accepts list input as an array, JSON string array, or newline string', () => {
     const file = join(TMP, 'job-valid-list.json');
     const listSchema = {
