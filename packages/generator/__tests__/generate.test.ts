@@ -5,7 +5,7 @@ import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
-import { text } from '@pdfme/schemas';
+import { multiVariableText, text } from '@pdfme/schemas';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -608,5 +608,93 @@ describe('malformed placeholders (#1309)', () => {
       // A short missing literal affects fewer pixels than the usual full-page tolerance.
       allowedPixelRatio: 0,
     });
+  });
+});
+
+describe('read-only multiVariableText (#1345)', () => {
+  test('renders substituted schema.text instead of the JSON key', async () => {
+    const incoming: Array<{ name: string; value: string }> = [];
+    const drawn: string[] = [];
+    const wrappingMvt: Plugin = {
+      ...multiVariableText,
+      pdf: async (props) => {
+        incoming.push({ name: props.schema.name, value: props.value });
+        const originalDrawText = props.page.drawText.bind(props.page);
+        props.page.drawText = ((text: string, options?: Parameters<typeof originalDrawText>[1]) => {
+          drawn.push(text);
+          return originalDrawText(text, options);
+        }) as typeof props.page.drawText;
+        await multiVariableText.pdf(props);
+      },
+    };
+
+    const pdf = await generate({
+      template: {
+        basePdf: {
+          width: 210,
+          height: 297,
+          padding: [10, 10, 10, 10],
+          staticSchema: [
+            {
+              name: 'staticFullName',
+              type: 'multiVariableText',
+              readOnly: true,
+              text: '{lastName}, {firstName}',
+              variables: ['firstName', 'lastName'],
+              content: JSON.stringify({ lastName: 'Smith', firstName: 'John' }),
+              position: { x: 10, y: 250 },
+              width: 120,
+              height: 10,
+              fontSize: 10,
+            },
+          ],
+        },
+        schemas: [
+          [
+            {
+              name: 'fullName',
+              type: 'multiVariableText',
+              readOnly: true,
+              text: '{lastName}, {firstName}',
+              variables: ['firstName', 'lastName'],
+              content: JSON.stringify({ lastName: 'Smith', firstName: 'John' }),
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 10,
+              fontSize: 12,
+            },
+            {
+              name: 'info',
+              type: 'multiVariableText',
+              readOnly: false,
+              text: 'Invoice No.{InvoiceNo}',
+              variables: ['InvoiceNo', 'Date'],
+              content: JSON.stringify({ InvoiceNo: '00000', Date: 'unused' }),
+              position: { x: 10, y: 25 },
+              width: 80,
+              height: 10,
+              fontSize: 12,
+            },
+          ],
+        ],
+      },
+      inputs: [{ info: JSON.stringify({ InvoiceNo: '12345', Date: '16 June 2025' }) }],
+      options: { font: getFont() },
+      plugins: { multiVariableText: wrappingMvt },
+    });
+
+    const incomingByName = Object.fromEntries(incoming.map((item) => [item.name, item.value]));
+    const variableJson = JSON.stringify({ lastName: 'Smith', firstName: 'John' });
+    expect(incomingByName.fullName).toBe(variableJson);
+    expect(incomingByName.staticFullName).toBe(variableJson);
+    expect(incomingByName.info).toBe(JSON.stringify({ InvoiceNo: '12345', Date: '16 June 2025' }));
+    expect(Object.values(incomingByName)).not.toContain('lastName');
+    expect(drawn.join('\n')).toContain('Smith, John');
+    expect(drawn.join('\n')).toContain('Invoice No.12345');
+    expect(drawn.join('\n')).not.toContain('lastName');
+
+    const pdfDoc = await PDFDocument.load(pdf);
+    expect(pdfDoc.getPageCount()).toBe(1);
+    expect(pdf.byteLength).toBeGreaterThan(1000);
   });
 });

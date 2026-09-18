@@ -1,6 +1,6 @@
 import * as acorn from 'acorn';
 import type { Node as AcornNode, Identifier, Property } from 'estree';
-import type { SchemaPageArray } from './types.js';
+import type { Schema, SchemaPageArray } from './types.js';
 
 const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
 
@@ -431,6 +431,28 @@ const evaluatePlaceholders = (arg: {
   }
 
   return resultContent;
+};
+
+/**
+ * Resolve a read-only schema's render value.
+ * Text `content` is an expression template. MVT `content` is a variable JSON
+ * map and must not go through {@link replacePlaceholders}. Other types (table,
+ * image, …) keep the previous generate/UI behavior of evaluating expressions.
+ */
+export const resolveReadOnlyContent = (arg: {
+  schema: Schema;
+  variables: Record<string, unknown>;
+  schemas: SchemaPageArray;
+}): string => {
+  const content = arg.schema.content || '';
+  if (arg.schema.type === 'multiVariableText') {
+    return content;
+  }
+  return replacePlaceholders({
+    content,
+    variables: arg.variables,
+    schemas: arg.schemas,
+  });
 };
 
 export const replacePlaceholders = (arg: {

@@ -1,6 +1,8 @@
 import {
+  resolveReadOnlyMultiVariableText,
   substituteVariables,
   substituteVariablesAsInlineMarkdownLiterals,
+  tryParseVariableMap,
   validateVariables,
 } from '../src/multiVariableText/helper.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from '../src/text/inlineMarkdown.js';
@@ -85,6 +87,132 @@ describe('substituteVariables', () => {
       { text: ' uses ' },
       { text: 'PDF `42`', code: true },
     ]);
+  });
+});
+
+describe('resolveReadOnlyMultiVariableText', () => {
+  const fullNameSchema = {
+    name: 'fullName',
+    type: 'multiVariableText',
+    readOnly: true,
+    text: '{lastName}, {firstName}',
+    variables: ['firstName', 'lastName'],
+    content: JSON.stringify({ lastName: 'Smith', firstName: 'John' }),
+  } as MultiVariableTextSchema;
+
+  it('substitutes schema.text from Designer variable JSON in content', () => {
+    expect(resolveReadOnlyMultiVariableText(fullNameSchema, 'lastName')).toBe('Smith, John');
+  });
+
+  it('substitutes Designer variable JSON even when keys match a JSON snapshot shape', () => {
+    const designer = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(designer)).toBe('Acme');
+  });
+
+  it('does not treat variable JSON as an expression result', () => {
+    expect(resolveReadOnlyMultiVariableText(fullNameSchema)).not.toBe('lastName');
+    expect(tryParseVariableMap(fullNameSchema.content)).toEqual({
+      lastName: 'Smith',
+      firstName: 'John',
+    });
+  });
+
+  it('keeps jsx locked plaintext content as the resolved snapshot', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      content: 'Kumo Coffee\nAki Tanaka',
+      text: '{company}\n{name}',
+      variables: ['company', 'name'],
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe(
+      'Kumo Coffee\nAki Tanaka',
+    );
+  });
+
+  it('keeps a JSON object snapshot that is not Designer variable data', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"name":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, 'name')).toBe('{"name":"Acme"}');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe('{"name":"Acme"}');
+  });
+
+  it('keeps an empty JSON object snapshot instead of substituting schema.text', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, '{}')).toBe('{}');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).toBe('{}');
+  });
+
+  it('keeps a JSON snapshot whose keys match schema.variables', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe(
+      '{"payload":"Acme"}',
+    );
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).not.toBe('Acme');
+  });
+
+  it('keeps an empty-string snapshot instead of falling back to schema.text', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, '')).toBe('');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).toBe('');
+    expect(resolveReadOnlyMultiVariableText(jsxLocked)).not.toBe('{payload}');
+  });
+
+  it('still substitutes Designer variable JSON when a value is an empty string', () => {
+    const designer = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":""}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(designer)).toBe('');
+    expect(resolveReadOnlyMultiVariableText(designer)).not.toBe('{payload}');
+  });
+
+  it('renders schema.text when there are no variables', () => {
+    const staticSchema = {
+      ...fullNameSchema,
+      text: 'Just static text',
+      variables: [],
+      content: '{}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(staticSchema, '{}')).toBe('Just static text');
   });
 });
 

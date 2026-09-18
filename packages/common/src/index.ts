@@ -84,7 +84,7 @@ import {
 import { PAGE_SIZE_PRESETS, detectPaperSize, resolvePageSize } from './pageSize.js';
 import { getDynamicTemplate, getReadOnlyTableValue, getSchemaValue } from './dynamicTemplate.js';
 import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './splitRange.js';
-import { replacePlaceholders } from './expression.js';
+import { replacePlaceholders, resolveReadOnlyContent } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
 
 export {
@@ -113,6 +113,7 @@ export {
   getReadOnlyTableValue,
   getSchemaValue,
   replacePlaceholders,
+  resolveReadOnlyContent,
   checkFont,
   checkInputs,
   checkUIOptions,

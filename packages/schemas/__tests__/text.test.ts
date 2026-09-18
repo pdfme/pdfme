@@ -648,6 +648,31 @@ describe('text dynamic layout', () => {
 
     expect(result.heights[0]).toBeGreaterThan(5);
   });
+
+  it('expands read-only multiVariableText from variable JSON instead of an expression key', async () => {
+    const schema = {
+      ...getTextSchema(),
+      name: 'fullName',
+      type: 'multiVariableText',
+      readOnly: true,
+      height: 5,
+      width: 20,
+      overflow: 'expand',
+      text: '{lastName}, {firstName}',
+      variables: ['firstName', 'lastName'],
+      content: JSON.stringify({
+        lastName: 'Smith',
+        firstName: 'John '.repeat(40).trim(),
+      }),
+    } as MultiVariableTextSchema;
+
+    const result = await getDynamicLayoutForMultiVariableText('lastName', {
+      ...baseArgs,
+      schema,
+    });
+
+    expect(result.heights[0]).toBeGreaterThan(5);
+  });
 });
 
 describe('layoutRichTextLines', () => {

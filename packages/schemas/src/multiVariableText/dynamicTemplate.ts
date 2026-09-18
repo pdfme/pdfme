@@ -9,6 +9,7 @@ import {
 import { isInlineMarkdownTextSchema } from '../text/richText.js';
 import type { MultiVariableTextSchema } from './types.js';
 import {
+  resolveReadOnlyMultiVariableText,
   substituteVariables,
   substituteVariablesAsInlineMarkdownLiterals,
   validateVariables,
@@ -26,8 +27,10 @@ export const getDynamicLayoutForMultiVariableText = async (
     return { heights: [schema.height] };
   }
 
-  let renderValue = schema.readOnly && schema.variables.length === 0 ? schema.text || '' : value;
-  if (!schema.readOnly) {
+  let renderValue: string;
+  if (schema.readOnly) {
+    renderValue = resolveReadOnlyMultiVariableText(schema, value);
+  } else {
     if (!validateVariables(value, schema)) {
       return { heights: [schema.height] };
     }

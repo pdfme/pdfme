@@ -2,6 +2,7 @@ import { PDFRenderProps } from '@pdfme/common';
 import { MultiVariableTextSchema } from './types.js';
 import { pdfRender as parentPdfRender } from '../text/pdfRender.js';
 import {
+  resolveReadOnlyMultiVariableText,
   substituteVariables,
   substituteVariablesAsInlineMarkdownLiterals,
   validateVariables,
@@ -12,8 +13,11 @@ export const pdfRender = async (arg: PDFRenderProps<MultiVariableTextSchema>) =>
   const { value, schema, ...rest } = arg;
 
   if (schema.readOnly) {
-    const readOnlyValue = schema.variables.length > 0 ? value : schema.text || '';
-    await parentPdfRender({ value: readOnlyValue, schema, ...rest });
+    await parentPdfRender({
+      value: resolveReadOnlyMultiVariableText(schema, value),
+      schema,
+      ...rest,
+    });
     return;
   }
 
