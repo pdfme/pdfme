@@ -146,18 +146,20 @@ const getOffscreenCanvasCtor = () =>
 /**
  * Pick a barcode renderer from capabilities, not `typeof window`.
  * Browser Workers have neither `window` nor Node's `bwip-js.toBuffer()`.
+ * OffscreenCanvas without `toCanvas()` (Node bwip-js export) falls back to `toBuffer()`.
  */
 export const resolveBarcodeRenderRuntime = (): BarcodeRenderRuntime => {
   const doc = getDocument();
+  const renderer = getBwipJsRenderer();
   if (doc && typeof doc.createElement === 'function') {
     return 'document-canvas';
   }
 
-  if (typeof getOffscreenCanvasCtor() === 'function') {
+  if (typeof getOffscreenCanvasCtor() === 'function' && typeof renderer.toCanvas === 'function') {
     return 'offscreencanvas';
   }
 
-  if (typeof getBwipJsRenderer().toBuffer === 'function') {
+  if (typeof renderer.toBuffer === 'function') {
     return 'node-buffer';
   }
 

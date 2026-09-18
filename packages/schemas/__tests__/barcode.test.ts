@@ -376,7 +376,7 @@ describe('resolveBarcodeRenderRuntime', () => {
     expect(resolveBarcodeRenderRuntime()).toBe('node-buffer');
   });
 
-  test('uses offscreencanvas when document is absent and OffscreenCanvas exists', () => {
+  test('falls back to node-buffer when OffscreenCanvas exists but toCanvas is missing', async () => {
     vi.stubGlobal(
       'OffscreenCanvas',
       class {
@@ -386,7 +386,19 @@ describe('resolveBarcodeRenderRuntime', () => {
         ) {}
       },
     );
-    expect(resolveBarcodeRenderRuntime()).toBe('offscreencanvas');
+    expect(resolveBarcodeRenderRuntime()).toBe('node-buffer');
+
+    const buffer = await createBarCode({
+      type: 'qrcode',
+      input: 'https://pdfme.com/node-export',
+      width: 10,
+      height: 10,
+      backgroundColor: '00000000',
+    });
+    const png = PNG.sync.read(buffer);
+    const qr = jsQR(new Uint8ClampedArray(png.data), png.width, png.height) as QRCode;
+    expect(qr).not.toBeNull();
+    expect(Buffer.from(qr.binaryData).toString('utf8')).toEqual('https://pdfme.com/node-export');
   });
 
   test('prefers document-canvas when both document and OffscreenCanvas exist', () => {
