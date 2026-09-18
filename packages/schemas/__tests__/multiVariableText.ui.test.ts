@@ -699,6 +699,7 @@ describe('multiVariableText without variables', () => {
       text: '{payload}',
       variables: ['payload'],
       readOnly: true,
+      contentSnapshot: true,
       content: '{"name":"Acme"}',
       textFormat: 'plain',
     };
@@ -718,6 +719,33 @@ describe('multiVariableText without variables', () => {
     expect(textBlock.textContent).not.toBe('Acme');
   });
 
+  it('renders a JSON snapshot whose keys match schema.variables', async () => {
+    const rootElement = document.createElement('div');
+    const schema: MultiVariableTextSchema = {
+      ...getSchema(),
+      text: '{payload}',
+      variables: ['payload'],
+      readOnly: true,
+      contentSnapshot: true,
+      content: '{"payload":"Acme"}',
+      textFormat: 'plain',
+    };
+
+    await uiRender({
+      value: schema.content,
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font: getSampleFont() },
+      _cache: new Map(),
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.textContent).toBe('{"payload":"Acme"}');
+    expect(textBlock.textContent).not.toBe('Acme');
+  });
+
   it('renders an empty JSON object snapshot instead of an empty substitution', async () => {
     const rootElement = document.createElement('div');
     const schema: MultiVariableTextSchema = {
@@ -725,6 +753,7 @@ describe('multiVariableText without variables', () => {
       text: '{payload}',
       variables: ['payload'],
       readOnly: true,
+      contentSnapshot: true,
       content: '{}',
       textFormat: 'plain',
     };
@@ -752,6 +781,7 @@ describe('multiVariableText without variables', () => {
       text: '{company}\n{name}',
       variables: ['company', 'name'],
       readOnly: true,
+      contentSnapshot: true,
       content: 'Kumo Coffee\nAki Tanaka',
       textFormat: 'plain',
     };

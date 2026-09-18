@@ -104,6 +104,17 @@ describe('resolveReadOnlyMultiVariableText', () => {
     expect(resolveReadOnlyMultiVariableText(fullNameSchema, 'lastName')).toBe('Smith, John');
   });
 
+  it('substitutes Designer variable JSON even when keys match a JSON snapshot shape', () => {
+    const designer = {
+      ...fullNameSchema,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(designer)).toBe('Acme');
+  });
+
   it('does not treat variable JSON as an expression result', () => {
     expect(resolveReadOnlyMultiVariableText(fullNameSchema)).not.toBe('lastName');
     expect(tryParseVariableMap(fullNameSchema.content)).toEqual({
@@ -115,6 +126,7 @@ describe('resolveReadOnlyMultiVariableText', () => {
   it('keeps jsx locked plaintext content as the resolved snapshot', () => {
     const jsxLocked = {
       ...fullNameSchema,
+      contentSnapshot: true,
       content: 'Kumo Coffee\nAki Tanaka',
       text: '{company}\n{name}',
       variables: ['company', 'name'],
@@ -128,6 +140,7 @@ describe('resolveReadOnlyMultiVariableText', () => {
   it('keeps a JSON object snapshot that is not Designer variable data', () => {
     const jsxLocked = {
       ...fullNameSchema,
+      contentSnapshot: true,
       text: '{payload}',
       variables: ['payload'],
       content: '{"name":"Acme"}',
@@ -140,6 +153,7 @@ describe('resolveReadOnlyMultiVariableText', () => {
   it('keeps an empty JSON object snapshot instead of substituting schema.text', () => {
     const jsxLocked = {
       ...fullNameSchema,
+      contentSnapshot: true,
       text: '{payload}',
       variables: ['payload'],
       content: '{}',
@@ -147,6 +161,21 @@ describe('resolveReadOnlyMultiVariableText', () => {
 
     expect(resolveReadOnlyMultiVariableText(jsxLocked, '{}')).toBe('{}');
     expect(resolveReadOnlyMultiVariableText(jsxLocked)).toBe('{}');
+  });
+
+  it('keeps a JSON snapshot whose keys match schema.variables', () => {
+    const jsxLocked = {
+      ...fullNameSchema,
+      contentSnapshot: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: '{"payload":"Acme"}',
+    } as MultiVariableTextSchema;
+
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).toBe(
+      '{"payload":"Acme"}',
+    );
+    expect(resolveReadOnlyMultiVariableText(jsxLocked, jsxLocked.content)).not.toBe('Acme');
   });
 
   it('renders schema.text when there are no variables', () => {

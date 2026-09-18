@@ -140,11 +140,32 @@ describe('@pdfme/jsx renderToTemplate', () => {
       type: 'multiVariableText',
       readOnly: true,
       content: 'Hello Alice',
+      contentSnapshot: true,
       text: 'Hello {name}',
       variables: ['name'],
     });
     expect(schema?.height).toBeGreaterThan(0);
     expect(result.inputs[0]).toEqual({});
+  });
+
+  it('keeps a JSON payload snapshot instead of treating it as a variable map', async () => {
+    const payload = '{"payload":"Acme"}';
+    const result = await renderToTemplate(
+      <Page>
+        <MultiVariableText text="{payload}" values={{ payload }} />
+      </Page>,
+    );
+
+    const schema = result.template.schemas[0]?.[0];
+    expect(schema).toMatchObject({
+      type: 'multiVariableText',
+      readOnly: true,
+      text: '{payload}',
+      variables: ['payload'],
+      content: payload,
+      contentSnapshot: true,
+    });
+    expect(schema?.content).not.toBe('Acme');
   });
 
   it('orders MultiVariableText variables from props, template placeholders, then values', async () => {

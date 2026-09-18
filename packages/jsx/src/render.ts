@@ -908,6 +908,7 @@ const renderMultiVariableText = async (
     underline: props.underline ?? false,
     text: templateText,
     variables,
+    ...(readOnly ? { contentSnapshot: true } : {}),
   };
 
   if (props.borderColor) schema.borderColor = props.borderColor;
