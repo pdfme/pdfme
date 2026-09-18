@@ -5,6 +5,7 @@ import {
   createBarCode,
   barCodeType2Bcid,
   mapHexColorForBwipJsLib,
+  resolveBarcodeRenderRuntime,
 } from '../src/barcodes/helper.js';
 
 describe('validateBarcodeInput test', () => {
@@ -361,6 +362,57 @@ describe('barCodeType2Bcid test', () => {
     expect(barCodeType2Bcid('upce')).toEqual('upce');
     expect(barCodeType2Bcid('gs1datamatrix')).toEqual('gs1datamatrix');
     expect(barCodeType2Bcid('pdf417')).toEqual('pdf417');
+  });
+});
+
+describe('resolveBarcodeRenderRuntime', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  test('uses node-buffer in Node when neither document nor OffscreenCanvas exists', () => {
+    expect(typeof globalThis.document).toBe('undefined');
+    expect(typeof (globalThis as { OffscreenCanvas?: unknown }).OffscreenCanvas).toBe('undefined');
+    expect(resolveBarcodeRenderRuntime()).toBe('node-buffer');
+  });
+
+  test('falls back to node-buffer when OffscreenCanvas exists but toCanvas is missing', async () => {
+    vi.stubGlobal(
+      'OffscreenCanvas',
+      class {
+        constructor(
+          public width: number,
+          public height: number,
+        ) {}
+      },
+    );
+    expect(resolveBarcodeRenderRuntime()).toBe('node-buffer');
+
+    const buffer = await createBarCode({
+      type: 'qrcode',
+      input: 'https://pdfme.com/node-export',
+      width: 10,
+      height: 10,
+      backgroundColor: '00000000',
+    });
+    const png = PNG.sync.read(buffer);
+    const qr = jsQR(new Uint8ClampedArray(png.data), png.width, png.height) as QRCode;
+    expect(qr).not.toBeNull();
+    expect(Buffer.from(qr.binaryData).toString('utf8')).toEqual('https://pdfme.com/node-export');
+  });
+
+  test('prefers document-canvas when both document and OffscreenCanvas exist', () => {
+    vi.stubGlobal('document', { createElement: () => ({}) });
+    vi.stubGlobal(
+      'OffscreenCanvas',
+      class {
+        constructor(
+          public width: number,
+          public height: number,
+        ) {}
+      },
+    );
+    expect(resolveBarcodeRenderRuntime()).toBe('document-canvas');
   });
 });
 

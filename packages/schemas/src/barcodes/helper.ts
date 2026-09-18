@@ -127,6 +127,85 @@ export const barCodeType2Bcid = (type: BarcodeTypes) =>
 export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
   color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
 
+export type BarcodeRenderRuntime = 'document-canvas' | 'offscreencanvas' | 'node-buffer';
+
+type CanvasLike = HTMLCanvasElement | OffscreenCanvas;
+
+type BwipJsRenderer = {
+  toCanvas?: (canvas: CanvasLike, options: RenderOptions) => void;
+  toBuffer?: (options: RenderOptions) => Promise<Buffer>;
+};
+
+const getBwipJsRenderer = () => bwipjs as unknown as BwipJsRenderer;
+
+const getDocument = () => (globalThis as { document?: Document }).document;
+
+const getOffscreenCanvasCtor = () =>
+  (globalThis as { OffscreenCanvas?: typeof OffscreenCanvas }).OffscreenCanvas;
+
+/**
+ * Pick a barcode renderer from capabilities, not `typeof window`.
+ * Browser Workers have neither `window` nor Node's `bwip-js.toBuffer()`.
+ * OffscreenCanvas without `toCanvas()` (Node bwip-js export) falls back to `toBuffer()`.
+ */
+export const resolveBarcodeRenderRuntime = (): BarcodeRenderRuntime => {
+  const doc = getDocument();
+  const renderer = getBwipJsRenderer();
+  if (doc && typeof doc.createElement === 'function') {
+    return 'document-canvas';
+  }
+
+  if (typeof getOffscreenCanvasCtor() === 'function' && typeof renderer.toCanvas === 'function') {
+    return 'offscreencanvas';
+  }
+
+  if (typeof renderer.toBuffer === 'function') {
+    return 'node-buffer';
+  }
+
+  throw new Error(
+    '[@pdfme/schemas] Barcode rendering requires a document canvas, OffscreenCanvas, or bwip-js toBuffer().',
+  );
+};
+
+const pngBufferFromDataUrl = (dataUrl: string): Buffer =>
+  Buffer.from(b64toUint8Array(dataUrl).buffer);
+
+const pngBufferFromBlob = async (blob: Blob): Promise<Buffer> =>
+  Buffer.from(await blob.arrayBuffer());
+
+const renderBarcodeToCanvas = (canvas: CanvasLike, options: RenderOptions) => {
+  const toCanvas = getBwipJsRenderer().toCanvas;
+  if (typeof toCanvas !== 'function') {
+    throw new Error('[@pdfme/schemas] bwip-js toCanvas() is not available in this environment.');
+  }
+  toCanvas(canvas, options);
+};
+
+const renderBarcodeToDocumentCanvas = (options: RenderOptions): Buffer => {
+  const canvas = getDocument()!.createElement('canvas');
+  renderBarcodeToCanvas(canvas, options);
+  return pngBufferFromDataUrl(canvas.toDataURL('image/png'));
+};
+
+const renderBarcodeToOffscreenCanvas = async (options: RenderOptions): Promise<Buffer> => {
+  const OffscreenCanvasCtor = getOffscreenCanvasCtor();
+  if (typeof OffscreenCanvasCtor !== 'function') {
+    throw new Error('[@pdfme/schemas] OffscreenCanvas is not available in this environment.');
+  }
+  const canvas = new OffscreenCanvasCtor(1, 1);
+  renderBarcodeToCanvas(canvas, options);
+  return pngBufferFromBlob(await canvas.convertToBlob({ type: 'image/png' }));
+};
+
+const renderBarcodeToNodeBuffer = async (options: RenderOptions): Promise<Buffer> => {
+  const toBuffer = getBwipJsRenderer().toBuffer;
+  if (typeof toBuffer !== 'function') {
+    throw new Error('[@pdfme/schemas] bwip-js toBuffer() is not available in this environment.');
+  }
+  return toBuffer(options);
+};
+
 export const createBarCode = async (arg: {
   type: BarcodeTypes;
   input: string;
@@ -164,24 +243,12 @@ export const createBarCode = async (arg: {
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
   if (textColor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textColor);
 
-  let res: Buffer;
-
-  if (typeof window !== 'undefined') {
-    const canvas = document.createElement('canvas');
-    // Use a type assertion to safely call toCanvas
-    const bwipjsModule = bwipjs as unknown as {
-      toCanvas(canvas: HTMLCanvasElement, options: RenderOptions): void;
-    };
-    bwipjsModule.toCanvas(canvas, bwipjsArg);
-    const dataUrl = canvas.toDataURL('image/png');
-    res = Buffer.from(b64toUint8Array(dataUrl).buffer);
-  } else {
-    // Use a type assertion to safely call toBuffer
-    const bwipjsModule = bwipjs as unknown as {
-      toBuffer(options: RenderOptions): Promise<Buffer>;
-    };
-    res = await bwipjsModule.toBuffer(bwipjsArg);
+  const runtime = resolveBarcodeRenderRuntime();
+  if (runtime === 'document-canvas') {
+    return renderBarcodeToDocumentCanvas(bwipjsArg);
   }
-
-  return res;
+  if (runtime === 'offscreencanvas') {
+    return renderBarcodeToOffscreenCanvas(bwipjsArg);
+  }
+  return renderBarcodeToNodeBuffer(bwipjsArg);
 };
