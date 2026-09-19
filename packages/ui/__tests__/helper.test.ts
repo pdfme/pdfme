@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   SchemaForUI,
   Schema,
@@ -1041,5 +1044,22 @@ describe('getStickyScrollPageIndex', () => {
     );
 
     expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+});
+
+describe('hotkeys-js version floor (#1465)', () => {
+  test('declared range cannot resolve 4.0.0–4.0.3', () => {
+    const pkgPath = join(dirname(fileURLToPath(import.meta.url)), '..', 'package.json');
+    const { dependencies } = JSON.parse(readFileSync(pkgPath, 'utf8')) as {
+      dependencies: Record<string, string>;
+    };
+    const range = dependencies['hotkeys-js'];
+    const match = range?.trim().match(/^(?:\^|~|>=)?(\d+)\.(\d+)\.(\d+)$/);
+    expect(match, `unexpected hotkeys-js range: ${range}`).not.toBeNull();
+    const major = Number(match![1]);
+    const minor = Number(match![2]);
+    const patch = Number(match![3]);
+    const atLeast404 = major > 4 || (major === 4 && (minor > 0 || patch >= 4));
+    expect(atLeast404).toBe(true);
   });
 });
