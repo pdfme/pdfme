@@ -20,8 +20,10 @@ import {
   DEFAULT_FONT_COLOR,
   PLACEHOLDER_FONT_COLOR,
   CODE_BACKGROUND_COLOR,
+  CODE_HORIZONTAL_PADDING,
   SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
   TEXT_FORMAT_INLINE_MARKDOWN,
+  ALIGN_JUSTIFY,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -29,7 +31,10 @@ import {
   getBrowserVerticalFontAdjustments,
   isFirefox,
   splitTextToSize,
+  wrapTextToSize,
+  widthOfTextAtSize,
 } from './helper.js';
+import { getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
@@ -122,11 +127,21 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           _cache,
         })
       : undefined;
+  const resolvedPlainFontSize =
+    !enableInlineMarkdown && enableDynamicFontSize && (usePlaceholder ? placeholder : displayValue)
+      ? calculateDynamicFontSize({
+          textSchema: schema,
+          fontKitFont,
+          value: usePlaceholder ? (placeholder as string) : displayValue,
+        })
+      : (schema.fontSize ?? DEFAULT_FONT_SIZE);
+  const useComputedWrapLines = !editable;
   const textBlock = buildStyledTextContainer(
     isReadOnlySplitInlineMarkdownFormChunk ? { ...arg, mode: 'viewer' } : arg,
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
-    dynamicRichTextFontSize,
+    dynamicRichTextFontSize ?? resolvedPlainFontSize,
+    { useComputedWrapLines },
   );
 
   const processedText = replaceUnsupportedChars(
@@ -134,7 +149,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       value,
       schema,
       fontKitFont,
-      fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
+      fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
     }),
     fontKitFont,
   );
@@ -147,24 +162,29 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
         schema,
         font,
         _cache,
+        fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
       });
       return;
     }
 
-    // Read-only mode
-    textBlock.innerHTML = processedText
-      .split('')
-      .map((l, i) => {
-        const escaped = l
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-        return `<span style="letter-spacing:${
-          String(value).length === i + 1 ? 0 : 'inherit'
-        };">${escaped}</span>`;
-      })
-      .join('');
+    renderReadOnlyPlainLines({
+      textBlock,
+      lines: applyTextLineRange(
+        wrapTextToSize({
+          value,
+          characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+          fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
+          fontKitFont,
+          boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+        }),
+        getTextLineRange(schema),
+      ),
+      fontKitFont,
+      fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
+      characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+      alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
+      boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+    });
     return;
   }
 
@@ -239,49 +259,66 @@ const renderInlineMarkdownReadOnly = async (arg: {
   schema: TextSchema;
   font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
   _cache: Map<string | number, unknown>;
+  fontSize: number;
 }) => {
-  const { textBlock, value, schema, font, _cache } = arg;
+  const { textBlock, value, schema, font, _cache, fontSize } = arg;
+  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
+  const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
   const runs = await resolveRichTextRuns({
     runs: parseInlineMarkdown(value),
     schema,
     font,
     _cache,
   });
-  const lineRange = getTextLineRange(schema);
-  if (lineRange) {
-    const lines = applyTextLineRange(
-      layoutRichTextLines({
-        runs,
-        fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
-        characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
-        boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
-      }),
-      lineRange,
-    );
-
-    textBlock.innerHTML = '';
-    lines.forEach((line, lineIndex) => {
-      line.runs.forEach((run) => {
-        appendInlineMarkdownRun({ textBlock, run, schema, font });
-      });
-      if (lineIndex < lines.length - 1) textBlock.appendChild(document.createElement('br'));
-    });
-    return;
-  }
+  const lines = applyTextLineRange(
+    layoutRichTextLines({
+      runs,
+      fontSize,
+      characterSpacing,
+      boxWidthInPt,
+    }),
+    getTextLineRange(schema),
+  );
 
   textBlock.innerHTML = '';
-  runs.forEach((run) => {
-    appendInlineMarkdownRun({ textBlock, run, schema, font });
+  lines.forEach((line, lineIndex) => {
+    const lineEl = document.createElement('span');
+    lineEl.dataset.pdfmeWrapLine = '';
+    lineEl.style.whiteSpace = 'pre';
+    const stripTrailingLetterSpacing = applySharedWrapLineSpacing(
+      lineEl,
+      {
+        text: line.runs.map((run) => run.text).join(''),
+        width: line.width,
+        hardBreak: line.hardBreak,
+      },
+      alignment,
+      boxWidthInPt,
+      characterSpacing,
+    );
+
+    line.runs.forEach((run) => {
+      appendInlineMarkdownRun({ parent: lineEl, run, schema, font });
+    });
+    if (stripTrailingLetterSpacing) {
+      stripLineEndLetterSpacing(lineEl);
+    }
+
+    textBlock.appendChild(lineEl);
+    if (lineIndex < lines.length - 1) {
+      textBlock.appendChild(document.createTextNode('\n'));
+    }
   });
 };
 
 const appendInlineMarkdownRun = (arg: {
-  textBlock: HTMLDivElement;
+  parent: HTMLElement;
   run: Awaited<ReturnType<typeof resolveRichTextRuns>>[number];
   schema: TextSchema;
   font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
 }) => {
-  const { textBlock, run, schema, font } = arg;
+  const { parent, run, schema, font } = arg;
   const href = run.href ? normalizeLinkHref(run.href) : undefined;
   const span = href ? document.createElement('a') : document.createElement('span');
   const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
@@ -316,12 +353,100 @@ const appendInlineMarkdownRun = (arg: {
   if (run.code) {
     span.style.backgroundColor = CODE_BACKGROUND_COLOR;
     span.style.borderRadius = '2px';
-    span.style.padding = '0 0.15em';
+    span.style.padding = `0 ${CODE_HORIZONTAL_PADDING}pt`;
     if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
       span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
     }
   }
-  textBlock.appendChild(span);
+  parent.appendChild(span);
+};
+
+const applySharedWrapLineSpacing = (
+  lineEl: HTMLElement,
+  line: { text: string; width: number; hardBreak: boolean },
+  alignment: string,
+  boxWidthInPt: number,
+  characterSpacing: number,
+) => {
+  const { extraLetterSpacing } = getLineAlignment(line, boxWidthInPt, alignment);
+  const stripTrailingLetterSpacing = !(alignment === ALIGN_JUSTIFY && !line.hardBreak);
+  if (!stripTrailingLetterSpacing && extraLetterSpacing !== 0) {
+    lineEl.style.letterSpacing = `${characterSpacing + extraLetterSpacing}pt`;
+  }
+  return stripTrailingLetterSpacing;
+};
+
+const stripLineEndLetterSpacing = (lineEl: HTMLElement) => {
+  let node: ChildNode | null = lineEl.lastChild;
+  while (node && (node.nodeType !== Node.ELEMENT_NODE || !node.textContent)) {
+    node = node.previousSibling;
+  }
+  if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+
+  const el = node as HTMLElement;
+  const graphemes = splitGraphemes(el.textContent ?? '');
+  if (graphemes.length === 0) return;
+  if (graphemes.length === 1) {
+    el.style.letterSpacing = '0';
+    return;
+  }
+
+  el.textContent = graphemes.slice(0, -1).join('');
+  const tail = document.createElement('span');
+  tail.textContent = graphemes[graphemes.length - 1];
+  tail.style.letterSpacing = '0';
+  el.appendChild(tail);
+};
+
+const renderReadOnlyPlainLines = (arg: {
+  textBlock: HTMLDivElement;
+  lines: WrapLine[];
+  fontKitFont: FontKitFont;
+  fontSize: number;
+  characterSpacing: number;
+  alignment: string;
+  boxWidthInPt: number;
+}) => {
+  const { textBlock, lines, fontKitFont, fontSize, characterSpacing, alignment, boxWidthInPt } =
+    arg;
+  textBlock.innerHTML = '';
+
+  lines.forEach((line, lineIndex) => {
+    const lineEl = document.createElement('span');
+    lineEl.dataset.pdfmeWrapLine = '';
+    lineEl.style.whiteSpace = 'pre';
+    const displayText = replaceUnsupportedChars(line.text, fontKitFont);
+
+    const textWidth = widthOfTextAtSize(line.text, fontKitFont, fontSize, characterSpacing);
+    const stripTrailingLetterSpacing = applySharedWrapLineSpacing(
+      lineEl,
+      { text: line.text, width: textWidth, hardBreak: line.hardBreak },
+      alignment,
+      boxWidthInPt,
+      characterSpacing,
+    );
+
+    const graphemes = splitGraphemes(displayText);
+    graphemes.forEach((grapheme, index) => {
+      const span = document.createElement('span');
+      span.textContent = grapheme;
+      // PDF `setCharacterSpacing` applies Tc after every grapheme, including
+      // the last. Zeroing the last glyph is only for ordinary characterSpacing
+      // so browsers do not count a trailing gap when wrapping.
+      if (index === graphemes.length - 1 && stripTrailingLetterSpacing) {
+        span.style.letterSpacing = '0';
+      }
+      lineEl.appendChild(span);
+    });
+
+    textBlock.appendChild(lineEl);
+    // Join with a real newline so `pre` paints one visual line per wrap line
+    // and `textContent` keeps paragraph breaks. Do not suffix facade `\n`
+    // characters — that would add an extra blank line after each paragraph.
+    if (lineIndex < lines.length - 1) {
+      textBlock.appendChild(document.createTextNode('\n'));
+    }
+  });
 };
 
 const getRangedPlainTextValue = (arg: {
@@ -352,12 +477,17 @@ export const buildStyledTextContainer = (
   fontKitFont: FontKitFont,
   value: string,
   resolvedDynamicFontSize?: number,
+  display?: { useComputedWrapLines?: boolean },
 ) => {
   const { schema, rootElement, mode } = arg;
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const editable = isEditable(mode, schema);
+  // `pre` + left-for-justify is for read-only displays whose wrap-engine
+  // lines are already computed (plain text and inline Markdown). Live Form /
+  // Designer editing keeps `pre-wrap` so caret / IME stay native.
+  const useComputedWrapLines = display?.useComputedWrapLines ?? !editable;
 
   if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema, arg.basePdf) && value) {
     dynamicFontSize = calculateDynamicFontSize({
@@ -421,6 +551,7 @@ export const buildStyledTextContainer = (
   if (schema.strikethrough) textDecorations.push('line-through');
   if (schema.underline) textDecorations.push('underline');
 
+  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
@@ -428,9 +559,11 @@ export const buildStyledTextContainer = (
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${characterSpacing}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-    textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
+    // Read-only Viewer paints wrap-engine lines with `pre`. CSS justify would
+    // fight the PDF grapheme-count letter-spacing applied per soft line.
+    textAlign: useComputedWrapLines && alignment === ALIGN_JUSTIFY ? 'left' : alignment,
+    whiteSpace: useComputedWrapLines ? 'pre' : 'pre-wrap',
+    wordBreak: useComputedWrapLines ? 'normal' : 'break-word',
     // Block layout styles
     resize: 'none',
     border: 'none',

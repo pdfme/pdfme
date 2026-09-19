@@ -2,6 +2,7 @@
 
 import type { Font as FontKitFont } from 'fontkit';
 import type { Font } from '@pdfme/common';
+import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
 import { uiRender } from '../src/text/uiRender.js';
 import type { TextSchema } from '../src/text/types.js';
 
@@ -155,6 +156,134 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
 
+  it('paints read-only inline markdown from the shared wrap engine with white-space:pre', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      alignment: 'justify',
+      width: 18,
+      fontSize: 10,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+    const value =
+      'This is a **long** inline markdown sentence that must still wrap inside the box instead of overflowing as a single `pre` line.';
+
+    await uiRender({
+      value,
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
+
+    expect(textBlock.style.whiteSpace).toBe('pre');
+    expect(textBlock.style.wordBreak).toBe('normal');
+    expect(textBlock.style.textAlign).toBe('left');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls.every((line) => line.style.whiteSpace === 'pre')).toBe(true);
+    expect(textBlock.textContent).toContain('long');
+    expect(textBlock.textContent).toContain('pre');
+    expect(textBlock.textContent).not.toContain('**');
+    expect(textBlock.querySelector('strong, b')).toBeNull();
+    expect(
+      Array.from(textBlock.querySelectorAll('span')).some(
+        (span) => span.style.fontWeight === '800',
+      ),
+    ).toBe(true);
+  });
+
+  it('paints Viewer lines from the wrap engine with white-space:pre', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      textFormat: 'plain',
+      width: 18,
+      fontSize: 10,
+      characterSpacing: 0,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Party-König: oder die ‘Party’',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
+
+    expect(textBlock.style.whiteSpace).toBe('pre');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls.every((line) => line.style.whiteSpace === 'pre')).toBe(true);
+    expect(lineEls.some((line) => line.textContent?.startsWith(':'))).toBe(false);
+    expect(lineEls.some((line) => line.textContent?.includes('König:'))).toBe(true);
+    expect(textBlock.textContent?.includes('\n')).toBe(true);
+    expect(textBlock.textContent?.endsWith('\n')).toBe(false);
+  });
+
+  it('replicates PDF grapheme-count letter-spacing on justified soft lines', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      textFormat: 'plain',
+      alignment: 'justify',
+      width: 18,
+      fontSize: 10,
+      characterSpacing: 0,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'aaa bbb ccc',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
+
+    expect(textBlock.style.textAlign).toBe('left');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls[0]?.style.letterSpacing).not.toBe('');
+    expect(lineEls.at(-1)?.style.letterSpacing).toBe('');
+    const firstLineLastGlyph = lineEls[0]?.querySelector('span:last-child') as HTMLSpanElement;
+    expect(firstLineLastGlyph.style.letterSpacing).toBe('');
+  });
+
   it('lets non-top vertical alignment move the UI text block', async () => {
     const rootElement = document.createElement('div');
     const schema: TextSchema = {
@@ -251,5 +380,89 @@ describe('text inline markdown UI rendering', () => {
     expect(onChange).not.toHaveBeenCalled();
     expect(textBlock.textContent).toContain('Hello');
     expect(textBlock.textContent).not.toContain('world');
+  });
+
+  it('paints markdown code padding in the same pt units the engine measures', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      width: 125,
+      fontSize: 64,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+      Code: { data: new Uint8Array() },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+      ['getFontKitFont-Code', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: '`code-overflow-check`',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const codeSpan = Array.from(rootElement.querySelectorAll('span')).find(
+      (span) => span.style.backgroundColor,
+    );
+    expect(codeSpan?.style.paddingRight).toBe(`${CODE_HORIZONTAL_PADDING}pt`);
+    expect(codeSpan?.style.paddingLeft).toBe(`${CODE_HORIZONTAL_PADDING}pt`);
+    expect(codeSpan?.style.padding).not.toContain('em');
+  });
+
+  it('strips end-of-line letter-spacing for markdown like plain text', async () => {
+    const render = async (
+      textFormat: 'plain' | 'inline-markdown',
+      alignment: 'right' | 'center',
+    ) => {
+      const rootElement = document.createElement('div');
+      const schema: TextSchema = {
+        ...getTextSchema(),
+        textFormat,
+        alignment,
+        characterSpacing: 4,
+        fontSize: 13,
+        width: 80,
+      };
+      const font = {
+        Base: { data: new Uint8Array(), fallback: true },
+      } as Font;
+      const cache = new Map<string | number, unknown>([
+        ['getFontKitFont-Base', createMockFont(() => true)],
+      ]);
+
+      await uiRender({
+        value: 'hello world',
+        schema,
+        rootElement,
+        mode: 'viewer',
+        options: { font },
+        _cache: cache,
+        theme: { colorPrimary: '#1677ff' },
+      } as Parameters<typeof uiRender>[0]);
+
+      const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+      const lineEl = textBlock.querySelector('[data-pdfme-wrap-line]') as HTMLElement;
+      let lastGlyph = lineEl.lastElementChild as HTMLElement;
+      while (lastGlyph.lastElementChild) {
+        lastGlyph = lastGlyph.lastElementChild as HTMLElement;
+      }
+      return { textBlock, lastGlyph };
+    };
+
+    for (const alignment of ['right', 'center'] as const) {
+      const plain = await render('plain', alignment);
+      const markdown = await render('inline-markdown', alignment);
+      expect(plain.lastGlyph.style.letterSpacing).toBe('0px');
+      expect(markdown.lastGlyph.style.letterSpacing).toBe('0px');
+      expect(plain.lastGlyph.textContent).toBe('d');
+      expect(markdown.lastGlyph.textContent).toBe('d');
+    }
   });
 });

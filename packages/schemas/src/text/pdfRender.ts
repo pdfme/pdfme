@@ -27,8 +27,9 @@ import {
   getFontKitFont,
   fetchRemoteFontData,
   widthOfTextAtSize,
-  splitTextToSize,
+  wrapTextToSize,
 } from './helper.js';
+import { getLineAlignment } from './wrap.js';
 import { stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange } from './measure.js';
 import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './richText.js';
@@ -114,13 +115,6 @@ const getFontProp = ({
     fontSize,
     color,
   };
-};
-
-let graphemeSegmenter: Intl.Segmenter | undefined;
-
-const getGraphemeSegmenter = () => {
-  graphemeSegmenter ??= new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-  return graphemeSegmenter;
 };
 
 export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
@@ -216,7 +210,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   const halfLineHeightAdjustment = lineHeight === 0 ? 0 : ((lineHeight - 1) * fontSize) / 2;
 
   const lines = applyTextLineRange(
-    splitTextToSize({
+    wrapTextToSize({
       value,
       characterSpacing,
       fontSize,
@@ -245,26 +239,22 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   }
 
   lines.forEach((line, rowIndex) => {
-    const trimmed = line.replace('\n', '');
+    const trimmed = line.text;
     const textWidth = needsTextWidth
       ? widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing)
       : 0;
     const textHeight = needsTextHeight ? heightOfFontAtSize(fontKitFont, fontSize) : 0;
     const rowYOffset = lineHeight * fontSize * rowIndex;
+    const alignmentMetrics = getLineAlignment(
+      { text: trimmed, width: textWidth, hardBreak: line.hardBreak },
+      contentWidth,
+      alignment,
+    );
 
     // Adobe Acrobat Reader shows an error if `drawText` is called with an empty text
-    if (line === '') {
-      // return; // this also works
-      line = '\r\n';
-    }
+    const drawText = trimmed === '' ? '\r\n' : trimmed;
 
-    let xLine = contentX;
-    if (alignment === 'center') {
-      xLine += (contentWidth - textWidth) / 2;
-    } else if (alignment === 'right') {
-      xLine += contentWidth - textWidth;
-    }
-
+    let xLine = contentX + alignmentMetrics.x;
     let yLine = contentY + contentHeight - yOffset - rowYOffset;
 
     // draw strikethrough
@@ -301,17 +291,11 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       yLine = rotatedPoint.y;
     }
 
-    let spacing = characterSpacing;
-    if (alignment === 'justify' && line.slice(-1) !== '\n') {
-      // if alignment is `justify` but the end of line is not newline, then adjust the spacing
-      const segmenter = getGraphemeSegmenter();
-      const iterator = segmenter.segment(trimmed)[Symbol.iterator]();
-      const len = Array.from(iterator).length;
-      spacing += (contentWidth - textWidth) / len;
-    }
-    page.pushOperators(pdfLib.setCharacterSpacing(spacing));
+    page.pushOperators(
+      pdfLib.setCharacterSpacing(characterSpacing + alignmentMetrics.extraLetterSpacing),
+    );
 
-    page.drawText(trimmed, {
+    page.drawText(drawText, {
       x: xLine,
       y: yLine,
       rotate,

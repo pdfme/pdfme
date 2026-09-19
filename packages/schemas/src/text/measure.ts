@@ -4,7 +4,7 @@ import { DEFAULT_CHARACTER_SPACING, DEFAULT_FONT_SIZE, DEFAULT_LINE_HEIGHT } fro
 import {
   calculateDynamicFontSize,
   getFontKitFont,
-  heightOfFontAtSize,
+  getLineBoxHeightPt,
   splitTextToSize,
 } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
@@ -89,9 +89,12 @@ export const measureTextLines = async ({
       boxWidthInPt,
     });
 
+    const fallbackFont =
+      resolvedRuns[0]?.fontKitFont ??
+      (await getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>));
     return {
       lines: lines.map((line) => line.runs.map((run) => run.text).join('')),
-      lineHeights: measureRichTextLineHeights(lines, resolvedFontSize, lineHeight),
+      lineHeights: measureRichTextLineHeights(lines, resolvedFontSize, lineHeight, fallbackFont),
     };
   }
 
@@ -196,23 +199,26 @@ const measurePlainTextLineHeights = (
   lineHeight: number,
 ) => {
   if (lines.length === 0) return [];
-  const firstLineHeight = heightOfFontAtSize(fontKitFont, fontSize) * lineHeight;
-  const otherLineHeight = fontSize * lineHeight;
-  return lines.map((_, index) => pt2mm(index === 0 ? firstLineHeight : otherLineHeight));
+  return lines.map((_, index) =>
+    pt2mm(getLineBoxHeightPt(fontSize, index === 0, [fontKitFont], fontKitFont) * lineHeight),
+  );
 };
 
 const measureRichTextLineHeights = (
   lines: RichTextLine[],
   fontSize: number,
   lineHeight: number,
+  fallbackFont: FontKitFont,
 ) => {
   if (lines.length === 0) return [];
   return lines.map((line, index) =>
-    pt2mm((index === 0 ? getRichTextLineHeight(line, fontSize) : fontSize) * lineHeight),
+    pt2mm(
+      getLineBoxHeightPt(
+        fontSize,
+        index === 0,
+        line.runs.map((run) => run.fontKitFont),
+        fallbackFont,
+      ) * lineHeight,
+    ),
   );
-};
-
-const getRichTextLineHeight = (line: RichTextLine, fontSize: number) => {
-  if (line.runs.length === 0) return fontSize;
-  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)));
 };
