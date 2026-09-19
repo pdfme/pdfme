@@ -38,6 +38,10 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
     this.glyphIdMap = new Map();
   }
 
+  protected registerShapedGlyphs(_glyphs: Glyph[]): void {
+    // Subset embedder already tracks used glyphs via `includeGlyph`.
+  }
+
   encodeText(text: string): PDFHexString {
     const glyphs = this.layoutGlyphs(text);
     const hexCodes = Array(glyphs.length);

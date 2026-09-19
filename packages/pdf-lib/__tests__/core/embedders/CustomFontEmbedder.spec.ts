@@ -3,10 +3,16 @@ import fs from 'fs';
 
 import {
   CustomFontEmbedder,
+  PDFArray,
   PDFContext,
   PDFDict,
+  PDFDocument,
   PDFHexString,
+  PDFName,
+  PDFNumber,
+  PDFRawStream,
   PDFRef,
+  decodePDFRawStream,
 } from '../../../src/index';
 
 const ubuntuFont = fs.readFileSync('./assets/fonts/ubuntu/Ubuntu-R.ttf');
@@ -163,5 +169,77 @@ describe(`CustomFontEmbedder`, () => {
         .join('');
       expect(embedder.encodeText(text).asString()).toBe(wholeStringHex);
     });
+
+    it(`keeps GSUB-only gid 736 out of the character-set cache until layout`, async () => {
+      const embedder = await CustomFontEmbedder.for(fontkit, sarabunFont);
+      const cache = (
+        embedder as unknown as {
+          glyphCache: { access: () => Array<{ id: number; codePoints: number[] }> };
+        }
+      ).glyphCache;
+      expect(cache.access().some((glyph) => glyph.id === 736)).toBe(false);
+
+      embedder.encodeText('A วันที่');
+
+      const raisedMark = cache.access().find((glyph) => glyph.id === 736);
+      expect(raisedMark).toBeDefined();
+      expect(raisedMark!.codePoints).toContain(0x0e48);
+    });
+
+    it(`registers GSUB-only gid 736 in widths and ToUnicode when embedding the full font`, async () => {
+      const RAISED_TONE_GID = 736;
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.registerFontkit(fontkit);
+      const font = await pdfDoc.embedFont(sarabunFont, { subset: false });
+      pdfDoc.addPage().drawText('A วันที่ วันที่', { font, size: 24 });
+      const bytes = await pdfDoc.save();
+      expect(bytes.byteLength).toBeGreaterThan(0);
+
+      const objects = pdfDoc.context.enumerateIndirectObjects().map(([, obj]) => obj);
+      const cidFont = objects.find(
+        (obj): obj is PDFDict => obj instanceof PDFDict && obj.has(PDFName.of('W')),
+      );
+      expect(cidFont).toBeDefined();
+
+      const widthGids = new Set<number>();
+      const w = cidFont!.lookup(PDFName.of('W'), PDFArray);
+      let runStart: number | undefined;
+      for (let idx = 0, len = w.size(); idx < len; idx++) {
+        const entry = w.get(idx);
+        if (entry instanceof PDFNumber) {
+          runStart = entry.asNumber();
+        } else if (entry instanceof PDFArray && runStart !== undefined) {
+          for (let offset = 0, runLen = entry.size(); offset < runLen; offset++) {
+            widthGids.add(runStart + offset);
+          }
+          runStart = undefined;
+        }
+      }
+      expect(widthGids.has(RAISED_TONE_GID)).toBe(true);
+
+      const type0 = objects.find(
+        (obj): obj is PDFDict =>
+          obj instanceof PDFDict && obj.has(PDFName.of('ToUnicode')),
+      );
+      expect(type0).toBeDefined();
+      const cmapObj = pdfDoc.context.lookup(type0!.get(PDFName.of('ToUnicode')));
+      expect(cmapObj).toBeInstanceOf(PDFRawStream);
+      const cmap = new TextDecoder('latin1').decode(
+        decodePDFRawStream(cmapObj as PDFRawStream).decode(),
+      );
+      expect(cmap).toContain('<02E0> <0E48>');
+    });
+
+    it(
+      `does not overflow the stack when laying out a long Latin run plus Thai`,
+      async () => {
+        const embedder = await CustomFontEmbedder.for(fontkit, sarabunFont);
+        const text = 'A'.repeat(150000) + 'วันที่';
+        expect(() => fontkit.create(sarabunFont).layout(text)).not.toThrow();
+        expect(() => embedder.widthOfTextAtSize(text, 12)).not.toThrow();
+        expect(embedder.encodeText(text).asString().endsWith('02E0')).toBe(true);
+      },
+      30_000,
+    );
   });
 });

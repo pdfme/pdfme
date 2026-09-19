@@ -39,6 +39,7 @@ class CustomFontEmbedder {
 
   protected baseFontName: string;
   protected glyphCache: Cache<Glyph[]>;
+  private readonly shapedGlyphsById: Map<number, Glyph>;
 
   protected constructor(
     font: Font,
@@ -54,6 +55,7 @@ class CustomFontEmbedder {
     this.fontFeatures = fontFeatures;
 
     this.baseFontName = '';
+    this.shapedGlyphsById = new Map();
     this.glyphCache = Cache.populatedBy(this.allGlyphsInFontSortedById);
   }
 
@@ -90,10 +92,38 @@ class CustomFontEmbedder {
    */
   protected layoutGlyphs(text: string): Glyph[] {
     const runs = splitTextIntoShapingRuns(text);
-    if (runs.length <= 1) return this.font.layout(runs[0] ?? '', this.fontFeatures).glyphs;
-    const glyphs: Glyph[] = [];
-    for (const run of runs) glyphs.push(...this.font.layout(run, this.fontFeatures).glyphs);
+    let glyphs: Glyph[];
+    if (runs.length <= 1) {
+      glyphs = this.font.layout(runs[0] ?? '', this.fontFeatures).glyphs;
+    } else {
+      // Loop-push: `push(...runGlyphs)` overflows on long mixed-script strings.
+      glyphs = [];
+      for (const run of runs) {
+        const runGlyphs = this.font.layout(run, this.fontFeatures).glyphs;
+        for (let idx = 0, len = runGlyphs.length; idx < len; idx++) {
+          glyphs.push(runGlyphs[idx]);
+        }
+      }
+    }
+    this.registerShapedGlyphs(glyphs);
     return glyphs;
+  }
+
+  /**
+   * GSUB can emit glyphs that are not in `font.characterSet` (e.g. Sarabun
+   * tone gid 736). Retain those objects so `computeWidths()` and
+   * `embedUnicodeCmap()` include them when the full font is embedded.
+   */
+  protected registerShapedGlyphs(glyphs: Glyph[]): void {
+    let added = false;
+    for (let idx = 0, len = glyphs.length; idx < len; idx++) {
+      const glyph = glyphs[idx];
+      if (!this.shapedGlyphsById.has(glyph.id)) {
+        this.shapedGlyphsById.set(glyph.id, glyph);
+        added = true;
+      }
+    }
+    if (added) this.glyphCache.invalidate();
   }
 
   heightOfFontAtSize(size: number, options: { descender?: boolean } = {}): number {
@@ -245,10 +275,14 @@ class CustomFontEmbedder {
   }
 
   private allGlyphsInFontSortedById = (): Glyph[] => {
-    const glyphs: Glyph[] = Array(this.font.characterSet.length);
-    for (let idx = 0, len = glyphs.length; idx < len; idx++) {
+    const glyphs: Glyph[] = Array(this.font.characterSet.length + this.shapedGlyphsById.size);
+    for (let idx = 0, len = this.font.characterSet.length; idx < len; idx++) {
       const codePoint = this.font.characterSet[idx];
       glyphs[idx] = this.font.glyphForCodePoint(codePoint);
+    }
+    let extraIdx = this.font.characterSet.length;
+    for (const glyph of this.shapedGlyphsById.values()) {
+      glyphs[extraIdx++] = glyph;
     }
     return sortedUniq(glyphs.sort(byAscendingId), (g) => g.id);
   };
