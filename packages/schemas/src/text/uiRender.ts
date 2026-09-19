@@ -22,6 +22,7 @@ import {
   CODE_BACKGROUND_COLOR,
   SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
   TEXT_FORMAT_INLINE_MARKDOWN,
+  ALIGN_JUSTIFY,
 } from './constants.js';
 import {
   calculateDynamicFontSize,
@@ -29,7 +30,10 @@ import {
   getBrowserVerticalFontAdjustments,
   isFirefox,
   splitTextToSize,
+  wrapTextToSize,
+  widthOfTextAtSize,
 } from './helper.js';
+import { countGraphemes, splitGraphemes, type WrapLine } from './wrap.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
@@ -122,11 +126,19 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           _cache,
         })
       : undefined;
+  const resolvedPlainFontSize =
+    !enableInlineMarkdown && enableDynamicFontSize && (usePlaceholder ? placeholder : displayValue)
+      ? calculateDynamicFontSize({
+          textSchema: schema,
+          fontKitFont,
+          value: usePlaceholder ? (placeholder as string) : displayValue,
+        })
+      : (schema.fontSize ?? DEFAULT_FONT_SIZE);
   const textBlock = buildStyledTextContainer(
     isReadOnlySplitInlineMarkdownFormChunk ? { ...arg, mode: 'viewer' } : arg,
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
-    dynamicRichTextFontSize,
+    dynamicRichTextFontSize ?? resolvedPlainFontSize,
   );
 
   const processedText = replaceUnsupportedChars(
@@ -134,7 +146,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       value,
       schema,
       fontKitFont,
-      fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
+      fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
     }),
     fontKitFont,
   );
@@ -151,20 +163,24 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       return;
     }
 
-    // Read-only mode
-    textBlock.innerHTML = processedText
-      .split('')
-      .map((l, i) => {
-        const escaped = l
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-        return `<span style="letter-spacing:${
-          String(value).length === i + 1 ? 0 : 'inherit'
-        };">${escaped}</span>`;
-      })
-      .join('');
+    renderReadOnlyPlainLines({
+      textBlock,
+      lines: applyTextLineRange(
+        wrapTextToSize({
+          value,
+          characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+          fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
+          fontKitFont,
+          boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+        }),
+        getTextLineRange(schema),
+      ),
+      fontKitFont,
+      fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
+      characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
+      alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
+      boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+    });
     return;
   }
 
@@ -324,6 +340,53 @@ const appendInlineMarkdownRun = (arg: {
   textBlock.appendChild(span);
 };
 
+const renderReadOnlyPlainLines = (arg: {
+  textBlock: HTMLDivElement;
+  lines: WrapLine[];
+  fontKitFont: FontKitFont;
+  fontSize: number;
+  characterSpacing: number;
+  alignment: string;
+  boxWidthInPt: number;
+}) => {
+  const { textBlock, lines, fontKitFont, fontSize, characterSpacing, alignment, boxWidthInPt } =
+    arg;
+  textBlock.innerHTML = '';
+
+  lines.forEach((line, lineIndex) => {
+    const lineEl = document.createElement('span');
+    lineEl.dataset.pdfmeWrapLine = '';
+    lineEl.style.whiteSpace = 'pre';
+    const displayText = replaceUnsupportedChars(line.text, fontKitFont);
+
+    if (alignment === ALIGN_JUSTIFY && !line.hardBreak) {
+      const textWidth = widthOfTextAtSize(line.text, fontKitFont, fontSize, characterSpacing);
+      const graphemeCount = countGraphemes(line.text);
+      if (graphemeCount > 0) {
+        lineEl.style.letterSpacing = `${characterSpacing + (boxWidthInPt - textWidth) / graphemeCount}pt`;
+      }
+    }
+
+    const graphemes = splitGraphemes(displayText);
+    graphemes.forEach((grapheme, index) => {
+      const span = document.createElement('span');
+      span.textContent = grapheme;
+      if (index === graphemes.length - 1) {
+        span.style.letterSpacing = '0';
+      }
+      lineEl.appendChild(span);
+    });
+
+    textBlock.appendChild(lineEl);
+    // Join with a real newline so `pre` paints one visual line per wrap line
+    // and `textContent` keeps paragraph breaks. Do not suffix facade `\n`
+    // characters — that would add an extra blank line after each paragraph.
+    if (lineIndex < lines.length - 1) {
+      textBlock.appendChild(document.createTextNode('\n'));
+    }
+  });
+};
+
 const getRangedPlainTextValue = (arg: {
   value: string;
   schema: TextSchema;
@@ -421,6 +484,7 @@ export const buildStyledTextContainer = (
   if (schema.strikethrough) textDecorations.push('line-through');
   if (schema.underline) textDecorations.push('underline');
 
+  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const textBlockStyle: CSS.Properties = {
     // Font formatting styles
     fontFamily: schema.fontName ? `'${schema.fontName}'` : 'inherit',
@@ -428,9 +492,11 @@ export const buildStyledTextContainer = (
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${characterSpacing}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-    textAlign: schema.alignment ?? DEFAULT_ALIGNMENT,
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
+    // Read-only Viewer paints wrap-engine lines with `pre`. CSS justify would
+    // fight the PDF grapheme-count letter-spacing applied per soft line.
+    textAlign: !editable && alignment === ALIGN_JUSTIFY ? 'left' : alignment,
+    whiteSpace: editable ? 'pre-wrap' : 'pre',
+    wordBreak: editable ? 'break-word' : 'normal',
     // Block layout styles
     resize: 'none',
     border: 'none',

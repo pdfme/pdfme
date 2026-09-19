@@ -14,6 +14,7 @@ import {
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
+import { toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -335,22 +336,17 @@ export const calculateDynamicFontSize = ({
     const otherRowHeightInMm = pt2mm(size * lineHeight);
 
     paragraphs.forEach((paragraph, paraIndex) => {
-      const lines = getSplittedLinesBySegmenter(paragraph, {
-        font: fontKitFont,
-        fontSize: size,
-        characterSpacing,
+      const lines = wrapText(
+        paragraph,
+        (text) =>
+          text.length === 0 ? 0 : widthOfTextAtSize(text, fontKitFont, size, characterSpacing),
         boxWidthInPt,
-      });
+      );
 
       lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
           // For vertical fit we want to consider the width of text lines where we detect a split
-          const textWidth = widthOfTextAtSize(
-            line.replace('\n', ''),
-            fontKitFont,
-            size,
-            characterSpacing,
-          );
+          const textWidth = widthOfTextAtSize(line.text, fontKitFont, size, characterSpacing);
           const textWidthInMm = pt2mm(textWidth);
           totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
         }
@@ -415,113 +411,41 @@ export const calculateDynamicFontSize = ({
   return dynamicFontSize;
 };
 
+const measureTextWidth = (
+  text: string,
+  fontKitFont: fontkit.Font,
+  fontSize: number,
+  characterSpacing: number,
+) => (text.length === 0 ? 0 : widthOfTextAtSize(text, fontKitFont, fontSize, characterSpacing));
+
+export const wrapTextToSize = (arg: {
+  value: string;
+  characterSpacing: number;
+  boxWidthInPt: number;
+  fontSize: number;
+  fontKitFont: fontkit.Font;
+}): WrapLine[] => {
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
+  return wrapText(
+    value,
+    (text) => measureTextWidth(text, fontKitFont, fontSize, characterSpacing),
+    boxWidthInPt,
+  );
+};
+
+/**
+ * Facade over the shared wrap engine. Converts structured `{ text, hardBreak }`
+ * lines into the historical `\n`-suffixed strings used by PDF / tables / lists.
+ * Viewer should call `wrapTextToSize` instead — see `toLegacySplitLines`.
+ */
 export const splitTextToSize = (arg: {
   value: string;
   characterSpacing: number;
   boxWidthInPt: number;
   fontSize: number;
   fontKitFont: fontkit.Font;
-}) => {
-  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
-  const fontWidthCalcValues: FontWidthCalcValues = {
-    font: fontKitFont,
-    fontSize,
-    characterSpacing,
-    boxWidthInPt,
-  };
-  let lines: string[] = [];
-  value.split(/\r\n|\r|\n|\f|\v/g).forEach((line: string) => {
-    lines = lines.concat(getSplittedLinesBySegmenter(line, fontWidthCalcValues));
-  });
-  return lines;
-};
+}) => toLegacySplitLines(wrapTextToSize(arg));
 export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-
-let wordSegmenter: Intl.Segmenter | undefined;
-
-const getWordSegmenter = () => {
-  wordSegmenter ??= new Intl.Segmenter(undefined, { granularity: 'word' });
-  return wordSegmenter;
-};
-
-const getSplittedLinesBySegmenter = (line: string, calcValues: FontWidthCalcValues): string[] => {
-  // nothing to process but need to keep this for new lines.
-  if (line.trim() === '') {
-    return [''];
-  }
-
-  const { font, fontSize, characterSpacing, boxWidthInPt } = calcValues;
-  const segmenter = getWordSegmenter();
-  const iterator = segmenter.segment(line.trimEnd())[Symbol.iterator]();
-
-  let lines: string[] = [];
-  let lineCounter: number = 0;
-  let currentTextSize: number = 0;
-
-  while (true) {
-    const chunk = iterator.next();
-    if (chunk.done) break;
-    const segment = chunk.value.segment;
-    const textWidth = widthOfTextAtSize(segment, font, fontSize, characterSpacing);
-    if (currentTextSize + textWidth <= boxWidthInPt) {
-      // the size of boxWidth is large enough to add the segment
-      if (lines[lineCounter]) {
-        lines[lineCounter] += segment;
-        currentTextSize += textWidth + characterSpacing;
-      } else {
-        lines[lineCounter] = segment;
-        currentTextSize = textWidth + characterSpacing;
-      }
-    } else if (segment.trim() === '') {
-      // a segment can be consist of multiple spaces like '     '
-      // if they overflow the box, treat them as a line break and move to the next line
-      lines[++lineCounter] = '';
-      currentTextSize = 0;
-    } else if (textWidth <= boxWidthInPt) {
-      // the segment is small enough to be added to the next line
-      lines[++lineCounter] = segment;
-      currentTextSize = textWidth + characterSpacing;
-    } else {
-      // the segment is too large to fit in the boxWidth, we wrap the segment
-      for (const char of segment) {
-        const size = widthOfTextAtSize(char, font, fontSize, characterSpacing);
-        if (currentTextSize + size <= boxWidthInPt) {
-          if (lines[lineCounter]) {
-            lines[lineCounter] += char;
-            currentTextSize += size + characterSpacing;
-          } else {
-            lines[lineCounter] = char;
-            currentTextSize = size + characterSpacing;
-          }
-        } else {
-          lines[++lineCounter] = char;
-          currentTextSize = size + characterSpacing;
-        }
-      }
-    }
-  }
-
-  if (lines.some(containsJapanese)) {
-    return adjustEndOfLine(filterEndJP(filterStartJP(lines)));
-  } else {
-    return adjustEndOfLine(lines);
-  }
-};
-
-// add a newline if the line is the end of the paragraph
-const adjustEndOfLine = (lines: string[]): string[] => {
-  return lines.map((line, index) => {
-    if (index === lines.length - 1) {
-      return line.trimEnd() + '\n';
-    } else {
-      return line.trimEnd();
-    }
-  });
-};
-
-function containsJapanese(text: string): boolean {
-  return /[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u.test(text);
-}
 //
 // 日本語禁則処理
 //

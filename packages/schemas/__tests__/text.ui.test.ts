@@ -155,6 +155,84 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
 
+  it('paints Viewer lines from the wrap engine with white-space:pre', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      textFormat: 'plain',
+      width: 18,
+      fontSize: 10,
+      characterSpacing: 0,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Party-König: oder die ‘Party’',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
+
+    expect(textBlock.style.whiteSpace).toBe('pre');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls.every((line) => line.style.whiteSpace === 'pre')).toBe(true);
+    expect(lineEls.some((line) => line.textContent?.startsWith(':'))).toBe(false);
+    expect(lineEls.some((line) => line.textContent?.includes('König:'))).toBe(true);
+    expect(textBlock.textContent?.includes('\n')).toBe(true);
+    expect(textBlock.textContent?.endsWith('\n')).toBe(false);
+  });
+
+  it('replicates PDF grapheme-count letter-spacing on justified soft lines', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      textFormat: 'plain',
+      alignment: 'justify',
+      width: 18,
+      fontSize: 10,
+      characterSpacing: 0,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'aaa bbb ccc',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
+
+    expect(textBlock.style.textAlign).toBe('left');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls[0]?.style.letterSpacing).not.toBe('');
+    expect(lineEls.at(-1)?.style.letterSpacing).toBe('');
+  });
+
   it('lets non-top vertical alignment move the UI text block', async () => {
     const rootElement = document.createElement('div');
     const schema: TextSchema = {
