@@ -129,6 +129,8 @@ const copyWin = 'ctrl+c';
 const copyMac = 'command+c';
 const pasteWin = 'ctrl+v';
 const pasteMac = 'command+v';
+// Letter shortcuts need hotkeys-js ≥4.0.4 (we declare ^4.0.7). 4.0.0–4.0.3
+// matched via physical event.code, so QWERTZ layouts swapped undo/redo (#1465).
 const redoWin = 'ctrl+y';
 const redoMac = 'shift+command+z';
 const undoWin = 'ctrl+z';
