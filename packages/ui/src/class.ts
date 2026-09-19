@@ -61,7 +61,7 @@ export abstract class BaseUIClass {
     const { domContainer, template, options = {}, plugins = {} } = props;
     this.domContainer = domContainer;
     this.template = cloneDeep(template);
-    this.options = options;
+    this.options = Object.assign({}, options);
     const container = this.domContainer;
     this.size = measureUiContainerSize(container, {
       height: window.innerHeight,
@@ -122,7 +122,7 @@ export abstract class BaseUIClass {
     if (font) {
       this.font = font;
     }
-    this.options = Object.assign(this.options, options);
+    this.options = Object.assign({}, this.options, options);
     this.render();
   }
 
