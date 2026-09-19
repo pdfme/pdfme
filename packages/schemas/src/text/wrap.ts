@@ -162,8 +162,33 @@ const wrapParagraph = (
   let current = '';
 
   const flush = (hardBreak: boolean) => {
-    lines.push({ text: current.trimEnd(), hardBreak });
+    const text = current.trimEnd();
     current = '';
+    if (text === '') {
+      // Space-only atoms measure as empty after trimEnd. Do not invent a blank
+      // soft line; promote the previous line when this flush ends the paragraph.
+      if (!hardBreak) return;
+      if (lines.length === 0) {
+        lines.push({ text: '', hardBreak: true });
+        return;
+      }
+      const last = lines[lines.length - 1];
+      if (last) lines[lines.length - 1] = { ...last, hardBreak: true };
+      return;
+    }
+    lines.push({ text, hardBreak });
+  };
+
+  const startLine = (atomText: string) => {
+    if (atomText === '') {
+      current = '';
+      return;
+    }
+    if (measure(atomText.trimEnd()) <= maxWidth) {
+      current = atomText;
+    } else {
+      appendOverflow(atomText);
+    }
   };
 
   const appendOverflow = (atomText: string) => {
@@ -180,22 +205,16 @@ const wrapParagraph = (
   };
 
   for (const atom of getAtoms(source)) {
-    const next = current + atom.text;
     if (current === '') {
-      if (measure(atom.text.trimEnd()) <= maxWidth) {
-        current = atom.text;
-      } else {
-        appendOverflow(atom.text);
-      }
-    } else if (measure(next.trimEnd()) <= maxWidth) {
-      current = next;
+      startLine(atom.text);
+    } else if (measure((current + atom.text).trimEnd()) <= maxWidth) {
+      current += atom.text;
     } else {
       flush(false);
-      if (measure(atom.text.trimEnd()) <= maxWidth) {
-        current = atom.text;
-      } else {
-        appendOverflow(atom.text);
-      }
+      // Spaces that caused the wrap belong to the previous line; do not indent
+      // the continuation. Paragraph-leading spaces still go through startLine
+      // above because `current` is empty at the start of the paragraph.
+      startLine(atom.text.replace(/^\s+/, ''));
     }
 
     if (atom.required) {

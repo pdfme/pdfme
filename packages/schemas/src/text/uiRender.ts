@@ -370,10 +370,14 @@ const renderReadOnlyPlainLines = (arg: {
     }
 
     const graphemes = splitGraphemes(displayText);
+    const justifiedSoftLine = alignment === ALIGN_JUSTIFY && !line.hardBreak;
     graphemes.forEach((grapheme, index) => {
       const span = document.createElement('span');
       span.textContent = grapheme;
-      if (index === graphemes.length - 1) {
+      // PDF `setCharacterSpacing` applies Tc after every grapheme, including
+      // the last. Zeroing the last glyph is only for ordinary characterSpacing
+      // so browsers do not count a trailing gap when wrapping.
+      if (index === graphemes.length - 1 && !justifiedSoftLine) {
         span.style.letterSpacing = '0';
       }
       lineEl.appendChild(span);

@@ -269,6 +269,8 @@ describe('text inline markdown UI rendering', () => {
     expect(lineEls.length).toBeGreaterThan(1);
     expect(lineEls[0]?.style.letterSpacing).not.toBe('');
     expect(lineEls.at(-1)?.style.letterSpacing).toBe('');
+    const firstLineLastGlyph = lineEls[0]?.querySelector('span:last-child') as HTMLSpanElement;
+    expect(firstLineLastGlyph.style.letterSpacing).toBe('');
   });
 
   it('lets non-top vertical alignment move the UI text block', async () => {

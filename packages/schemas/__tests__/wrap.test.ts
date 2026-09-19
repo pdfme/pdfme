@@ -91,6 +91,20 @@ describe('shared wrap engine (#1115)', () => {
     expect(lines[1]?.hardBreak).toBe(true);
   });
 
+  it('does not emit a blank line from a space-only wrap atom', () => {
+    const lines = wrap('aaa    bbb', 20);
+    expect(lineTexts(lines)).toEqual(['aaa', 'bbb']);
+    expect(lines.some((line) => line.text === '')).toBe(false);
+  });
+
+  it('keeps paragraph indentation while dropping wrap-leading spaces', () => {
+    const lines = wrap('hello\n  world', 100);
+    expect(lines).toEqual([
+      { text: 'hello', hardBreak: true },
+      { text: '  world', hardBreak: true },
+    ]);
+  });
+
   it('does not emit an empty line from leftover space after an overflow split', () => {
     // Monospaced 3-char width (5pt/glyph at 10pt). "abcdef " overflows, and
     // the trailing space used to become its own line before "xyz".
