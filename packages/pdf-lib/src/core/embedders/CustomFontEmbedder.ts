@@ -6,7 +6,13 @@ import PDFHexString from '../objects/PDFHexString.js';
 import PDFRef from '../objects/PDFRef.js';
 import PDFString from '../objects/PDFString.js';
 import PDFContext from '../PDFContext.js';
-import { byAscendingId, Cache, sortedUniq, toHexStringOfMinLength } from '../../utils/index.js';
+import {
+  byAscendingId,
+  Cache,
+  sortedUniq,
+  splitTextIntoShapingRuns,
+  toHexStringOfMinLength,
+} from '../../utils/index.js';
 
 /**
  * A note of thanks to the developers of https://github.com/foliojs/pdfkit, as
@@ -33,6 +39,7 @@ class CustomFontEmbedder {
 
   protected baseFontName: string;
   protected glyphCache: Cache<Glyph[]>;
+  private readonly shapedGlyphsById: Map<number, Glyph>;
 
   protected constructor(
     font: Font,
@@ -48,6 +55,7 @@ class CustomFontEmbedder {
     this.fontFeatures = fontFeatures;
 
     this.baseFontName = '';
+    this.shapedGlyphsById = new Map();
     this.glyphCache = Cache.populatedBy(this.allGlyphsInFontSortedById);
   }
 
@@ -56,7 +64,7 @@ class CustomFontEmbedder {
    * Unicode, but embedded fonts use their own custom encodings)
    */
   encodeText(text: string): PDFHexString {
-    const { glyphs } = this.font.layout(text, this.fontFeatures);
+    const glyphs = this.layoutGlyphs(text);
     const hexCodes = Array(glyphs.length);
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       hexCodes[idx] = toHexStringOfMinLength(glyphs[idx].id, 4);
@@ -67,13 +75,55 @@ class CustomFontEmbedder {
   // The advanceWidth takes into account kerning automatically, so we don't
   // have to do that manually like we do for the standard fonts.
   widthOfTextAtSize(text: string, size: number): number {
-    const { glyphs } = this.font.layout(text, this.fontFeatures);
+    const glyphs = this.layoutGlyphs(text);
     let totalWidth = 0;
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       totalWidth += glyphs[idx].advanceWidth * this.scale;
     }
     const scale = size / 1000;
     return totalWidth * scale;
+  }
+
+  /**
+   * Layout `text` as one or more fontkit runs. Thai/Lao spans are shaped
+   * separately so GSUB mark variants are selected even when Latin/CJK leads.
+   * A script tag is never passed — each run has one strong script, so fontkit
+   * auto-detection matches the script we would have specified.
+   */
+  protected layoutGlyphs(text: string): Glyph[] {
+    const runs = splitTextIntoShapingRuns(text);
+    let glyphs: Glyph[];
+    if (runs.length <= 1) {
+      glyphs = this.font.layout(runs[0] ?? '', this.fontFeatures).glyphs;
+    } else {
+      // Loop-push: `push(...runGlyphs)` overflows on long mixed-script strings.
+      glyphs = [];
+      for (const run of runs) {
+        const runGlyphs = this.font.layout(run, this.fontFeatures).glyphs;
+        for (let idx = 0, len = runGlyphs.length; idx < len; idx++) {
+          glyphs.push(runGlyphs[idx]);
+        }
+      }
+    }
+    this.registerShapedGlyphs(glyphs);
+    return glyphs;
+  }
+
+  /**
+   * GSUB can emit glyphs that are not in `font.characterSet` (e.g. Sarabun
+   * tone gid 736). Retain those objects so `computeWidths()` and
+   * `embedUnicodeCmap()` include them when the full font is embedded.
+   */
+  protected registerShapedGlyphs(glyphs: Glyph[]): void {
+    let added = false;
+    for (let idx = 0, len = glyphs.length; idx < len; idx++) {
+      const glyph = glyphs[idx];
+      if (!this.shapedGlyphsById.has(glyph.id)) {
+        this.shapedGlyphsById.set(glyph.id, glyph);
+        added = true;
+      }
+    }
+    if (added) this.glyphCache.invalidate();
   }
 
   heightOfFontAtSize(size: number, options: { descender?: boolean } = {}): number {
@@ -225,10 +275,14 @@ class CustomFontEmbedder {
   }
 
   private allGlyphsInFontSortedById = (): Glyph[] => {
-    const glyphs: Glyph[] = Array(this.font.characterSet.length);
-    for (let idx = 0, len = glyphs.length; idx < len; idx++) {
+    const glyphs: Glyph[] = Array(this.font.characterSet.length + this.shapedGlyphsById.size);
+    for (let idx = 0, len = this.font.characterSet.length; idx < len; idx++) {
       const codePoint = this.font.characterSet[idx];
       glyphs[idx] = this.font.glyphForCodePoint(codePoint);
+    }
+    let extraIdx = this.font.characterSet.length;
+    for (const glyph of this.shapedGlyphsById.values()) {
+      glyphs[extraIdx++] = glyph;
     }
     return sortedUniq(glyphs.sort(byAscendingId), (g) => g.id);
   };

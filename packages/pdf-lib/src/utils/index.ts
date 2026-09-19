@@ -8,4 +8,5 @@ export * from './base64.js';
 export * from './objects.js';
 export * from './validators.js';
 export * from './pdfDocEncoding.js';
+export * from './scriptRuns.js';
 export { default as Cache } from './Cache.js';
