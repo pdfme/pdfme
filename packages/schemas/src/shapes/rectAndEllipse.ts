@@ -1,7 +1,11 @@
 import { Plugin, Schema, mm2pt } from '@pdfme/common';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { hex2PrintingColor, convertForPdfLayoutProps, createSvgStr } from '../utils.js';
-import { toRadians } from '@pdfme/pdf-lib';
+import {
+  hex2PrintingColor,
+  convertForPdfLayoutProps,
+  createSvgStr,
+  rotatePoint,
+} from '../utils.js';
 import { Circle, Square } from 'lucide';
 
 export interface ShapeSchema extends Schema {
@@ -61,16 +65,18 @@ const shape: Plugin<ShapeSchema> = {
       });
     } else if (schema.type === 'rectangle') {
       const radius = schema.radius ?? 0;
+      // position is the (already center-rotated) bottom-left anchor of the full box.
+      // Inset the stroke path by borderWidth/2 in the box's local rotated frame so the
+      // centered PDF stroke matches the UI's inside (border-box) border.
+      const inset = rotatePoint(
+        { x: position.x + borderWidth / 2, y: position.y + borderWidth / 2 },
+        position,
+        rotate.angle,
+      );
 
       page.drawRectangle({
-        x:
-          position.x +
-          borderWidth * ((1 - Math.sin(toRadians(rotate))) / 2) +
-          Math.tan(toRadians(rotate)) * Math.PI ** 2,
-        y:
-          position.y +
-          borderWidth * ((1 + Math.sin(toRadians(rotate))) / 2) +
-          Math.tan(toRadians(rotate)) * Math.PI ** 2,
+        x: inset.x,
+        y: inset.y,
         width: width - borderWidth,
         height: height - borderWidth,
         ...(radius ? { radius: mm2pt(radius) } : {}),
