@@ -39,7 +39,7 @@ class CustomFontSubsetEmbedder extends CustomFontEmbedder {
   }
 
   encodeText(text: string): PDFHexString {
-    const { glyphs } = this.font.layout(text, this.fontFeatures);
+    const glyphs = this.layoutGlyphs(text);
     const hexCodes = Array(glyphs.length);
 
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {

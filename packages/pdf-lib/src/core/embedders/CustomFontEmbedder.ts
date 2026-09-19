@@ -6,7 +6,13 @@ import PDFHexString from '../objects/PDFHexString.js';
 import PDFRef from '../objects/PDFRef.js';
 import PDFString from '../objects/PDFString.js';
 import PDFContext from '../PDFContext.js';
-import { byAscendingId, Cache, sortedUniq, toHexStringOfMinLength } from '../../utils/index.js';
+import {
+  byAscendingId,
+  Cache,
+  sortedUniq,
+  splitTextIntoShapingRuns,
+  toHexStringOfMinLength,
+} from '../../utils/index.js';
 
 /**
  * A note of thanks to the developers of https://github.com/foliojs/pdfkit, as
@@ -56,7 +62,7 @@ class CustomFontEmbedder {
    * Unicode, but embedded fonts use their own custom encodings)
    */
   encodeText(text: string): PDFHexString {
-    const { glyphs } = this.font.layout(text, this.fontFeatures);
+    const glyphs = this.layoutGlyphs(text);
     const hexCodes = Array(glyphs.length);
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       hexCodes[idx] = toHexStringOfMinLength(glyphs[idx].id, 4);
@@ -67,13 +73,27 @@ class CustomFontEmbedder {
   // The advanceWidth takes into account kerning automatically, so we don't
   // have to do that manually like we do for the standard fonts.
   widthOfTextAtSize(text: string, size: number): number {
-    const { glyphs } = this.font.layout(text, this.fontFeatures);
+    const glyphs = this.layoutGlyphs(text);
     let totalWidth = 0;
     for (let idx = 0, len = glyphs.length; idx < len; idx++) {
       totalWidth += glyphs[idx].advanceWidth * this.scale;
     }
     const scale = size / 1000;
     return totalWidth * scale;
+  }
+
+  /**
+   * Layout `text` as one or more fontkit runs. Thai/Lao spans are shaped
+   * separately so GSUB mark variants are selected even when Latin/CJK leads.
+   * A script tag is never passed — each run has one strong script, so fontkit
+   * auto-detection matches the script we would have specified.
+   */
+  protected layoutGlyphs(text: string): Glyph[] {
+    const runs = splitTextIntoShapingRuns(text);
+    if (runs.length <= 1) return this.font.layout(runs[0] ?? '', this.fontFeatures).glyphs;
+    const glyphs: Glyph[] = [];
+    for (const run of runs) glyphs.push(...this.font.layout(run, this.fontFeatures).glyphs);
+    return glyphs;
   }
 
   heightOfFontAtSize(size: number, options: { descender?: boolean } = {}): number {

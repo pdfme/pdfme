@@ -5,10 +5,18 @@ import {
   CustomFontSubsetEmbedder,
   PDFContext,
   PDFDict,
+  PDFDocument,
   PDFHexString,
 } from '../../../src/index';
 
 const ubuntuFont = fs.readFileSync('./assets/fonts/ubuntu/Ubuntu-R.ttf');
+const sarabunFont = fs.readFileSync(
+  './assets/fonts/sarabun/Sarabun-Regular.ttf',
+);
+
+type SubsetGlyph = { id: number; codePoints: number[] };
+const subsetGlyphs = (embedder: CustomFontSubsetEmbedder): SubsetGlyph[] =>
+  (embedder as unknown as { glyphs: SubsetGlyph[] }).glyphs;
 
 describe(`CustomFontSubsetEmbedder`, () => {
   it(`can be constructed with CustomFontSubsetEmbedder.for(...)`, async () => {
@@ -58,5 +66,25 @@ describe(`CustomFontSubsetEmbedder`, () => {
     const embedder = await CustomFontSubsetEmbedder.for(fontkit, ubuntuFont);
     expect(embedder.sizeOfFontAtHeight(12)).toBeCloseTo(10.705);
     expect(embedder.sizeOfFontAtHeight(24)).toBeCloseTo(21.409);
+  });
+
+  it(`subsets mixed Latin+Thai with the raised mark glyph and ToUnicode`, async () => {
+    const embedder = await CustomFontSubsetEmbedder.for(fontkit, sarabunFont);
+    const encoded = embedder.encodeText('A วันที่');
+
+    expect(encoded.asString()).toMatch(/^[0-9A-F]{32}$/);
+
+    const raisedMark = subsetGlyphs(embedder).find((glyph) => glyph.id === 736);
+    expect(raisedMark).toBeDefined();
+    expect(raisedMark!.codePoints).toContain(0x0e48);
+  });
+
+  it(`can draw mixed Latin+Thai text through PDFPage.drawText with subsetting`, async () => {
+    const pdfDoc = await PDFDocument.create();
+    pdfDoc.registerFontkit(fontkit);
+    const font = await pdfDoc.embedFont(sarabunFont, { subset: true });
+    pdfDoc.addPage().drawText('A วันที่', { font, size: 24 });
+    const bytes = await pdfDoc.save();
+    expect(bytes.byteLength).toBeGreaterThan(0);
   });
 });
