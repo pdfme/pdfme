@@ -9,7 +9,6 @@ import {
   CODE_HORIZONTAL_PADDING,
   DYNAMIC_FIT_HORIZONTAL,
   DYNAMIC_FIT_VERTICAL,
-  FONT_SIZE_ADJUSTMENT,
   FONT_VARIANT_FALLBACK_ERROR,
   FONT_VARIANT_FALLBACK_PLAIN,
   SYNTHETIC_BOLD_OFFSET_RATIO,
@@ -17,7 +16,13 @@ import {
   SYNTHETIC_ITALIC_SKEW_DEGREES,
   TEXT_FORMAT_INLINE_MARKDOWN,
 } from './constants.js';
-import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.js';
+import {
+  fitDynamicFontSize,
+  getFontKitFont,
+  getLineBoxHeightPt,
+  heightOfFontAtSize,
+  widthOfTextAtSize,
+} from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
 import { getBoxContentArea } from '../box.js';
@@ -242,10 +247,18 @@ const measureParagraphWidths = (
   return widths;
 };
 
-const getLineHeightAtSize = (line: RichTextLine, fontSize: number) => {
-  if (line.runs.length === 0) return fontSize;
-  return Math.max(...line.runs.map((run) => heightOfFontAtSize(run.fontKitFont, fontSize)));
-};
+export const getRichTextLineBoxHeightPt = (
+  line: RichTextLine,
+  fontSize: number,
+  isFirstLine: boolean,
+  fallbackFont: FontKitFont,
+) =>
+  getLineBoxHeightPt(
+    fontSize,
+    isFirstLine,
+    line.runs.map((run) => run.fontKitFont),
+    fallbackFont,
+  );
 
 export const calculateDynamicRichTextFontSize = async (arg: {
   value: string;
@@ -264,90 +277,49 @@ export const calculateDynamicRichTextFontSize = async (arg: {
   const { width: boxWidth, height: boxHeight } = getBoxContentArea(schema);
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
-  if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
   const richTextRuns = parseInlineMarkdown(value);
   const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
+  const fallbackFont =
+    resolvedRuns[0]?.fontKitFont ??
+    (await getFontKitFont(schema.fontName, font, _cache as Map<string, FontKitFont>));
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const dynamicFontFit = dynamicFontSizeSetting.fit ?? DEFAULT_DYNAMIC_FIT;
   const boxWidthInPt = mm2pt(boxWidth);
 
-  let dynamicFontSize = fontSize;
-  if (dynamicFontSize < dynamicFontSizeSetting.min) {
-    dynamicFontSize = dynamicFontSizeSetting.min;
-  } else if (dynamicFontSize > dynamicFontSizeSetting.max) {
-    dynamicFontSize = dynamicFontSizeSetting.max;
-  }
+  return fitDynamicFontSize({
+    startSize: fontSize,
+    setting: dynamicFontSizeSetting,
+    boxWidth,
+    boxHeight,
+    calculateConstraints: (size) => {
+      let totalWidthInMm = 0;
+      let totalHeightInMm = 0;
 
-  const calculateConstraints = (size: number) => {
-    let totalWidthInMm = 0;
-    let totalHeightInMm = 0;
-
-    const lines = layoutRichTextLines({
-      runs: resolvedRuns,
-      fontSize: size,
-      characterSpacing,
-      boxWidthInPt,
-    });
-
-    lines.forEach((line, lineIndex) => {
-      if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
-        totalWidthInMm = Math.max(totalWidthInMm, pt2mm(line.width));
-      }
-
-      if (lineIndex === 0) {
-        totalHeightInMm += pt2mm(getLineHeightAtSize(line, size) * lineHeight);
-      } else {
-        totalHeightInMm += pt2mm(size * lineHeight);
-      }
-    });
-
-    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
-      measureParagraphWidths(resolvedRuns, size, characterSpacing).forEach((paragraphWidth) => {
-        totalWidthInMm = Math.max(totalWidthInMm, pt2mm(paragraphWidth));
+      const lines = layoutRichTextLines({
+        runs: resolvedRuns,
+        fontSize: size,
+        characterSpacing,
+        boxWidthInPt,
       });
-    }
 
-    return { totalWidthInMm, totalHeightInMm };
-  };
+      lines.forEach((line, lineIndex) => {
+        if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
+          totalWidthInMm = Math.max(totalWidthInMm, pt2mm(line.width));
+        }
 
-  const shouldFontGrowToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
-    if (dynamicFontSize >= dynamicFontSizeSetting.max) {
-      return false;
-    }
-    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
-      return totalWidthInMm < boxWidth;
-    }
-    return totalHeightInMm < boxHeight;
-  };
+        totalHeightInMm += pt2mm(
+          getRichTextLineBoxHeightPt(line, size, lineIndex === 0, fallbackFont) * lineHeight,
+        );
+      });
 
-  const shouldFontShrinkToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
-    if (dynamicFontSize <= dynamicFontSizeSetting.min || dynamicFontSize <= 0) {
-      return false;
-    }
-    return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
-  };
+      if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
+        measureParagraphWidths(resolvedRuns, size, characterSpacing).forEach((paragraphWidth) => {
+          totalWidthInMm = Math.max(totalWidthInMm, pt2mm(paragraphWidth));
+        });
+      }
 
-  let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
-
-  while (shouldFontGrowToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
-    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
-      calculateConstraints(dynamicFontSize);
-
-    if (newHeight < boxHeight) {
-      totalWidthInMm = newWidth;
-      totalHeightInMm = newHeight;
-    } else {
-      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-      break;
-    }
-  }
-
-  while (shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
-  }
-
-  return dynamicFontSize;
+      return { totalWidthInMm, totalHeightInMm };
+    },
+  });
 };

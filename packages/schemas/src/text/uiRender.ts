@@ -20,6 +20,7 @@ import {
   DEFAULT_FONT_COLOR,
   PLACEHOLDER_FONT_COLOR,
   CODE_BACKGROUND_COLOR,
+  CODE_HORIZONTAL_PADDING,
   SYNTHETIC_BOLD_CSS_TEXT_SHADOW,
   TEXT_FORMAT_INLINE_MARKDOWN,
   ALIGN_JUSTIFY,
@@ -33,7 +34,7 @@ import {
   wrapTextToSize,
   widthOfTextAtSize,
 } from './helper.js';
-import { countGraphemes, getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
+import { getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
@@ -285,25 +286,24 @@ const renderInlineMarkdownReadOnly = async (arg: {
     const lineEl = document.createElement('span');
     lineEl.dataset.pdfmeWrapLine = '';
     lineEl.style.whiteSpace = 'pre';
-    const justifiedSoftLine = alignment === ALIGN_JUSTIFY && !line.hardBreak;
-    if (justifiedSoftLine) {
-      const { extraLetterSpacing } = getLineAlignment(
-        {
-          text: line.runs.map((run) => run.text).join(''),
-          width: line.width,
-          hardBreak: line.hardBreak,
-        },
-        boxWidthInPt,
-        alignment,
-      );
-      if (extraLetterSpacing !== 0) {
-        lineEl.style.letterSpacing = `${characterSpacing + extraLetterSpacing}pt`;
-      }
-    }
+    const stripTrailingLetterSpacing = applySharedWrapLineSpacing(
+      lineEl,
+      {
+        text: line.runs.map((run) => run.text).join(''),
+        width: line.width,
+        hardBreak: line.hardBreak,
+      },
+      alignment,
+      boxWidthInPt,
+      characterSpacing,
+    );
 
     line.runs.forEach((run) => {
       appendInlineMarkdownRun({ parent: lineEl, run, schema, font });
     });
+    if (stripTrailingLetterSpacing) {
+      stripLineEndLetterSpacing(lineEl);
+    }
 
     textBlock.appendChild(lineEl);
     if (lineIndex < lines.length - 1) {
@@ -353,12 +353,49 @@ const appendInlineMarkdownRun = (arg: {
   if (run.code) {
     span.style.backgroundColor = CODE_BACKGROUND_COLOR;
     span.style.borderRadius = '2px';
-    span.style.padding = '0 0.15em';
+    span.style.padding = `0 ${CODE_HORIZONTAL_PADDING}pt`;
     if (!schema.fontVariants?.code || !font[schema.fontVariants.code]) {
       span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
     }
   }
   parent.appendChild(span);
+};
+
+const applySharedWrapLineSpacing = (
+  lineEl: HTMLElement,
+  line: { text: string; width: number; hardBreak: boolean },
+  alignment: string,
+  boxWidthInPt: number,
+  characterSpacing: number,
+) => {
+  const { extraLetterSpacing } = getLineAlignment(line, boxWidthInPt, alignment);
+  const stripTrailingLetterSpacing = !(alignment === ALIGN_JUSTIFY && !line.hardBreak);
+  if (!stripTrailingLetterSpacing && extraLetterSpacing !== 0) {
+    lineEl.style.letterSpacing = `${characterSpacing + extraLetterSpacing}pt`;
+  }
+  return stripTrailingLetterSpacing;
+};
+
+const stripLineEndLetterSpacing = (lineEl: HTMLElement) => {
+  let node: ChildNode | null = lineEl.lastChild;
+  while (node && (node.nodeType !== Node.ELEMENT_NODE || !node.textContent)) {
+    node = node.previousSibling;
+  }
+  if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+
+  const el = node as HTMLElement;
+  const graphemes = splitGraphemes(el.textContent ?? '');
+  if (graphemes.length === 0) return;
+  if (graphemes.length === 1) {
+    el.style.letterSpacing = '0';
+    return;
+  }
+
+  el.textContent = graphemes.slice(0, -1).join('');
+  const tail = el.cloneNode(false) as HTMLElement;
+  tail.textContent = graphemes[graphemes.length - 1];
+  tail.style.letterSpacing = '0';
+  lineEl.appendChild(tail);
 };
 
 const renderReadOnlyPlainLines = (arg: {
@@ -380,23 +417,23 @@ const renderReadOnlyPlainLines = (arg: {
     lineEl.style.whiteSpace = 'pre';
     const displayText = replaceUnsupportedChars(line.text, fontKitFont);
 
-    if (alignment === ALIGN_JUSTIFY && !line.hardBreak) {
-      const textWidth = widthOfTextAtSize(line.text, fontKitFont, fontSize, characterSpacing);
-      const graphemeCount = countGraphemes(line.text);
-      if (graphemeCount > 0) {
-        lineEl.style.letterSpacing = `${characterSpacing + (boxWidthInPt - textWidth) / graphemeCount}pt`;
-      }
-    }
+    const textWidth = widthOfTextAtSize(line.text, fontKitFont, fontSize, characterSpacing);
+    const stripTrailingLetterSpacing = applySharedWrapLineSpacing(
+      lineEl,
+      { text: line.text, width: textWidth, hardBreak: line.hardBreak },
+      alignment,
+      boxWidthInPt,
+      characterSpacing,
+    );
 
     const graphemes = splitGraphemes(displayText);
-    const justifiedSoftLine = alignment === ALIGN_JUSTIFY && !line.hardBreak;
     graphemes.forEach((grapheme, index) => {
       const span = document.createElement('span');
       span.textContent = grapheme;
       // PDF `setCharacterSpacing` applies Tc after every grapheme, including
       // the last. Zeroing the last glyph is only for ordinary characterSpacing
       // so browsers do not count a trailing gap when wrapping.
-      if (index === graphemes.length - 1 && !justifiedSoftLine) {
+      if (index === graphemes.length - 1 && stripTrailingLetterSpacing) {
         span.style.letterSpacing = '0';
       }
       lineEl.appendChild(span);

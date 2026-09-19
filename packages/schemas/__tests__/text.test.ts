@@ -774,6 +774,41 @@ describe('calculateDynamicRichTextFontSize', () => {
       }),
     );
   });
+
+  it('computes the same size as plain text for leading empty lines', async () => {
+    const fontKitFont = await getFontKitFont('SauceHanSansJP', getSampleFont(), new Map());
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      fontName: 'SauceHanSansJP',
+      width: 60,
+      height: 25,
+      fontSize: 13,
+      characterSpacing: 0,
+      lineHeight: 1,
+      dynamicFontSize: { min: 4, max: 30, fit: 'vertical' },
+    };
+    const value = '\n\nhello world';
+    const font = getSampleFont();
+    const cache = new Map<string | number, FontKitFont>([
+      ['getFontKitFont-SauceHanSansJP', fontKitFont],
+    ]);
+
+    const plainSize = calculateDynamicFontSize({
+      textSchema: schema,
+      fontKitFont,
+      value,
+    });
+    const markdownSize = await calculateDynamicRichTextFontSize({
+      value,
+      schema: { ...schema, textFormat: 'inline-markdown', readOnly: true },
+      font,
+      _cache: cache,
+    });
+
+    expect(plainSize).toBeGreaterThan(4);
+    expect(plainSize).toBeLessThan(30);
+    expect(markdownSize).toBe(plainSize);
+  });
 });
 
 describe('getSplitPosition test with mocked font width calculations', () => {

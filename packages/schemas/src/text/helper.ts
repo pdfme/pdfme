@@ -12,7 +12,7 @@ import {
   isUrlSafeToFetch,
 } from '@pdfme/common';
 import { Buffer } from 'buffer';
-import type { TextSchema, FontWidthCalcValues } from './types.js';
+import type { DYNAMIC_FONT_SIZE_FIT, TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
 import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
 import {
@@ -85,6 +85,86 @@ export const heightOfFontAtSize = (fontKitFont: FontKitFont, fontSize: number) =
   height -= Math.abs(descent * scale) || 0;
 
   return (height / 1000) * fontSize;
+};
+
+/**
+ * First-line height uses font metrics (including empty leading lines).
+ * Later lines use the nominal font size. Shared by plain and Markdown.
+ */
+export const getLineBoxHeightPt = (
+  fontSize: number,
+  isFirstLine: boolean,
+  lineFonts: readonly FontKitFont[],
+  fallbackFont: FontKitFont,
+) => {
+  if (!isFirstLine) return fontSize;
+  const fonts = lineFonts.length > 0 ? lineFonts : [fallbackFont];
+  return Math.max(...fonts.map((font) => heightOfFontAtSize(font, fontSize)));
+};
+
+export const fitDynamicFontSize = ({
+  startSize,
+  setting,
+  boxWidth,
+  boxHeight,
+  calculateConstraints,
+}: {
+  startSize: number;
+  setting: { min: number; max: number; fit?: DYNAMIC_FONT_SIZE_FIT };
+  boxWidth: number;
+  boxHeight: number;
+  calculateConstraints: (size: number) => { totalWidthInMm: number; totalHeightInMm: number };
+}) => {
+  if (setting.max < setting.min) return startSize;
+
+  let dynamicFontSize = startSize;
+  if (dynamicFontSize < setting.min) {
+    dynamicFontSize = setting.min;
+  } else if (dynamicFontSize > setting.max) {
+    dynamicFontSize = setting.max;
+  }
+
+  const dynamicFontFit = setting.fit ?? DEFAULT_DYNAMIC_FIT;
+
+  const shouldFontGrowToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
+    if (dynamicFontSize >= setting.max) {
+      return false;
+    }
+    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
+      return totalWidthInMm < boxWidth;
+    }
+    return totalHeightInMm < boxHeight;
+  };
+
+  const shouldFontShrinkToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
+    if (dynamicFontSize <= setting.min || dynamicFontSize <= 0) {
+      return false;
+    }
+    return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
+  };
+
+  let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
+
+  while (shouldFontGrowToFit(totalWidthInMm, totalHeightInMm)) {
+    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
+    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
+      calculateConstraints(dynamicFontSize);
+
+    if (newHeight < boxHeight) {
+      totalWidthInMm = newWidth;
+      totalHeightInMm = newHeight;
+    } else {
+      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
+      break;
+    }
+  }
+
+  while (shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm)) {
+    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
+    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
+  }
+
+  return dynamicFontSize;
 };
 
 const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
@@ -317,27 +397,19 @@ export const calculateDynamicFontSize = ({
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const paragraphs = splitParagraphs(value);
-
-  let dynamicFontSize = fontSize;
-  if (dynamicFontSize < dynamicFontSizeSetting.min) {
-    dynamicFontSize = dynamicFontSizeSetting.min;
-  } else if (dynamicFontSize > dynamicFontSizeSetting.max) {
-    dynamicFontSize = dynamicFontSizeSetting.max;
-  }
   const dynamicFontFit = dynamicFontSizeSetting.fit ?? DEFAULT_DYNAMIC_FIT;
 
-  const calculateConstraints = (size: number) => {
-    let totalWidthInMm = 0;
-    let totalHeightInMm = 0;
-
-    const boxWidthInPt = mm2pt(boxWidth);
-    const firstLineTextHeight = heightOfFontAtSize(fontKitFont, size);
-    const firstLineHeightInMm = pt2mm(firstLineTextHeight * lineHeight);
-    const otherRowHeightInMm = pt2mm(size * lineHeight);
-
-    paragraphs.forEach((paragraph, paraIndex) => {
+  return fitDynamicFontSize({
+    startSize: fontSize,
+    setting: dynamicFontSizeSetting,
+    boxWidth,
+    boxHeight,
+    calculateConstraints: (size) => {
+      let totalWidthInMm = 0;
+      let totalHeightInMm = 0;
+      const boxWidthInPt = mm2pt(boxWidth);
       const lines = wrapText(
-        paragraph,
+        value,
         (text) =>
           text.length === 0 ? 0 : widthOfTextAtSize(text, fontKitFont, size, characterSpacing),
         boxWidthInPt,
@@ -345,70 +417,25 @@ export const calculateDynamicFontSize = ({
 
       lines.forEach((line, lineIndex) => {
         if (dynamicFontFit === DYNAMIC_FIT_VERTICAL) {
-          // For vertical fit we want to consider the width of text lines where we detect a split
           const textWidth = widthOfTextAtSize(line.text, fontKitFont, size, characterSpacing);
-          const textWidthInMm = pt2mm(textWidth);
-          totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
+          totalWidthInMm = Math.max(totalWidthInMm, pt2mm(textWidth));
         }
 
-        if (paraIndex + lineIndex === 0) {
-          totalHeightInMm += firstLineHeightInMm;
-        } else {
-          totalHeightInMm += otherRowHeightInMm;
-        }
+        totalHeightInMm += pt2mm(
+          getLineBoxHeightPt(size, lineIndex === 0, [fontKitFont], fontKitFont) * lineHeight,
+        );
       });
+
       if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
-        // For horizontal fit we want to consider the line's width 'unsplit'
-        const textWidth = widthOfTextAtSize(paragraph, fontKitFont, size, characterSpacing);
-        const textWidthInMm = pt2mm(textWidth);
-        totalWidthInMm = Math.max(totalWidthInMm, textWidthInMm);
+        paragraphs.forEach((paragraph) => {
+          const textWidth = widthOfTextAtSize(paragraph, fontKitFont, size, characterSpacing);
+          totalWidthInMm = Math.max(totalWidthInMm, pt2mm(textWidth));
+        });
       }
-    });
 
-    return { totalWidthInMm, totalHeightInMm };
-  };
-
-  const shouldFontGrowToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
-    if (dynamicFontSize >= dynamicFontSizeSetting.max) {
-      return false;
-    }
-    if (dynamicFontFit === DYNAMIC_FIT_HORIZONTAL) {
-      return totalWidthInMm < boxWidth;
-    }
-    return totalHeightInMm < boxHeight;
-  };
-
-  const shouldFontShrinkToFit = (totalWidthInMm: number, totalHeightInMm: number) => {
-    if (dynamicFontSize <= dynamicFontSizeSetting.min || dynamicFontSize <= 0) {
-      return false;
-    }
-    return totalWidthInMm > boxWidth || totalHeightInMm > boxHeight;
-  };
-
-  let { totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize);
-
-  // Attempt to increase the font size up to desired fit
-  while (shouldFontGrowToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize += FONT_SIZE_ADJUSTMENT;
-    const { totalWidthInMm: newWidth, totalHeightInMm: newHeight } =
-      calculateConstraints(dynamicFontSize);
-
-    if (newHeight < boxHeight) {
-      totalWidthInMm = newWidth;
-      totalHeightInMm = newHeight;
-    } else {
-      dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-      break;
-    }
-  }
-
-  // Attempt to decrease the font size down to desired fit
-  while (shouldFontShrinkToFit(totalWidthInMm, totalHeightInMm)) {
-    dynamicFontSize -= FONT_SIZE_ADJUSTMENT;
-    ({ totalWidthInMm, totalHeightInMm } = calculateConstraints(dynamicFontSize));
-  }
-
-  return dynamicFontSize;
+      return { totalWidthInMm, totalHeightInMm };
+    },
+  });
 };
 
 const measureTextWidth = (

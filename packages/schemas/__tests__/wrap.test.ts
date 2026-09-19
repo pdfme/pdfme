@@ -1,12 +1,14 @@
 import type { Font as FontKitFont } from 'fontkit';
-import { mm2pt } from '@pdfme/common';
+import { mm2pt, type Font } from '@pdfme/common';
 import { calculateDynamicFontSize, splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
+import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
 import { CJ, getRawLineBreakClass, IS, QU, SA } from '../src/text/lineBreak.js';
 import {
   LINE_BREAK_SOURCE_SHA256,
   LINE_BREAK_UNICODE_VERSION,
 } from '../src/text/lineBreakClasses.generated.js';
 import {
+  calculateDynamicRichTextFontSize,
   getRichTextLineText,
   layoutRichTextLines,
   type ResolvedRichTextRun,
@@ -327,5 +329,77 @@ describe('shared styled-run layout (plain === markdown)', () => {
     const markdownLines = richLines(value, boxWidthInPt, plainSize);
     expect(markdownLines).toHaveLength(plainLines.length);
     expect(markdownLines.map(getRichTextLineText)).toEqual(lineTexts(plainLines));
+  });
+
+  it('computes the same dynamicFontSize for plain and undecorated markdown with leading empty lines', async () => {
+    const fontKitFont = createMockFont();
+    const textSchema = {
+      name: 'fit',
+      type: 'text',
+      position: { x: 0, y: 0 },
+      width: 60,
+      height: 25,
+      fontSize: 13,
+      lineHeight: 1,
+      characterSpacing: 0,
+      fontName: 'Base',
+      dynamicFontSize: { min: 4, max: 30, fit: 'vertical' },
+    } as TextSchema;
+    const value = '\n\nhello world';
+    const font = { Base: { data: new Uint8Array(), fallback: true } } as Font;
+    const cache = new Map<string | number, FontKitFont>([['getFontKitFont-Base', fontKitFont]]);
+
+    const plainSize = calculateDynamicFontSize({
+      textSchema,
+      fontKitFont,
+      value,
+    });
+    const markdownSize = await calculateDynamicRichTextFontSize({
+      value,
+      schema: { ...textSchema, textFormat: 'inline-markdown', readOnly: true },
+      font,
+      _cache: cache,
+    });
+
+    expect(plainSize).not.toBe(30);
+    expect(markdownSize).toBe(plainSize);
+  });
+
+  it('measures code decoration with the same pt padding the Viewer paints', () => {
+    const fontSize = 64;
+    const boxWidthInPt = mm2pt(125);
+    const fontKitFont = createMockFont(80);
+    const measure = (text: string) =>
+      layoutRichTextLines({
+        runs: [
+          {
+            text,
+            code: true,
+            fontName: 'Base',
+            fontKitFont,
+            syntheticBold: false,
+            syntheticItalic: false,
+          },
+        ],
+        fontSize,
+        characterSpacing: 0,
+        boxWidthInPt,
+      });
+
+    let text = 'x';
+    while (true) {
+      const next = `${text}x`;
+      const nextLines = measure(next);
+      if (nextLines.length > 1 || (nextLines[0]?.width ?? 0) > boxWidthInPt) break;
+      text = next;
+    }
+
+    const lines = measure(text);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.width).toBeLessThanOrEqual(boxWidthInPt);
+
+    const contentWidth = (lines[0]?.width ?? 0) - CODE_HORIZONTAL_PADDING * 2;
+    const emPaintWidth = contentWidth + 0.15 * fontSize * 2;
+    expect(emPaintWidth).toBeGreaterThan(boxWidthInPt);
   });
 });
