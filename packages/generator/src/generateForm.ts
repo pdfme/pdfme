@@ -1,4 +1,4 @@
-import type { GenerateProps, Plugins, Schema, Template } from '@pdfme/common';
+import type { GenerateProps, PdfBytes, Plugins, Schema, Template } from '@pdfme/common';
 import { cloneDeep } from '@pdfme/common';
 import { checkbox, radioGroup, text } from '@pdfme/schemas';
 import { acroCheckboxPlugin, acroRadioGroupPlugin, acroTextPlugin } from './acroForm.js';
@@ -84,7 +84,7 @@ const getAcroFormTemplate = (template: Template): Template => {
 const normalizeInputs = (inputs?: GenerateProps['inputs']) =>
   inputs && inputs.length > 0 ? inputs : [{}];
 
-const generateForm = async (props: GenerateFormProps): Promise<Uint8Array<ArrayBuffer>> => {
+const generateForm = async (props: GenerateFormProps): Promise<PdfBytes> => {
   return generate({
     ...props,
     inputs: normalizeInputs(props.inputs),

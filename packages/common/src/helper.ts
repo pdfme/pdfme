@@ -11,6 +11,7 @@ import {
   BlankPdf,
   LegacySchemaPageArray,
   SchemaPageArray,
+  PdfBytes,
 } from './types.js';
 import {
   Inputs as InputsSchema,
@@ -391,7 +392,7 @@ export const isBlankPdf = (basePdf: BasePdf): basePdf is BlankPdf =>
 
 const getByteString = (base64: string) => Buffer.from(base64, 'base64').toString('binary');
 
-export const b64toUint8Array = (base64: string) => {
+export const b64toUint8Array = (base64: string): PdfBytes => {
   const data = base64.split(';base64,')[1] ? base64.split(';base64,')[1] : base64;
 
   const byteString = getByteString(data);

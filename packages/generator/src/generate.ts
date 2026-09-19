@@ -5,6 +5,7 @@ import type {
   Schema,
   PDFRenderProps,
   Template,
+  PdfBytes,
 } from '@pdfme/common';
 import {
   checkGenerateProps,
@@ -110,7 +111,7 @@ const getRenderOptions = (options: GeneratorOptions): GeneratorOptions => {
   return renderOptions;
 };
 
-const generate = async (props: GenerateProps): Promise<Uint8Array<ArrayBuffer>> => {
+const generate = async (props: GenerateProps): Promise<PdfBytes> => {
   checkGenerateProps(props);
   const { inputs, template: _template, options = {}, plugins: userPlugins = {} } = props;
   const renderOptions = getRenderOptions(options);

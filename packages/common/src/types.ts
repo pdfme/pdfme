@@ -25,6 +25,8 @@ import {
   SchemaPageArray,
 } from './schema.js';
 
+export type { PdfBytes } from './schema.js';
+
 export interface UIOptionsThemeToken {
   colorPrimary?: string;
   colorPrimaryBg?: string;

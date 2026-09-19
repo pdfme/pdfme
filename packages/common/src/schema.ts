@@ -154,8 +154,20 @@ export const Schema = z
 const SchemaForUIAdditionalInfo = z.object({ id: z.string() });
 export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
 
+/**
+ * PDF / font bytes with a definite ArrayBuffer backing store.
+ *
+ * Printed by name in declaration emit so published .d.ts stays valid on
+ * TypeScript ≤5.6, where `Uint8Array` is not generic. Using
+ * `Uint8Array<ArrayBuffer>` directly poisons `z.infer` unions such as
+ * `Template['basePdf']` on those compilers (see #1021).
+ */
+export interface PdfBytes extends Uint8Array {
+  readonly buffer: ArrayBuffer;
+}
+
 const ArrayBufferSchema: z.ZodSchema<ArrayBuffer> = z.any().refine((v) => v instanceof ArrayBuffer);
-const Uint8ArraySchema: z.ZodSchema<Uint8Array<ArrayBuffer>> = z
+const Uint8ArraySchema: z.ZodSchema<PdfBytes> = z
   .any()
   .refine((v) => v instanceof Uint8Array && v.buffer instanceof ArrayBuffer);
 
