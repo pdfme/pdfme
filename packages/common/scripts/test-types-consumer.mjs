@@ -1,4 +1,12 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
@@ -108,6 +116,7 @@ const main = () => {
 
   const tempRoot = mkdtempSync(join(tmpdir(), 'pdfme-common-consumer-'));
   try {
+    writeJson(join(tempRoot, 'package.json'), { private: true, type: 'module' });
     writeFileSync(join(tempRoot, 'consumer.ts'), CONSUMER_SOURCE);
     writeJson(join(tempRoot, 'tsconfig.json'), {
       compilerOptions: {
@@ -139,7 +148,9 @@ const main = () => {
         [join(compilerDir, 'node_modules/typescript/bin/tsc'), '--pretty', 'false', '-p', tempRoot],
         tempRoot,
       );
-      console.log(`[typescript@${version} skipLibCheck:true] @pdfme/common Template + generate PdfBytes ok`);
+      console.log(
+        `[typescript@${version} skipLibCheck:true] @pdfme/common Template + generate PdfBytes ok`,
+      );
     }
     console.log('test:types:consumer passed (TS 5.5/5.6 floor; skipLibCheck:true)');
   } finally {

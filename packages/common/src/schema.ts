@@ -1,6 +1,20 @@
 import { z } from 'zod';
 
-const langs = ['en', 'zh', 'zh-TW', 'ja', 'ko', 'ar', 'th', 'tr', 'pl', 'it', 'de', 'es', 'fr'] as const;
+const langs = [
+  'en',
+  'zh',
+  'zh-TW',
+  'ja',
+  'ko',
+  'ar',
+  'th',
+  'tr',
+  'pl',
+  'it',
+  'de',
+  'es',
+  'fr',
+] as const;
 
 export const Lang = z.enum(langs);
 export const Dict = z.object({
@@ -158,9 +172,9 @@ export const SchemaForUI = Schema.merge(SchemaForUIAdditionalInfo);
  * PDF / font bytes with a definite ArrayBuffer backing store.
  *
  * Printed by name in declaration emit so published .d.ts stays valid on
- * TypeScript ≤5.6, where `Uint8Array` is not generic. Using
- * `Uint8Array<ArrayBuffer>` directly poisons `z.infer` unions such as
- * `Template['basePdf']` on those compilers (see #1021).
+ * TypeScript ≤5.6, where Uint8Array is not generic. A generic typed-array
+ * annotation poisons `z.infer` unions such as `Template['basePdf']` on
+ * those compilers (see #1021).
  */
 export interface PdfBytes extends Uint8Array {
   readonly buffer: ArrayBuffer;
