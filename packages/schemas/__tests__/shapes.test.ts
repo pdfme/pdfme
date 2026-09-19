@@ -92,9 +92,7 @@ describe('rectangle.pdf border inset', () => {
   const angles = [0, 30, 45, 90, 180] as const;
   const borderWidths = [0, 1, 10, 25] as const;
 
-  it.each(
-    angles.flatMap((rotate) => borderWidths.map((borderWidth) => ({ rotate, borderWidth }))),
-  )(
+  it.each(angles.flatMap((rotate) => borderWidths.map((borderWidth) => ({ rotate, borderWidth }))))(
     'insets the stroke path in the local frame at rotate=$rotate borderWidth=$borderWidth',
     ({ rotate, borderWidth }) => {
       const schema = getRectangleSchema({ rotate, borderWidth });
@@ -161,9 +159,7 @@ describe('rectangle.pdf border inset', () => {
     const schema = getRectangleSchema({ rotate: 45, radius: 8, borderWidth: 10 });
     const page = renderPdf(rectangle, schema);
 
-    expect(page.drawRectangle).toHaveBeenCalledWith(
-      expect.objectContaining({ radius: mm2pt(8) }),
-    );
+    expect(page.drawRectangle).toHaveBeenCalledWith(expect.objectContaining({ radius: mm2pt(8) }));
   });
 
   it('does not draw when neither fill nor border color is set', () => {
