@@ -21,3 +21,7 @@
 .custom-toc {
   position: static !important
 }
+
+.card__footer .button--block {
+  white-space: normal;
+}
