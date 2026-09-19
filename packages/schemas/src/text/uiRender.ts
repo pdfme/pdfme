@@ -33,7 +33,7 @@ import {
   wrapTextToSize,
   widthOfTextAtSize,
 } from './helper.js';
-import { countGraphemes, splitGraphemes, type WrapLine } from './wrap.js';
+import { countGraphemes, getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
 import { parseInlineMarkdown, stripInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange, plainTextLinesToValue } from './measure.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
@@ -134,7 +134,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           value: usePlaceholder ? (placeholder as string) : displayValue,
         })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE);
-  const useComputedWrapLines = !editable && !renderInlineMarkdownReadOnlyChunk;
+  const useComputedWrapLines = !editable;
   const textBlock = buildStyledTextContainer(
     isReadOnlySplitInlineMarkdownFormChunk ? { ...arg, mode: 'viewer' } : arg,
     fontKitFont,
@@ -161,6 +161,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
         schema,
         font,
         _cache,
+        fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
       });
       return;
     }
@@ -257,49 +258,67 @@ const renderInlineMarkdownReadOnly = async (arg: {
   schema: TextSchema;
   font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
   _cache: Map<string | number, unknown>;
+  fontSize: number;
 }) => {
-  const { textBlock, value, schema, font, _cache } = arg;
+  const { textBlock, value, schema, font, _cache, fontSize } = arg;
+  const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
+  const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
+  const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
   const runs = await resolveRichTextRuns({
     runs: parseInlineMarkdown(value),
     schema,
     font,
     _cache,
   });
-  const lineRange = getTextLineRange(schema);
-  if (lineRange) {
-    const lines = applyTextLineRange(
-      layoutRichTextLines({
-        runs,
-        fontSize: schema.fontSize ?? DEFAULT_FONT_SIZE,
-        characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
-        boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
-      }),
-      lineRange,
-    );
-
-    textBlock.innerHTML = '';
-    lines.forEach((line, lineIndex) => {
-      line.runs.forEach((run) => {
-        appendInlineMarkdownRun({ textBlock, run, schema, font });
-      });
-      if (lineIndex < lines.length - 1) textBlock.appendChild(document.createElement('br'));
-    });
-    return;
-  }
+  const lines = applyTextLineRange(
+    layoutRichTextLines({
+      runs,
+      fontSize,
+      characterSpacing,
+      boxWidthInPt,
+    }),
+    getTextLineRange(schema),
+  );
 
   textBlock.innerHTML = '';
-  runs.forEach((run) => {
-    appendInlineMarkdownRun({ textBlock, run, schema, font });
+  lines.forEach((line, lineIndex) => {
+    const lineEl = document.createElement('span');
+    lineEl.dataset.pdfmeWrapLine = '';
+    lineEl.style.whiteSpace = 'pre';
+    const justifiedSoftLine = alignment === ALIGN_JUSTIFY && !line.hardBreak;
+    if (justifiedSoftLine) {
+      const { extraLetterSpacing } = getLineAlignment(
+        {
+          text: line.runs.map((run) => run.text).join(''),
+          width: line.width,
+          hardBreak: line.hardBreak,
+        },
+        boxWidthInPt,
+        alignment,
+      );
+      if (extraLetterSpacing !== 0) {
+        lineEl.style.letterSpacing = `${characterSpacing + extraLetterSpacing}pt`;
+      }
+    }
+
+    line.runs.forEach((run) => {
+      appendInlineMarkdownRun({ parent: lineEl, run, schema, font });
+    });
+
+    textBlock.appendChild(lineEl);
+    if (lineIndex < lines.length - 1) {
+      textBlock.appendChild(document.createTextNode('\n'));
+    }
   });
 };
 
 const appendInlineMarkdownRun = (arg: {
-  textBlock: HTMLDivElement;
+  parent: HTMLElement;
   run: Awaited<ReturnType<typeof resolveRichTextRuns>>[number];
   schema: TextSchema;
   font: NonNullable<UIRenderProps<TextSchema>['options']['font']>;
 }) => {
-  const { textBlock, run, schema, font } = arg;
+  const { parent, run, schema, font } = arg;
   const href = run.href ? normalizeLinkHref(run.href) : undefined;
   const span = href ? document.createElement('a') : document.createElement('span');
   const processedText = replaceUnsupportedChars(run.text, run.fontKitFont);
@@ -339,7 +358,7 @@ const appendInlineMarkdownRun = (arg: {
       span.style.fontFamily = run.fontName ? `'${run.fontName}', monospace` : 'monospace';
     }
   }
-  textBlock.appendChild(span);
+  parent.appendChild(span);
 };
 
 const renderReadOnlyPlainLines = (arg: {
@@ -428,9 +447,9 @@ export const buildStyledTextContainer = (
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const editable = isEditable(mode, schema);
-  // `pre` + left-for-justify is only for plain-text displays whose wrap-engine
-  // lines are already computed. Markdown / richText still rely on CSS wrap
-  // (or their own layout) and must keep `pre-wrap` + the schema alignment.
+  // `pre` + left-for-justify is for read-only displays whose wrap-engine
+  // lines are already computed (plain text and inline Markdown). Live Form /
+  // Designer editing keeps `pre-wrap` so caret / IME stay native.
   const useComputedWrapLines = display?.useComputedWrapLines ?? !editable;
 
   if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema, arg.basePdf) && value) {
@@ -503,9 +522,8 @@ export const buildStyledTextContainer = (
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${characterSpacing}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-    // Read-only plain-text Viewer paints wrap-engine lines with `pre`. CSS
-    // justify would fight the PDF grapheme-count letter-spacing applied per
-    // soft line. Markdown / richText keep CSS wrap and the schema alignment.
+    // Read-only Viewer paints wrap-engine lines with `pre`. CSS justify would
+    // fight the PDF grapheme-count letter-spacing applied per soft line.
     textAlign: useComputedWrapLines && alignment === ALIGN_JUSTIFY ? 'left' : alignment,
     whiteSpace: useComputedWrapLines ? 'pre' : 'pre-wrap',
     wordBreak: useComputedWrapLines ? 'normal' : 'break-word',

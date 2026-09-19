@@ -21,6 +21,7 @@ import { getFontKitFont, heightOfFontAtSize, widthOfTextAtSize } from './helper.
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
 import { getBoxContentArea } from '../box.js';
+import { countGraphemes, layoutStyledRuns } from './wrap.js';
 
 export type ResolvedRichTextRun = RichTextRun & {
   fontName: string;
@@ -44,14 +45,6 @@ type FontVariantResolution = {
   syntheticBold: boolean;
   syntheticItalic: boolean;
 };
-
-type RichTextRunPiece = {
-  run: ResolvedRichTextRun;
-  text: string;
-};
-
-const richTextWordSegmenter = new Intl.Segmenter(undefined, { granularity: 'word' });
-const richTextGraphemeSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
 
 const getBaseFontName = (schema: TextSchema, font: Font) =>
   schema.fontName && font[schema.fontName] ? schema.fontName : getFallbackFontName(font);
@@ -154,7 +147,7 @@ export const resolveRichTextRuns = async (arg: {
   );
 };
 
-const measureRunText = (
+export const measureRunText = (
   run: ResolvedRichTextRun,
   text: string,
   fontSize: number,
@@ -175,125 +168,8 @@ const measureRunText = (
   );
 };
 
-const createLine = (): RichTextLine => ({ runs: [], width: 0, hardBreak: false });
-
-const pushRunToLine = (
-  line: RichTextLine,
-  run: ResolvedRichTextRun,
-  text: string,
-  fontSize: number,
-  characterSpacing: number,
-) => {
-  if (!text) return;
-  const width = measureRunText(run, text, fontSize, characterSpacing);
-  const lastRun = line.runs[line.runs.length - 1];
-  if (lastRun && canMergeRichTextRuns(lastRun, run)) {
-    // Adjacent pieces from the same logical rich-text span should stay one run so spacing,
-    // inline code padding, and synthetic font offsets are measured for the combined span.
-    const previousWidth = lastRun.width;
-    lastRun.text += text;
-    lastRun.width = measureRunText(lastRun, lastRun.text, fontSize, characterSpacing);
-    line.width += lastRun.width - previousWidth;
-    return;
-  }
-
-  if (line.runs.length > 0) line.width += characterSpacing;
-  line.runs.push({ ...run, text, width });
-  line.width += width;
-};
-
-const canMergeRichTextRuns = (a: ResolvedRichTextRun, b: ResolvedRichTextRun) =>
-  a.fontName === b.fontName &&
-  a.fontKitFont === b.fontKitFont &&
-  a.syntheticBold === b.syntheticBold &&
-  a.syntheticItalic === b.syntheticItalic &&
-  a.bold === b.bold &&
-  a.italic === b.italic &&
-  a.strikethrough === b.strikethrough &&
-  a.code === b.code &&
-  a.href === b.href;
-
-const measurePiecesWidth = (
-  pieces: RichTextRunPiece[],
-  fontSize: number,
-  characterSpacing: number,
-) => {
-  let width = 0;
-  let hasText = false;
-  pieces.forEach((piece) => {
-    if (!piece.text) return;
-    if (hasText) width += characterSpacing;
-    width += measureRunText(piece.run, piece.text, fontSize, characterSpacing);
-    hasText = true;
-  });
-  return width;
-};
-
-const sliceRunPieces = (
-  pieces: RichTextRunPiece[],
-  startIndex: number,
-  endIndex: number,
-): RichTextRunPiece[] => {
-  const result: RichTextRunPiece[] = [];
-  let offset = 0;
-
-  pieces.forEach((piece) => {
-    const pieceStart = offset;
-    const pieceEnd = pieceStart + piece.text.length;
-    const sliceStart = Math.max(startIndex, pieceStart);
-    const sliceEnd = Math.min(endIndex, pieceEnd);
-
-    if (sliceStart < sliceEnd) {
-      result.push({
-        run: piece.run,
-        text: piece.text.slice(sliceStart - pieceStart, sliceEnd - pieceStart),
-      });
-    }
-
-    offset = pieceEnd;
-  });
-
-  return result;
-};
-
-const segmentRunPiecesByWord = (
-  runs: ResolvedRichTextRun[],
-  onSegment: (pieces: RichTextRunPiece[]) => void,
-  onHardBreak: () => void,
-) => {
-  let paragraphPieces: RichTextRunPiece[] = [];
-
-  const flushParagraph = () => {
-    if (paragraphPieces.length === 0) return;
-
-    const paragraphText = paragraphPieces.map((piece) => piece.text).join('');
-    Array.from(richTextWordSegmenter.segment(paragraphText), ({ segment, index }) => {
-      const pieces = sliceRunPieces(paragraphPieces, index, index + segment.length);
-      if (pieces.length > 0) onSegment(pieces);
-    });
-    paragraphPieces = [];
-  };
-
-  runs.forEach((run) => {
-    run.text.split(/(\r\n|\r|\n)/).forEach((part) => {
-      if (part === '\r\n' || part === '\r' || part === '\n') {
-        flushParagraph();
-        onHardBreak();
-        return;
-      }
-
-      if (part) paragraphPieces.push({ run, text: part });
-    });
-  });
-
-  flushParagraph();
-};
-
-const splitIntoGraphemes = (value: string) =>
-  Array.from(richTextGraphemeSegmenter.segment(value), ({ segment }) => segment);
-
 export const countRichTextLineGraphemes = (line: RichTextLine) =>
-  splitIntoGraphemes(line.runs.map((run) => run.text).join('')).length;
+  countGraphemes(line.runs.map((run) => run.text).join(''));
 
 export const getRichTextLineText = (line: RichTextLine) =>
   line.runs.map((run) => run.text).join('');
@@ -305,101 +181,23 @@ export const layoutRichTextLines = (arg: {
   boxWidthInPt: number;
 }): RichTextLine[] => {
   const { runs, fontSize, characterSpacing, boxWidthInPt } = arg;
-  const lines: RichTextLine[] = [];
-  let currentLine = createLine();
-
-  const pushCurrentLine = (hardBreak: boolean) => {
-    currentLine.hardBreak = hardBreak;
-    lines.push(currentLine);
-    currentLine = createLine();
-  };
-
-  const pushPiecesToLine = (pieces: RichTextRunPiece[]) => {
-    pieces.forEach((piece) => {
-      pushRunToLine(currentLine, piece.run, piece.text, fontSize, characterSpacing);
-    });
-  };
-
-  const pushOversizedText = (run: ResolvedRichTextRun, text: string) => {
-    let remainingText = text;
-
-    while (remainingText.length > 0) {
-      const pendingSpacing = currentLine.runs.length > 0 ? characterSpacing : 0;
-      const remainingWidth = Math.max(boxWidthInPt - currentLine.width - pendingSpacing, 0);
-      const remainingTextWidth = measureRunText(run, remainingText, fontSize, characterSpacing);
-
-      if (
-        remainingTextWidth <= remainingWidth ||
-        (currentLine.runs.length === 0 && remainingTextWidth <= boxWidthInPt)
-      ) {
-        pushRunToLine(currentLine, run, remainingText, fontSize, characterSpacing);
-        return;
-      }
-
-      if (currentLine.runs.length > 0 && remainingTextWidth <= boxWidthInPt) {
-        pushCurrentLine(false);
-        continue;
-      }
-
-      const graphemes = splitIntoGraphemes(remainingText);
-      let fittingText = '';
-      let fittingLength = 0;
-
-      for (const grapheme of graphemes) {
-        const candidate = fittingText + grapheme;
-        const candidateWidth = measureRunText(run, candidate, fontSize, characterSpacing);
-        const maxWidth = currentLine.runs.length === 0 ? boxWidthInPt : remainingWidth;
-        if (candidateWidth > maxWidth) {
-          if (fittingText) break;
-          if (currentLine.runs.length > 0) break;
-        }
-        fittingText = candidate;
-        fittingLength += grapheme.length;
-        if (candidateWidth > maxWidth) break;
-      }
-
-      if (!fittingText) {
-        pushCurrentLine(false);
-        continue;
-      }
-
-      pushRunToLine(currentLine, run, fittingText, fontSize, characterSpacing);
-      remainingText = remainingText.slice(fittingLength);
-      if (remainingText.length > 0) pushCurrentLine(false);
-    }
-  };
-
-  const pushSegment = (pieces: RichTextRunPiece[]) => {
-    const segmentWidth = measurePiecesWidth(pieces, fontSize, characterSpacing);
-    const pendingSpacing = currentLine.runs.length > 0 ? characterSpacing : 0;
-    const remainingWidth = Math.max(boxWidthInPt - currentLine.width - pendingSpacing, 0);
-
-    if (
-      segmentWidth <= remainingWidth ||
-      (currentLine.runs.length === 0 && segmentWidth <= boxWidthInPt)
-    ) {
-      pushPiecesToLine(pieces);
-      return;
-    }
-
-    if (currentLine.runs.length > 0) {
-      pushCurrentLine(false);
-      if (segmentWidth <= boxWidthInPt) {
-        pushPiecesToLine(pieces);
-        return;
-      }
-    }
-
-    pieces.forEach((piece) => pushOversizedText(piece.run, piece.text));
-  };
-
-  segmentRunPiecesByWord(runs, pushSegment, () => pushCurrentLine(true));
-
-  if (currentLine.runs.length > 0 || lines.length === 0) {
-    pushCurrentLine(false);
-  }
-
-  return lines;
+  return layoutStyledRuns(
+    runs.map((run) => ({
+      text: run.text,
+      measure: (text) => measureRunText(run, text, fontSize, characterSpacing),
+      style: run,
+    })),
+    boxWidthInPt,
+    { characterSpacing },
+  ).map((line) => ({
+    runs: line.spans.map((span) => ({
+      ...span.style,
+      text: span.text,
+      width: span.width,
+    })),
+    width: line.width,
+    hardBreak: line.hardBreak,
+  }));
 };
 
 const measureParagraphWidths = (
@@ -408,21 +206,35 @@ const measureParagraphWidths = (
   characterSpacing: number,
 ) => {
   const widths: number[] = [];
-  let paragraphPieces: RichTextRunPiece[] = [];
+  let paragraphText = '';
+  let paragraphRuns: ResolvedRichTextRun[] = [];
 
   const pushWidth = () => {
-    widths.push(measurePiecesWidth(paragraphPieces, fontSize, characterSpacing));
-    paragraphPieces = [];
+    if (paragraphRuns.length === 0 && paragraphText === '') {
+      widths.push(0);
+      return;
+    }
+    let width = 0;
+    paragraphRuns.forEach((run, index) => {
+      if (index > 0) width += characterSpacing;
+      width += measureRunText(run, run.text, fontSize, characterSpacing);
+    });
+    widths.push(width);
+    paragraphText = '';
+    paragraphRuns = [];
   };
 
   runs.forEach((run) => {
-    run.text.split(/(\r\n|\r|\n)/).forEach((part) => {
-      if (part === '\r\n' || part === '\r' || part === '\n') {
+    run.text.split(/(\r\n|\r|\n|\f|\v)/).forEach((part) => {
+      if (part === '\r\n' || part === '\r' || part === '\n' || part === '\f' || part === '\v') {
         pushWidth();
         return;
       }
 
-      if (part) paragraphPieces.push({ run, text: part });
+      if (part) {
+        paragraphText += part;
+        paragraphRuns.push({ ...run, text: part });
+      }
     });
   });
 

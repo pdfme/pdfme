@@ -155,7 +155,7 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
 
-  it('keeps CSS wrap on read-only inline markdown instead of white-space:pre', async () => {
+  it('paints read-only inline markdown from the shared wrap engine with white-space:pre', async () => {
     const rootElement = document.createElement('div');
     const schema: TextSchema = {
       ...getTextSchema(),
@@ -183,14 +183,22 @@ describe('text inline markdown UI rendering', () => {
     } as Parameters<typeof uiRender>[0]);
 
     const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    const lineEls = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line]'),
+    ) as HTMLSpanElement[];
 
-    expect(textBlock.style.whiteSpace).toBe('pre-wrap');
-    expect(textBlock.style.wordBreak).toBe('break-word');
-    expect(textBlock.style.textAlign).toBe('justify');
-    expect(textBlock.querySelectorAll('[data-pdfme-wrap-line]')).toHaveLength(0);
+    expect(textBlock.style.whiteSpace).toBe('pre');
+    expect(textBlock.style.wordBreak).toBe('normal');
+    expect(textBlock.style.textAlign).toBe('left');
+    expect(lineEls.length).toBeGreaterThan(1);
+    expect(lineEls.every((line) => line.style.whiteSpace === 'pre')).toBe(true);
     expect(textBlock.textContent).toContain('long');
     expect(textBlock.textContent).toContain('pre');
     expect(textBlock.textContent).not.toContain('**');
+    expect(textBlock.querySelector('strong, b')).toBeNull();
+    expect(
+      Array.from(textBlock.querySelectorAll('span')).some((span) => span.style.fontWeight === '800'),
+    ).toBe(true);
   });
 
   it('paints Viewer lines from the wrap engine with white-space:pre', async () => {

@@ -698,11 +698,11 @@ describe('layoutRichTextLines', () => {
       boxWidthInPt: 6,
     });
 
-    expect(lines.map(getRichTextLineText)).toEqual(['x ', 'hello']);
+    expect(lines.map(getRichTextLineText)).toEqual(['x', 'hello']);
     expect(lines[1].runs.map((run) => run.text)).toEqual(['he', 'llo']);
   });
 
-  it('wraps before splitting an oversized token at the end of a line', () => {
+  it('keeps a word on the next line when it still fits the full box', () => {
     const lines = layoutRichTextLines({
       runs: [createRun('abc '), createRun('123456', { code: true })],
       fontSize: 12,
@@ -710,7 +710,24 @@ describe('layoutRichTextLines', () => {
       boxWidthInPt: 7,
     });
 
-    expect(lines.map(getRichTextLineText)).toEqual(['abc ', '1234', '56']);
+    // Wrap-point spaces are trimmed like plain text. code padding can still
+    // force a grapheme split, but not by parking 123456 wholly on the next line.
+    const texts = lines.map(getRichTextLineText);
+    expect(texts[0]?.startsWith('abc')).toBe(true);
+    expect(texts.join('')).toBe('abc123456');
+    expect(texts.some((text) => text.startsWith('123456'))).toBe(false);
+  });
+
+  it('fills remaining current-line width before splitting a word wider than the box', () => {
+    const lines = layoutRichTextLines({
+      runs: [createRun('xx abcdefgh')],
+      fontSize: 12,
+      characterSpacing: 0,
+      boxWidthInPt: 4,
+    });
+
+    expect(lines.map(getRichTextLineText)).toEqual(['xx a', 'bcde', 'fgh']);
+    expect(lines.map((line) => line.hardBreak)).toEqual([false, false, true]);
   });
 });
 

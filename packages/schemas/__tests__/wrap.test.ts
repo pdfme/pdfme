@@ -1,10 +1,16 @@
 import type { Font as FontKitFont } from 'fontkit';
+import { mm2pt } from '@pdfme/common';
 import { calculateDynamicFontSize, splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
 import { CJ, getRawLineBreakClass, IS, QU, SA } from '../src/text/lineBreak.js';
 import {
   LINE_BREAK_SOURCE_SHA256,
   LINE_BREAK_UNICODE_VERSION,
 } from '../src/text/lineBreakClasses.generated.js';
+import {
+  getRichTextLineText,
+  layoutRichTextLines,
+  type ResolvedRichTextRun,
+} from '../src/text/richText.js';
 import { toLegacySplitLines, type WrapLine } from '../src/text/wrap.js';
 import type { TextSchema } from '../src/text/types.js';
 
@@ -202,5 +208,124 @@ describe('shared wrap engine (#1115)', () => {
     const joined = lineTexts(lines).join('');
     expect(joined).toBe(thai);
     expect(lineTexts(lines).every((text) => text.length > 1 || thai.includes(text))).toBe(true);
+  });
+
+  it('fills remaining current-line width before splitting a word wider than the box', () => {
+    const lines = wrap('xx abcdefgh', 20);
+    expect(lineTexts(lines)).toEqual(['xx a', 'bcde', 'fgh']);
+    expect(lines.map((line) => line.hardBreak)).toEqual([false, false, true]);
+  });
+
+  it('does not split grapheme clusters when overflowing', () => {
+    const lines = wrap('aaaé́bbb', 15);
+    const joined = lineTexts(lines).join('');
+    expect(joined.replace(/\s/g, '')).toBe('aaaé́bbb'.replace(/\s/g, ''));
+    expect(lineTexts(lines).some((text) => text.includes('\u0301') && !text.includes('é'))).toBe(
+      false,
+    );
+  });
+});
+
+const richLines = (value: string, boxWidthInPt: number, fontSize = 10) => {
+  const run: ResolvedRichTextRun = {
+    text: value,
+    fontName: 'Base',
+    fontKitFont: createMockFont(),
+    syntheticBold: false,
+    syntheticItalic: false,
+  };
+  return layoutRichTextLines({
+    runs: [run],
+    fontSize,
+    characterSpacing: 0,
+    boxWidthInPt,
+  });
+};
+
+describe('shared styled-run layout (plain === markdown)', () => {
+  it('matches plain wrap for undecorated markdown runs', () => {
+    const value = "Party-König: oder die ‘Party’ companies' word\n\nnext";
+    const plain = wrap(value, 55);
+    const markdown = richLines(value, 55);
+    expect(markdown.map(getRichTextLineText)).toEqual(lineTexts(plain));
+    expect(markdown.map((line) => line.hardBreak)).toEqual(plain.map((line) => line.hardBreak));
+  });
+
+  it('breaks com**pan**ies as the word companies', () => {
+    const fontKitFont = createMockFont();
+    const lines = layoutRichTextLines({
+      runs: [
+        { text: 'x ', fontName: 'Base', fontKitFont, syntheticBold: false, syntheticItalic: false },
+        {
+          text: 'com',
+          fontName: 'Base',
+          fontKitFont,
+          syntheticBold: false,
+          syntheticItalic: false,
+        },
+        {
+          text: 'pan',
+          bold: true,
+          fontName: 'Base',
+          fontKitFont,
+          syntheticBold: true,
+          syntheticItalic: false,
+        },
+        {
+          text: 'ies',
+          fontName: 'Base',
+          fontKitFont,
+          syntheticBold: false,
+          syntheticItalic: false,
+        },
+      ],
+      fontSize: 10,
+      characterSpacing: 0,
+      boxWidthInPt: 50,
+    });
+    expect(lines.map(getRichTextLineText)).toEqual(['x', 'companies']);
+    expect(lines[1]?.runs.map((run) => run.text)).toEqual(['com', 'pan', 'ies']);
+  });
+
+  it('keeps hardBreak through a page-split range', () => {
+    const lines = richLines('aaa bbb ccc', 15);
+    expect(lines.length).toBeGreaterThan(1);
+    const firstPage = lines.slice(0, 1);
+    const secondPage = lines.slice(1);
+    expect(firstPage[0]?.hardBreak).toBe(false);
+    expect(secondPage.at(-1)?.hardBreak).toBe(true);
+  });
+
+  it('treats markdown CRLF as one paragraph break', () => {
+    const crlf = richLines('hello\r\nworld', 100);
+    const lf = richLines('hello\nworld', 100);
+    expect(crlf.map(getRichTextLineText)).toEqual(['hello', 'world']);
+    expect(crlf.map(getRichTextLineText)).toEqual(lf.map(getRichTextLineText));
+    expect(crlf.map((line) => line.hardBreak)).toEqual([true, true]);
+  });
+
+  it('matches dynamicFontSize line counts for plain and undecorated markdown', () => {
+    const fontKitFont = createMockFont();
+    const textSchema = {
+      type: 'text',
+      position: { x: 0, y: 0 },
+      width: 15,
+      height: 20,
+      fontSize: 10,
+      lineHeight: 1,
+      characterSpacing: 0,
+      dynamicFontSize: { min: 4, max: 20, fit: 'vertical' },
+    } as TextSchema;
+    const value = 'aaa bbb ccc ddd eee';
+    const plainSize = calculateDynamicFontSize({
+      textSchema,
+      fontKitFont,
+      value,
+    });
+    const boxWidthInPt = mm2pt(15);
+    const plainLines = wrap(value, boxWidthInPt, plainSize);
+    const markdownLines = richLines(value, boxWidthInPt, plainSize);
+    expect(markdownLines).toHaveLength(plainLines.length);
+    expect(markdownLines.map(getRichTextLineText)).toEqual(lineTexts(plainLines));
   });
 });

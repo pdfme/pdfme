@@ -109,7 +109,9 @@ const renderSplitFormMultiVariableText = async (
 describe('multiVariableText inline markdown UI rendering', () => {
   it('renders viewer variable values as literal text inside template markdown', async () => {
     const textBlock = await renderMultiVariableText('viewer');
-    const spans = Array.from(textBlock.querySelectorAll('span'));
+    const spans = Array.from(
+      textBlock.querySelectorAll('[data-pdfme-wrap-line] > span, [data-pdfme-wrap-line] > a'),
+    );
 
     expect(textBlock.textContent).toBe('A **bold** user uses PDF `42`');
     expect(spans[0].textContent).toBe('A **bold** user');

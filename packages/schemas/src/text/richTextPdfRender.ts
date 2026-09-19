@@ -16,12 +16,8 @@ import { getFontDescentInPt, heightOfFontAtSize, widthOfTextAtSize } from './hel
 import { addUriLinkAnnotation, type LinkAnnotationRect } from './linkAnnotation.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import { applyTextLineRange } from './measure.js';
-import {
-  countRichTextLineGraphemes,
-  layoutRichTextLines,
-  resolveRichTextRuns,
-  type RichTextLineRun,
-} from './richText.js';
+import { layoutRichTextLines, resolveRichTextRuns, type RichTextLineRun } from './richText.js';
+import { getLineAlignment } from './wrap.js';
 import type { TextSchema } from './types.js';
 import { hex2PrintingColor, rotatePoint } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
@@ -313,7 +309,6 @@ export const renderInlineMarkdownText = async (arg: {
   });
   const lineRange = getTextLineRange(schema);
   const lines = applyTextLineRange(allLines, lineRange);
-  const lineRangeStart = lineRange?.start ?? 0;
   const pdfFontObj = await embedFontsForRuns(
     lines.flatMap((line) => line.runs),
     embedPdfFont,
@@ -340,25 +335,18 @@ export const renderInlineMarkdownText = async (arg: {
   lines.forEach((line, rowIndex) => {
     if (line.runs.length === 0) return;
 
-    let textWidth = line.width;
-    let spacing = characterSpacing;
-    const shouldJustify =
-      alignment === 'justify' && !line.hardBreak && lineRangeStart + rowIndex < allLines.length - 1;
-
-    if (shouldJustify) {
-      const graphemeCount = countRichTextLineGraphemes(line);
-      if (graphemeCount > 0) {
-        spacing += (width - textWidth) / graphemeCount;
-        textWidth = width;
-      }
-    }
-
-    let xLine = x;
-    if (alignment === 'center') {
-      xLine += (width - textWidth) / 2;
-    } else if (alignment === 'right') {
-      xLine += width - textWidth;
-    }
+    const alignmentMetrics = getLineAlignment(
+      {
+        text: line.runs.map((run) => run.text).join(''),
+        width: line.width,
+        hardBreak: line.hardBreak,
+      },
+      width,
+      alignment,
+    );
+    const textWidth = alignmentMetrics.usedWidth;
+    const spacing = characterSpacing + alignmentMetrics.extraLetterSpacing;
+    const xLine = x + alignmentMetrics.x;
 
     const yLine = y + height - yOffset - lineHeight * fontSize * rowIndex;
     page.pushOperators(pdfLib.setCharacterSpacing(spacing));
