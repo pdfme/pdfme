@@ -1,9 +1,14 @@
 /* eslint-disable */
 /**
- * Compact Unicode LineBreak ranges generated from UCD LineBreak.txt.
+ * Compact Unicode LineBreak ranges generated from Unicode 18.0.0 LineBreak.txt.
+ * Source: https://www.unicode.org/Public/18.0.0/ucd/LineBreak.txt
+ * SHA-256: 91201c52cb2f69d45543147a7e56e8700d4eb52931ae7fe32951f11273275bd3
  * Packed as [start, end, classId, ...]. Lookup is binary search.
  * Do not edit by hand — regenerate with scripts/generate-line-break-classes.mjs.
  */
+export const LINE_BREAK_UNICODE_VERSION = '18.0.0';
+export const LINE_BREAK_SOURCE_SHA256 =
+  '91201c52cb2f69d45543147a7e56e8700d4eb52931ae7fe32951f11273275bd3';
 export const LINE_BREAK_RANGE_DATA = new Uint32Array([
   0, 8, 21, 9, 9, 17, 10, 10, 37, 11, 12, 34, 13, 13, 36, 14, 31, 21, 32, 32, 41, 33, 33, 6, 34, 34,
   3, 35, 35, 12, 36, 36, 9, 37, 37, 10, 38, 38, 12, 39, 39, 3, 40, 40, 0, 41, 41, 2, 42, 42, 12, 43,

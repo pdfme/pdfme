@@ -1,7 +1,12 @@
 import type { Font as FontKitFont } from 'fontkit';
-import { splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
+import { calculateDynamicFontSize, splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
 import { CJ, getRawLineBreakClass, IS, QU, SA } from '../src/text/lineBreak.js';
+import {
+  LINE_BREAK_SOURCE_SHA256,
+  LINE_BREAK_UNICODE_VERSION,
+} from '../src/text/lineBreakClasses.generated.js';
 import { toLegacySplitLines, type WrapLine } from '../src/text/wrap.js';
+import type { TextSchema } from '../src/text/types.js';
 
 const createMockFont = (advanceWidth = 500) =>
   ({
@@ -27,6 +32,11 @@ const wrap = (value: string, boxWidthInPt: number, fontSize = 10, characterSpaci
 const lineTexts = (lines: WrapLine[]) => lines.map((line) => line.text);
 
 describe('UCD line-break classes', () => {
+  it('pins the generated table to a Unicode version and checksum', () => {
+    expect(LINE_BREAK_UNICODE_VERSION).toBe('18.0.0');
+    expect(LINE_BREAK_SOURCE_SHA256).toMatch(/^[0-9a-f]{64}$/);
+  });
+
   it('classifies the #1115 punctuation that used to orphan', () => {
     expect(getRawLineBreakClass(':'.codePointAt(0)!)).toBe(IS);
     expect(getRawLineBreakClass("'".codePointAt(0)!)).toBe(QU);
@@ -103,6 +113,40 @@ describe('shared wrap engine (#1115)', () => {
     expect(lines.length).toBeGreaterThan(1);
     expect(lines.slice(0, -1).every((line) => !line.hardBreak)).toBe(true);
     expect(lines.at(-1)?.hardBreak).toBe(true);
+  });
+
+  it('treats CRLF as one paragraph break, matching LF', () => {
+    const crlf = wrap('hello\r\nworld', 100);
+    const lf = wrap('hello\nworld', 100);
+    expect(lineTexts(crlf)).toEqual(['hello', 'world']);
+    expect(lineTexts(crlf)).toEqual(lineTexts(lf));
+    expect(crlf).toHaveLength(2);
+  });
+
+  it('counts the same lines for dynamic font size and wrap on CRLF', () => {
+    const fontKitFont = createMockFont();
+    const textSchema = {
+      type: 'text',
+      position: { x: 0, y: 0 },
+      width: 50,
+      height: 20,
+      fontSize: 10,
+      lineHeight: 1,
+      characterSpacing: 0,
+      dynamicFontSize: { min: 4, max: 20, fit: 'vertical' },
+    } as TextSchema;
+    const crlf = calculateDynamicFontSize({
+      textSchema,
+      fontKitFont,
+      value: 'hello\r\nworld',
+    });
+    const lf = calculateDynamicFontSize({
+      textSchema,
+      fontKitFont,
+      value: 'hello\nworld',
+    });
+    expect(wrap('hello\r\nworld', 100)).toHaveLength(2);
+    expect(crlf).toBe(lf);
   });
 
   it('preserves blank paragraphs as empty hard lines', () => {

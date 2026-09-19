@@ -14,7 +14,7 @@ import {
 import { Buffer } from 'buffer';
 import type { TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
-import { toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
+import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -316,7 +316,7 @@ export const calculateDynamicFontSize = ({
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const paragraphs = value.split('\n');
+  const paragraphs = splitParagraphs(value);
 
   let dynamicFontSize = fontSize;
   if (dynamicFontSize < dynamicFontSizeSetting.min) {

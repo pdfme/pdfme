@@ -1,9 +1,11 @@
 /**
  * Generates a compact UCD LineBreak range table for the wrap pair engine.
  *
- * Source: Unicode LineBreak.txt (https://www.unicode.org/Public/UCD/latest/ucd/LineBreak.txt)
- * Re-run: node packages/schemas/scripts/generate-line-break-classes.mjs
+ * Pin a Unicode version — do not use UCD/latest. Example:
+ *   curl -L -o LineBreak.txt https://www.unicode.org/Public/18.0.0/ucd/LineBreak.txt
+ *   node packages/schemas/scripts/generate-line-break-classes.mjs LineBreak.txt
  */
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -75,6 +77,13 @@ if (!sourcePath) {
 }
 
 const source = readFileSync(sourcePath, 'utf8');
+const unicodeVersion =
+  source.match(/^# LineBreak-(\d+\.\d+\.\d+)\.txt/m)?.[1] ??
+  source.match(/^# LineBreak-(\d+\.\d+)\.txt/m)?.[1];
+if (!unicodeVersion) {
+  throw new Error('Could not read a pinned Unicode version from LineBreak.txt header');
+}
+const sourceSha256 = createHash('sha256').update(source).digest('hex');
 const ranges = [];
 
 for (const rawLine of source.split(/\r?\n/)) {
@@ -113,10 +122,14 @@ const values = merged.flat();
 const lines = [
   '/* eslint-disable */',
   '/**',
-  ' * Compact Unicode LineBreak ranges generated from UCD LineBreak.txt.',
+  ` * Compact Unicode LineBreak ranges generated from Unicode ${unicodeVersion} LineBreak.txt.`,
+  ` * Source: https://www.unicode.org/Public/${unicodeVersion}/ucd/LineBreak.txt`,
+  ` * SHA-256: ${sourceSha256}`,
   ' * Packed as [start, end, classId, ...]. Lookup is binary search.',
   ' * Do not edit by hand — regenerate with scripts/generate-line-break-classes.mjs.',
   ' */',
+  `export const LINE_BREAK_UNICODE_VERSION = '${unicodeVersion}';`,
+  `export const LINE_BREAK_SOURCE_SHA256 = '${sourceSha256}';`,
   `export const LINE_BREAK_RANGE_DATA = new Uint32Array([${values.join(',')}]);`,
   `export const LINE_BREAK_RANGE_COUNT = ${merged.length};`,
   '',

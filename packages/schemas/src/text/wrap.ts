@@ -22,7 +22,9 @@ type WrapAtom = {
   required: boolean;
 };
 
-const PARAGRAPH_SPLIT = /\r\n|\r|\n|\f|\v/g;
+export const PARAGRAPH_SPLIT = /\r\n|\r|\n|\f|\v/g;
+
+export const splitParagraphs = (value: string): string[] => value.split(PARAGRAPH_SPLIT);
 
 let wordSegmenter: Intl.Segmenter | undefined;
 let graphemeSegmenter: Intl.Segmenter | undefined;
@@ -218,7 +220,7 @@ export const wrapText = (
   maxWidth: number,
 ): WrapLine[] => {
   const lines: WrapLine[] = [];
-  for (const paragraph of value.split(PARAGRAPH_SPLIT)) {
+  for (const paragraph of splitParagraphs(value)) {
     lines.push(...wrapParagraph(paragraph, measure, maxWidth));
   }
   return lines.length > 0 ? lines : [{ text: '', hardBreak: true }];
