@@ -46,7 +46,7 @@
     "typecheck": "node packages/common/set-version.js && tsc -b",
     "test": "vp run --filter '@pdfme/*' test",
     "test:packages": "vp run --filter '@pdfme/*' --filter '!@pdfme/cli' test",
-    "test:types:consumer": "npm run test:types:consumer -w packages/pdf-lib",
+    "test:types:consumer": "npm run test:types:consumer -w packages/pdf-lib && npm run test:types:consumer -w packages/common",
     "test:cli": "npm run test:run -w packages/cli --",
     "lint": "vp run --filter '@pdfme/*' lint && npm --prefix playground run lint",
     "lint:fix": "vp lint -c .oxlintrc.json packages/cli/src packages/common/src packages/converter/src packages/generator/src packages/jsx/src packages/manipulator/src packages/pdf-lib/src packages/pdf-lib/scripts packages/schemas/src packages/ui/src --fix && npm --prefix playground run lint -- --fix"

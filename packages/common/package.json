@@ -45,7 +45,8 @@
     "clean": "rimraf dist",
     "lint": "vp lint -c ../../.oxlintrc.json src",
     "fmt": "vp fmt -c ../../.oxfmtrc.json src --write",
-    "test": "vitest run --config ../../vitest.config.ts"
+    "test": "vitest run --config ../../vitest.config.ts",
+    "test:types:consumer": "node ./scripts/test-types-consumer.mjs"
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",

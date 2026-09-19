@@ -47,6 +47,7 @@ import type {
   DynamicLayoutPatchArgs,
   DynamicLayoutResult,
   GetDynamicLayout,
+  PdfBytes,
 } from './types.js';
 import type { PdfLinkAnnotationRect } from './helper.js';
 import type { PageOrientation, PageSize, PageSizePreset } from './pageSize.js';
@@ -181,4 +182,5 @@ export type {
   PageOrientation,
   PageSize,
   PageSizePreset,
+  PdfBytes,
 };
