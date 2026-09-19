@@ -15,6 +15,7 @@ const verticalAlignmentMiddle = require('./verticalAlignmentMiddle.json') as Tem
 const verticalAlignmentBottom = require('./verticalAlignmentBottom.json') as Template;
 const test = require('./test.json') as Template;
 const shapes = require('./shapes.json') as Template;
+const rotatedShapes = require('./rotatedShapes.json') as Template;
 const pet = require('./pet.json') as Template;
 const pdfImage = require('./pdfImage.json') as Template;
 const underlineStrikethrough = require('./underlineStrikethrough.json') as Template;
@@ -37,6 +38,7 @@ export const textType = {
 export const other = {
   barcodes,
   shapes,
+  rotatedShapes,
   test,
   preVersion5Format,
   z97mmx210mm,
