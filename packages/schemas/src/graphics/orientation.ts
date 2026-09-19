@@ -117,35 +117,53 @@ export const parseTiffOrientation = (tiff: Uint8Array): number | undefined => {
   }
 };
 
-/** JPEG: scan APP1 'Exif\0\0' segments; stop at SOS/EOI. */
+const isExifApp1Payload = (segment: Uint8Array): boolean =>
+  segment.length >= 6 &&
+  segment[0] === 0x45 &&
+  segment[1] === 0x78 &&
+  segment[2] === 0x69 &&
+  segment[3] === 0x66 &&
+  segment[4] === 0 &&
+  segment[5] === 0;
+
+/** Standalone JPEG markers have no length field (TEM, RST0–7, SOI). */
+const isStandaloneJpegMarker = (marker: number): boolean =>
+  marker === 0x01 || (marker >= 0xd0 && marker <= 0xd8);
+
+/**
+ * JPEG: scan APP1 'Exif\0\0' segments; stop at SOS/EOI.
+ * Skips 0xFF fill/padding and standalone markers. If an Exif APP1 has no
+ * valid Orientation, keep scanning for a later one.
+ */
 export const getJpegOrientation = (bytes: Uint8Array): number | undefined => {
-  if (bytes.length < 4 || bytes[0] !== JPEG_SOI_0 || bytes[1] !== JPEG_SOI_1) return undefined;
+  if (bytes.length < 2 || bytes[0] !== JPEG_SOI_0 || bytes[1] !== JPEG_SOI_1) return undefined;
   let pos = 2;
-  while (pos + 4 <= bytes.length) {
+  while (pos < bytes.length) {
     if (bytes[pos] !== 0xff) return undefined;
-    const marker = bytes[pos + 1];
+    while (pos < bytes.length && bytes[pos] === 0xff) pos++;
+    if (pos >= bytes.length) return undefined;
+    const marker = bytes[pos++];
+    if (isStandaloneJpegMarker(marker)) continue;
     if (marker === 0xda || marker === 0xd9) return undefined; // SOS/EOI
-    const size = (bytes[pos + 2] << 8) | bytes[pos + 3];
-    if (size < 2 || pos + 2 + size > bytes.length) return undefined;
+    if (pos + 2 > bytes.length) return undefined;
+    const size = (bytes[pos] << 8) | bytes[pos + 1];
+    if (size < 2 || pos + size > bytes.length) return undefined;
     if (marker === 0xe1 && size >= 8) {
-      const segment = bytes.subarray(pos + 4, pos + 2 + size);
-      if (
-        segment[0] === 0x45 &&
-        segment[1] === 0x78 &&
-        segment[2] === 0x69 &&
-        segment[3] === 0x66 &&
-        segment[4] === 0 &&
-        segment[5] === 0
-      ) {
-        return parseTiffOrientation(segment.subarray(6));
+      const segment = bytes.subarray(pos + 2, pos + size);
+      if (isExifApp1Payload(segment)) {
+        const orientation = parseTiffOrientation(segment.subarray(6));
+        if (orientation !== undefined) return orientation;
       }
     }
-    pos += 2 + size;
+    pos += size;
   }
   return undefined;
 };
 
-/** PNG: scan chunks for eXIf (raw TIFF payload); stop at IDAT/IEND. */
+/**
+ * PNG: scan chunks for eXIf (raw TIFF payload). Skip IDAT and other
+ * ancillary chunks; eXIf may appear after image data. Stop at IEND.
+ */
 export const getPngOrientation = (bytes: Uint8Array): number | undefined => {
   if (!isPngSignature(bytes)) return undefined;
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
@@ -162,7 +180,7 @@ export const getPngOrientation = (bytes: Uint8Array): number | undefined => {
     if (type === 'eXIf') {
       return parseTiffOrientation(bytes.subarray(pos + 8, pos + 8 + length));
     }
-    if (type === 'IDAT' || type === 'IEND') return undefined;
+    if (type === 'IEND') return undefined;
     pos += 12 + length;
   }
   return undefined;

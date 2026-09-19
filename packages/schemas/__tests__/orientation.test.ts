@@ -97,12 +97,7 @@ const jpegWithOrientation = (
   littleEndian = true,
 ): Uint8Array => insertJpegSegments(jpegBytes, [jpegApp1(exifPayload(orientation, littleEndian))]);
 
-const pngWithOrientation = (
-  pngBytes: Uint8Array,
-  orientation: number,
-  littleEndian = true,
-): Uint8Array => {
-  const tiff = buildTiff(orientation, littleEndian);
+const buildExifChunk = (tiff: Uint8Array): Uint8Array => {
   const typeAndData = new Uint8Array(4 + tiff.length);
   typeAndData.set([0x65, 0x58, 0x49, 0x66]);
   typeAndData.set(tiff, 4);
@@ -111,7 +106,14 @@ const pngWithOrientation = (
   view.setUint32(0, tiff.length);
   chunk.set(typeAndData, 4);
   view.setUint32(8 + tiff.length, crc32(typeAndData));
+  return chunk;
+};
 
+const insertPngChunkBefore = (
+  pngBytes: Uint8Array,
+  chunk: Uint8Array,
+  beforeType: string,
+): Uint8Array => {
   const pngView = new DataView(pngBytes.buffer, pngBytes.byteOffset, pngBytes.byteLength);
   let pos = 8;
   while (pos + 8 <= pngBytes.length) {
@@ -122,7 +124,7 @@ const pngWithOrientation = (
       pngBytes[pos + 6],
       pngBytes[pos + 7],
     );
-    if (type === 'IDAT' || type === 'IEND') {
+    if (type === beforeType) {
       const out = new Uint8Array(pngBytes.length + chunk.length);
       out.set(pngBytes.subarray(0, pos), 0);
       out.set(chunk, pos);
@@ -131,8 +133,22 @@ const pngWithOrientation = (
     }
     pos += 12 + length;
   }
-  throw new Error('PNG fixture is missing IDAT/IEND');
+  throw new Error(`PNG fixture is missing ${beforeType}`);
 };
+
+const pngWithOrientation = (
+  pngBytes: Uint8Array,
+  orientation: number,
+  littleEndian = true,
+): Uint8Array =>
+  insertPngChunkBefore(pngBytes, buildExifChunk(buildTiff(orientation, littleEndian)), 'IDAT');
+
+const pngWithOrientationAfterIdat = (
+  pngBytes: Uint8Array,
+  orientation: number,
+  littleEndian = true,
+): Uint8Array =>
+  insertPngChunkBefore(pngBytes, buildExifChunk(buildTiff(orientation, littleEndian)), 'IEND');
 
 const makePatternRgba = (): Uint8Array => {
   const data = new Uint8Array(PATTERN_WIDTH * PATTERN_HEIGHT * 4);
@@ -226,6 +242,27 @@ describe('orientation parser', () => {
       jpegApp1(exifPayload(6, true)),
     ]);
     expect(getJpegOrientation(jpegBytes)).toBe(6);
+  });
+
+  it('skips 0xFF fill bytes and standalone RST markers before Exif APP1', () => {
+    const fillAndRst = new Uint8Array([0xff, 0xff, 0xff, 0xd0]);
+    const jpegBytes = insertJpegSegments(encodeJpegPattern(), [
+      fillAndRst,
+      jpegApp1(exifPayload(6, true)),
+    ]);
+    expect(getJpegOrientation(jpegBytes)).toBe(6);
+  });
+
+  it('keeps scanning after an Exif APP1 with no valid Orientation', () => {
+    const jpegBytes = insertJpegSegments(encodeJpegPattern(), [
+      jpegApp1(exifPayload(0, true)),
+      jpegApp1(exifPayload(6, true)),
+    ]);
+    expect(getJpegOrientation(jpegBytes)).toBe(6);
+  });
+
+  it('reads a PNG eXIf chunk that appears after IDAT', () => {
+    expect(getPngOrientation(pngWithOrientationAfterIdat(encodePngPattern(), 6))).toBe(6);
   });
 
   it('returns undefined for missing, truncated, or out-of-range tags', () => {
