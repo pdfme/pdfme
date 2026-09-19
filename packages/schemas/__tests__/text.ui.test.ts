@@ -155,6 +155,44 @@ describe('text inline markdown UI rendering', () => {
     expect(rootElement.textContent).toBe('Visit [bad](javascript:alert(1)).');
   });
 
+  it('keeps CSS wrap on read-only inline markdown instead of white-space:pre', async () => {
+    const rootElement = document.createElement('div');
+    const schema: TextSchema = {
+      ...getTextSchema(),
+      alignment: 'justify',
+      width: 18,
+      fontSize: 10,
+    };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+    const value =
+      'This is a **long** inline markdown sentence that must still wrap inside the box instead of overflowing as a single `pre` line.';
+
+    await uiRender({
+      value,
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+
+    expect(textBlock.style.whiteSpace).toBe('pre-wrap');
+    expect(textBlock.style.wordBreak).toBe('break-word');
+    expect(textBlock.style.textAlign).toBe('justify');
+    expect(textBlock.querySelectorAll('[data-pdfme-wrap-line]')).toHaveLength(0);
+    expect(textBlock.textContent).toContain('long');
+    expect(textBlock.textContent).toContain('pre');
+    expect(textBlock.textContent).not.toContain('**');
+  });
+
   it('paints Viewer lines from the wrap engine with white-space:pre', async () => {
     const rootElement = document.createElement('div');
     const schema: TextSchema = {

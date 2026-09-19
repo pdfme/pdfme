@@ -134,11 +134,13 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           value: usePlaceholder ? (placeholder as string) : displayValue,
         })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE);
+  const useComputedWrapLines = !editable && !renderInlineMarkdownReadOnlyChunk;
   const textBlock = buildStyledTextContainer(
     isReadOnlySplitInlineMarkdownFormChunk ? { ...arg, mode: 'viewer' } : arg,
     fontKitFont,
     usePlaceholder ? placeholder : displayValue,
     dynamicRichTextFontSize ?? resolvedPlainFontSize,
+    { useComputedWrapLines },
   );
 
   const processedText = replaceUnsupportedChars(
@@ -415,12 +417,17 @@ export const buildStyledTextContainer = (
   fontKitFont: FontKitFont,
   value: string,
   resolvedDynamicFontSize?: number,
+  display?: { useComputedWrapLines?: boolean },
 ) => {
   const { schema, rootElement, mode } = arg;
 
   let dynamicFontSize: undefined | number = resolvedDynamicFontSize;
   const characterSpacing = schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING;
   const editable = isEditable(mode, schema);
+  // `pre` + left-for-justify is only for plain-text displays whose wrap-engine
+  // lines are already computed. Markdown / richText still rely on CSS wrap
+  // (or their own layout) and must keep `pre-wrap` + the schema alignment.
+  const useComputedWrapLines = display?.useComputedWrapLines ?? !editable;
 
   if (dynamicFontSize === undefined && shouldUseDynamicFontSize(schema, arg.basePdf) && value) {
     dynamicFontSize = calculateDynamicFontSize({
@@ -492,11 +499,12 @@ export const buildStyledTextContainer = (
     fontSize: `${dynamicFontSize ?? schema.fontSize ?? DEFAULT_FONT_SIZE}pt`,
     letterSpacing: `${characterSpacing}pt`,
     lineHeight: `${schema.lineHeight ?? DEFAULT_LINE_HEIGHT}em`,
-    // Read-only Viewer paints wrap-engine lines with `pre`. CSS justify would
-    // fight the PDF grapheme-count letter-spacing applied per soft line.
-    textAlign: !editable && alignment === ALIGN_JUSTIFY ? 'left' : alignment,
-    whiteSpace: editable ? 'pre-wrap' : 'pre',
-    wordBreak: editable ? 'break-word' : 'normal',
+    // Read-only plain-text Viewer paints wrap-engine lines with `pre`. CSS
+    // justify would fight the PDF grapheme-count letter-spacing applied per
+    // soft line. Markdown / richText keep CSS wrap and the schema alignment.
+    textAlign: useComputedWrapLines && alignment === ALIGN_JUSTIFY ? 'left' : alignment,
+    whiteSpace: useComputedWrapLines ? 'pre' : 'pre-wrap',
+    wordBreak: useComputedWrapLines ? 'normal' : 'break-word',
     // Block layout styles
     resize: 'none',
     border: 'none',

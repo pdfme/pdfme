@@ -167,9 +167,14 @@ const wrapParagraph = (
   const appendOverflow = (atomText: string) => {
     const pieces = splitOverflowByGrapheme(atomText, measure, maxWidth);
     for (let index = 0; index < pieces.length - 1; index += 1) {
-      lines.push({ text: pieces[index]?.trimEnd() ?? '', hardBreak: false });
+      const text = pieces[index]?.trimEnd() ?? '';
+      if (text === '') continue;
+      lines.push({ text, hardBreak: false });
     }
-    current = pieces[pieces.length - 1] ?? '';
+    // A leftover space after an overflowing word ("abcdef " → "abc"/"def"/" ")
+    // must not become its own line or a space-only `current` that flushes empty.
+    const remainder = pieces[pieces.length - 1] ?? '';
+    current = remainder.trim() === '' ? '' : remainder;
   };
 
   for (const atom of getAtoms(source)) {

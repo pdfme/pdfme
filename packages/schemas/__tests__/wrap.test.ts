@@ -81,6 +81,23 @@ describe('shared wrap engine (#1115)', () => {
     expect(lines[1]?.hardBreak).toBe(true);
   });
 
+  it('does not emit an empty line from leftover space after an overflow split', () => {
+    // Monospaced 3-char width (5pt/glyph at 10pt). "abcdef " overflows, and
+    // the trailing space used to become its own line before "xyz".
+    const lines = wrap('abcdef xyz', 15);
+    expect(lineTexts(lines)).toEqual(['abc', 'def', 'xyz']);
+    expect(lines.map((line) => line.hardBreak)).toEqual([false, false, true]);
+    expect(
+      splitTextToSize({
+        value: 'abcdef xyz',
+        characterSpacing: 0,
+        boxWidthInPt: 15,
+        fontSize: 10,
+        fontKitFont: createMockFont(),
+      }),
+    ).toEqual(['abc', 'def', 'xyz\n']);
+  });
+
   it('marks only the last line of a paragraph as a hard break', () => {
     const lines = wrap('aaa bbb ccc', 15);
     expect(lines.length).toBeGreaterThan(1);
