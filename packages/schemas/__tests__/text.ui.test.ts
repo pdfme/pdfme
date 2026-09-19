@@ -198,7 +198,9 @@ describe('text inline markdown UI rendering', () => {
     expect(textBlock.textContent).not.toContain('**');
     expect(textBlock.querySelector('strong, b')).toBeNull();
     expect(
-      Array.from(textBlock.querySelectorAll('span')).some((span) => span.style.fontWeight === '800'),
+      Array.from(textBlock.querySelectorAll('span')).some(
+        (span) => span.style.fontWeight === '800',
+      ),
     ).toBe(true);
   });
 
@@ -409,12 +411,16 @@ describe('text inline markdown UI rendering', () => {
     const codeSpan = Array.from(rootElement.querySelectorAll('span')).find(
       (span) => span.style.backgroundColor,
     );
-    expect(codeSpan?.style.padding).toBe(`0 ${CODE_HORIZONTAL_PADDING}pt`);
+    expect(codeSpan?.style.paddingRight).toBe(`${CODE_HORIZONTAL_PADDING}pt`);
+    expect(codeSpan?.style.paddingLeft).toBe(`${CODE_HORIZONTAL_PADDING}pt`);
     expect(codeSpan?.style.padding).not.toContain('em');
   });
 
   it('strips end-of-line letter-spacing for markdown like plain text', async () => {
-    const render = async (textFormat: 'plain' | 'inline-markdown', alignment: 'right' | 'center') => {
+    const render = async (
+      textFormat: 'plain' | 'inline-markdown',
+      alignment: 'right' | 'center',
+    ) => {
       const rootElement = document.createElement('div');
       const schema: TextSchema = {
         ...getTextSchema(),
@@ -443,15 +449,18 @@ describe('text inline markdown UI rendering', () => {
 
       const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
       const lineEl = textBlock.querySelector('[data-pdfme-wrap-line]') as HTMLElement;
-      const lastGlyph = lineEl.lastElementChild as HTMLElement;
+      let lastGlyph = lineEl.lastElementChild as HTMLElement;
+      while (lastGlyph.lastElementChild) {
+        lastGlyph = lastGlyph.lastElementChild as HTMLElement;
+      }
       return { textBlock, lastGlyph };
     };
 
     for (const alignment of ['right', 'center'] as const) {
       const plain = await render('plain', alignment);
       const markdown = await render('inline-markdown', alignment);
-      expect(plain.lastGlyph.style.letterSpacing).toBe('0');
-      expect(markdown.lastGlyph.style.letterSpacing).toBe('0');
+      expect(plain.lastGlyph.style.letterSpacing).toBe('0px');
+      expect(markdown.lastGlyph.style.letterSpacing).toBe('0px');
       expect(plain.lastGlyph.textContent).toBe('d');
       expect(markdown.lastGlyph.textContent).toBe('d');
     }

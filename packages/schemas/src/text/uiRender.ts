@@ -392,10 +392,10 @@ const stripLineEndLetterSpacing = (lineEl: HTMLElement) => {
   }
 
   el.textContent = graphemes.slice(0, -1).join('');
-  const tail = el.cloneNode(false) as HTMLElement;
+  const tail = document.createElement('span');
   tail.textContent = graphemes[graphemes.length - 1];
   tail.style.letterSpacing = '0';
-  lineEl.appendChild(tail);
+  el.appendChild(tail);
 };
 
 const renderReadOnlyPlainLines = (arg: {
