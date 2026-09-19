@@ -567,17 +567,20 @@ exports[`Designer snapshot 1`] = `
                   >
                     <div
                       id="text-3"
-                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre-wrap; word-break: break-word; resize: none; border: medium; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent; height: 100%;"
+                      style="font-family: inherit; color: rgb(0, 0, 0); font-size: 30pt; letter-spacing: 0pt; line-height: 1em; text-align: left; white-space: pre; word-break: normal; resize: none; border: medium; outline: none; margin-bottom: 0px; padding-top: 3.436640625px; background-color: transparent; height: 100%;"
                     >
                       <span
-                        style="letter-spacing:inherit;"
+                        data-pdfme-wrap-line=""
+                        style="white-space: pre;"
                       >
-                        b
-                      </span>
-                      <span
-                        style="letter-spacing:0;"
-                      >
-                        b
+                        <span>
+                          b
+                        </span>
+                        <span
+                          style="letter-spacing: 0px;"
+                        >
+                          b
+                        </span>
                       </span>
                     </div>
                   </div>
