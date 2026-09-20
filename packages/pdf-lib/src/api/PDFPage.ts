@@ -1526,6 +1526,7 @@ export default class PDFPage {
     assertOrUndefined(options.y, 'options.y', ['number']);
     assertOrUndefined(options.width, 'options.width', ['number']);
     assertOrUndefined(options.height, 'options.height', ['number']);
+    assertOrUndefined(options.mapColor, 'options.mapColor', [Function]);
 
     await drawSvg(this, svg, {
       x: options.x ?? this.x,
@@ -1533,6 +1534,7 @@ export default class PDFPage {
       fonts: options.fonts,
       width: options.width,
       height: options.height,
+      mapColor: options.mapColor,
     });
   }
 

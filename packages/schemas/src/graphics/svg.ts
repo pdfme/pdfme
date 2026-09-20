@@ -1,10 +1,12 @@
 import { Font, Plugin, Schema } from '@pdfme/common';
+import type { SvgColorMapper } from '@pdfme/pdf-lib';
 import {
   convertForPdfLayoutProps,
   isEditable,
   addAlphaToHex,
   createErrorElm,
   createSvgStr,
+  rgbColorToCmykColor,
 } from '../utils.js';
 import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
@@ -307,7 +309,15 @@ const svgSchema: Plugin<SVGSchema> = {
         )
       : [];
     const fonts = fontEntries.length > 0 ? Object.fromEntries(fontEntries) : undefined;
-    await page.drawSvg(value, { x, y: y + height, width, height, fonts });
+    const mapColor: SvgColorMapper | undefined =
+      options.colorType?.toLowerCase() === 'cmyk'
+        ? ({ parsed }) => ({
+            color: rgbColorToCmykColor(parsed.rgb),
+            alpha: parsed.alpha,
+          })
+        : undefined;
+
+    await page.drawSvg(value, { x, y: y + height, width, height, fonts, mapColor });
   },
   propPanel: {
     schema: {},
