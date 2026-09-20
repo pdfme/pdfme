@@ -51,7 +51,7 @@ class Designer extends BaseUIClass {
     checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.template = cloneDeep(template);
-    this.updateTemplatePage = options.page ?? 0;
+    this.updateTemplatePage = options.page;
     if (this.onChangeTemplateCallback) {
       this.onChangeTemplateCallback(template);
     }
@@ -102,8 +102,6 @@ class Designer extends BaseUIClass {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
-    const updateTemplatePage = this.updateTemplatePage;
-    this.updateTemplatePage = undefined;
     this.mount(
       <AppContextProvider
         lang={this.getLang()}
@@ -145,7 +143,12 @@ class Designer extends BaseUIClass {
           onRegisterSchemaSelectionHandler={(handler) => {
             this.selectSchemasHandler = handler;
           }}
-          updateTemplatePage={updateTemplatePage}
+          onUpdateTemplatePageApplied={(page) => {
+            if (Object.is(this.updateTemplatePage, page)) {
+              this.updateTemplatePage = undefined;
+            }
+          }}
+          updateTemplatePage={this.updateTemplatePage}
           size={this.size}
         />
       </AppContextProvider>,

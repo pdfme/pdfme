@@ -53,8 +53,15 @@ type TemplateEditorProps = Omit<DesignerProps, 'domContainer'> & {
   onChangeTemplate: (t: Template) => void;
   onChangeSelection?: (selection: DesignerSelection) => void;
   onRegisterSchemaSelectionHandler?: (handler: DesignerSelectSchemas | null) => void;
+  onUpdateTemplatePageApplied?: (page: number) => void;
   onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
   updateTemplatePage?: number;
+};
+
+type PendingScrollPage = {
+  page: number;
+  queuedPageSizes: Size[];
+  requestedPage?: number;
 };
 
 /**
@@ -80,13 +87,14 @@ const TemplateEditor = ({
   onPageCursorChange,
   onChangeSelection,
   onRegisterSchemaSelectionHandler,
+  onUpdateTemplatePageApplied,
   updateTemplatePage,
 }: TemplateEditorProps) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
-  const pendingScrollPageRef = useRef<number | null>(null);
+  const pendingScrollPageRef = useRef<PendingScrollPage | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -242,14 +250,41 @@ const TemplateEditor = ({
   });
 
   useLayoutEffect(() => {
-    const pendingPage = pendingScrollPageRef.current;
-    if (pendingPage === null || !pageSizes[pendingPage] || !canvasRef.current) {
+    const pendingScrollPage = pendingScrollPageRef.current;
+    if (!pendingScrollPage || !canvasRef.current) {
+      return;
+    }
+
+    const { page: pendingPage, queuedPageSizes, requestedPage } = pendingScrollPage;
+    if (!pageSizes[pendingPage] || pageSizes.length !== schemasList.length) {
+      return;
+    }
+
+    if (isBlankPdf(template.basePdf)) {
+      const { width, height } = template.basePdf;
+      const hasCurrentBlankPdfSizes = pageSizes.every(
+        (pageSize) => pageSize.width === width && pageSize.height === height,
+      );
+      if (!hasCurrentBlankPdfSizes) {
+        return;
+      }
+    } else if (pageSizes === queuedPageSizes) {
       return;
     }
 
     pendingScrollPageRef.current = null;
     canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
-  }, [displayScale, pageCursor, pageSizes, schemasList.length]);
+    if (requestedPage !== undefined) {
+      onUpdateTemplatePageApplied?.(requestedPage);
+    }
+  }, [
+    displayScale,
+    pageCursor,
+    pageSizes,
+    schemasList.length,
+    template.basePdf,
+    onUpdateTemplatePageApplied,
+  ]);
 
   useLayoutEffect(() => {
     const updateHeight = () => {
@@ -327,17 +362,21 @@ const TemplateEditor = ({
         const clampedPage = Math.min(Math.max(normalizedPage, 0), sl.length - 1);
         setPageCursor(clampedPage);
         onPageCursorChange(clampedPage, sl.length);
-        pendingScrollPageRef.current = clampedPage;
+        pendingScrollPageRef.current = {
+          page: clampedPage,
+          queuedPageSizes: pageSizes,
+          requestedPage: targetPage,
+        };
       } else {
         const clampedPage = Math.min(pageCursor, sl.length - 1);
         setPageCursor(clampedPage);
         if (clampedPage !== pageCursor) {
           onPageCursorChange(clampedPage, sl.length);
-          pendingScrollPageRef.current = clampedPage;
+          pendingScrollPageRef.current = { page: clampedPage, queuedPageSizes: pageSizes };
         }
       }
     },
-    [pageCursor, onPageCursorChange],
+    [pageCursor, pageSizes, onPageCursorChange],
   );
 
   const addSchema = (defaultSchema: Schema) => {
