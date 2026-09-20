@@ -103,7 +103,11 @@ test('Designer snapshot', async () => {
     container = c;
   });
 
-  await waitFor(() => container.getElementsByClassName(SELECTABLE_CLASSNAME).length > 0);
+  await waitFor(() => {
+    expect(container.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent('field1');
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent('field2');
+  });
   expect(normalizeElementIdsForSnapshot(container)).toMatchSnapshot();
 });
 
