@@ -109,4 +109,50 @@ describe('PDFPage.drawSvg', () => {
     expect(namedCall.parsed.rgb.blue).toBe(1);
     expect(namedCall.parsed.alpha).toBeUndefined();
   });
+
+  it('keeps mapped CMYK components separate from SVG alpha', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      '<svg width="10" height="10"><rect width="10" height="10" fill="rgba(17, 34, 51, 0.5)"/></svg>',
+      {
+        mapColor: ({ parsed }) => ({
+          color: cmyk(1, 0, 0, 0),
+          alpha: parsed.alpha,
+        }),
+      },
+    );
+
+    const content = getPageContent(page);
+
+    expect(content).toContain('1 0 0 0 k');
+    expect(content).toMatch(/\/GS-\d+ gs/);
+    expect(content).not.toContain('0.5 0 0 0 k');
+  });
+
+  it('does not map none or transparent paints but maps currentColor fallback', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+    const mapColor = vi.fn(() => ({ color: cmyk(0, 0, 0, 1) }));
+
+    await page.drawSvg(
+      `<svg width="20" height="10">
+        <rect width="10" height="10" fill="none" stroke="transparent"/>
+        <path d="M10 0L20 0" stroke="currentColor" fill="none"/>
+      </svg>`,
+      { mapColor },
+    );
+
+    const content = getPageContent(page);
+
+    expect(content).toContain('0 0 0 1 K');
+    expect(mapColor).toHaveBeenCalledTimes(1);
+    expect(mapColor).toHaveBeenCalledWith(
+      expect.objectContaining({
+        color: '#000000',
+        kind: 'stroke',
+      }),
+    );
+  });
 });
