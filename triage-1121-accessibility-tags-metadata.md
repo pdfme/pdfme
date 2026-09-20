@@ -3,12 +3,14 @@
 - Status on current `main`: `partially_done`
 - Suggested maintainer action: `keep / needs design`
 - Evidence video: `/workspace/evidence/evidence-1121-1187-generated-pdf.webm`
-  - 00:00-00:03: generated PDF viewer opens.
-  - 00:03-00:09: inspection summary shows metadata path exists but `StructTreeRoot=false` and `MarkInfo=false`.
+  - 00:00-00:03: live Playground Designer with an editable text schema.
+  - 00:03-00:10: the same recorded browser tab opens the generated PDF in Chrome's PDF viewer.
 
 ## Rationale
 
 Generator-level document metadata is supported through options such as author, title, subject, keywords, language, creator, producer, and dates. Tagged PDF / PDF/UA structure support is not present: generated documents do not create a structure tree, role map, marked-content IDs, or MarkInfo entries.
+
+The evidence video is a real screen recording only; the missing structure/tag data is established from code/catalog inspection rather than a generated text-slide video.
 
 Code evidence:
 
