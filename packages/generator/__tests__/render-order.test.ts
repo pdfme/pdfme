@@ -6,7 +6,6 @@ import { image } from '@pdfme/schemas';
 
 const plugins = { image };
 
-// Distinct PNG widths make the rendered image order observable.
 const PNG_10x1 =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAABCAIAAABol6gpAAAAKElEQVR4nGPgEpHTMLJxC4hKyato6pm2YNWWfScu3Xn24RcLn4SSDgCy3w0rOw2EswAAAABJRU5ErkJggg==';
 const PNG_50x1 =
