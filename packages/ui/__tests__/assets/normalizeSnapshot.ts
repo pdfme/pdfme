@@ -61,6 +61,11 @@ export const normalizeElementIdsForSnapshot = (container: HTMLElement) => {
         return;
       }
 
+      if (attributeName === 'aria-describedby') {
+        element.removeAttribute(attributeName);
+        return;
+      }
+
       if (value.startsWith('text-')) {
         const key = value.slice(5);
         if (idMap.has(key)) {

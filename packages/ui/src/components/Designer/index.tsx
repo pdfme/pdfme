@@ -47,6 +47,23 @@ import Root from '../Root.js';
 import ErrorScreen from '../ErrorScreen.js';
 import CtlBar from '../CtlBar.js';
 
+type TemplateEditorProps = Omit<DesignerProps, 'domContainer'> & {
+  size: Size;
+  onSaveTemplate: (t: Template) => void;
+  onChangeTemplate: (t: Template) => void;
+  onChangeSelection?: (selection: DesignerSelection) => void;
+  onRegisterSchemaSelectionHandler?: (handler: DesignerSelectSchemas | null) => void;
+  onUpdateTemplatePageApplied?: (page: number) => void;
+  onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
+  updateTemplatePage?: number;
+};
+
+type PendingScrollPage = {
+  page: number;
+  queuedPageSizes: Size[];
+  requestedPage?: number;
+};
+
 /**
  * When the canvas scales there is a displacement of the starting position of the dragged schema.
  * It moves left or right from the top-left corner of the drag icon depending on the scale.
@@ -70,16 +87,9 @@ const TemplateEditor = ({
   onPageCursorChange,
   onChangeSelection,
   onRegisterSchemaSelectionHandler,
-}: Omit<DesignerProps, 'domContainer'> & {
-  size: Size;
-  onSaveTemplate: (t: Template) => void;
-  onChangeTemplate: (t: Template) => void;
-  onChangeSelection?: (selection: DesignerSelection) => void;
-  onRegisterSchemaSelectionHandler?: (handler: DesignerSelectSchemas | null) => void;
-} & {
-  onChangeTemplate: (t: Template) => void;
-  onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
-}) => {
+  onUpdateTemplatePageApplied,
+  updateTemplatePage,
+}: TemplateEditorProps) => {
   const past = useRef<SchemaForUI[][]>([]);
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -96,6 +106,7 @@ const TemplateEditor = ({
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
+  const [pendingScrollPage, setPendingScrollPage] = useState<PendingScrollPage | null>(null);
   // Close the sidebar by default on narrow viewports (e.g. smartphones) where
   // it would not leave any usable canvas width.
   const [sidebarOpen, setSidebarOpen] = useState(
@@ -239,6 +250,43 @@ const TemplateEditor = ({
   });
 
   useLayoutEffect(() => {
+    if (!pendingScrollPage || !canvasRef.current) {
+      return;
+    }
+
+    const { page: pendingPage, queuedPageSizes, requestedPage } = pendingScrollPage;
+    if (!pageSizes[pendingPage] || pageSizes.length !== schemasList.length) {
+      return;
+    }
+
+    if (isBlankPdf(template.basePdf)) {
+      const { width, height } = template.basePdf;
+      const hasCurrentBlankPdfSizes = pageSizes.every(
+        (pageSize) => pageSize.width === width && pageSize.height === height,
+      );
+      if (!hasCurrentBlankPdfSizes) {
+        return;
+      }
+    } else if (pageSizes === queuedPageSizes) {
+      return;
+    }
+
+    setPendingScrollPage(null);
+    canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
+    if (requestedPage !== undefined) {
+      onUpdateTemplatePageApplied?.(requestedPage);
+    }
+  }, [
+    displayScale,
+    pageCursor,
+    pageSizes,
+    pendingScrollPage,
+    schemasList.length,
+    template.basePdf,
+    onUpdateTemplatePageApplied,
+  ]);
+
+  useLayoutEffect(() => {
     const updateHeight = () => {
       setCanvasHeight(canvasRef.current ? canvasRef.current.clientHeight : 0);
     };
@@ -304,29 +352,31 @@ const TemplateEditor = ({
   });
 
   const updateTemplate = useCallback(
-    async (newTemplate: Template, preservePage = false) => {
+    async (newTemplate: Template, targetPage?: number) => {
       const sl = await template2SchemasList(newTemplate);
       setSchemasList(sl);
       onEditEnd();
-      if (!preservePage) {
-        setPageCursor(0);
-        if (canvasRef.current?.scroll) {
-          canvasRef.current.scroll({ top: 0, behavior: 'smooth' });
-        }
-      } else {
-        setPageCursor((prev) => {
-          const clamped = Math.min(prev, sl.length - 1);
-          if (clamped !== prev && canvasRef.current) {
-            canvasRef.current.scroll({
-              top: getPagesScrollTopByIndex(pageSizes, clamped, displayScale),
-              behavior: 'smooth',
-            });
-          }
-          return clamped;
+
+      if (targetPage !== undefined) {
+        const normalizedPage = Number.isFinite(targetPage) ? Math.trunc(targetPage) : 0;
+        const clampedPage = Math.min(Math.max(normalizedPage, 0), sl.length - 1);
+        setPageCursor(clampedPage);
+        onPageCursorChange(clampedPage, sl.length);
+        setPendingScrollPage({
+          page: clampedPage,
+          queuedPageSizes: pageSizes,
+          requestedPage: targetPage,
         });
+      } else {
+        const clampedPage = Math.min(pageCursor, sl.length - 1);
+        setPageCursor(clampedPage);
+        if (clampedPage !== pageCursor) {
+          onPageCursorChange(clampedPage, sl.length);
+          setPendingScrollPage({ page: clampedPage, queuedPageSizes: pageSizes });
+        }
       }
     },
-    [pageSizes, displayScale],
+    [pageCursor, pageSizes, onPageCursorChange],
   );
 
   const addSchema = (defaultSchema: Schema) => {
@@ -390,11 +440,8 @@ const TemplateEditor = ({
     setPageCursor(newPageCursor);
     const newTemplate = schemasList2template(sl, template.basePdf);
     onChangeTemplate(newTemplate);
-    await updateTemplate(newTemplate, true);
+    await updateTemplate(newTemplate, newPageCursor);
     void refresh(newTemplate);
-
-    // Notify page change with updated total pages
-    onPageCursorChange(newPageCursor, sl.length);
 
     // Use setTimeout to update scroll position after render
     setTimeout(() => {
@@ -425,7 +472,7 @@ const TemplateEditor = ({
 
   if (prevTemplate !== template) {
     setPrevTemplate(template);
-    void updateTemplate(template, true);
+    void updateTemplate(template, updateTemplatePage);
   }
 
   if (error) {
