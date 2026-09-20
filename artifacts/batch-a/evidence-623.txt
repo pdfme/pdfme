@@ -1,0 +1,10 @@
+Issue #623 - CropBox != MediaBox
+
+Runtime check:
+- Created 300x200 pt PDF with CropBox x=50 y=40 w=200 h=120.
+- Generated overlay on current main.
+- Output page size: 200x120.
+- Output CropBox: x=0 y=0 w=200 h=120.
+
+Status: fixed_already
+Maintainer action: close-as-fixed if no counterexample is provided

@@ -1,0 +1,11 @@
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/001-loaded.png'
+duration 1.4
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/002-page1-field.png'
+duration 1.4
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/003-page2-fields.png'
+duration 1.4
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/004-back-page1-before-undo.png'
+duration 1.4
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/005-page1-after-undo.png'
+duration 1.4
+file '/workspace/artifacts/batch-a/issue-1397-browser-frames/005-page1-after-undo.png'

@@ -1,0 +1,10 @@
+Issue #638 - CJK blank-space wrapping
+
+Runtime check:
+- Generated Japanese text PDF with NotoSansJP.
+- Current text wrap source uses Intl.Segmenter/UAX #14.
+- Existing integration-segmenter fixture covers Japanese wrapping.
+- Output PDF/PNG saved for visual inspection.
+
+Status: fixed_already
+Maintainer action: close-as-fixed or ask for exact old template if mismatch remains

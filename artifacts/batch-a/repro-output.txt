@@ -1,0 +1,33 @@
+
+#460 CMYK QR code
+generated issue-460-cmyk-qr.pdf (14288 bytes)
+embedded XObject color spaces: [{"name":"raw","colorSpace":"/DeviceRGB"}]
+
+#495 Viewer with large PDF
+synthetic PDF bytes=217525, pages=80
+pdf2size all pages: 227.1ms
+pdf2img rendered images eagerly: count=80, 1628.7ms
+source: packages/ui/src/hooks.ts useUIPreProcessor awaits pdf2size and pdf2img for the whole base PDF before rendering
+
+#623 CropBox vs MediaBox
+output page size: {"width":200,"height":120}
+output cropBox: {"x":0,"y":0,"width":200,"height":120}
+saved issue-623-cropbox-output.pdf and .png
+
+#638 CJK blank-space wrapping
+sample width at 12pt: 59055
+contains Intl.Segmenter: true
+saved issue-638-cjk-wrap.pdf and .png
+
+#1348 AES-256 V=5/R=5 encrypted PDFs
+candidate packages/pdf-lib/assets/pdfs/encrypted_new.pdf did not provide a V=5/R=5 empty-password repro: NEEDS PASSWORD
+candidate packages/pdf-lib/assets/pdfs/with_large_page_count.pdf did not provide a V=5/R=5 empty-password repro: ENOENT: no such file or directory, open '/workspace/packages/pdf-lib/assets/pdfs/with_large_page_count.pdf'
+No V=5/R=5 empty-password fixture or creation tool (qpdf/pikepdf) is available in this workspace.
+
+#1397 Designer undo when adding pages
+before undo page1=field1 page2=field2,field3
+after current timeTravel('undo') logic page1=field2 page2=field2,field3
+source: packages/ui/src/hooks.ts timeTravel pushes/pops only schemasList[pageCursor]
+
+#1433 SVG non-Latin font forwarding
+generate() threw: WinAnsi cannot encode "日" (0x65e5)

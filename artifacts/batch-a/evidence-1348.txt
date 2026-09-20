@@ -1,0 +1,9 @@
+Issue #1348 - AES-256 V=5/R=5 encrypted PDFs
+
+Runtime check:
+- Looked for suitable repo fixture.
+- encrypted_new.pdf requires a non-empty password and did not exercise the report.
+- qpdf and pikepdf are unavailable in this workspace to synthesize V=5/R=5.
+
+Status: needs_more_info
+Maintainer action: need author fixture or exact creation steps

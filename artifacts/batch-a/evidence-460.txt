@@ -1,0 +1,9 @@
+Issue #460 - CMYK QR code
+
+Runtime check:
+- Generated artifacts/batch-a/issue-460-cmyk-qr.pdf with options.colorType = cmyk.
+- Inspected PDF image dictionaries.
+- Embedded QR image ColorSpace: /DeviceRGB.
+
+Status: reproduces
+Maintainer action: keep

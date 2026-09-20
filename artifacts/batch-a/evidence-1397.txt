@@ -1,0 +1,10 @@
+Issue #1397 - Designer undo across added pages
+
+Runtime check:
+- Simulated current timeTravel logic from packages/ui/src/hooks.ts.
+- Before undo: page1=field1, page2=field2,field3.
+- After undo on page 1: page1=field2, page2=field2,field3.
+- The history stack stores only schemasList[pageCursor].
+
+Status: reproduces
+Maintainer action: keep
