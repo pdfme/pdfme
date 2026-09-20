@@ -1,24 +1,27 @@
 import { describe, expect, it, vi } from 'vitest';
-import { BLANK_PDF, type PDFRenderProps, type Schema } from '@pdfme/common';
+import { BLANK_PDF, mm2pt, type PDFRenderProps, type Schema } from '@pdfme/common';
 import * as pdfLib from '@pdfme/pdf-lib';
 import { svg } from '../src/index.js';
 
-const createSchema = (content: string): Schema => ({
+const createSchema = (content: string, overrides: Partial<Schema> = {}): Schema => ({
   name: 'svg',
   type: 'svg',
   content,
   position: { x: 0, y: 0 },
   width: 10,
   height: 10,
+  ...overrides,
 });
 
 const renderSvg = async ({
   value,
+  schema = createSchema(value),
   options = {},
   font,
   embedFont = vi.fn(),
 }: {
   value: string;
+  schema?: Schema;
   options?: Record<string, unknown>;
   font?: Record<string, unknown>;
   embedFont?: ReturnType<typeof vi.fn>;
@@ -26,6 +29,7 @@ const renderSvg = async ({
   const page = {
     getHeight: () => 100,
     drawSvg: vi.fn(),
+    pushOperators: vi.fn(),
   };
   const pdfDoc = {
     embedFont,
@@ -33,7 +37,7 @@ const renderSvg = async ({
 
   await svg.pdf({
     value,
-    schema: createSchema(value),
+    schema,
     basePdf: BLANK_PDF,
     pdfLib,
     pdfDoc,
@@ -100,5 +104,42 @@ describe('svg.pdf', () => {
         mapColor: expect.any(Function),
       }),
     );
+  });
+
+  it('wraps rotated SVG draws in a center-pivot graphics state transform', async () => {
+    const value = '<svg width="10" height="10"><rect width="10" height="10" fill="#112233"/></svg>';
+    const schema = createSchema(value, {
+      position: { x: 20, y: 30 },
+      width: 40,
+      height: 10,
+      rotate: 30,
+    });
+    const { page } = await renderSvg({ value, schema });
+    const width = mm2pt(schema.width);
+    const height = mm2pt(schema.height);
+    const x = mm2pt(schema.position.x);
+    const y = 100 - mm2pt(schema.position.y) - height;
+    const pivotX = x + width / 2;
+    const pivotY = y + height / 2;
+
+    expect(page.drawSvg).toHaveBeenCalledWith(
+      value,
+      expect.objectContaining({ x, y: y + height, width, height }),
+    );
+    expect(page.pushOperators).toHaveBeenCalledTimes(2);
+    const operators = page.pushOperators.mock.calls[0].map((operator) => operator.toString());
+    expect(operators).toEqual([
+      pdfLib.pushGraphicsState().toString(),
+      pdfLib.translate(pivotX, pivotY).toString(),
+      pdfLib.rotateDegrees(-30).toString(),
+      pdfLib.translate(-pivotX, -pivotY).toString(),
+    ]);
+    expect(page.pushOperators.mock.calls[1][0].toString()).toBe(
+      pdfLib.popGraphicsState().toString(),
+    );
+  });
+
+  it('enables rotation controls for the SVG schema', () => {
+    expect(svg.propPanel.defaultSchema.rotate).toBe(0);
   });
 });
