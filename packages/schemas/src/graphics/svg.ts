@@ -1,4 +1,4 @@
-import { Plugin, Schema } from '@pdfme/common';
+import { Font, Plugin, Schema } from '@pdfme/common';
 import {
   convertForPdfLayoutProps,
   isEditable,
@@ -8,6 +8,7 @@ import {
 } from '../utils.js';
 import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
+import { embedAndGetFont } from '../pdfFont.js';
 
 const isValidSVG = (svgString: string): boolean => {
   try {
@@ -35,6 +36,200 @@ const isValidSVG = (svgString: string): boolean => {
   } catch {
     return false;
   }
+};
+
+type SvgFontStyle = {
+  fontFamily?: string;
+  fontStyle?: string;
+  fontWeight?: string;
+};
+
+const isWhitespace = (char: string | undefined) =>
+  char === ' ' || char === '\n' || char === '\r' || char === '\t' || char === '\f';
+
+const isAsciiAlpha = (char: string | undefined) =>
+  typeof char === 'string' &&
+  ((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z'));
+
+const isAttributeNameChar = (char: string | undefined) =>
+  typeof char === 'string' &&
+  (isAsciiAlpha(char) ||
+    (char >= '0' && char <= '9') ||
+    char === '_' ||
+    char === ':' ||
+    char === '-');
+
+const stripImportantSuffix = (value: string): string => {
+  const suffix = '!important';
+  const trimmed = value.trim();
+  return trimmed.toLowerCase().endsWith(suffix)
+    ? trimmed.slice(0, -suffix.length).trimEnd()
+    : trimmed;
+};
+
+const parseStyleAttribute = (style: string | undefined): Record<string, string> => {
+  if (!style) return {};
+
+  return style.split(';').reduce<Record<string, string>>((acc, declaration) => {
+    const [key, ...valueParts] = declaration.split(':');
+    const value = valueParts.join(':').trim();
+    if (key && value) acc[key.trim()] = value;
+    return acc;
+  }, {});
+};
+
+const parseAttributes = (tag: string): Record<string, string> => {
+  const attributes: Record<string, string> = {};
+  let index = 0;
+
+  while (index < tag.length) {
+    while (index < tag.length && !isAsciiAlpha(tag[index]) && tag[index] !== '_') index += 1;
+    if (index >= tag.length) break;
+    const nameStart = index;
+    while (isAttributeNameChar(tag[index])) index += 1;
+    const name = tag.slice(nameStart, index);
+
+    while (isWhitespace(tag[index])) index += 1;
+    if (tag[index] !== '=') continue;
+    index += 1;
+    while (isWhitespace(tag[index])) index += 1;
+
+    const quote = tag[index];
+    if (quote !== '"' && quote !== "'") {
+      index += 1;
+      continue;
+    }
+    index += 1;
+    const valueStart = index;
+    while (index < tag.length && tag[index] !== quote) index += 1;
+    attributes[name] = tag.slice(valueStart, index);
+    if (tag[index] === quote) index += 1;
+  }
+
+  return attributes;
+};
+
+const splitFontFamilies = (fontFamily: string | undefined): string[] => {
+  if (!fontFamily) return [];
+
+  const families: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | undefined;
+
+  for (const char of fontFamily) {
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+      continue;
+    }
+    if (char === ',' && !quote) {
+      if (current.trim()) families.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) families.push(current.trim());
+  return families.map(stripImportantSuffix).filter(Boolean);
+};
+
+const findTagEnd = (svgString: string, startIndex: number): number => {
+  let index = startIndex;
+  let quote: '"' | "'" | undefined;
+
+  while (index < svgString.length) {
+    const char = svgString[index];
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+    } else if (char === '>' && !quote) {
+      return index;
+    }
+    index += 1;
+  }
+
+  return -1;
+};
+
+const isSelfClosingTag = (tag: string): boolean => {
+  let index = tag.length - 2;
+  while (index >= 0 && isWhitespace(tag[index])) index -= 1;
+  return tag[index] === '/';
+};
+
+const mergeFontStyle = (base: SvgFontStyle, attributes: Record<string, string>): SvgFontStyle => {
+  const style = parseStyleAttribute(attributes.style);
+  return {
+    fontFamily: style['font-family'] || attributes['font-family'] || base.fontFamily,
+    fontStyle: style['font-style'] || attributes['font-style'] || base.fontStyle,
+    fontWeight: style['font-weight'] || attributes['font-weight'] || base.fontWeight,
+  };
+};
+
+const getFontCandidates = (fontFamily: string, { fontStyle, fontWeight }: SvgFontStyle) => {
+  const isBold = fontWeight === 'bold' || Number(fontWeight) >= 700;
+  const isItalic = fontStyle === 'italic';
+  return Array.from(
+    new Set([
+      `${fontFamily}${isBold ? '_bold' : ''}${isItalic ? '_italic' : ''}`,
+      `${fontFamily}${isBold ? '_bold' : ''}`,
+      `${fontFamily}${isItalic ? '_italic' : ''}`,
+      fontFamily,
+    ]),
+  );
+};
+
+const selectSvgFontNames = (svgString: string, font: Font): string[] => {
+  const selectedFontNames = new Set<string>();
+  const fontNames = Object.keys(font);
+  const styleStack: SvgFontStyle[] = [{}];
+  let index = 0;
+
+  while (index < svgString.length) {
+    if (svgString[index] !== '<') {
+      index += 1;
+      continue;
+    }
+
+    let cursor = index + 1;
+    const isClosingTag = svgString[cursor] === '/';
+    if (isClosingTag) cursor += 1;
+
+    if (!isAsciiAlpha(svgString[cursor])) {
+      index += 1;
+      continue;
+    }
+
+    const tagNameStart = cursor;
+    while (isAttributeNameChar(svgString[cursor])) cursor += 1;
+    const tagName = svgString.slice(tagNameStart, cursor).toLowerCase();
+    const tagEnd = findTagEnd(svgString, cursor);
+    if (tagEnd === -1) break;
+    const tag = svgString.slice(index, tagEnd + 1);
+
+    if (isClosingTag) {
+      if (styleStack.length > 1) styleStack.pop();
+      index = tagEnd + 1;
+      continue;
+    }
+
+    const currentStyle = mergeFontStyle(styleStack[styleStack.length - 1], parseAttributes(tag));
+
+    if (tagName === 'text') {
+      let selectedFontName: string | undefined;
+      for (const family of splitFontFamilies(currentStyle.fontFamily)) {
+        selectedFontName =
+          getFontCandidates(family, currentStyle).find((fontName) => font[fontName]) ||
+          fontNames.find((fontName) => fontName.startsWith(family));
+        if (selectedFontName) break;
+      }
+      if (selectedFontName) selectedFontNames.add(selectedFontName);
+    }
+
+    if (!isSelfClosingTag(tag)) styleStack.push(currentStyle);
+    index = tagEnd + 1;
+  }
+
+  return Array.from(selectedFontNames);
 };
 
 const defaultValue = `<svg viewBox="0 0 488 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -97,12 +292,22 @@ const svgSchema: Plugin<SVGSchema> = {
     }
   },
   pdf: async (arg) => {
-    const { page, schema, value } = arg;
+    const { page, pdfDoc, options, schema, value, _cache } = arg;
     if (!value || !isValidSVG(value)) return;
     const pageHeight = page.getHeight();
     const { width, height, position } = convertForPdfLayoutProps({ schema, pageHeight });
     const { x, y } = position;
-    await page.drawSvg(value, { x, y: y + height, width, height });
+    const font = options.font;
+    const fontEntries = font
+      ? await Promise.all(
+          selectSvgFontNames(value, font).map(async (fontName) => [
+            fontName,
+            await embedAndGetFont({ pdfDoc, font, fontName, _cache }),
+          ]),
+        )
+      : [];
+    const fonts = fontEntries.length > 0 ? Object.fromEntries(fontEntries) : undefined;
+    await page.drawSvg(value, { x, y: y + height, width, height, fonts });
   },
   propPanel: {
     schema: {},

@@ -217,12 +217,15 @@ const runnersToPage = (
       const isItalic = style.fontStyle === 'italic';
       const getFont = (bold: boolean, italic: boolean, family: string) =>
         fonts[family + (bold ? '_bold' : '') + (italic ? '_italic' : '')];
+      const matchingFontFamily = Object.keys(fonts).find((fontFamily) =>
+        fontFamily.startsWith(family),
+      );
       return (
         getFont(isBold, isItalic, family) ||
         getFont(isBold, false, family) ||
         getFont(false, isItalic, family) ||
         getFont(false, false, family) ||
-        Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(family))
+        (matchingFontFamily ? fonts[matchingFontFamily] : undefined)
       );
     }
 
@@ -369,6 +372,40 @@ const parseStyles = (style: string): SVGStyle => {
     match = cssRegex.exec(style);
   }
   return css;
+};
+
+const stripImportantSuffix = (value: string): string => {
+  const suffix = '!important';
+  const trimmed = value.trim();
+  return trimmed.toLowerCase().endsWith(suffix)
+    ? trimmed.slice(0, -suffix.length).trimEnd()
+    : trimmed;
+};
+
+const splitFontFamilies = (fontFamily: string): string[] => {
+  const families: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | undefined;
+
+  for (const char of fontFamily) {
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+      continue;
+    }
+    if (char === ',' && !quote) {
+      if (current.trim()) families.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) families.push(current.trim());
+  return families.map(stripImportantSuffix).filter(Boolean);
+};
+
+const normalizeFontFamily = (fontFamily: string): string => {
+  return splitFontFamilies(fontFamily)[0] || fontFamily.trim();
 };
 
 const parseColor = (
@@ -530,8 +567,7 @@ const parseAttributes = (
 
   if (newInherited.fontFamily) {
     // Handle complex fontFamily like `"Linux Libertine O", serif`
-    const inner = newInherited.fontFamily.match(/^"(.*?)"|^'(.*?)'/);
-    if (inner) newInherited.fontFamily = inner[1] || inner[2];
+    newInherited.fontFamily = normalizeFontFamily(newInherited.fontFamily);
   }
 
   if (newInherited.strokeWidth) {
