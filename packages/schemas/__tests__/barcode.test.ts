@@ -3,6 +3,7 @@ import { PNG } from 'pngjs';
 import {
   validateBarcodeInput,
   createBarCode,
+  createBarCodeSvg,
   barCodeType2Bcid,
   mapHexColorForBwipJsLib,
   resolveBarcodeRenderRuntime,
@@ -343,6 +344,38 @@ describe('createBarCode', () => {
         expect(dataBuffer.toString('utf8')).toEqual(t[2]);
       });
     }
+  });
+});
+
+describe('createBarCodeSvg', () => {
+  const validInputs = {
+    qrcode: 'https://pdfme.com/',
+    japanpost: '10000131-3-2-B503',
+    ean13: '1111111111116',
+    ean8: '11111115',
+    code39: 'ABC-123',
+    code128: 'ABC-123',
+    nw7: 'A12345B',
+    itf14: '12345678901231',
+    upca: '123456789012',
+    upce: '01234565',
+    gs1datamatrix: '(01)12345678901231',
+    pdf417: 'Test PDF417 barcode generation',
+  } as const;
+
+  test.each(Object.entries(validInputs))('%s emits vector SVG without images', (type, input) => {
+    const svg = createBarCodeSvg({
+      type: type as keyof typeof validInputs,
+      input,
+      width: 30,
+      height: 20,
+      backgroundColor: '#ffffff',
+      barColor: '#000000',
+      textColor: '#000000',
+    });
+
+    expect(svg).toContain('<svg');
+    expect(svg).not.toMatch(/<image\b/i);
   });
 });
 

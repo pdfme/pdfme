@@ -134,6 +134,7 @@ type CanvasLike = HTMLCanvasElement | OffscreenCanvas;
 type BwipJsRenderer = {
   toCanvas?: (canvas: CanvasLike, options: RenderOptions) => void;
   toBuffer?: (options: RenderOptions) => Promise<Buffer>;
+  toSVG?: (options: RenderOptions) => string;
 };
 
 const getBwipJsRenderer = () => bwipjs as unknown as BwipJsRenderer;
@@ -206,7 +207,7 @@ const renderBarcodeToNodeBuffer = async (options: RenderOptions): Promise<Buffer
   return toBuffer(options);
 };
 
-export const createBarCode = async (arg: {
+type CreateBarCodeArg = {
   type: BarcodeTypes;
   input: string;
   width: number;
@@ -215,7 +216,9 @@ export const createBarCode = async (arg: {
   barColor?: string;
   textColor?: string;
   includetext?: boolean;
-}): Promise<Buffer> => {
+};
+
+const createBwipJsRenderOptions = (arg: CreateBarCodeArg): RenderOptions => {
   const {
     type,
     input,
@@ -243,6 +246,27 @@ export const createBarCode = async (arg: {
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
   if (textColor) bwipjsArg.textcolor = mapHexColorForBwipJsLib(textColor);
 
+  return bwipjsArg;
+};
+
+export const createBarCodeSvg = (arg: CreateBarCodeArg): string => {
+  const toSVG = getBwipJsRenderer().toSVG;
+  if (typeof toSVG !== 'function') {
+    throw new Error('[@pdfme/schemas] bwip-js toSVG() is not available in this environment.');
+  }
+
+  const svg = toSVG(createBwipJsRenderOptions(arg));
+  if (/<image\b/i.test(svg)) {
+    throw new Error(
+      `[@pdfme/schemas] bwip-js emitted an embedded image for ${arg.type}; vector barcode PDF rendering requires path-based SVG.`,
+    );
+  }
+
+  return svg;
+};
+
+export const createBarCode = async (arg: CreateBarCodeArg): Promise<Buffer> => {
+  const bwipjsArg = createBwipJsRenderOptions(arg);
   const runtime = resolveBarcodeRenderRuntime();
   if (runtime === 'document-canvas') {
     return renderBarcodeToDocumentCanvas(bwipjsArg);
