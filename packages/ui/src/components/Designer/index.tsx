@@ -249,7 +249,7 @@ const TemplateEditor = ({
 
     pendingScrollPageRef.current = null;
     canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
-  }, [displayScale, pageSizes, schemasList.length]);
+  }, [displayScale, pageCursor, pageSizes, schemasList.length]);
 
   useLayoutEffect(() => {
     const updateHeight = () => {
