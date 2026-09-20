@@ -8,6 +8,7 @@ import {
 } from '../utils.js';
 import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
+import { embedAndGetFont } from '../pdfFont.js';
 
 const isValidSVG = (svgString: string): boolean => {
   try {
@@ -97,12 +98,22 @@ const svgSchema: Plugin<SVGSchema> = {
     }
   },
   pdf: async (arg) => {
-    const { page, schema, value } = arg;
+    const { page, pdfDoc, options, schema, value, _cache } = arg;
     if (!value || !isValidSVG(value)) return;
     const pageHeight = page.getHeight();
     const { width, height, position } = convertForPdfLayoutProps({ schema, pageHeight });
     const { x, y } = position;
-    await page.drawSvg(value, { x, y: y + height, width, height });
+    const font = options.font;
+    const fontEntries = font
+      ? await Promise.all(
+          Object.keys(font).map(async (fontName) => [
+            fontName,
+            await embedAndGetFont({ pdfDoc, font, fontName, _cache }),
+          ]),
+        )
+      : [];
+    const fonts = fontEntries.length > 0 ? Object.fromEntries(fontEntries) : undefined;
+    await page.drawSvg(value, { x, y: y + height, width, height, fonts });
   },
   propPanel: {
     schema: {},

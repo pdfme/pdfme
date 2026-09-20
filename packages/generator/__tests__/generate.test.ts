@@ -5,7 +5,7 @@ import generate from '../src/generate.js';
 import { Template, BLANK_PDF, Schema, type Plugin } from '@pdfme/common';
 import { PDFDocument } from '@pdfme/pdf-lib';
 import { getFont, getImageSnapshotOptions, pdfToImages } from './utils.js';
-import { multiVariableText, text } from '@pdfme/schemas';
+import { multiVariableText, svg, text } from '@pdfme/schemas';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -113,6 +113,47 @@ describe('generate integrate test', () => {
       expect(observedPositions).toHaveLength(2);
       expect(observedPositions[0]).toEqual(observedPositions[1]);
       expect(observedPositions[0]).toEqual(probeSchema.position);
+    });
+
+    test('renders non-Latin SVG text with configured fonts', async () => {
+      const font = getFont();
+      const template: Template = {
+        basePdf: BLANK_PDF,
+        schemas: [
+          [
+            {
+              name: 'svgText',
+              type: 'svg',
+              content: '',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 20,
+            },
+          ],
+        ],
+      };
+      const inputs = [
+        {
+          svgText:
+            '<svg viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="0" y="24" font-family="NotoSansJP" font-size="20">こんにちは</text></svg>',
+        },
+      ];
+
+      await expect(
+        generate({
+          inputs,
+          template,
+          plugins: { svg },
+          options: {
+            font: {
+              NotoSansJP: {
+                ...font.NotoSansJP,
+                subset: false,
+              },
+            },
+          },
+        }),
+      ).resolves.toBeInstanceOf(Uint8Array);
     });
 
     test('loads permission encrypted custom base PDFs with empty password fallback', async () => {
