@@ -29,11 +29,6 @@ import {
   validateRequiredFields,
 } from './helper.js';
 
-type SchemaRenderInfo = {
-  schemaNames: string[];
-  schemaPages: Map<string, Schema>[];
-};
-
 const hasDynamicLayoutSchema = (schemas: Schema[][]) => {
   for (let i = 0; i < schemas.length; i += 1) {
     const schemaPage = schemas[i];
@@ -44,31 +39,6 @@ const hasDynamicLayoutSchema = (schemas: Schema[][]) => {
     }
   }
   return false;
-};
-
-const getSchemaRenderInfo = (schemas: Schema[][]): SchemaRenderInfo => {
-  const schemaNameSet = new Set<string>();
-  const schemaPages: Map<string, Schema>[] = [];
-
-  for (let i = 0; i < schemas.length; i += 1) {
-    const schemaPage = schemas[i];
-    const schemaMap = new Map<string, Schema>();
-
-    for (let j = 0; j < schemaPage.length; j += 1) {
-      const schema = schemaPage[j];
-      if (!schema.name) {
-        continue;
-      }
-      schemaNameSet.add(schema.name);
-      if (!schemaMap.has(schema.name)) {
-        schemaMap.set(schema.name, schema);
-      }
-    }
-
-    schemaPages.push(schemaMap);
-  }
-
-  return { schemaNames: Array.from(schemaNameSet), schemaPages };
 };
 
 const getAdjustedSchema = (
@@ -141,9 +111,6 @@ const generate = async (props: GenerateProps): Promise<PdfBytes> => {
         template,
         pdfDoc,
       });
-  const cachedRenderInfo = shouldApplyDynamicTemplate
-    ? undefined
-    : getSchemaRenderInfo(template.schemas);
 
   for (let i = 0; i < inputs.length; i += 1) {
     const input = inputs[i];
@@ -167,9 +134,6 @@ const generate = async (props: GenerateProps): Promise<PdfBytes> => {
       }));
 
     const schemas = dynamicTemplate.schemas;
-    const { schemaNames, schemaPages } = shouldApplyDynamicTemplate
-      ? getSchemaRenderInfo(schemas)
-      : (cachedRenderInfo as SchemaRenderInfo);
 
     for (let j = 0; j < basePages.length; j += 1) {
       const basePage = basePages[j];
@@ -222,15 +186,10 @@ const generate = async (props: GenerateProps): Promise<PdfBytes> => {
         }
       }
 
-      const schemaPage = schemaPages[j];
-      if (!schemaPage) {
-        continue;
-      }
-
-      for (let l = 0; l < schemaNames.length; l += 1) {
-        const name = schemaNames[l];
-        const schema = schemaPage.get(name);
-        if (!schema) {
+      const schemaPage = schemas[j] || [];
+      for (let l = 0; l < schemaPage.length; l += 1) {
+        const schema = schemaPage[l];
+        if (!schema.name) {
           continue;
         }
 
@@ -247,7 +206,7 @@ const generate = async (props: GenerateProps): Promise<PdfBytes> => {
                   variables,
                   schemas,
                 })
-              : ((input[name] || '') as string);
+              : ((input[schema.name] || '') as string);
 
         const adjustedSchema = getAdjustedSchema(schema, boundingBoxLeft, boundingBoxBottom);
         registerSchemaAnchor(_cache, adjustedSchema, page);
