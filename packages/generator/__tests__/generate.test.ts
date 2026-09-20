@@ -157,6 +157,38 @@ describe('generate integrate test', () => {
       ).resolves.toBeInstanceOf(Uint8Array);
     });
 
+    test('renders rotated SVG schemas', async () => {
+      const pdf = await generate({
+        template: {
+          basePdf: { width: 80, height: 80, padding: [0, 0, 0, 0] },
+          schemas: [
+            [
+              {
+                name: 'rotatedSvg',
+                type: 'svg',
+                content: '',
+                position: { x: 25, y: 25 },
+                width: 30,
+                height: 20,
+                rotate: 35,
+              },
+            ],
+          ],
+        },
+        inputs: [
+          {
+            rotatedSvg:
+              '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg"><rect width="30" height="20" fill="#ff0000"/><path d="M0 0 L30 0 L30 20 Z" fill="#0000ff"/></svg>',
+          },
+        ],
+        plugins: { svg },
+      });
+
+      const images = await pdfToImages(pdf);
+      expect(images).toHaveLength(1);
+      await expect(images[0]).toMatchImage(getImageSnapshotOptions('svg-rotate-1'));
+    });
+
     test('does not embed unused fonts for SVG rendering', async () => {
       const font = getFont();
       const template: Template = {

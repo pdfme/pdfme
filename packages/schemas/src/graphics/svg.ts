@@ -294,10 +294,14 @@ const svgSchema: Plugin<SVGSchema> = {
     }
   },
   pdf: async (arg) => {
-    const { page, pdfDoc, options, schema, value, _cache } = arg;
+    const { page, pdfDoc, pdfLib, options, schema, value, _cache } = arg;
     if (!value || !isValidSVG(value)) return;
     const pageHeight = page.getHeight();
-    const { width, height, position } = convertForPdfLayoutProps({ schema, pageHeight });
+    const { width, height, position } = convertForPdfLayoutProps({
+      schema,
+      pageHeight,
+      applyRotateTranslate: false,
+    });
     const { x, y } = position;
     const font = options.font;
     const fontEntries = font
@@ -317,7 +321,23 @@ const svgSchema: Plugin<SVGSchema> = {
           })
         : undefined;
 
-    await page.drawSvg(value, { x, y: y + height, width, height, fonts, mapColor });
+    const rotateDegrees = schema.rotate ? -schema.rotate : 0;
+    if (rotateDegrees) {
+      const pivotX = x + width / 2;
+      const pivotY = y + height / 2;
+      page.pushOperators(
+        pdfLib.pushGraphicsState(),
+        pdfLib.translate(pivotX, pivotY),
+        pdfLib.rotateDegrees(rotateDegrees),
+        pdfLib.translate(-pivotX, -pivotY),
+      );
+    }
+
+    try {
+      await page.drawSvg(value, { x, y: y + height, width, height, fonts, mapColor });
+    } finally {
+      if (rotateDegrees) page.pushOperators(pdfLib.popGraphicsState());
+    }
   },
   propPanel: {
     schema: {},
@@ -328,6 +348,7 @@ const svgSchema: Plugin<SVGSchema> = {
       position: { x: 0, y: 0 },
       width: 40,
       height: 50,
+      rotate: 0,
     },
   },
   icon: createSvgStr(Route),
