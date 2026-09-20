@@ -284,15 +284,26 @@ const issue495 = async () => {
   return { status: 'needs_more_info', pages: sizes.length, renderMs };
 };
 
-const results = {
-  460: await issue460(),
-  495: await issue495(),
-  623: await issue623(),
-  638: await issue638(),
-  1348: await issue1348(),
-  1397: await issue1397(),
-  1433: await issue1433(),
+const issueFns = {
+  460: issue460,
+  495: issue495,
+  623: issue623,
+  638: issue638,
+  1348: issue1348,
+  1397: issue1397,
+  1433: issue1433,
 };
+
+const selectedIssue = process.argv[2];
+const entries = selectedIssue ? [[selectedIssue, issueFns[selectedIssue]]] : Object.entries(issueFns);
+if (entries.some(([, fn]) => typeof fn !== 'function')) {
+  throw new Error(`Unknown issue ${selectedIssue}. Expected one of ${Object.keys(issueFns).join(', ')}`);
+}
+
+const results = {};
+for (const [issue, fn] of entries) {
+  results[issue] = await fn();
+}
 
 await write('repro-results.json', JSON.stringify(results, null, 2));
 await write('repro-output.txt', `${logLines.join('\n')}\n`);

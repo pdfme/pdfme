@@ -2,6 +2,10 @@
 
 Current main checked: `7501849ebe917e098e0a22569a1f338bf0fcc978`
 
+Evidence videos are real screen recordings: terminal-based issues were captured from `xterm`
+running the repro command, and #1397's UI evidence was captured from headed Chrome running the
+Playground Designer.
+
 | Issue | Title | Status on current main | Suggested maintainer action | Primary evidence |
 |---:|---|---|---|---|
 | #460 | CMYK option does not apply to QR codes | `reproduces` | keep | `artifacts/batch-a/evidence-460-cmyk-qr.mp4` |

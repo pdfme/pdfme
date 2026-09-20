@@ -5,8 +5,8 @@ embedded XObject color spaces: [{"name":"raw","colorSpace":"/DeviceRGB"}]
 
 #495 Viewer with large PDF
 synthetic PDF bytes=217525, pages=80
-pdf2size all pages: 227.1ms
-pdf2img rendered images eagerly: count=80, 1628.7ms
+pdf2size all pages: 224.2ms
+pdf2img rendered images eagerly: count=80, 1598.1ms
 source: packages/ui/src/hooks.ts useUIPreProcessor awaits pdf2size and pdf2img for the whole base PDF before rendering
 
 #623 CropBox vs MediaBox

@@ -15,9 +15,9 @@ await fs.mkdir(framesDir, { recursive: true });
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const browser = await puppeteer.launch({
-  headless: 'new',
+  headless: process.env.HEADED === '1' ? false : 'new',
   executablePath: '/usr/local/bin/google-chrome',
-  args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1400,1000'],
 });
 
 const page = await browser.newPage();
