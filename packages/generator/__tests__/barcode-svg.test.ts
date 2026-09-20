@@ -1,5 +1,6 @@
 import generate from '../src/generate.js';
 import { BLANK_PDF, type Template } from '@pdfme/common';
+import { getImageSnapshotOptions, pdfToImages } from './utils.js';
 import {
   decodePDFRawStream,
   PDFArray,
@@ -22,6 +23,21 @@ const qrTemplate: Template = {
         height: 30,
         backgroundColor: '#ffffff',
         barColor: '#000000',
+      },
+    ],
+  ],
+};
+
+const rotatedQrTemplate: Template = {
+  basePdf: BLANK_PDF,
+  schemas: [
+    [
+      {
+        ...qrTemplate.schemas[0][0],
+        position: { x: 60, y: 70 },
+        width: 35,
+        height: 35,
+        rotate: 37,
       },
     ],
   ],
@@ -84,5 +100,18 @@ describe('barcode SVG PDF rendering', () => {
 
     expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? rg(?:\s|$)/);
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+  });
+
+  test('renders rotated QR codes as visible vector SVG', async () => {
+    const pdf = await generate({
+      template: rotatedQrTemplate,
+      inputs: [{ qr: 'https://pdfme.com/issue-460-rotated' }],
+      plugins: { qrcode: barcodes.qrcode },
+    });
+    const { pdfDoc, page } = await loadFirstPageContent(pdf);
+    const images = await pdfToImages(pdf);
+
+    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-qrcode-svg-1'));
   });
 });

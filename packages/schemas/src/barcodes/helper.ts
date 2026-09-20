@@ -255,7 +255,11 @@ export const createBarCodeSvg = (arg: CreateBarCodeArg): string => {
     throw new Error('[@pdfme/schemas] bwip-js toSVG() is not available in this environment.');
   }
 
-  const svg = toSVG(createBwipJsRenderOptions(arg));
+  const defaultFill = `#${mapHexColorForBwipJsLib(arg.barColor)}`;
+  const svg = toSVG(createBwipJsRenderOptions(arg)).replace(
+    /<svg\b(?![^>]*\sfill=)/,
+    `<svg fill="${defaultFill}"`,
+  );
   if (/<image\b/i.test(svg)) {
     throw new Error(
       `[@pdfme/schemas] bwip-js emitted an embedded image for ${arg.type}; vector barcode PDF rendering requires path-based SVG.`,

@@ -377,6 +377,19 @@ describe('createBarCodeSvg', () => {
     expect(svg).toContain('<svg');
     expect(svg).not.toMatch(/<image\b/i);
   });
+
+  test('adds a default fill for SVG paths without an explicit fill', () => {
+    const svg = createBarCodeSvg({
+      type: 'qrcode',
+      input: 'https://pdfme.com/default-fill',
+      width: 30,
+      height: 30,
+      backgroundColor: '',
+      barColor: '',
+    });
+
+    expect(svg).toMatch(/<svg\b[^>]*fill="#000000"/);
+  });
 });
 
 describe('barCodeType2Bcid test', () => {
