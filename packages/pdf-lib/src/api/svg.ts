@@ -374,11 +374,30 @@ const parseStyles = (style: string): SVGStyle => {
   return css;
 };
 
+const splitFontFamilies = (fontFamily: string): string[] => {
+  const families: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | undefined;
+
+  for (const char of fontFamily) {
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+      continue;
+    }
+    if (char === ',' && !quote) {
+      if (current.trim()) families.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) families.push(current.trim());
+  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
+};
+
 const normalizeFontFamily = (fontFamily: string): string => {
-  const trimmed = fontFamily.trim();
-  const quoted = trimmed.match(/^"(.*?)"|^'(.*?)'/);
-  if (quoted) return quoted[1] || quoted[2];
-  return trimmed.split(',')[0].trim();
+  return splitFontFamilies(fontFamily)[0] || fontFamily.trim();
 };
 
 const parseColor = (

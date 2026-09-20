@@ -68,27 +68,40 @@ const parseAttributes = (tag: string): Record<string, string> => {
   return attributes;
 };
 
-const normalizeFontFamily = (fontFamily: string | undefined) => {
-  if (!fontFamily) return undefined;
-  // Mirror pdf-lib: only unwrap a leading quoted family in values like `"Noto Sans", serif`.
-  const inner = fontFamily.match(/^"(.*?)"|^'(.*?)'/);
-  return inner ? inner[1] || inner[2] : fontFamily;
+const splitFontFamilies = (fontFamily: string | undefined): string[] => {
+  if (!fontFamily) return [];
+
+  const families: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | undefined;
+
+  for (const char of fontFamily) {
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+      continue;
+    }
+    if (char === ',' && !quote) {
+      if (current.trim()) families.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) families.push(current.trim());
+  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
 };
 
 const mergeFontStyle = (base: SvgFontStyle, attributes: Record<string, string>): SvgFontStyle => {
   const style = parseStyleAttribute(attributes.style);
   return {
-    fontFamily: normalizeFontFamily(
-      style['font-family'] || attributes['font-family'] || base.fontFamily,
-    ),
+    fontFamily: style['font-family'] || attributes['font-family'] || base.fontFamily,
     fontStyle: style['font-style'] || attributes['font-style'] || base.fontStyle,
     fontWeight: style['font-weight'] || attributes['font-weight'] || base.fontWeight,
   };
 };
 
-const getFontCandidates = ({ fontFamily, fontStyle, fontWeight }: SvgFontStyle) => {
-  if (!fontFamily) return [];
-
+const getFontCandidates = (fontFamily: string, { fontStyle, fontWeight }: SvgFontStyle) => {
   const isBold = fontWeight === 'bold' || Number(fontWeight) >= 700;
   const isItalic = fontStyle === 'italic';
   return Array.from(
@@ -123,14 +136,13 @@ const selectSvgFontNames = (svgString: string, font: Font): string[] => {
     const currentStyle = mergeFontStyle(styleStack[styleStack.length - 1], parseAttributes(tag));
 
     if (tagName === 'text') {
-      const exactMatch = getFontCandidates(currentStyle).find((fontName) => font[fontName]);
-      const prefixMatch = exactMatch
-        ? undefined
-        : fontNames.find((fontName) => {
-            const family = currentStyle.fontFamily;
-            return family ? fontName.startsWith(family) : false;
-          });
-      const selectedFontName = exactMatch || prefixMatch;
+      let selectedFontName: string | undefined;
+      for (const family of splitFontFamilies(currentStyle.fontFamily)) {
+        selectedFontName =
+          getFontCandidates(family, currentStyle).find((fontName) => font[fontName]) ||
+          fontNames.find((fontName) => fontName.startsWith(family));
+        if (selectedFontName) break;
+      }
       if (selectedFontName) selectedFontNames.add(selectedFontName);
     }
 
