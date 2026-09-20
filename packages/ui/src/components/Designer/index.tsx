@@ -94,7 +94,6 @@ const TemplateEditor = ({
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
-  const pendingScrollPageRef = useRef<PendingScrollPage | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -107,6 +106,7 @@ const TemplateEditor = ({
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
   const [schemasList, setSchemasList] = useState<SchemaForUI[][]>([[]] as SchemaForUI[][]);
   const [pageCursor, setPageCursor] = useState(0);
+  const [pendingScrollPage, setPendingScrollPage] = useState<PendingScrollPage | null>(null);
   // Close the sidebar by default on narrow viewports (e.g. smartphones) where
   // it would not leave any usable canvas width.
   const [sidebarOpen, setSidebarOpen] = useState(
@@ -250,7 +250,6 @@ const TemplateEditor = ({
   });
 
   useLayoutEffect(() => {
-    const pendingScrollPage = pendingScrollPageRef.current;
     if (!pendingScrollPage || !canvasRef.current) {
       return;
     }
@@ -272,7 +271,7 @@ const TemplateEditor = ({
       return;
     }
 
-    pendingScrollPageRef.current = null;
+    setPendingScrollPage(null);
     canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
     if (requestedPage !== undefined) {
       onUpdateTemplatePageApplied?.(requestedPage);
@@ -281,6 +280,7 @@ const TemplateEditor = ({
     displayScale,
     pageCursor,
     pageSizes,
+    pendingScrollPage,
     schemasList.length,
     template.basePdf,
     onUpdateTemplatePageApplied,
@@ -362,17 +362,17 @@ const TemplateEditor = ({
         const clampedPage = Math.min(Math.max(normalizedPage, 0), sl.length - 1);
         setPageCursor(clampedPage);
         onPageCursorChange(clampedPage, sl.length);
-        pendingScrollPageRef.current = {
+        setPendingScrollPage({
           page: clampedPage,
           queuedPageSizes: pageSizes,
           requestedPage: targetPage,
-        };
+        });
       } else {
         const clampedPage = Math.min(pageCursor, sl.length - 1);
         setPageCursor(clampedPage);
         if (clampedPage !== pageCursor) {
           onPageCursorChange(clampedPage, sl.length);
-          pendingScrollPageRef.current = { page: clampedPage, queuedPageSizes: pageSizes };
+          setPendingScrollPage({ page: clampedPage, queuedPageSizes: pageSizes });
         }
       }
     },

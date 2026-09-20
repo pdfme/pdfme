@@ -300,6 +300,19 @@ test('Designer.updateTemplate can keep a requested page cursor and scroll positi
       expect(canvas.scrollTop).toBe(pageTwoScrollTop);
     });
 
+    const canvas = domContainer.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLDivElement;
+    canvas.scrollTop = 0;
+
+    await act(async () => {
+      designer.updateTemplate(updatedTemplate, { page: 1 });
+    });
+
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(canvas.scrollTop).toBe(pageTwoScrollTop);
+    });
+
     await act(async () => {
       designer.updateTemplate(updatedTemplate, { page: 99 });
     });
