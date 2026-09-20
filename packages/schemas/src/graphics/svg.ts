@@ -10,6 +10,63 @@ import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
 import { embedAndGetFont } from '../pdfFont.js';
 
+const splitFontFamilies = (fontFamily: string): string[] => {
+  const families: string[] = [];
+  let current = '';
+  let quote: '"' | "'" | undefined;
+
+  for (const char of fontFamily) {
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+      continue;
+    }
+    if (char === ',' && !quote) {
+      if (current.trim()) families.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) families.push(current.trim());
+  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
+};
+
+const getFontFamiliesInSvg = (svgString: string): string[] => {
+  const fontFamilies = new Set<string>();
+
+  svgString.replace(
+    /\bfont-family\s*=\s*(["'])(.*?)\1/gims,
+    (_match: string, _quote: string, value: string) => {
+      splitFontFamilies(value).forEach((family) => fontFamilies.add(family));
+      return '';
+    },
+  );
+
+  svgString.replace(
+    /\bstyle\s*=\s*(["'])(.*?)\1/gims,
+    (_match: string, _quote: string, style: string) => {
+      style.replace(
+        /(?:^|;)\s*font-family\s*:\s*([^;]+)/gim,
+        (_styleMatch: string, value: string) => {
+          splitFontFamilies(value).forEach((family) => fontFamilies.add(family));
+          return '';
+        },
+      );
+      return '';
+    },
+  );
+
+  return [...fontFamilies];
+};
+
+const fontNameMatchesFamily = (fontName: string, family: string): boolean =>
+  fontName === family ||
+  fontName === `${family}_bold` ||
+  fontName === `${family}_italic` ||
+  fontName === `${family}_bold_italic` ||
+  fontName.startsWith(family);
+
 const isValidSVG = (svgString: string): boolean => {
   try {
     // Basic validation checks that work in both Node.js and browser
@@ -104,9 +161,15 @@ const svgSchema: Plugin<SVGSchema> = {
     const { width, height, position } = convertForPdfLayoutProps({ schema, pageHeight });
     const { x, y } = position;
     const font = options.font;
+    const fontFamilies = getFontFamiliesInSvg(value);
+    const fontNames = font
+      ? Object.keys(font).filter((fontName) =>
+          fontFamilies.some((family) => fontNameMatchesFamily(fontName, family)),
+        )
+      : [];
     const fontEntries = font
       ? await Promise.all(
-          Object.keys(font).map(async (fontName) => [
+          fontNames.map(async (fontName) => [
             fontName,
             await embedAndGetFont({ pdfDoc, font, fontName, _cache }),
           ]),

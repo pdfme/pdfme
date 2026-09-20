@@ -217,12 +217,15 @@ const runnersToPage = (
       const isItalic = style.fontStyle === 'italic';
       const getFont = (bold: boolean, italic: boolean, family: string) =>
         fonts[family + (bold ? '_bold' : '') + (italic ? '_italic' : '')];
+      const matchingFontFamily = Object.keys(fonts).find((fontFamily) =>
+        fontFamily.startsWith(family),
+      );
       return (
         getFont(isBold, isItalic, family) ||
         getFont(isBold, false, family) ||
         getFont(false, isItalic, family) ||
         getFont(false, false, family) ||
-        Object.keys(fonts).find((fontFamily) => fontFamily.startsWith(family))
+        (matchingFontFamily ? fonts[matchingFontFamily] : undefined)
       );
     }
 
@@ -369,6 +372,13 @@ const parseStyles = (style: string): SVGStyle => {
     match = cssRegex.exec(style);
   }
   return css;
+};
+
+const normalizeFontFamily = (fontFamily: string): string => {
+  const trimmed = fontFamily.trim();
+  const quoted = trimmed.match(/^"(.*?)"|^'(.*?)'/);
+  if (quoted) return quoted[1] || quoted[2];
+  return trimmed.split(',')[0].trim();
 };
 
 const parseColor = (
@@ -530,8 +540,7 @@ const parseAttributes = (
 
   if (newInherited.fontFamily) {
     // Handle complex fontFamily like `"Linux Libertine O", serif`
-    const inner = newInherited.fontFamily.match(/^"(.*?)"|^'(.*?)'/);
-    if (inner) newInherited.fontFamily = inner[1] || inner[2];
+    newInherited.fontFamily = normalizeFontFamily(newInherited.fontFamily);
   }
 
   if (newInherited.strokeWidth) {

@@ -157,6 +157,92 @@ describe('generate integrate test', () => {
       ).resolves.toBeInstanceOf(Uint8Array);
     });
 
+    test('does not embed unused fonts for SVG rendering', async () => {
+      const font = getFont();
+      const template: Template = {
+        basePdf: BLANK_PDF,
+        schemas: [
+          [
+            {
+              name: 'svgText',
+              type: 'svg',
+              content: '',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 20,
+            },
+          ],
+        ],
+      };
+
+      await expect(
+        generate({
+          inputs: [
+            {
+              svgText:
+                '<svg viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="0" y="24" font-family="NotoSansJP" font-size="20">こんにちは</text></svg>',
+            },
+          ],
+          template,
+          plugins: { svg },
+          options: {
+            font: {
+              NotoSansJP: {
+                ...font.NotoSansJP,
+                fallback: true,
+                subset: false,
+              },
+              UnusedBrokenFont: {
+                data: 'not-a-font',
+                fallback: false,
+              },
+            },
+          },
+        }),
+      ).resolves.toBeInstanceOf(Uint8Array);
+    });
+
+    test('renders SVG text when configured font key extends the font family', async () => {
+      const font = getFont();
+      const template: Template = {
+        basePdf: BLANK_PDF,
+        schemas: [
+          [
+            {
+              name: 'svgText',
+              type: 'svg',
+              content: '',
+              position: { x: 10, y: 10 },
+              width: 80,
+              height: 20,
+            },
+          ],
+        ],
+      };
+
+      await expect(
+        generate({
+          inputs: [
+            {
+              svgText:
+                '<svg viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg"><text x="0" y="24" font-family="NotoSansJP" font-size="20">こんにちは</text></svg>',
+            },
+          ],
+          template,
+          plugins: { svg },
+          options: {
+            font: {
+              'NotoSansJP-Regular': {
+                ...font['NotoSansJP-Regular'],
+                fallback: true,
+                subset: false,
+              },
+            },
+          },
+        }),
+      ).resolves.toBeInstanceOf(Uint8Array);
+    });
+
     test('loads permission encrypted custom base PDFs with empty password fallback', async () => {
       const encryptedBasePdf = readFileSync(
         path.join(
