@@ -192,9 +192,8 @@ describe('generate integrate test', () => {
                 fallback: true,
                 subset: false,
               },
-              UnusedBrokenFont: {
-                data: 'not-a-font',
-                fallback: false,
+              NotoSansJP_bold: {
+                data: Buffer.from([0]),
               },
             },
           },

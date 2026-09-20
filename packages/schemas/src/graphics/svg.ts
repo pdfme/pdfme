@@ -1,4 +1,4 @@
-import { Plugin, Schema } from '@pdfme/common';
+import { Font, Plugin, Schema } from '@pdfme/common';
 import {
   convertForPdfLayoutProps,
   isEditable,
@@ -9,63 +9,6 @@ import {
 import { sanitizeSVG } from '../sanitize.js';
 import { Route } from 'lucide';
 import { embedAndGetFont } from '../pdfFont.js';
-
-const splitFontFamilies = (fontFamily: string): string[] => {
-  const families: string[] = [];
-  let current = '';
-  let quote: '"' | "'" | undefined;
-
-  for (const char of fontFamily) {
-    if ((char === '"' || char === "'") && (!quote || quote === char)) {
-      quote = quote ? undefined : char;
-      continue;
-    }
-    if (char === ',' && !quote) {
-      if (current.trim()) families.push(current.trim());
-      current = '';
-      continue;
-    }
-    current += char;
-  }
-
-  if (current.trim()) families.push(current.trim());
-  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
-};
-
-const getFontFamiliesInSvg = (svgString: string): string[] => {
-  const fontFamilies = new Set<string>();
-
-  svgString.replace(
-    /\bfont-family\s*=\s*(["'])(.*?)\1/gims,
-    (_match: string, _quote: string, value: string) => {
-      splitFontFamilies(value).forEach((family) => fontFamilies.add(family));
-      return '';
-    },
-  );
-
-  svgString.replace(
-    /\bstyle\s*=\s*(["'])(.*?)\1/gims,
-    (_match: string, _quote: string, style: string) => {
-      style.replace(
-        /(?:^|;)\s*font-family\s*:\s*([^;]+)/gim,
-        (_styleMatch: string, value: string) => {
-          splitFontFamilies(value).forEach((family) => fontFamilies.add(family));
-          return '';
-        },
-      );
-      return '';
-    },
-  );
-
-  return [...fontFamilies];
-};
-
-const fontNameMatchesFamily = (fontName: string, family: string): boolean =>
-  fontName === family ||
-  fontName === `${family}_bold` ||
-  fontName === `${family}_italic` ||
-  fontName === `${family}_bold_italic` ||
-  fontName.startsWith(family);
 
 const isValidSVG = (svgString: string): boolean => {
   try {
@@ -93,6 +36,109 @@ const isValidSVG = (svgString: string): boolean => {
   } catch {
     return false;
   }
+};
+
+type SvgFontStyle = {
+  fontFamily?: string;
+  fontStyle?: string;
+  fontWeight?: string;
+};
+
+const parseStyleAttribute = (style: string | undefined): Record<string, string> => {
+  if (!style) return {};
+
+  return style.split(';').reduce<Record<string, string>>((acc, declaration) => {
+    const [key, ...valueParts] = declaration.split(':');
+    const value = valueParts.join(':').trim();
+    if (key && value) acc[key.trim()] = value;
+    return acc;
+  }, {});
+};
+
+const parseAttributes = (tag: string): Record<string, string> => {
+  const attributes: Record<string, string> = {};
+  const attributeRegex = /([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
+  let match = attributeRegex.exec(tag);
+
+  while (match) {
+    attributes[match[1]] = match[2] ?? match[3] ?? '';
+    match = attributeRegex.exec(tag);
+  }
+
+  return attributes;
+};
+
+const normalizeFontFamily = (fontFamily: string | undefined) => {
+  if (!fontFamily) return undefined;
+  // Mirror pdf-lib: only unwrap a leading quoted family in values like `"Noto Sans", serif`.
+  const inner = fontFamily.match(/^"(.*?)"|^'(.*?)'/);
+  return inner ? inner[1] || inner[2] : fontFamily;
+};
+
+const mergeFontStyle = (base: SvgFontStyle, attributes: Record<string, string>): SvgFontStyle => {
+  const style = parseStyleAttribute(attributes.style);
+  return {
+    fontFamily: normalizeFontFamily(
+      style['font-family'] || attributes['font-family'] || base.fontFamily,
+    ),
+    fontStyle: style['font-style'] || attributes['font-style'] || base.fontStyle,
+    fontWeight: style['font-weight'] || attributes['font-weight'] || base.fontWeight,
+  };
+};
+
+const getFontCandidates = ({ fontFamily, fontStyle, fontWeight }: SvgFontStyle) => {
+  if (!fontFamily) return [];
+
+  const isBold = fontWeight === 'bold' || Number(fontWeight) >= 700;
+  const isItalic = fontStyle === 'italic';
+  return Array.from(
+    new Set([
+      `${fontFamily}${isBold ? '_bold' : ''}${isItalic ? '_italic' : ''}`,
+      `${fontFamily}${isBold ? '_bold' : ''}`,
+      `${fontFamily}${isItalic ? '_italic' : ''}`,
+      fontFamily,
+    ]),
+  );
+};
+
+const selectSvgFontNames = (svgString: string, font: Font): string[] => {
+  const selectedFontNames = new Set<string>();
+  const fontNames = Object.keys(font);
+  const styleStack: SvgFontStyle[] = [{}];
+  const tagRegex = /<\/?([A-Za-z][\w:-]*)([^>]*)>/g;
+  let match = tagRegex.exec(svgString);
+
+  while (match) {
+    const [tag, rawTagName] = match;
+    const tagName = rawTagName.toLowerCase();
+    const isClosingTag = tag.startsWith('</');
+    const isSelfClosingTag = tag.endsWith('/>');
+
+    if (isClosingTag) {
+      if (styleStack.length > 1) styleStack.pop();
+      match = tagRegex.exec(svgString);
+      continue;
+    }
+
+    const currentStyle = mergeFontStyle(styleStack[styleStack.length - 1], parseAttributes(tag));
+
+    if (tagName === 'text') {
+      const exactMatch = getFontCandidates(currentStyle).find((fontName) => font[fontName]);
+      const prefixMatch = exactMatch
+        ? undefined
+        : fontNames.find((fontName) => {
+            const family = currentStyle.fontFamily;
+            return family ? fontName.startsWith(family) : false;
+          });
+      const selectedFontName = exactMatch || prefixMatch;
+      if (selectedFontName) selectedFontNames.add(selectedFontName);
+    }
+
+    if (!isSelfClosingTag) styleStack.push(currentStyle);
+    match = tagRegex.exec(svgString);
+  }
+
+  return Array.from(selectedFontNames);
 };
 
 const defaultValue = `<svg viewBox="0 0 488 600" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -161,15 +207,9 @@ const svgSchema: Plugin<SVGSchema> = {
     const { width, height, position } = convertForPdfLayoutProps({ schema, pageHeight });
     const { x, y } = position;
     const font = options.font;
-    const fontFamilies = getFontFamiliesInSvg(value);
-    const fontNames = font
-      ? Object.keys(font).filter((fontName) =>
-          fontFamilies.some((family) => fontNameMatchesFamily(fontName, family)),
-        )
-      : [];
     const fontEntries = font
       ? await Promise.all(
-          fontNames.map(async (fontName) => [
+          selectSvgFontNames(value, font).map(async (fontName) => [
             fontName,
             await embedAndGetFont({ pdfDoc, font, fontName, _cache }),
           ]),
