@@ -272,6 +272,35 @@ test('Designer.updateTemplate can keep a requested page cursor and scroll positi
       expect(domContainer).toHaveTextContent('2/2');
       expect(canvas.scrollTop).toBe(pageTwoScrollTop);
     });
+
+    await act(async () => {
+      designer.updateTemplate(updatedTemplate, { page: 99 });
+    });
+
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer).toHaveTextContent('2/2');
+    });
+
+    await act(async () => {
+      designer.updateTemplate(updatedTemplate, { page: -1 });
+    });
+
+    await waitFor(() => {
+      const canvas = domContainer.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLDivElement;
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(canvas.scrollTop).toBe(0);
+    });
+
+    await act(async () => {
+      designer.updateTemplate(updatedTemplate, { page: Number.NaN });
+    });
+
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer).toHaveTextContent('1/2');
+    });
   } finally {
     act(() => {
       designer.destroy();

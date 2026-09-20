@@ -86,6 +86,7 @@ const TemplateEditor = ({
   const future = useRef<SchemaForUI[][]>([]);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
+  const pendingScrollPageRef = useRef<number | null>(null);
 
   const i18n = useContext(I18nContext);
   const pluginsRegistry = useContext(PluginsRegistry);
@@ -241,6 +242,16 @@ const TemplateEditor = ({
   });
 
   useLayoutEffect(() => {
+    const pendingPage = pendingScrollPageRef.current;
+    if (pendingPage === null || !pageSizes[pendingPage] || !canvasRef.current) {
+      return;
+    }
+
+    pendingScrollPageRef.current = null;
+    canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
+  }, [displayScale, pageSizes, schemasList.length]);
+
+  useLayoutEffect(() => {
     const updateHeight = () => {
       setCanvasHeight(canvasRef.current ? canvasRef.current.clientHeight : 0);
     };
@@ -316,29 +327,17 @@ const TemplateEditor = ({
         const clampedPage = Math.min(Math.max(normalizedPage, 0), sl.length - 1);
         setPageCursor(clampedPage);
         onPageCursorChange(clampedPage, sl.length);
-        if (canvasRef.current) {
-          canvasRef.current.scrollTop = getPagesScrollTopByIndex(
-            pageSizes,
-            clampedPage,
-            displayScale,
-          );
-        }
+        pendingScrollPageRef.current = clampedPage;
       } else {
         const clampedPage = Math.min(pageCursor, sl.length - 1);
         setPageCursor(clampedPage);
         if (clampedPage !== pageCursor) {
           onPageCursorChange(clampedPage, sl.length);
-          if (canvasRef.current) {
-            canvasRef.current.scrollTop = getPagesScrollTopByIndex(
-              pageSizes,
-              clampedPage,
-              displayScale,
-            );
-          }
+          pendingScrollPageRef.current = clampedPage;
         }
       }
     },
-    [pageCursor, pageSizes, displayScale, onPageCursorChange],
+    [pageCursor, onPageCursorChange],
   );
 
   const addSchema = (defaultSchema: Schema) => {
