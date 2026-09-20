@@ -50,8 +50,7 @@ const isWhitespace = (char: string | undefined) =>
   char === ' ' || char === '\n' || char === '\r' || char === '\t' || char === '\f';
 
 const isAsciiAlpha = (char: string | undefined) =>
-  typeof char === 'string' &&
-  ((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z'));
+  typeof char === 'string' && ((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z'));
 
 const isAttributeNameChar = (char: string | undefined) =>
   typeof char === 'string' &&

@@ -134,7 +134,9 @@ describe('svg.pdf', () => {
       pdfLib.rotateDegrees(-30).toString(),
       pdfLib.translate(-pivotX, -pivotY).toString(),
     ]);
-    expect(page.pushOperators.mock.calls[1][0].toString()).toBe(pdfLib.popGraphicsState().toString());
+    expect(page.pushOperators.mock.calls[1][0].toString()).toBe(
+      pdfLib.popGraphicsState().toString(),
+    );
   });
 
   it('enables rotation controls for the SVG schema', () => {
