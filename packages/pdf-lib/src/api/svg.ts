@@ -5,7 +5,7 @@ import {
   Node,
   NodeType,
 } from 'node-html-better-parser';
-import { Color, colorString } from './colors.js';
+import { colorString, type Color, type RGB } from './colors.js';
 import { Degrees, degreesToRadians } from './rotations.js';
 import PDFFont from './PDFFont.js';
 import PDFPage from './PDFPage.js';
@@ -46,6 +46,16 @@ type InheritedAttributes = {
   rotation?: Degrees;
   viewBox: Box;
 };
+
+type PaintKind = 'fill' | 'stroke';
+
+type ColorParserOptions = Pick<PDFPageDrawSVGElementOptions, 'mapColor'>;
+
+type ParsedColor = {
+  rgb: Color;
+  alpha?: string;
+};
+
 type SVGAttributes = {
   rotate?: Degrees;
   scale?: number;
@@ -410,15 +420,44 @@ const normalizeFontFamily = (fontFamily: string): string => {
 
 const parseColor = (
   color: string,
-  inherited?: { rgb: Color; alpha?: string },
-): { rgb: Color; alpha?: string } | undefined => {
+  kind: PaintKind,
+  options: ColorParserOptions,
+  inherited?: { color?: Color; opacity?: number },
+): ParsedColor | undefined => {
   if (!color || color.length === 0) return undefined;
   if (['none', 'transparent'].includes(color)) return undefined;
-  if (color === 'currentColor') return inherited || parseColor('#000000');
+  if (color === 'currentColor') {
+    if (inherited?.color) {
+      return { rgb: inherited.color, alpha: inherited.opacity?.toString() };
+    }
+    return parseColor('#000000', kind, options);
+  }
   const parsedColor = colorString(color);
+  const parsed = {
+    rgb: parsedColor.rgb as RGB,
+    alpha: parsedColor.alpha,
+  };
+  const mappedColor = options.mapColor?.({
+    color,
+    parsed,
+    kind,
+    inherited,
+  });
+  if (mappedColor) {
+    return {
+      rgb: mappedColor.color,
+      alpha:
+        mappedColor.alpha !== undefined
+          ? mappedColor.alpha.toString()
+          : parsedColor.alpha !== undefined
+            ? parsedColor.alpha.toString()
+            : undefined,
+    };
+  }
+
   return {
     rgb: parsedColor.rgb,
-    alpha: parsedColor.alpha ? parsedColor.alpha + '' : undefined,
+    alpha: parsedColor.alpha !== undefined ? parsedColor.alpha.toString() : undefined,
   };
 };
 
@@ -433,15 +472,22 @@ const parseAttributes = (
   element: HTMLElement,
   inherited: InheritedAttributes,
   matrix: TransformationMatrix,
+  options: ColorParserOptions,
 ): ParsedAttributes => {
   const attributes = element.attributes;
   const style = parseStyles(attributes.style);
   const widthRaw = styleOrAttribute(attributes, style, 'width', '');
   const heightRaw = styleOrAttribute(attributes, style, 'height', '');
-  const fillRaw = parseColor(styleOrAttribute(attributes, style, 'fill'));
+  const fillRaw = parseColor(styleOrAttribute(attributes, style, 'fill'), 'fill', options, {
+    color: inherited.fill,
+    opacity: inherited.fillOpacity,
+  });
   const fillOpacityRaw = styleOrAttribute(attributes, style, 'fill-opacity');
   const opacityRaw = styleOrAttribute(attributes, style, 'opacity');
-  const strokeRaw = parseColor(styleOrAttribute(attributes, style, 'stroke'));
+  const strokeRaw = parseColor(styleOrAttribute(attributes, style, 'stroke'), 'stroke', options, {
+    color: inherited.stroke,
+    opacity: inherited.strokeOpacity,
+  });
   const strokeOpacityRaw = styleOrAttribute(attributes, style, 'stroke-opacity');
   const strokeLineCapRaw = styleOrAttribute(attributes, style, 'stroke-linecap');
   const strokeLineJoinRaw = styleOrAttribute(attributes, style, 'stroke-linejoin');
@@ -689,20 +735,33 @@ const parseHTMLNode = (
   inherited: InheritedAttributes,
   matrix: TransformationMatrix,
   clipSpaces: Space[],
+  options: ColorParserOptions,
 ): SVGElement[] => {
   if (node.nodeType === NodeType.COMMENT_NODE) return [];
   else if (node.nodeType === NodeType.TEXT_NODE) return [];
   else if (node.tagName === 'g') {
-    return parseGroupNode(node as HTMLElement & { tagName: 'g' }, inherited, matrix, clipSpaces);
+    return parseGroupNode(
+      node as HTMLElement & { tagName: 'g' },
+      inherited,
+      matrix,
+      clipSpaces,
+      options,
+    );
   } else if (node.tagName === 'svg') {
-    return parseSvgNode(node as HTMLElement & { tagName: 'svg' }, inherited, matrix, clipSpaces);
+    return parseSvgNode(
+      node as HTMLElement & { tagName: 'svg' },
+      inherited,
+      matrix,
+      clipSpaces,
+      options,
+    );
   } else {
     if (node.tagName === 'polygon') {
       node.tagName = 'path';
       node.attributes.d = `M${node.attributes.points}Z`;
       delete node.attributes.points;
     }
-    const attributes = parseAttributes(node, inherited, matrix);
+    const attributes = parseAttributes(node, inherited, matrix, options);
     const svgAttributes = {
       ...attributes.inherited,
       ...attributes.svgAttributes,
@@ -719,6 +778,7 @@ const parseSvgNode = (
   inherited: InheritedAttributes,
   matrix: TransformationMatrix,
   clipSpaces: Space[],
+  options: ColorParserOptions,
 ): SVGElement[] => {
   // if the width/height aren't set, the svg will have the same dimension as the current drawing space
   if (!node.attributes.width) {
@@ -727,7 +787,7 @@ const parseSvgNode = (
   if (!node.attributes.height) {
     node.setAttribute('height', inherited.viewBox.height + '');
   }
-  const attributes = parseAttributes(node, inherited, matrix);
+  const attributes = parseAttributes(node, inherited, matrix, options);
   const result: SVGElement[] = [];
   const viewBox = node.attributes.viewBox
     ? parseViewBox(node.attributes.viewBox)!
@@ -780,10 +840,13 @@ const parseSvgNode = (
   newMatrix = combineTransformation(contentTransform, 'translate', [-viewBox.x, -viewBox.y]);
 
   node.childNodes.forEach((child) => {
-    const parsedNodes = parseHTMLNode(child, { ...attributes.inherited, viewBox }, newMatrix, [
-      ...clipSpaces,
-      baseClipSpace,
-    ]);
+    const parsedNodes = parseHTMLNode(
+      child,
+      { ...attributes.inherited, viewBox },
+      newMatrix,
+      [...clipSpaces, baseClipSpace],
+      options,
+    );
     result.push(...parsedNodes);
   });
   return result;
@@ -794,11 +857,14 @@ const parseGroupNode = (
   inherited: InheritedAttributes,
   matrix: TransformationMatrix,
   clipSpaces: Space[],
+  options: ColorParserOptions,
 ): SVGElement[] => {
-  const attributes = parseAttributes(node, inherited, matrix);
+  const attributes = parseAttributes(node, inherited, matrix, options);
   const result: SVGElement[] = [];
   node.childNodes.forEach((child) => {
-    result.push(...parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces));
+    result.push(
+      ...parseHTMLNode(child, attributes.inherited, attributes.matrix, clipSpaces, options),
+    );
   });
   return result;
 };
@@ -826,7 +892,7 @@ const parseViewBox = (viewBox?: string): Box | undefined => {
 
 const parse = (
   svg: string,
-  { width, height, fontSize }: PDFPageDrawSVGElementOptions,
+  { width, height, fontSize, mapColor }: PDFPageDrawSVGElementOptions,
   size: Size,
   matrix: TransformationMatrix,
 ): SVGElement[] => {
@@ -843,6 +909,7 @@ const parse = (
     },
     matrix,
     [],
+    { mapColor },
   );
 };
 
