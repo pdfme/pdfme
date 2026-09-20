@@ -148,6 +148,7 @@ describe('generate integrate test', () => {
             font: {
               NotoSansJP: {
                 ...font.NotoSansJP,
+                fallback: true,
                 subset: false,
               },
             },
