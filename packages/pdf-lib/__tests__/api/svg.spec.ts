@@ -92,12 +92,12 @@ describe('PDFPage.drawSvg', () => {
     expect(shortHex.parsed.rgb.red).toBeCloseTo(0xaa / 255);
     expect(shortHex.parsed.rgb.green).toBeCloseTo(0xbb / 255);
     expect(shortHex.parsed.rgb.blue).toBeCloseTo(0xcc / 255);
-    expect(shortHex.parsed.alpha).toBe(1);
+    expect(shortHex.parsed.alpha).toBeUndefined();
 
     expect(rgbCall.parsed.rgb.red).toBeCloseTo(17 / 255);
     expect(rgbCall.parsed.rgb.green).toBeCloseTo(34 / 255);
     expect(rgbCall.parsed.rgb.blue).toBeCloseTo(51 / 255);
-    expect(rgbCall.parsed.alpha).toBe(1);
+    expect(rgbCall.parsed.alpha).toBeUndefined();
 
     expect(rgbaCall.parsed.rgb.red).toBeCloseTo(17 / 255);
     expect(rgbaCall.parsed.rgb.green).toBeCloseTo(34 / 255);
@@ -107,6 +107,6 @@ describe('PDFPage.drawSvg', () => {
     expect(namedCall.parsed.rgb.red).toBe(0);
     expect(namedCall.parsed.rgb.green).toBe(0);
     expect(namedCall.parsed.rgb.blue).toBe(1);
-    expect(namedCall.parsed.alpha).toBe(1);
+    expect(namedCall.parsed.alpha).toBeUndefined();
   });
 });
