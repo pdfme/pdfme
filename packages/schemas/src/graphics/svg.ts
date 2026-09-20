@@ -44,6 +44,29 @@ type SvgFontStyle = {
   fontWeight?: string;
 };
 
+const isWhitespace = (char: string | undefined) =>
+  char === ' ' || char === '\n' || char === '\r' || char === '\t' || char === '\f';
+
+const isAsciiAlpha = (char: string | undefined) =>
+  typeof char === 'string' &&
+  ((char >= 'A' && char <= 'Z') || (char >= 'a' && char <= 'z'));
+
+const isAttributeNameChar = (char: string | undefined) =>
+  typeof char === 'string' &&
+  (isAsciiAlpha(char) ||
+    (char >= '0' && char <= '9') ||
+    char === '_' ||
+    char === ':' ||
+    char === '-');
+
+const stripImportantSuffix = (value: string): string => {
+  const suffix = '!important';
+  const trimmed = value.trim();
+  return trimmed.toLowerCase().endsWith(suffix)
+    ? trimmed.slice(0, -suffix.length).trimEnd()
+    : trimmed;
+};
+
 const parseStyleAttribute = (style: string | undefined): Record<string, string> => {
   if (!style) return {};
 
@@ -57,12 +80,30 @@ const parseStyleAttribute = (style: string | undefined): Record<string, string> 
 
 const parseAttributes = (tag: string): Record<string, string> => {
   const attributes: Record<string, string> = {};
-  const attributeRegex = /([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g;
-  let match = attributeRegex.exec(tag);
+  let index = 0;
 
-  while (match) {
-    attributes[match[1]] = match[2] ?? match[3] ?? '';
-    match = attributeRegex.exec(tag);
+  while (index < tag.length) {
+    while (index < tag.length && !isAsciiAlpha(tag[index]) && tag[index] !== '_') index += 1;
+    if (index >= tag.length) break;
+    const nameStart = index;
+    while (isAttributeNameChar(tag[index])) index += 1;
+    const name = tag.slice(nameStart, index);
+
+    while (isWhitespace(tag[index])) index += 1;
+    if (tag[index] !== '=') continue;
+    index += 1;
+    while (isWhitespace(tag[index])) index += 1;
+
+    const quote = tag[index];
+    if (quote !== '"' && quote !== "'") {
+      index += 1;
+      continue;
+    }
+    index += 1;
+    const valueStart = index;
+    while (index < tag.length && tag[index] !== quote) index += 1;
+    attributes[name] = tag.slice(valueStart, index);
+    if (tag[index] === quote) index += 1;
   }
 
   return attributes;
@@ -89,7 +130,30 @@ const splitFontFamilies = (fontFamily: string | undefined): string[] => {
   }
 
   if (current.trim()) families.push(current.trim());
-  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
+  return families.map(stripImportantSuffix).filter(Boolean);
+};
+
+const findTagEnd = (svgString: string, startIndex: number): number => {
+  let index = startIndex;
+  let quote: '"' | "'" | undefined;
+
+  while (index < svgString.length) {
+    const char = svgString[index];
+    if ((char === '"' || char === "'") && (!quote || quote === char)) {
+      quote = quote ? undefined : char;
+    } else if (char === '>' && !quote) {
+      return index;
+    }
+    index += 1;
+  }
+
+  return -1;
+};
+
+const isSelfClosingTag = (tag: string): boolean => {
+  let index = tag.length - 2;
+  while (index >= 0 && isWhitespace(tag[index])) index -= 1;
+  return tag[index] === '/';
 };
 
 const mergeFontStyle = (base: SvgFontStyle, attributes: Record<string, string>): SvgFontStyle => {
@@ -118,18 +182,33 @@ const selectSvgFontNames = (svgString: string, font: Font): string[] => {
   const selectedFontNames = new Set<string>();
   const fontNames = Object.keys(font);
   const styleStack: SvgFontStyle[] = [{}];
-  const tagRegex = /<\/?([A-Za-z][\w:-]*)([^>]*)>/g;
-  let match = tagRegex.exec(svgString);
+  let index = 0;
 
-  while (match) {
-    const [tag, rawTagName] = match;
-    const tagName = rawTagName.toLowerCase();
-    const isClosingTag = tag.startsWith('</');
-    const isSelfClosingTag = tag.endsWith('/>');
+  while (index < svgString.length) {
+    if (svgString[index] !== '<') {
+      index += 1;
+      continue;
+    }
+
+    let cursor = index + 1;
+    const isClosingTag = svgString[cursor] === '/';
+    if (isClosingTag) cursor += 1;
+
+    if (!isAsciiAlpha(svgString[cursor])) {
+      index += 1;
+      continue;
+    }
+
+    const tagNameStart = cursor;
+    while (isAttributeNameChar(svgString[cursor])) cursor += 1;
+    const tagName = svgString.slice(tagNameStart, cursor).toLowerCase();
+    const tagEnd = findTagEnd(svgString, cursor);
+    if (tagEnd === -1) break;
+    const tag = svgString.slice(index, tagEnd + 1);
 
     if (isClosingTag) {
       if (styleStack.length > 1) styleStack.pop();
-      match = tagRegex.exec(svgString);
+      index = tagEnd + 1;
       continue;
     }
 
@@ -146,8 +225,8 @@ const selectSvgFontNames = (svgString: string, font: Font): string[] => {
       if (selectedFontName) selectedFontNames.add(selectedFontName);
     }
 
-    if (!isSelfClosingTag) styleStack.push(currentStyle);
-    match = tagRegex.exec(svgString);
+    if (!isSelfClosingTag(tag)) styleStack.push(currentStyle);
+    index = tagEnd + 1;
   }
 
   return Array.from(selectedFontNames);

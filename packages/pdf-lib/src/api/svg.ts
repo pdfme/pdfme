@@ -374,6 +374,14 @@ const parseStyles = (style: string): SVGStyle => {
   return css;
 };
 
+const stripImportantSuffix = (value: string): string => {
+  const suffix = '!important';
+  const trimmed = value.trim();
+  return trimmed.toLowerCase().endsWith(suffix)
+    ? trimmed.slice(0, -suffix.length).trimEnd()
+    : trimmed;
+};
+
 const splitFontFamilies = (fontFamily: string): string[] => {
   const families: string[] = [];
   let current = '';
@@ -393,7 +401,7 @@ const splitFontFamilies = (fontFamily: string): string[] => {
   }
 
   if (current.trim()) families.push(current.trim());
-  return families.map((family) => family.replace(/\s*!important\s*$/i, '').trim()).filter(Boolean);
+  return families.map(stripImportantSuffix).filter(Boolean);
 };
 
 const normalizeFontFamily = (fontFamily: string): string => {
