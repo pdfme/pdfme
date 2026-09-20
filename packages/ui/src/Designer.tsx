@@ -21,6 +21,10 @@ import {
   type DesignerSelectionChangeCallback,
 } from './designerSelection.js';
 
+export type DesignerUpdateTemplateOptions = {
+  page?: number;
+};
+
 class Designer extends BaseUIClass {
   private onSaveTemplateCallback?: (template: Template) => void;
   private onChangeTemplateCallback?: (template: Template) => void;
@@ -29,6 +33,7 @@ class Designer extends BaseUIClass {
   private pageCursor: number = 0;
   private selection: DesignerSelection = EMPTY_DESIGNER_SELECTION;
   private selectSchemasHandler: DesignerSelectSchemas | null = null;
+  private updateTemplatePage?: number;
 
   constructor(props: DesignerProps) {
     super(props);
@@ -42,10 +47,11 @@ class Designer extends BaseUIClass {
     }
   }
 
-  public updateTemplate(template: Template) {
+  public updateTemplate(template: Template, options: DesignerUpdateTemplateOptions = {}) {
     checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.template = cloneDeep(template);
+    this.updateTemplatePage = options.page ?? 0;
     if (this.onChangeTemplateCallback) {
       this.onChangeTemplateCallback(template);
     }
@@ -96,6 +102,8 @@ class Designer extends BaseUIClass {
 
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
+    const updateTemplatePage = this.updateTemplatePage;
+    this.updateTemplatePage = undefined;
     this.mount(
       <AppContextProvider
         lang={this.getLang()}
@@ -137,6 +145,7 @@ class Designer extends BaseUIClass {
           onRegisterSchemaSelectionHandler={(handler) => {
             this.selectSchemasHandler = handler;
           }}
+          updateTemplatePage={updateTemplatePage}
           size={this.size}
         />
       </AppContextProvider>,

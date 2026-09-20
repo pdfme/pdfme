@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, act, fireEvent, waitFor } from '@testing-library/react';
 import Designer from '../../src/components/Designer/index.js';
+import PublicDesigner from '../../src/Designer.js';
 import { I18nContext, FontContext, OptionsContext, PluginsRegistry } from '../../src/contexts';
 import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
@@ -216,6 +217,68 @@ test('Designer does not reapply options.zoomLevel when changing pages', async ()
     expect(container).toHaveTextContent('2/2');
     expect(container).toHaveTextContent('125%');
   });
+});
+
+test('Designer.updateTemplate can keep a requested page cursor and scroll position', async () => {
+  setupUIMock(2);
+  const originalResizeObserver = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+
+  const domContainer = document.createElement('div');
+  Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: 1200 });
+  Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: 1200 });
+  document.body.appendChild(domContainer);
+
+  const designer = new PublicDesigner({
+    domContainer,
+    template: getTwoPageTemplate(),
+    plugins,
+  });
+
+  try {
+    await act(async () => {
+      designer.updateTemplate(getTwoPageTemplate());
+    });
+
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+    });
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+
+    let pageTwoScrollTop = 0;
+    await waitFor(() => {
+      const canvas = domContainer.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLDivElement;
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(canvas.scrollTop).toBeGreaterThan(0);
+      pageTwoScrollTop = canvas.scrollTop;
+    });
+
+    const updatedTemplate = getTwoPageTemplate();
+    updatedTemplate.schemas[1][0].content = 'updated page 2';
+
+    await act(async () => {
+      designer.updateTemplate(updatedTemplate, { page: 1 });
+    });
+
+    await waitFor(() => {
+      const canvas = domContainer.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLDivElement;
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(canvas.scrollTop).toBe(pageTwoScrollTop);
+    });
+  } finally {
+    act(() => {
+      designer.destroy();
+    });
+    domContainer.remove();
+    globalThis.ResizeObserver = originalResizeObserver;
+  }
 });
 
 test('Designer toolbar fit width updates the zoom level', async () => {
