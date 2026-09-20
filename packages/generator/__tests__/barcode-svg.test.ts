@@ -28,21 +28,6 @@ const qrTemplate: Template = {
   ],
 };
 
-const rotatedQrTemplate: Template = {
-  basePdf: BLANK_PDF,
-  schemas: [
-    [
-      {
-        ...qrTemplate.schemas[0][0],
-        position: { x: 60, y: 70 },
-        width: 35,
-        height: 35,
-        rotate: 37,
-      },
-    ],
-  ],
-};
-
 const rotatedBarcodeTypesTemplate: Template = {
   basePdf: BLANK_PDF,
   schemas: [
@@ -99,6 +84,17 @@ const rotatedBarcodeTypesTemplate: Template = {
         width: 35,
         height: 35,
         rotate: 45,
+        backgroundColor: '#ffffff',
+        barColor: '#000000',
+      },
+      {
+        name: 'qr',
+        type: 'qrcode',
+        content: '',
+        position: { x: 135, y: 145 },
+        width: 35,
+        height: 35,
+        rotate: -28,
         backgroundColor: '#ffffff',
         barColor: '#000000',
       },
@@ -165,24 +161,12 @@ describe('barcode SVG PDF rendering', () => {
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
   });
 
-  test('renders rotated QR codes as visible vector SVG', async () => {
-    const pdf = await generate({
-      template: rotatedQrTemplate,
-      inputs: [{ qr: 'https://pdfme.com/issue-460-rotated' }],
-      plugins: { qrcode: barcodes.qrcode },
-    });
-    const { pdfDoc, page } = await loadFirstPageContent(pdf);
-    const images = await pdfToImages(pdf);
-
-    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
-    await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-qrcode-svg-1'));
-  });
-
-  test('renders rotated 1D and 2D barcode SVGs', async () => {
+  test('renders rotated barcode SVGs', async () => {
     const pdf = await generate({
       template: rotatedBarcodeTypesTemplate,
       inputs: [
         {
+          qr: 'https://pdfme.com/issue-460-rotated',
           code128: 'ABC-123',
           ean13: '1111111111116',
           japanpost: '10000131-3-2-B503',
@@ -191,6 +175,7 @@ describe('barcode SVG PDF rendering', () => {
         },
       ],
       plugins: {
+        qrcode: barcodes.qrcode,
         code128: barcodes.code128,
         ean13: barcodes.ean13,
         japanpost: barcodes.japanpost,
@@ -202,6 +187,6 @@ describe('barcode SVG PDF rendering', () => {
     const images = await pdfToImages(pdf);
 
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
-    await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-barcode-types-svg-1'));
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-barcodes-svg-1'));
   });
 });
