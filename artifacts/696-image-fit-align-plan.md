@@ -1,10 +1,10 @@
-# Implementation Plan: Issue #696 Image/PDF Fit and Alignment
+# Implementation Plan: Issue #696 Image Fit and Alignment
 
 ## Issue mapping
 
 GitHub Issue: <https://github.com/pdfme/pdfme/issues/696>
 
-The issue reports that when an image or PDF aspect ratio differs from the target area, pdfme currently gives no way to choose fit behavior or align the visible content. On current `main`, the built-in image plugin effectively does `contain + center`: PDF output resizes the image to fit and offsets the short axis by half the leftover space, and UI output uses CSS `object-fit: contain` with centered positioning.
+The issue is scoped to JPEG/PNG image schema fields. It reports that when an image aspect ratio differs from the target field area, pdfme currently gives no way to choose fit behavior or align the visible content. On current `main`, the built-in image plugin effectively does `contain + center`: PDF output resizes the image to fit and offsets the short axis by half the leftover space, and UI output uses CSS `object-fit: contain` with centered positioning.
 
 This plan keeps the locked product decisions:
 
@@ -12,7 +12,7 @@ This plan keeps the locked product decisions:
 - Fit modes: `contain` and `cover`.
 - Alignment applies only when fit is `contain`.
 - Existing templates keep the current default: `contain + center`.
-- Cover both image schemas and embedded/custom base PDF behavior where aspect-mismatch handling exists.
+- Scope is image schemas only. Embedded/custom `basePdf` placement is permanently out of scope for Issue #696 because `basePdf` is not a schema box.
 
 ## Current code findings
 
@@ -55,7 +55,7 @@ Relevant files:
 - `packages/ui/src/components/Paper.tsx`
   - Background image is painted at the page's own size: `backgroundSize: ${paperSize.width}px ${paperSize.height}px`.
 
-Because custom `basePdf` pages currently define the generated page size, there is not an existing "fit PDF into a differently shaped schema box" code path comparable to image fields. If maintainers want Issue #696 to include fitting an uploaded PDF page into a fixed blank-paper area, that is a new base-PDF placement feature rather than a parallel schema tweak.
+Because custom `basePdf` pages currently define the generated page size, there is not an existing "fit PDF into a differently shaped schema box" code path comparable to image fields. Per maintainer clarification, embedded/custom PDF placement must not be planned or implemented for Issue #696; the issue is fully addressed by JPEG/PNG image schema `objectFit`/`objectPosition`.
 
 ## Recommended API
 
@@ -280,53 +280,14 @@ Suggested keys:
 
 If maintainers want less translation churn, labels can compose existing `schemas.left`, `schemas.center`, `schemas.right`, `schemas.top`, `schemas.middle`, `schemas.bottom` in English order, but explicit keys give better localization.
 
-## Embedded PDF/basePdf plan
+## Embedded/custom PDF placement
 
-### Recommended first implementation
+Embedded/custom PDF placement is permanently out of scope for Issue #696.
 
-Do not add base-PDF fit/alignment controls in the first implementation unless maintainers want a larger template-level feature. The current custom `basePdf` path does not fit a PDF page into a mismatched target box; it makes the target page equal to the source page/crop box. Therefore there is no existing ratio-mismatch placement behavior to adjust in the same way as image schemas.
-
-Document this explicitly in the issue/PR:
-
-- Image fields: implement `objectFit` and `objectPosition`.
-- Custom `basePdf`: no schema box exists today, so no prop-panel equivalent is available.
-
-### If basePdf support is required for #696
-
-Add a template-level object form for custom PDFs, preserving string/bytes compatibility:
-
-```ts
-type CustomPdfPlacementFit = 'contain' | 'cover';
-type CustomPdfPlacementPosition = ImageObjectPosition;
-
-type CustomPdfWithPlacement = {
-  data: string | ArrayBuffer | Uint8Array;
-  size: { width: number; height: number };
-  objectFit?: CustomPdfPlacementFit;
-  objectPosition?: CustomPdfPlacementPosition;
-};
-
-type BasePdf = BlankPdf | CustomPdf | CustomPdfWithPlacement;
-```
-
-Then update:
-
-- `packages/common/src/schema.ts`
-  - Extend `BasePdf` union.
-- `packages/common/src/helper.ts`
-  - `getB64BasePdf()` reads `.data` for object-form custom PDFs.
-- `packages/generator/src/helper.ts`
-  - For object-form custom PDFs, create output pages at `size`.
-  - Draw each embedded source page using contain/cover math.
-  - Clip for cover.
-  - Adjust copied link annotations by the same scale and offset.
-- `packages/ui/src/hooks.ts`
-  - Rasterize source pages as today.
-  - Store target page sizes from `basePdf.size`.
-- `packages/ui/src/components/Paper.tsx`
-  - Render background with CSS `background-size: contain|cover` and `background-position`.
-
-This is materially larger than the image-schema work because it changes public `BasePdf` shape, generation page boxes, UI paper sizing, and annotation coordinate transforms.
+- There is no built-in PDF schema box under `packages/schemas`.
+- Custom PDFs are represented by `template.basePdf`, and the existing generator/UI paths make the generated page match each source page/crop box.
+- Since `basePdf` is not a schema box, it has no Image-like prop panel and no field-level aspect-ratio placement controls.
+- Issue #696 should be treated as fully addressed by JPEG/PNG image schema `objectFit`/`objectPosition`.
 
 ## Tests
 
@@ -388,17 +349,9 @@ Cases:
 - `packages/common/src/schema.ts` Dict type will force all dictionaries in `packages/ui/src/i18n.ts` to include new keys.
 - Run package typecheck/build to catch missing translations.
 
-### BasePdf tests if object-form support is added
-
-- `packages/generator/__tests__/base-pdf-link.test.ts`
-  - Add a placement case proving link annotations are translated/scaled with contain offsets.
-- `packages/ui/__tests__/hooks.test.tsx`
-  - Object-form custom basePdf uses declared target `size`, not source page size.
-- Visual snapshot for contain/cover PDF placement.
-
 ## Implementation steps
 
-### Phase 1: Image schema support (recommended S/M)
+### Image schema support (recommended S/M)
 
 1. Add image-specific types/constants/options in `packages/schemas/src/graphics/image.ts`.
 2. Replace hard-coded PDF contain-center math with normalized fit-layout helper.
@@ -411,22 +364,11 @@ Cases:
 
 Rough size: M, about 180-300 LOC production plus 120-220 LOC tests, depending on helper extraction and snapshot coverage.
 
-### Phase 2: BasePdf placement decision (recommended separate M/L if required)
-
-1. Confirm desired public API for fitting a custom PDF into a target page size.
-2. Add object-form custom basePdf type and validation.
-3. Update generator embed/draw logic and annotation transforms.
-4. Update UI paper/background rendering.
-5. Add generator, UI, and link annotation tests.
-
-Rough size: M/L, about 250-450 LOC production plus 180-300 LOC tests.
-
 ## Risks
 
 - PDF cover requires clipping. Incorrect clipping order could crop unrotated coordinates when schemas are rotated.
 - UI/PDF parity can drift if CSS `object-position` semantics and PDF offsets are not covered by shared tests.
 - Adding i18n keys requires updating every dictionary in `packages/ui/src/i18n.ts`.
-- BasePdf placement is a larger public API change than image schema alignment and may affect links/crop boxes.
 - Storing `objectPosition` while fit is `cover` is intentional but should be documented so template JSON does not look surprising.
 
 ## Non-goals
@@ -435,7 +377,8 @@ Rough size: M/L, about 250-450 LOC production plus 180-300 LOC tests.
 - No `fill`/`none`/`scale-down` fit modes.
 - No cover alignment controls; cover is center-crop only.
 - No migration script for existing templates because missing fields already map to current behavior.
-- No separate PDF field plugin unless maintainers decide to introduce one.
+- No separate PDF field plugin for Issue #696.
+- No custom `basePdf` / embedded-PDF placement changes for Issue #696.
 
 ## Success criteria
 
@@ -443,4 +386,4 @@ Rough size: M/L, about 250-450 LOC production plus 180-300 LOC tests.
 - Designer Image fields expose fit mode.
 - Alignment choices appear only for `contain`.
 - Generator output and Designer/Form/Viewer output match for contain alignment and cover center-crop.
-- Issue #696 can be closed for image fields, with custom/base PDF either explicitly out of scope for the first PR or handled by the separate basePdf placement work above.
+- Issue #696 can be closed for JPEG/PNG image fields; embedded/custom PDF placement remains out of scope for this issue.
