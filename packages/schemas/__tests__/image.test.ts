@@ -223,6 +223,7 @@ describe('image fit and position', () => {
       position: { x: 0, y: 0 },
       width: 40,
       height: 40,
+      rotate: 30,
       objectFit: 'cover',
       objectPosition: 'left top',
     } as ImageSchema;

@@ -429,6 +429,8 @@ describe('changeSchemas test', () => {
         position: { x: 0, y: 0 },
         width: 40,
         height: 40,
+        objectFit: 'contain',
+        objectPosition: 'center center',
         opacity: 1,
         rotate: 0,
       },
