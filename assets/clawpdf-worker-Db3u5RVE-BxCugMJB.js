@@ -18026,6 +18026,7 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		"ko",
 		"ar",
 		"th",
+		"tr",
 		"pl",
 		"it",
 		"de",
@@ -18084,6 +18085,19 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 		"schemas.middle": string(),
 		"schemas.bottom": string(),
 		"schemas.padding": string(),
+		"schemas.image.objectFit": string(),
+		"schemas.image.fit.contain": string(),
+		"schemas.image.fit.cover": string(),
+		"schemas.image.objectPosition": string(),
+		"schemas.image.position.left.top": string(),
+		"schemas.image.position.center.top": string(),
+		"schemas.image.position.right.top": string(),
+		"schemas.image.position.left.center": string(),
+		"schemas.image.position.center.center": string(),
+		"schemas.image.position.right.center": string(),
+		"schemas.image.position.left.bottom": string(),
+		"schemas.image.position.center.bottom": string(),
+		"schemas.image.position.right.bottom": string(),
 		"schemas.text.fontName": string(),
 		"schemas.text.size": string(),
 		"schemas.text.spacing": string(),
@@ -18324,4 +18338,4 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 	//#endregion
 })();
 
-//# sourceMappingURL=clawpdf-worker-CEyor7iC.js.map
+//# sourceMappingURL=clawpdf-worker-Db3u5RVE.js.map
