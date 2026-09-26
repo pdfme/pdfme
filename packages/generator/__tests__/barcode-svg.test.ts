@@ -128,16 +128,18 @@ const barcodeBackgroundTemplate: Template = {
         barColor: '#000000',
       },
       {
+        // bwip-js style hex without a leading hash must keep working.
         name: 'ean13',
         type: 'ean13',
         content: '',
         position: { x: 35, y: 92 },
         width: 46,
         height: 20,
-        backgroundColor: '#ccff66',
+        backgroundColor: 'ccff66',
         barColor: '#000000',
       },
       {
+        // The hex alpha channel must translate into background transparency.
         name: 'rotatedPdf417',
         type: 'pdf417',
         content: '',
@@ -145,7 +147,18 @@ const barcodeBackgroundTemplate: Template = {
         width: 52,
         height: 28,
         rotate: -32,
-        backgroundColor: '#ffcc66',
+        backgroundColor: '#ffcc6680',
+        barColor: '#000000',
+      },
+      {
+        // A fully transparent background must not paint a rectangle.
+        name: 'transparentQr',
+        type: 'qrcode',
+        content: '',
+        position: { x: 40, y: 150 },
+        width: 30,
+        height: 30,
+        backgroundColor: '#00000000',
         barColor: '#000000',
       },
     ],
@@ -196,6 +209,10 @@ describe('barcode SVG PDF rendering', () => {
     const { pdfDoc, page, content } = await loadFirstPageContent(pdf);
 
     expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? 1(?:\.0+)? k(?:\s|$)/);
+    // The schema-box background rectangle must honor colorType as well:
+    // the white background becomes `0 0 0 0 k` and no RGB fill remains.
+    expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? k(?:\s|$)/);
+    expect(content).not.toMatch(/(?:^|\s)rg(?:\s|$)/);
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
   });
 
@@ -249,6 +266,7 @@ describe('barcode SVG PDF rendering', () => {
           rotatedCode128: 'ABC-123',
           ean13: '1111111111116',
           rotatedPdf417: 'PDF417 background',
+          transparentQr: 'https://pdfme.com/background-transparent',
         },
       ],
       plugins: {
