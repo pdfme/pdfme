@@ -102,6 +102,69 @@ const rotatedBarcodeTypesTemplate: Template = {
   ],
 };
 
+const barcodeBackgroundTemplate: Template = {
+  basePdf: BLANK_PDF,
+  schemas: [
+    [
+      {
+        name: 'wideQr',
+        type: 'qrcode',
+        content: '',
+        position: { x: 15, y: 20 },
+        width: 62,
+        height: 24,
+        backgroundColor: '#ff66cc',
+        barColor: '#000000',
+      },
+      {
+        name: 'rotatedCode128',
+        type: 'code128',
+        content: '',
+        position: { x: 105, y: 30 },
+        width: 58,
+        height: 24,
+        rotate: 28,
+        backgroundColor: '#66ccff',
+        barColor: '#000000',
+      },
+      {
+        // bwip-js style hex without a leading hash must keep working.
+        name: 'ean13',
+        type: 'ean13',
+        content: '',
+        position: { x: 35, y: 92 },
+        width: 46,
+        height: 20,
+        backgroundColor: 'ccff66',
+        barColor: '#000000',
+      },
+      {
+        // The hex alpha channel must translate into background transparency.
+        name: 'rotatedPdf417',
+        type: 'pdf417',
+        content: '',
+        position: { x: 120, y: 95 },
+        width: 52,
+        height: 28,
+        rotate: -32,
+        backgroundColor: '#ffcc6680',
+        barColor: '#000000',
+      },
+      {
+        // A fully transparent background must not paint a rectangle.
+        name: 'transparentQr',
+        type: 'qrcode',
+        content: '',
+        position: { x: 40, y: 150 },
+        width: 30,
+        height: 30,
+        backgroundColor: '#00000000',
+        barColor: '#000000',
+      },
+    ],
+  ],
+};
+
 const loadFirstPageContent = async (pdfBytes: Uint8Array<ArrayBuffer>) => {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPage(0);
@@ -146,6 +209,10 @@ describe('barcode SVG PDF rendering', () => {
     const { pdfDoc, page, content } = await loadFirstPageContent(pdf);
 
     expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? 1(?:\.0+)? k(?:\s|$)/);
+    // The schema-box background rectangle must honor colorType as well:
+    // the white background becomes `0 0 0 0 k` and no RGB fill remains.
+    expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? k(?:\s|$)/);
+    expect(content).not.toMatch(/(?:^|\s)rg(?:\s|$)/);
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
   });
 
@@ -188,5 +255,31 @@ describe('barcode SVG PDF rendering', () => {
 
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-barcodes-svg-1'));
+  });
+
+  test('fills the schema box with barcode backgrounds', async () => {
+    const pdf = await generate({
+      template: barcodeBackgroundTemplate,
+      inputs: [
+        {
+          wideQr: 'https://pdfme.com/background-wide',
+          rotatedCode128: 'ABC-123',
+          ean13: '1111111111116',
+          rotatedPdf417: 'PDF417 background',
+          transparentQr: 'https://pdfme.com/background-transparent',
+        },
+      ],
+      plugins: {
+        qrcode: barcodes.qrcode,
+        code128: barcodes.code128,
+        ean13: barcodes.ean13,
+        pdf417: barcodes.pdf417,
+      },
+    });
+    const { pdfDoc, page } = await loadFirstPageContent(pdf);
+    const images = await pdfToImages(pdf);
+
+    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-backgrounds-svg-1'));
   });
 });

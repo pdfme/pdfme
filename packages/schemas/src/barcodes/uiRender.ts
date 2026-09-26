@@ -1,7 +1,7 @@
 import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types.js';
-import { validateBarcodeInput, createBarCode } from './helper.js';
+import { validateBarcodeInput, createBarCode, ensureHexColorHash } from './helper.js';
 import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 
 const fullSize = { width: '100%', height: '100%' };
@@ -17,6 +17,7 @@ const blobToDataURL = (blob: Blob): Promise<string> =>
 const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
   const imageBuf = await createBarCode({
     ...schema,
+    backgroundColor: undefined,
     input: value,
   });
   const barcodeData = new Blob([new Uint8Array(imageBuf)], { type: 'image/png' });
@@ -44,6 +45,7 @@ export const uiRender = async (arg: UIRenderProps<BarcodeSchema>) => {
     alignItems: 'center',
     justifyContent: 'center',
     fontFamily: "'Open Sans', sans-serif",
+    backgroundColor: ensureHexColorHash(schema.backgroundColor) || 'transparent',
   };
   Object.assign(container.style, containerStyle);
   rootElement.appendChild(container);
