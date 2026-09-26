@@ -102,6 +102,56 @@ const rotatedBarcodeTypesTemplate: Template = {
   ],
 };
 
+const barcodeBackgroundTemplate: Template = {
+  basePdf: BLANK_PDF,
+  schemas: [
+    [
+      {
+        name: 'wideQr',
+        type: 'qrcode',
+        content: '',
+        position: { x: 15, y: 20 },
+        width: 62,
+        height: 24,
+        backgroundColor: '#ff66cc',
+        barColor: '#000000',
+      },
+      {
+        name: 'rotatedCode128',
+        type: 'code128',
+        content: '',
+        position: { x: 105, y: 30 },
+        width: 58,
+        height: 24,
+        rotate: 28,
+        backgroundColor: '#66ccff',
+        barColor: '#000000',
+      },
+      {
+        name: 'ean13',
+        type: 'ean13',
+        content: '',
+        position: { x: 35, y: 92 },
+        width: 46,
+        height: 20,
+        backgroundColor: '#ccff66',
+        barColor: '#000000',
+      },
+      {
+        name: 'rotatedPdf417',
+        type: 'pdf417',
+        content: '',
+        position: { x: 120, y: 95 },
+        width: 52,
+        height: 28,
+        rotate: -32,
+        backgroundColor: '#ffcc66',
+        barColor: '#000000',
+      },
+    ],
+  ],
+};
+
 const loadFirstPageContent = async (pdfBytes: Uint8Array<ArrayBuffer>) => {
   const pdfDoc = await PDFDocument.load(pdfBytes);
   const page = pdfDoc.getPage(0);
@@ -188,5 +238,30 @@ describe('barcode SVG PDF rendering', () => {
 
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-barcodes-svg-1'));
+  });
+
+  test('fills the schema box with barcode backgrounds', async () => {
+    const pdf = await generate({
+      template: barcodeBackgroundTemplate,
+      inputs: [
+        {
+          wideQr: 'https://pdfme.com/background-wide',
+          rotatedCode128: 'ABC-123',
+          ean13: '1111111111116',
+          rotatedPdf417: 'PDF417 background',
+        },
+      ],
+      plugins: {
+        qrcode: barcodes.qrcode,
+        code128: barcodes.code128,
+        ean13: barcodes.ean13,
+        pdf417: barcodes.pdf417,
+      },
+    });
+    const { pdfDoc, page } = await loadFirstPageContent(pdf);
+    const images = await pdfToImages(pdf);
+
+    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-backgrounds-svg-1'));
   });
 });

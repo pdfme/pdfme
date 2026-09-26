@@ -6,7 +6,7 @@ import {
   rotateDegrees,
   translate,
 } from '@pdfme/pdf-lib';
-import { convertForPdfLayoutProps, rgbColorToCmykColor } from '../utils.js';
+import { convertForPdfLayoutProps, hex2PrintingColor, rgbColorToCmykColor } from '../utils.js';
 import type { BarcodeSchema } from './types.js';
 import { createBarCodeSvg, validateBarcodeInput } from './helper.js';
 
@@ -16,6 +16,16 @@ const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
 
 const addSvgOpacity = (svg: string, opacity?: number) => {
   return opacity === undefined ? svg : svg.replace(/<svg\b/, `<svg opacity="${opacity}"`);
+};
+
+const setSvgRootAttribute = (svg: string, name: string, value: string) => {
+  const attrRegex = new RegExp(`\\s${name}="[^"]*"`);
+  return svg.replace(/<svg\b([^>]*)>/, (_, attrs: string) => {
+    const nextAttrs = attrRegex.test(attrs)
+      ? attrs.replace(attrRegex, ` ${name}="${value}"`)
+      : `${attrs} ${name}="${value}"`;
+    return `<svg${nextAttrs}>`;
+  });
 };
 
 const getSvgColorMapper = (colorType = ''): SvgColorMapper | undefined => {
@@ -36,9 +46,11 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   if (!svg) {
     svg = createBarCodeSvg({
       ...schema,
+      backgroundColor: undefined,
       type: schema.type,
       input: value,
     });
+    svg = setSvgRootAttribute(svg, 'preserveAspectRatio', 'none');
     _cache.set(inputBarcodeCacheKey, svg);
   }
 
@@ -62,6 +74,18 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   }
 
   try {
+    const backgroundColor = hex2PrintingColor(schema.backgroundColor, options.colorType);
+    if (backgroundColor) {
+      page.drawRectangle({
+        x,
+        y,
+        width,
+        height,
+        color: backgroundColor,
+        opacity,
+      });
+    }
+
     await page.drawSvg(addSvgOpacity(svg, opacity), {
       x,
       y: y + height,
