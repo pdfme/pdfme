@@ -27,7 +27,7 @@
     "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^10.72.0",
     "lucide-react": "^0.475.0",
-    "monaco-editor": "^0.56.0",
+    "monaco-editor": "^0.57.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-router-dom": "^7.18.3",
@@ -49,7 +49,7 @@
     "tailwindcss": "^4.2.4",
     "typescript": "^7.0.2",
     "vite": "^8.0.3",
-    "vite-plus": "^0.3.0",
+    "vite-plus": "^0.1.24",
     "vitest": "^4.1.10",
     "vitest-image-snapshot": "^0.6.52"
   }
