@@ -52,5 +52,8 @@
     "vite-plus": "^0.3.0",
     "vitest": "^4.1.10",
     "vitest-image-snapshot": "^0.6.52"
+  },
+  "overrides": {
+    "dompurify": "^3.4.13"
   }
 }
