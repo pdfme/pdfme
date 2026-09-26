@@ -1,4 +1,4 @@
-import { b64toUint8Array } from '@pdfme/common';
+import { b64toUint8Array, isHexValid } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
@@ -126,6 +126,13 @@ export const barCodeType2Bcid = (type: BarcodeTypes) =>
  */
 export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
   color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
+
+/**
+ * Barcode colors historically accept bwip-js style hex without a leading '#';
+ * CSS and pdfme's color utils require the '#', so add it when missing.
+ */
+export const ensureHexColorHash = (color: string | undefined) =>
+  color && !color.startsWith('#') && isHexValid(`#${color}`) ? `#${color}` : color;
 
 export type BarcodeRenderRuntime = 'document-canvas' | 'offscreencanvas' | 'node-buffer';
 
