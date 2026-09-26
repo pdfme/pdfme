@@ -32,10 +32,7 @@
   "overrides": {
     "copy-webpack-plugin": "^14.0.0",
     "css-minimizer-webpack-plugin": "^8.0.0",
-    "serialize-javascript": "^7.0.5",
-    "qs": "^6.16.0",
-    "uuid": "^11.1.1",
-    "websocket-driver": "^0.7.5"
+    "serialize-javascript": "^7.0.5"
   },
   "browserslist": {
     "production": [
