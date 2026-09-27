@@ -19,7 +19,7 @@ import { applyTextLineRange } from './measure.js';
 import { layoutRichTextLines, resolveRichTextRuns, type RichTextLineRun } from './richText.js';
 import { getLineAlignment } from './wrap.js';
 import type { TextSchema } from './types.js';
-import { hex2PrintingColor, rotatePoint } from '../utils.js';
+import { hex2PrintingColor, rotatePoint, applyAlphaToOpacity } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 
 type TextColor = ReturnType<typeof hex2PrintingColor>;
@@ -149,6 +149,7 @@ const drawRun = (arg: {
   lineHeight: number;
   color: TextColor;
   opacity: number | undefined;
+  textOpacity: number | undefined;
   colorType: ColorType;
   characterSpacing: number;
   strikethrough: boolean;
@@ -167,6 +168,7 @@ const drawRun = (arg: {
     lineHeight,
     color,
     opacity,
+    textOpacity,
     colorType,
     characterSpacing,
     strikethrough,
@@ -206,7 +208,7 @@ const drawRun = (arg: {
       pivotPoint,
       fontSize,
       color,
-      opacity,
+      opacity: textOpacity,
     });
   }
 
@@ -220,7 +222,7 @@ const drawRun = (arg: {
       pivotPoint,
       fontSize,
       color,
-      opacity,
+      opacity: textOpacity,
     });
   }
 
@@ -235,7 +237,7 @@ const drawRun = (arg: {
       color,
       lineHeight: lineHeight * fontSize,
       font: pdfFont,
-      opacity,
+      opacity: textOpacity,
       ...(run.syntheticItalic ? { ySkew: pdfLib.degrees(SYNTHETIC_ITALIC_SKEW_DEGREES) } : {}),
     });
   };
@@ -273,6 +275,7 @@ export const renderInlineMarkdownText = async (arg: {
   pivotPoint: { x: number; y: number };
   rotate: Rotation;
   opacity: number | undefined;
+  colorAlpha: number;
 }) => {
   const {
     value,
@@ -298,7 +301,10 @@ export const renderInlineMarkdownText = async (arg: {
     pivotPoint,
     rotate,
     opacity,
+    colorAlpha,
   } = arg;
+  // The font color's alpha applies to text and its decorations, not to the code background.
+  const textOpacity = applyAlphaToOpacity(opacity, colorAlpha);
   const richTextRuns = parseInlineMarkdown(value);
   const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
   const allLines = layoutRichTextLines({
@@ -365,7 +371,7 @@ export const renderInlineMarkdownText = async (arg: {
           pivotPoint,
           fontSize,
           color,
-          opacity,
+          opacity: textOpacity,
         });
       }
       if (schema.underline) {
@@ -378,7 +384,7 @@ export const renderInlineMarkdownText = async (arg: {
           pivotPoint,
           fontSize,
           color,
-          opacity,
+          opacity: textOpacity,
         });
       }
     }
@@ -399,6 +405,7 @@ export const renderInlineMarkdownText = async (arg: {
         lineHeight,
         color,
         opacity,
+        textOpacity,
         colorType,
         characterSpacing: spacing,
         strikethrough: Boolean(run.strikethrough),

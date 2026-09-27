@@ -4,6 +4,8 @@ import {
   convertForPdfLayoutProps,
   hex2PrintingColor,
   createSvgStr,
+  splitHexAlpha,
+  applyAlphaToOpacity,
 } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { Minus } from 'lucide';
@@ -29,12 +31,13 @@ const lineSchema: Plugin<LineSchema> = {
       opacity,
     } = convertForPdfLayoutProps({ schema, pageHeight, applyRotateTranslate: false });
     const pivot = { x: x + width / 2, y: y + height / 2 };
+    const { color: lineHex, alpha } = splitHexAlpha(schema.color ?? DEFAULT_LINE_COLOR);
     page.drawLine({
       start: rotatePoint({ x, y: y + height / 2 }, pivot, rotate.angle),
       end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
       thickness: height,
-      color: hex2PrintingColor(schema.color ?? DEFAULT_LINE_COLOR, colorType),
-      opacity: opacity,
+      color: hex2PrintingColor(lineHex, colorType),
+      opacity: applyAlphaToOpacity(opacity, alpha),
     });
   },
   ui: (arg) => {
