@@ -54,6 +54,28 @@ describe('ColorWidget', () => {
     expect(openPickerAndCountSliders(true)).toBe(1);
   });
 
+  it('commits 6-digit hex from the picker for opaque colors and 8-digit only with alpha', () => {
+    const onChange = vi.fn();
+    const { container, unmount } = render(<ColorWidget value="#ff000080" onChange={onChange} />);
+    fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
+
+    // Typing a hex in the popover resets alpha to 100% (antd behavior); the commit
+    // must stay 6-digit rather than gaining a redundant "ff" suffix.
+    const hexInput = document.querySelector<HTMLInputElement>('.ant-color-picker-hex-input input')!;
+    fireEvent.change(hexInput, { target: { value: '00ff00' } });
+    expect(onChange).toHaveBeenLastCalledWith('#00ff00');
+
+    // Lowering the alpha stepper emits 8-digit hex (30% of #ff0000 -> 0x4d).
+    const alphaInput = document.querySelector<HTMLInputElement>(
+      '.ant-color-picker-alpha-input input',
+    )!;
+    fireEvent.change(alphaInput, { target: { value: '30%' } });
+    expect(onChange).toHaveBeenLastCalledWith('#ff00004d');
+
+    unmount();
+    document.body.innerHTML = '';
+  });
+
   it('commits typed 3/4/6/8-digit hex values', () => {
     for (const hex of ['#f00', '#f008', '#ff0000', '#ff000080']) {
       const { onChange, input } = renderColorWidget({ value: '#000000' });
