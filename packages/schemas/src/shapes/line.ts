@@ -5,6 +5,7 @@ import {
   hex2PrintingColor,
   createSvgStr,
   splitHexAlpha,
+  applyAlphaToOpacity,
 } from '../utils.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
 import { Minus } from 'lucide';
@@ -36,7 +37,7 @@ const lineSchema: Plugin<LineSchema> = {
       end: rotatePoint({ x: x + width, y: y + height / 2 }, pivot, rotate.angle),
       thickness: height,
       color: hex2PrintingColor(lineHex, colorType),
-      opacity: (opacity ?? 1) * alpha,
+      opacity: applyAlphaToOpacity(opacity, alpha),
     });
   },
   ui: (arg) => {

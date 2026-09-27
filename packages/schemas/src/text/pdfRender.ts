@@ -37,6 +37,7 @@ import {
   rotatePoint,
   hex2PrintingColor,
   splitHexAlpha,
+  applyAlphaToOpacity,
 } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
@@ -140,7 +141,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     lineHeight,
     characterSpacing,
   } = fontProp;
-  const textOpacity = (opacity ?? 1) * colorAlpha;
+  const textOpacity = applyAlphaToOpacity(opacity, colorAlpha);
 
   if (enableInlineMarkdown) {
     await renderInlineMarkdownText({

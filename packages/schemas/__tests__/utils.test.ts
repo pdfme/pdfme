@@ -6,6 +6,7 @@ import {
   hex2RgbColor,
   hex2PrintingColor,
   splitHexAlpha,
+  applyAlphaToOpacity,
   createSvgStr,
 } from '../src/utils.js';
 import { SquareCheck, IconNode } from 'lucide';
@@ -72,6 +73,22 @@ describe('splitHexAlpha', () => {
   it('should report fully transparent and fully opaque alpha values', () => {
     expect(splitHexAlpha('#ff000000')).toEqual({ color: '#ff0000', alpha: 0 });
     expect(splitHexAlpha('#ff0000ff')).toEqual({ color: '#ff0000', alpha: 1 });
+  });
+});
+
+describe('applyAlphaToOpacity', () => {
+  it('should multiply alpha into a defined opacity', () => {
+    expect(applyAlphaToOpacity(0.5, 0.5)).toBeCloseTo(0.25);
+    expect(applyAlphaToOpacity(1, 128 / 255)).toBeCloseTo(128 / 255);
+  });
+
+  it('should treat an undefined opacity as 1 when alpha is applied', () => {
+    expect(applyAlphaToOpacity(undefined, 0.5)).toBeCloseTo(0.5);
+  });
+
+  it('should leave the opacity untouched when alpha is 1, preserving undefined', () => {
+    expect(applyAlphaToOpacity(undefined, 1)).toBeUndefined();
+    expect(applyAlphaToOpacity(0.7, 1)).toBe(0.7);
   });
 });
 

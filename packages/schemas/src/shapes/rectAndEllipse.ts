@@ -6,6 +6,7 @@ import {
   createSvgStr,
   rotatePoint,
   splitHexAlpha,
+  applyAlphaToOpacity,
 } from '../utils.js';
 import { Circle, Square } from 'lucide';
 
@@ -55,8 +56,8 @@ const shape: Plugin<ShapeSchema> = {
       borderWidth,
       borderColor: hex2PrintingColor(borderHex, colorType),
       color: hex2PrintingColor(fillHex, colorType),
-      opacity: (opacity ?? 1) * fillAlpha,
-      borderOpacity: (opacity ?? 1) * borderAlpha,
+      opacity: applyAlphaToOpacity(opacity, fillAlpha),
+      borderOpacity: applyAlphaToOpacity(opacity, borderAlpha),
     };
     if (schema.type === 'ellipse') {
       page.drawEllipse({

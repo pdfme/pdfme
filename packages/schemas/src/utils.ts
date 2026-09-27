@@ -96,6 +96,15 @@ export const splitHexAlpha = (hexColor: string): { color: string; alpha: number 
   };
 };
 
+// Multiply a hex color's alpha channel into a draw opacity. An alpha of 1 returns
+// the opacity untouched (including undefined) so that PDFs rendered from colors
+// without an alpha channel stay byte-identical to previous releases: pdf-lib only
+// embeds an ExtGState when the opacity is defined.
+export const applyAlphaToOpacity = (
+  opacity: number | undefined,
+  alpha: number,
+): number | undefined => (alpha === 1 ? opacity : (opacity ?? 1) * alpha);
+
 const hex2rgb = (hex: string) => {
   // Drop any alpha channel; pdf-lib colors cannot represent it.
   hex = splitHexAlpha(hex).color;

@@ -1,5 +1,6 @@
 import generate from '../src/generate.js';
 import { Template } from '@pdfme/common';
+import { PDFDict, PDFDocument, PDFName } from '@pdfme/pdf-lib';
 import { ellipse, line, rectangle, text } from '@pdfme/schemas';
 import { getImageSnapshotOptions, pdfToImages } from './utils.js';
 
@@ -150,5 +151,53 @@ describe('hex colors with alpha channel (#1634, #1635)', () => {
     const images = await pdfToImages(pdf);
     expect(images).toHaveLength(1);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('hexAlpha-4digit-1'));
+  });
+
+  test('emits no graphics states for 6-digit colors when schema opacity is omitted', async () => {
+    // Alpha handling must not change the output of alpha-free templates: pdf-lib only
+    // embeds an ExtGState when a draw opacity is defined, and templates that omit
+    // `opacity` previously drew without one.
+    const noOpacity = (schema: Record<string, unknown>) => {
+      const { opacity: _, ...rest } = schema;
+      return rest;
+    };
+    const template: Template = {
+      basePdf: { width: 120, height: 120, padding: [0, 0, 0, 0] },
+      schemas: [
+        [
+          noOpacity(rectSchema({ name: 'rect', x: 10, y: 10, color: '#ff0000' })),
+          noOpacity({
+            name: 'line',
+            type: 'line',
+            content: '',
+            position: { x: 5, y: 50 },
+            width: 110,
+            height: 2,
+            rotate: 0,
+            color: '#00ff00',
+            readOnly: true,
+          }),
+          noOpacity({
+            name: 'text',
+            type: 'text',
+            content: 'no alpha',
+            position: { x: 10, y: 60 },
+            width: 100,
+            height: 20,
+            rotate: 0,
+            fontSize: 20,
+            fontColor: '#0000ff',
+            underline: true,
+            readOnly: true,
+          }),
+        ],
+      ],
+    };
+
+    const pdf = await generate({ inputs: [{}], template, plugins });
+    const doc = await PDFDocument.load(pdf);
+    const extGState = doc.getPage(0).node.Resources()?.lookup(PDFName.of('ExtGState'));
+    const graphicsStateCount = extGState instanceof PDFDict ? extGState.keys().length : 0;
+    expect(graphicsStateCount).toBe(0);
   });
 });

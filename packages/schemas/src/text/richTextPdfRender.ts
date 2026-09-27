@@ -19,7 +19,7 @@ import { applyTextLineRange } from './measure.js';
 import { layoutRichTextLines, resolveRichTextRuns, type RichTextLineRun } from './richText.js';
 import { getLineAlignment } from './wrap.js';
 import type { TextSchema } from './types.js';
-import { hex2PrintingColor, rotatePoint } from '../utils.js';
+import { hex2PrintingColor, rotatePoint, applyAlphaToOpacity } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 
 type TextColor = ReturnType<typeof hex2PrintingColor>;
@@ -149,7 +149,7 @@ const drawRun = (arg: {
   lineHeight: number;
   color: TextColor;
   opacity: number | undefined;
-  textOpacity: number;
+  textOpacity: number | undefined;
   colorType: ColorType;
   characterSpacing: number;
   strikethrough: boolean;
@@ -304,7 +304,7 @@ export const renderInlineMarkdownText = async (arg: {
     colorAlpha,
   } = arg;
   // The font color's alpha applies to text and its decorations, not to the code background.
-  const textOpacity = (opacity ?? 1) * colorAlpha;
+  const textOpacity = applyAlphaToOpacity(opacity, colorAlpha);
   const richTextRuns = parseInlineMarkdown(value);
   const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
   const allLines = layoutRichTextLines({
