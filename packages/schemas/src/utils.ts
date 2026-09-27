@@ -83,11 +83,13 @@ export const isEditable = (mode: Mode, schema: Schema) =>
 
 // Split a '#RGBA'/'#RRGGBBAA' hex into its opaque color and alpha channel, since
 // pdf-lib colors carry no alpha; alpha must be applied as draw opacity instead.
-// Colors without an alpha channel are passed through with alpha 1.
+// Colors without an alpha channel are passed through with alpha 1. Invalid hex is
+// also passed through untouched (never split) so that downstream color validation
+// still rejects the original string instead of a salvaged color plus a NaN alpha.
 export const splitHexAlpha = (hexColor: string): { color: string; alpha: number } => {
   if (!hexColor.startsWith('#')) return { color: hexColor, alpha: 1 };
   const hex = hexColor.slice(1);
-  if (hex.length !== 4 && hex.length !== 8) return { color: hexColor, alpha: 1 };
+  if (!/^(?:[0-9a-f]{4}|[0-9a-f]{8})$/i.test(hex)) return { color: hexColor, alpha: 1 };
   const rgbLength = hex.length === 4 ? 3 : 6;
   const alphaHex = hex.slice(rgbLength);
   return {

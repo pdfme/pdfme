@@ -153,6 +153,19 @@ describe('hex colors with alpha channel (#1634, #1635)', () => {
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('hexAlpha-4digit-1'));
   });
 
+  test('rejects invalid hex that merely looks like an alpha color instead of drawing NaN opacity', async () => {
+    // '#ff0000gg' must not be split into the valid '#ff0000' plus a NaN alpha:
+    // NaN passes pdf-lib's range assertions and would end up as '/ca NaN' in the PDF.
+    const template: Template = {
+      basePdf: { width: 80, height: 60, padding: [0, 0, 0, 0] },
+      schemas: [[rectSchema({ name: 'invalid', x: 10, y: 10, color: '#ff0000gg' })]],
+    };
+
+    await expect(generate({ inputs: [{}], template, plugins })).rejects.toThrow(
+      'Invalid hex color value #ff0000gg',
+    );
+  });
+
   test('emits no graphics states for 6-digit colors when schema opacity is omitted', async () => {
     // Alpha handling must not change the output of alpha-free templates: pdf-lib only
     // embeds an ExtGState when a draw opacity is defined, and templates that omit

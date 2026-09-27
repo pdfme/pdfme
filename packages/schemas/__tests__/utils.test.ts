@@ -70,6 +70,18 @@ describe('splitHexAlpha', () => {
     expect(splitHexAlpha('ff000080')).toEqual({ color: 'ff000080', alpha: 1 });
   });
 
+  it('should split uppercase hex', () => {
+    expect(splitHexAlpha('#FF000080')).toEqual({ color: '#FF0000', alpha: 128 / 255 });
+    expect(splitHexAlpha('#0F08')).toEqual({ color: '#0F0', alpha: 136 / 255 });
+  });
+
+  it('should pass through invalid 4/8-length hex unchanged instead of salvaging a color', () => {
+    // Splitting '#ff0000gg' would yield the valid color '#ff0000' plus a NaN alpha,
+    // silently drawing with a NaN opacity where downstream validation used to throw.
+    expect(splitHexAlpha('#ff0000gg')).toEqual({ color: '#ff0000gg', alpha: 1 });
+    expect(splitHexAlpha('#0f0g')).toEqual({ color: '#0f0g', alpha: 1 });
+  });
+
   it('should report fully transparent and fully opaque alpha values', () => {
     expect(splitHexAlpha('#ff000000')).toEqual({ color: '#ff0000', alpha: 0 });
     expect(splitHexAlpha('#ff0000ff')).toEqual({ color: '#ff0000', alpha: 1 });
