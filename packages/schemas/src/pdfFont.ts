@@ -29,12 +29,12 @@ export const embedAndGetFont = (arg: {
     return cachedFont;
   }
 
-  const fontValue = font[fontName];
-  if (!fontValue) {
-    return Promise.reject(new Error(`[@pdfme/schemas] Font "${fontName}" is not found.`));
-  }
-
   const pdfFontPromise = (async () => {
+    const fontValue = font[fontName];
+    if (!fontValue) {
+      throw new Error(`[@pdfme/schemas] Font "${fontName}" is not found.`);
+    }
+
     let fontData = fontValue.data;
     if (typeof fontData === 'string' && fontData.startsWith('http')) {
       fontData = await fetchRemoteFontData(fontData);
