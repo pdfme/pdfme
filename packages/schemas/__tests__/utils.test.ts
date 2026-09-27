@@ -10,6 +10,39 @@ import {
   createSvgStr,
 } from '../src/utils.js';
 import { SquareCheck, IconNode } from 'lucide';
+import { HEX_COLOR_PATTERN, OPAQUE_HEX_COLOR_PATTERN } from '../src/constants.js';
+
+describe('HEX_COLOR_PATTERN', () => {
+  const hexColorRegExp = new RegExp(HEX_COLOR_PATTERN);
+
+  it('should accept 3/4/6/8-digit hex, aligned with isHexValid', () => {
+    expect(hexColorRegExp.test('#fff')).toBe(true);
+    expect(hexColorRegExp.test('#fff8')).toBe(true);
+    expect(hexColorRegExp.test('#ffffff')).toBe(true);
+    expect(hexColorRegExp.test('#ffffff80')).toBe(true);
+    expect(hexColorRegExp.test('#FF000080')).toBe(true);
+  });
+
+  it('should reject other lengths and non-hex input', () => {
+    expect(hexColorRegExp.test('#ff')).toBe(false);
+    expect(hexColorRegExp.test('#fffff')).toBe(false);
+    expect(hexColorRegExp.test('#fffffff')).toBe(false);
+    expect(hexColorRegExp.test('#fffffffff')).toBe(false);
+    expect(hexColorRegExp.test('ffffff')).toBe(false);
+    expect(hexColorRegExp.test('#ff0000gg')).toBe(false);
+  });
+});
+
+describe('OPAQUE_HEX_COLOR_PATTERN', () => {
+  const opaqueHexColorRegExp = new RegExp(OPAQUE_HEX_COLOR_PATTERN);
+
+  it('should accept only 6-digit hex (bwip-js reads 8-digit hex as CMYK)', () => {
+    expect(opaqueHexColorRegExp.test('#ffffff')).toBe(true);
+    expect(opaqueHexColorRegExp.test('#fff')).toBe(false);
+    expect(opaqueHexColorRegExp.test('#fff8')).toBe(false);
+    expect(opaqueHexColorRegExp.test('#ffffff80')).toBe(false);
+  });
+});
 
 describe('hex2RgbColor', () => {
   it('should convert hex to rgb', () => {

@@ -1,14 +1,19 @@
-import { mm2pt, Plugin, Schema } from '@pdfme/common';
+import { mm2pt, Plugin, Schema, isHexValid } from '@pdfme/common';
 import { Circle } from 'lucide';
 import { HEX_COLOR_PATTERN } from '../constants.js';
-import { convertForPdfLayoutProps, createSvgStr, hex2PrintingColor, isEditable } from '../utils.js';
+import {
+  applyAlphaToOpacity,
+  convertForPdfLayoutProps,
+  createSvgStr,
+  hex2PrintingColor,
+  isEditable,
+  splitHexAlpha,
+} from '../utils.js';
 
 export interface CircleMarkSchema extends Schema {
   color: string;
   borderWidth: number;
 }
-
-const HEX_COLOR_REGEXP = new RegExp(HEX_COLOR_PATTERN);
 
 const isSelected = (value: unknown) => value === 'true';
 
@@ -17,7 +22,7 @@ const hasRenderableStyle = (schema: CircleMarkSchema) =>
   schema.height > 0 &&
   schema.borderWidth > 0 &&
   typeof schema.color === 'string' &&
-  HEX_COLOR_REGEXP.test(schema.color);
+  isHexValid(schema.color);
 
 const circleMark: Plugin<CircleMarkSchema> = {
   ui: (arg) => {
@@ -70,6 +75,7 @@ const circleMark: Plugin<CircleMarkSchema> = {
     const yScale = height / 2 - borderWidth / 2;
     if (xScale <= 0 || yScale <= 0) return;
 
+    const { color: borderColorHex, alpha: borderAlpha } = splitHexAlpha(schema.color);
     page.drawEllipse({
       x: x + width / 2,
       y: y + height / 2,
@@ -77,8 +83,8 @@ const circleMark: Plugin<CircleMarkSchema> = {
       yScale,
       rotate,
       borderWidth,
-      borderColor: hex2PrintingColor(schema.color, options.colorType),
-      borderOpacity: opacity,
+      borderColor: hex2PrintingColor(borderColorHex, options.colorType),
+      borderOpacity: applyAlphaToOpacity(opacity, borderAlpha),
     });
   },
   propPanel: {
@@ -87,9 +93,6 @@ const circleMark: Plugin<CircleMarkSchema> = {
         title: i18n('schemas.color'),
         type: 'string',
         widget: 'color',
-        props: {
-          disabledAlpha: true,
-        },
         required: true,
         rules: [{ pattern: HEX_COLOR_PATTERN, message: i18n('validation.hexColor') }],
       },

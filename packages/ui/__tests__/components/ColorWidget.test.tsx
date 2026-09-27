@@ -1,0 +1,127 @@
+import React from 'react';
+import { fireEvent, render } from '@testing-library/react';
+import ColorWidget from '../../src/components/Designer/RightSidebar/DetailView/ColorWidget';
+
+beforeAll(() => {
+  // antd's ColorPicker popover mounts an @rc-component/resize-observer, which
+  // jsdom does not implement.
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  Object.defineProperty(globalThis, 'ResizeObserver', {
+    configurable: true,
+    value: ResizeObserverStub,
+  });
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      addEventListener: vi.fn(),
+      addListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      matches: false,
+      media: query,
+      onchange: null,
+      removeEventListener: vi.fn(),
+      removeListener: vi.fn(),
+    })),
+  });
+});
+
+const renderColorWidget = (props: React.ComponentProps<typeof ColorWidget> = {}) => {
+  const onChange = vi.fn();
+  const utils = render(<ColorWidget onChange={onChange} {...props} />);
+  const input = utils.container.querySelector<HTMLInputElement>('input:not([type="color"])')!;
+  return { ...utils, onChange, input };
+};
+
+describe('ColorWidget', () => {
+  it('enables the alpha slider by default and hides it when disabledAlpha is set', () => {
+    const openPickerAndCountSliders = (disabledAlpha?: boolean) => {
+      const { container, unmount } = render(
+        <ColorWidget value="#ff0000" disabledAlpha={disabledAlpha} />,
+      );
+      fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
+      // antd renders a hue slider always and an alpha slider only when alpha is enabled.
+      const count = document.querySelectorAll('.ant-color-picker-slider').length;
+      unmount();
+      document.body.innerHTML = '';
+      return count;
+    };
+
+    expect(openPickerAndCountSliders()).toBe(2);
+    expect(openPickerAndCountSliders(true)).toBe(1);
+  });
+
+  it('commits 6-digit hex from the picker for opaque colors and 8-digit only with alpha', () => {
+    const onChange = vi.fn();
+    const { container, unmount } = render(<ColorWidget value="#ff000080" onChange={onChange} />);
+    fireEvent.click(container.querySelector('.ant-color-picker-trigger')!);
+
+    // Typing a hex in the popover resets alpha to 100% (antd behavior); the commit
+    // must stay 6-digit rather than gaining a redundant "ff" suffix.
+    const hexInput = document.querySelector<HTMLInputElement>('.ant-color-picker-hex-input input')!;
+    fireEvent.change(hexInput, { target: { value: '00ff00' } });
+    expect(onChange).toHaveBeenLastCalledWith('#00ff00');
+
+    // Lowering the alpha stepper emits 8-digit hex (30% of #ff0000 -> 0x4d).
+    const alphaInput = document.querySelector<HTMLInputElement>(
+      '.ant-color-picker-alpha-input input',
+    )!;
+    fireEvent.change(alphaInput, { target: { value: '30%' } });
+    expect(onChange).toHaveBeenLastCalledWith('#ff00004d');
+
+    unmount();
+    document.body.innerHTML = '';
+  });
+
+  it('commits typed 6/8-digit hex values while typing', () => {
+    for (const hex of ['#ff0000', '#ff000080']) {
+      const { onChange, input } = renderColorWidget({ value: '#000000' });
+      fireEvent.change(input, { target: { value: hex } });
+      expect(onChange).toHaveBeenCalledWith(hex);
+    }
+  });
+
+  it('never commits shorthand prefixes while typing toward a 6-digit color', () => {
+    const { onChange, input } = renderColorWidget({ value: '#000000' });
+    for (const partial of ['#f', '#ff', '#ff0', '#ff00', '#ff000']) {
+      fireEvent.change(input, { target: { value: partial } });
+    }
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: '#ff0000' } });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith('#ff0000');
+  });
+
+  it('commits 3/4-digit shorthand on blur or Enter', () => {
+    const { onChange, input } = renderColorWidget({ value: '#000000' });
+    fireEvent.change(input, { target: { value: '#f008' } });
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenCalledWith('#f008');
+
+    const enter = renderColorWidget({ value: '#000000' });
+    fireEvent.change(enter.input, { target: { value: '#f00' } });
+    expect(enter.onChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(enter.input, { key: 'Enter' });
+    expect(enter.onChange).toHaveBeenCalledWith('#f00');
+  });
+
+  it('keeps invalid free-text while typing and reverts it on blur without committing', () => {
+    const { onChange, input } = renderColorWidget({ value: '#000000' });
+    fireEvent.change(input, { target: { value: '#ff0000gg' } });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input.value).toBe('#ff0000gg');
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input.value).toBe('#000000');
+  });
+
+  it('commits undefined when the input is cleared', () => {
+    const { onChange, input } = renderColorWidget({ value: '#ff000080' });
+    fireEvent.change(input, { target: { value: '' } });
+    expect(onChange).toHaveBeenCalledWith(undefined);
+  });
+});
