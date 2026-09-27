@@ -18,10 +18,10 @@ export interface ColorWidgetProps {
 const DEFAULT_COLOR = '#000000';
 // Matches isHexValid in @pdfme/common: 3/4/6/8-digit hex, where 4/8-digit carry alpha.
 const HEX_COLOR_REGEXP = /^#(?:[0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
-
-// A value is safe to forward to the schema only when it is a valid hex color or
-// empty (clearing the field). This keeps invalid free-text out of PDF rendering.
-const isCommittableColor = (value: string) => value === '' || HEX_COLOR_REGEXP.test(value);
+// 3/4-digit shorthand is ambiguous while typing ("#ff0" may be a prefix of
+// "#ff0000"), so keystrokes only commit the unambiguous 6/8-digit forms; the
+// shorthand forms commit on blur/Enter instead.
+const FULL_HEX_COLOR_REGEXP = /^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
 const ColorWidget = (props: ColorWidgetProps) => {
   // Alpha is enabled by default; the picker emits 8-digit hex when alpha < 100%.
@@ -42,9 +42,24 @@ const ColorWidget = (props: ColorWidgetProps) => {
   }
 
   const commit = (next: string) => {
+    onChange?.(next === '' ? undefined : next);
+  };
+
+  const handleInputChange = (next: string) => {
     setInputValue(next);
-    if (isCommittableColor(next)) {
-      onChange?.(next === '' ? undefined : next);
+    if (next === '' || FULL_HEX_COLOR_REGEXP.test(next)) {
+      commit(next);
+    }
+  };
+
+  // Blur/Enter is the "done typing" signal: valid shorthand commits here, and
+  // invalid free-text reverts to the last committed value. This keeps invalid
+  // colors out of PDF rendering.
+  const handleInputCommit = () => {
+    if (HEX_COLOR_REGEXP.test(inputValue)) {
+      commit(inputValue);
+    } else if (inputValue !== '') {
+      setInputValue(value ?? '');
     }
   };
 
@@ -55,14 +70,20 @@ const ColorWidget = (props: ColorWidgetProps) => {
         disabled={disabled}
         disabledAlpha={disabledAlpha}
         format="hex"
-        onChange={(color) => commit(color.toHexString())}
+        onChange={(color) => {
+          const next = color.toHexString();
+          setInputValue(next);
+          commit(next);
+        }}
       />
       <Input
         className={className}
         placeholder={DEFAULT_COLOR}
         disabled={disabled}
         value={inputValue}
-        onChange={(ev) => commit(ev.target.value)}
+        onChange={(ev) => handleInputChange(ev.target.value)}
+        onBlur={handleInputCommit}
+        onPressEnter={handleInputCommit}
       />
     </Space.Compact>
   );

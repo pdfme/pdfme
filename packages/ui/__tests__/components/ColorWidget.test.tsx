@@ -76,19 +76,47 @@ describe('ColorWidget', () => {
     document.body.innerHTML = '';
   });
 
-  it('commits typed 3/4/6/8-digit hex values', () => {
-    for (const hex of ['#f00', '#f008', '#ff0000', '#ff000080']) {
+  it('commits typed 6/8-digit hex values while typing', () => {
+    for (const hex of ['#ff0000', '#ff000080']) {
       const { onChange, input } = renderColorWidget({ value: '#000000' });
       fireEvent.change(input, { target: { value: hex } });
       expect(onChange).toHaveBeenCalledWith(hex);
     }
   });
 
-  it('does not commit invalid free-text but keeps it in the input', () => {
+  it('never commits shorthand prefixes while typing toward a 6-digit color', () => {
+    const { onChange, input } = renderColorWidget({ value: '#000000' });
+    for (const partial of ['#f', '#ff', '#ff0', '#ff00', '#ff000']) {
+      fireEvent.change(input, { target: { value: partial } });
+    }
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(input, { target: { value: '#ff0000' } });
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenCalledWith('#ff0000');
+  });
+
+  it('commits 3/4-digit shorthand on blur or Enter', () => {
+    const { onChange, input } = renderColorWidget({ value: '#000000' });
+    fireEvent.change(input, { target: { value: '#f008' } });
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenCalledWith('#f008');
+
+    const enter = renderColorWidget({ value: '#000000' });
+    fireEvent.change(enter.input, { target: { value: '#f00' } });
+    expect(enter.onChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(enter.input, { key: 'Enter' });
+    expect(enter.onChange).toHaveBeenCalledWith('#f00');
+  });
+
+  it('keeps invalid free-text while typing and reverts it on blur without committing', () => {
     const { onChange, input } = renderColorWidget({ value: '#000000' });
     fireEvent.change(input, { target: { value: '#ff0000gg' } });
     expect(onChange).not.toHaveBeenCalled();
     expect(input.value).toBe('#ff0000gg');
+    fireEvent.blur(input);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input.value).toBe('#000000');
   });
 
   it('commits undefined when the input is cleared', () => {
