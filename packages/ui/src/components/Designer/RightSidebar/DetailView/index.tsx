@@ -14,7 +14,7 @@ import { TEXT_OVERFLOW_EXPAND, TEXT_OVERFLOW_VISIBLE } from '@pdfme/schemas/text
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
-import { debounce } from '../../../../helper.js';
+import { debounce, isRotatableSchema } from '../../../../helper.js';
 import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
@@ -421,7 +421,7 @@ const DetailView = (props: DetailViewProps) => {
         title: typedI18n('rotate'),
         type: 'number',
         widget: 'inputNumber',
-        disabled: typeof defaultSchema.rotate === 'undefined',
+        disabled: !isRotatableSchema(defaultSchema),
         max: 360,
         props: { min: 0 },
         span: 6,
