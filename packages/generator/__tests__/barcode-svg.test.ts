@@ -324,6 +324,35 @@ describe('barcode SVG PDF rendering', () => {
     }
   });
 
+  test('emits no graphics state for an opaque 6-digit background when schema opacity is omitted', async () => {
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'qr',
+            type: 'qrcode',
+            content: '',
+            position: { x: 10, y: 10 },
+            width: 30,
+            height: 30,
+            backgroundColor: '#ff66cc',
+            barColor: '#000000',
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [{ qr: 'https://pdfme.com/opaque-background' }],
+      plugins: { qrcode: barcodes.qrcode },
+    });
+    const { page } = await loadFirstPageContent(pdf);
+
+    expect(pageGraphicsStateAlphas(page)).toEqual([]);
+  });
+
   test('renders 4-digit bar and text colors without throwing', async () => {
     // bwip-js rejects 4-digit hex ('bwip-js: invalid color'); the alpha digit must be
     // stripped before the color reaches it.

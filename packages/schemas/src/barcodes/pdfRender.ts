@@ -2,6 +2,7 @@ import { PDFRenderProps } from '@pdfme/common';
 import type { SvgColorMapper } from '@pdfme/pdf-lib';
 import { popGraphicsState, pushGraphicsState, rotateDegrees, translate } from '@pdfme/pdf-lib';
 import {
+  applyAlphaToOpacity,
   convertForPdfLayoutProps,
   hex2PrintingColor,
   rgbColorToCmykColor,
@@ -77,7 +78,7 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
           width,
           height,
           color: backgroundColor,
-          opacity: (opacity ?? 1) * alpha,
+          opacity: applyAlphaToOpacity(opacity, alpha),
         });
       }
     }
