@@ -1,6 +1,7 @@
 import { b64toUint8Array, isHexValid } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
+import { splitHexAlpha } from '../utils.js';
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
 import { BarcodeTypes } from './types.js';
 
@@ -122,10 +123,16 @@ export const barCodeType2Bcid = (type: BarcodeTypes) =>
   type === 'nw7' ? 'rationalizedCodabar' : type;
 
 /**
- *  Strip hash from the beginning of HTML hex color codes for the bwip.js lib
+ *  Strip hash from the beginning of HTML hex color codes for the bwip.js lib.
+ *  Any '#RGBA'/'#RRGGBBAA' alpha channel is dropped first (rendered opaque, like
+ *  AcroForm colors): bwip-js has no alpha support — it reads 8-digit hex as CMYK
+ *  and throws on 4-digit hex. Hash-less colors pass through untouched because
+ *  bwip-js natively treats those as RRGGBB/CCMMYYKK.
  */
-export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) =>
-  color ? color.replace('#', '') : fallback ? fallback.replace('#', '') : '000000';
+export const mapHexColorForBwipJsLib = (color: string | undefined, fallback?: string) => {
+  const hex = color || fallback;
+  return hex ? splitHexAlpha(hex).color.replace('#', '') : '000000';
+};
 
 /**
  * Barcode colors historically accept bwip-js style hex without a leading '#';

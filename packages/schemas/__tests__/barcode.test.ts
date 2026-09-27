@@ -390,6 +390,38 @@ describe('createBarCodeSvg', () => {
 
     expect(svg).toMatch(/<svg\b[^>]*fill="#000000"/);
   });
+
+  test('drops the alpha channel of an 8-digit barColor so bwip-js does not misread it as CMYK', () => {
+    const svg = createBarCodeSvg({
+      type: 'qrcode',
+      input: 'https://pdfme.com/alpha-fill',
+      width: 30,
+      height: 30,
+      backgroundColor: '',
+      barColor: '#ff000080',
+    });
+
+    // The injected default fill must be the opaque color (no alpha to inherit in PDF),
+    // and bwip-js must have received 'ff0000', not the CMYK-misread 'ff000080' (#007f7f).
+    expect(svg).toMatch(/<svg\b[^>]*fill="#ff0000"/);
+    expect(svg).toContain('#ff0000');
+    expect(svg).not.toContain('ff000080');
+    expect(svg).not.toContain('#007f7f');
+  });
+
+  test('renders a 4-digit barColor without bwip-js throwing', () => {
+    const svg = createBarCodeSvg({
+      type: 'qrcode',
+      input: 'https://pdfme.com/short-alpha',
+      width: 30,
+      height: 30,
+      backgroundColor: '',
+      barColor: '#f008',
+    });
+
+    expect(svg).toContain('<svg');
+    expect(svg).not.toContain('f008');
+  });
 });
 
 describe('barCodeType2Bcid test', () => {
@@ -475,5 +507,14 @@ describe('mapHexColorForBwipJsLib text', () => {
   });
   test('it defaults to black if neither color nor fallback passed', () => {
     expect(mapHexColorForBwipJsLib(undefined)).toEqual('000000');
+  });
+  test('it drops the alpha channel so bwip-js never receives 8- or 4-digit hex', () => {
+    expect(mapHexColorForBwipJsLib('#ff000080')).toEqual('ff0000');
+    expect(mapHexColorForBwipJsLib('#f008')).toEqual('f00');
+    expect(mapHexColorForBwipJsLib(undefined, '#ff000080')).toEqual('ff0000');
+    expect(mapHexColorForBwipJsLib(undefined, '#f008')).toEqual('f00');
+  });
+  test('it keeps hash-less colors untouched (legacy bwip-js RRGGBB/CCMMYYKK format)', () => {
+    expect(mapHexColorForBwipJsLib('ff000080')).toEqual('ff000080');
   });
 });

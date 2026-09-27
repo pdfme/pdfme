@@ -4,8 +4,10 @@ import { getImageSnapshotOptions, pdfToImages } from './utils.js';
 import {
   decodePDFRawStream,
   PDFArray,
+  PDFDict,
   PDFDocument,
   PDFName,
+  PDFNumber,
   PDFRawStream,
 } from '@pdfme/pdf-lib';
 import { barcodes } from '@pdfme/schemas';
@@ -182,6 +184,18 @@ const loadFirstPageContent = async (pdfBytes: Uint8Array<ArrayBuffer>) => {
   return { pdfDoc, page, content };
 };
 
+const pageGraphicsStateAlphas = (page: ReturnType<PDFDocument['getPage']>) => {
+  const extGState = page.node.Resources()?.lookupMaybe(PDFName.of('ExtGState'), PDFDict);
+  if (!extGState) return [];
+  return extGState.keys().map((key) => {
+    const graphicsState = extGState.lookup(key, PDFDict);
+    return {
+      ca: graphicsState.lookupMaybe(PDFName.of('ca'), PDFNumber)?.asNumber(),
+      CA: graphicsState.lookupMaybe(PDFName.of('CA'), PDFNumber)?.asNumber(),
+    };
+  });
+};
+
 const pageHasImageXObject = (pdfDoc: PDFDocument, page: ReturnType<PDFDocument['getPage']>) => {
   const resources = page.node.Resources();
   const xobj = resources?.lookup(PDFName.of('XObject')) as
@@ -255,6 +269,103 @@ describe('barcode SVG PDF rendering', () => {
 
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('rotated-barcodes-svg-1'));
+  });
+
+  test('strips hex alpha from bar and text colors instead of letting bwip-js misread them', async () => {
+    // bwip-js reads 8-digit hex as CCMMYYKK: '#ff000080' used to render teal (#007f7f)
+    // and its raw value leaked into the SVG root fill, adding a stray ~50% opacity in
+    // the PDF only. The alpha channel must be dropped so bars render the opaque color.
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'qr',
+            type: 'qrcode',
+            content: '',
+            position: { x: 10, y: 10 },
+            width: 30,
+            height: 30,
+            backgroundColor: '',
+            barColor: '#ff000080',
+          },
+          {
+            name: 'code128',
+            type: 'code128',
+            content: '',
+            position: { x: 10, y: 50 },
+            width: 60,
+            height: 20,
+            backgroundColor: '',
+            barColor: '#000000',
+            textColor: '#0000ff80',
+            includetext: true,
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [{ qr: 'https://pdfme.com/alpha-barcolor', code128: 'ABC-123' }],
+      plugins: { qrcode: barcodes.qrcode, code128: barcodes.code128 },
+    });
+    const { page, content } = await loadFirstPageContent(pdf);
+
+    // The intended opaque colors: red QR modules and blue barcode text.
+    expect(content).toMatch(/(?:^|\s)1(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? rg(?:\s|$)/);
+    expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 1(?:\.0+)? rg(?:\s|$)/);
+    // Not the CMYK misreads: teal (0 0.498 0.498) or olive (0.498 0.498 0).
+    expect(content).not.toMatch(/0\.49\d+/);
+    // No stray opacity inherited from the injected SVG root fill.
+    for (const { ca, CA } of pageGraphicsStateAlphas(page)) {
+      expect(ca === undefined || ca === 1).toBe(true);
+      expect(CA === undefined || CA === 1).toBe(true);
+    }
+  });
+
+  test('renders 4-digit bar and text colors without throwing', async () => {
+    // bwip-js rejects 4-digit hex ('bwip-js: invalid color'); the alpha digit must be
+    // stripped before the color reaches it.
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'qr',
+            type: 'qrcode',
+            content: '',
+            position: { x: 10, y: 10 },
+            width: 30,
+            height: 30,
+            backgroundColor: '',
+            barColor: '#f008',
+          },
+          {
+            name: 'code128',
+            type: 'code128',
+            content: '',
+            position: { x: 10, y: 50 },
+            width: 60,
+            height: 20,
+            backgroundColor: '',
+            barColor: '#000000',
+            textColor: '#00f8',
+            includetext: true,
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [{ qr: 'https://pdfme.com/short-alpha-barcolor', code128: 'ABC-123' }],
+      plugins: { qrcode: barcodes.qrcode, code128: barcodes.code128 },
+    });
+    const { content } = await loadFirstPageContent(pdf);
+
+    expect(content).toMatch(/(?:^|\s)1(?:\.0+)? 0(?:\.0+)? 0(?:\.0+)? rg(?:\s|$)/);
+    expect(content).toMatch(/(?:^|\s)0(?:\.0+)? 0(?:\.0+)? 1(?:\.0+)? rg(?:\s|$)/);
   });
 
   test('fills the schema box with barcode backgrounds', async () => {
