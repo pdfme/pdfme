@@ -44,6 +44,11 @@ export const embedAndGetFont = (arg: {
     });
   })();
 
+  // Attach a no-op rejection handler so that if a caller creates this promise but
+  // unwinds before awaiting it (e.g. an earlier await throws for the same broken
+  // font data), the rejection doesn't escape as an unhandledRejection and crash
+  // the process (#1636). Callers that await the promise still receive the error.
+  pdfFontPromise.catch(() => {});
   pdfFontCache[fontName] = pdfFontPromise;
   return pdfFontPromise;
 };
