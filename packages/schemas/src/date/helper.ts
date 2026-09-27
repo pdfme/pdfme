@@ -488,9 +488,6 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
             title: i18n('schemas.textColor'),
             type: 'string',
             widget: 'color',
-            props: {
-              disabledAlpha: true,
-            },
             rules: [
               {
                 pattern: HEX_COLOR_PATTERN,
@@ -502,9 +499,6 @@ export const getPlugin = ({ type, icon }: { type: PickerType; icon: string }) =>
             title: i18n('schemas.bgColor'),
             type: 'string',
             widget: 'color',
-            props: {
-              disabledAlpha: true,
-            },
             rules: [
               {
                 pattern: HEX_COLOR_PATTERN,

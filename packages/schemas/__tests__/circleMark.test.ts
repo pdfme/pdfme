@@ -107,6 +107,35 @@ describe('circleMark plugin', () => {
     expect(renderPdf(schema, true)).not.toHaveBeenCalled();
   });
 
+  it('renders alpha hex colors as draw opacity multiplied with the schema opacity', () => {
+    const drawEllipse = renderPdf(getSchema({ color: '#33669980' }), 'true');
+
+    expect(drawEllipse).toHaveBeenCalledWith(
+      expect.objectContaining({
+        borderColor: { type: 'RGB', red: 0.2, green: 0.4, blue: 0.6 },
+        borderOpacity: 0.5 * (0x80 / 255),
+      }),
+    );
+  });
+
+  it('renders 3/4-digit shorthand hex colors', () => {
+    const drawShort = renderPdf(getSchema({ color: '#369' }), 'true');
+    expect(drawShort).toHaveBeenCalledWith(
+      expect.objectContaining({
+        borderColor: { type: 'RGB', red: 0.2, green: 0.4, blue: 0.6 },
+        borderOpacity: 0.5,
+      }),
+    );
+
+    const drawShortAlpha = renderPdf(getSchema({ color: '#3698' }), 'true');
+    expect(drawShortAlpha).toHaveBeenCalledWith(
+      expect.objectContaining({
+        borderColor: { type: 'RGB', red: 0.2, green: 0.4, blue: 0.6 },
+        borderOpacity: 0.5 * (0x88 / 255),
+      }),
+    );
+  });
+
   it('uses CMYK color conversion for PDF output when requested', () => {
     const drawEllipse = renderPdf(getSchema({ color: '#000000' }), 'true', 'cmyk');
 

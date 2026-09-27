@@ -5,7 +5,7 @@ import {
   DEFAULT_BARCODE_BG_COLOR,
   DEFAULT_BARCODE_INCLUDETEXT,
 } from './constants.js';
-import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
+import { DEFAULT_OPACITY, HEX_COLOR_PATTERN, OPAQUE_HEX_COLOR_PATTERN } from '../constants.js';
 
 const defaultColors = {
   backgroundColor: DEFAULT_BARCODE_BG_COLOR,
@@ -198,6 +198,8 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
 
   return {
     schema: ({ i18n }) => ({
+      // bar/text colors are rendered by bwip-js, which has no alpha support, so
+      // they stay restricted to opaque 6-digit hex (see OPAQUE_HEX_COLOR_PATTERN).
       barColor: {
         title: i18n('schemas.barcodes.barColor'),
         type: 'string',
@@ -207,7 +209,7 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         },
         rules: [
           {
-            pattern: HEX_COLOR_PATTERN,
+            pattern: OPAQUE_HEX_COLOR_PATTERN,
             message: i18n('validation.hexColor'),
           },
         ],
@@ -216,9 +218,6 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
         title: i18n('schemas.bgColor'),
         type: 'string',
         widget: 'color',
-        props: {
-          disabledAlpha: true,
-        },
         rules: [
           {
             pattern: HEX_COLOR_PATTERN,
@@ -235,6 +234,12 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
               props: {
                 disabledAlpha: true,
               },
+              rules: [
+                {
+                  pattern: OPAQUE_HEX_COLOR_PATTERN,
+                  message: i18n('validation.hexColor'),
+                },
+              ],
             },
             includetext: {
               title: i18n('schemas.barcodes.includetext'),

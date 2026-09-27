@@ -20,6 +20,17 @@ Dynamic layout and automatic page breaks require a blank `basePdf` object, such 
 
 The Designer canvas shows the authored schema boxes. Reflow is applied in Preview, Form, Viewer, and PDF generation.
 
+## Colors and Transparency
+
+Color properties accept hex colors in `#RGB`, `#RGBA`, `#RRGGBB`, and `#RRGGBBAA` formats. The 4- and 8-digit forms carry an alpha channel, which renders as transparency in both the UI and generated PDFs. The Designer color pickers include an alpha slider, so transparency can be set directly without hand-editing templates.
+
+A color's alpha channel multiplies with the schema-level `opacity` property, the same way browsers compose an `rgba()` color with an element's `opacity`. For example, a color with 50% alpha inside a schema with `opacity: 0.5` renders at 25% opacity.
+
+Exceptions:
+
+- **Barcode Bar Color and Text Color** are always rendered opaque; their pickers do not offer an alpha slider and only 6-digit hex is accepted. (The underlying barcode renderer, bwip-js, has no alpha support.) Barcode **Background Color** does support alpha.
+- **`generateForm` / AcroForm form fields** render their colors opaque: PDF field appearances have no per-color opacity, so any alpha channel is stripped.
+
 ### Text (text)
 
 - Style-related

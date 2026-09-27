@@ -16,17 +16,18 @@ export interface ColorWidgetProps {
 }
 
 const DEFAULT_COLOR = '#000000';
-// 6-digit hex, or 8-digit hex when a field opts into alpha (disabledAlpha={false}).
-const HEX_COLOR_REGEXP = /^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
+// Matches isHexValid in @pdfme/common: 3/4/6/8-digit hex, where 4/8-digit carry alpha.
+const HEX_COLOR_REGEXP = /^#(?:[0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/;
 
 // A value is safe to forward to the schema only when it is a valid hex color or
 // empty (clearing the field). This keeps invalid free-text out of PDF rendering.
 const isCommittableColor = (value: string) => value === '' || HEX_COLOR_REGEXP.test(value);
 
 const ColorWidget = (props: ColorWidgetProps) => {
-  // Default alpha off so the picker emits 6-digit hex; fields can opt in with
-  // disabledAlpha={false}, in which case 8-digit hex is intentional.
-  const { value, onChange, disabled, disabledAlpha = true, readOnly, className, style } = props;
+  // Alpha is enabled by default; the picker emits 8-digit hex when alpha < 100%.
+  // Fields whose renderer cannot handle alpha (barcode bar/text colors) opt out
+  // with disabledAlpha={true}.
+  const { value, onChange, disabled, disabledAlpha = false, readOnly, className, style } = props;
 
   // Keep a local copy so the text input stays responsive while the user types an
   // intermediate value (e.g. "#ff00") that is not yet a valid color.
