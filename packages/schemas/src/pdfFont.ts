@@ -29,12 +29,12 @@ export const embedAndGetFont = (arg: {
     return cachedFont;
   }
 
-  const fontValue = font[fontName];
-  if (!fontValue) {
-    return Promise.reject(new Error(`[@pdfme/schemas] Font "${fontName}" is not found.`));
-  }
-
   const pdfFontPromise = (async () => {
+    const fontValue = font[fontName];
+    if (!fontValue) {
+      throw new Error(`[@pdfme/schemas] Font "${fontName}" is not found.`);
+    }
+
     let fontData = fontValue.data;
     if (typeof fontData === 'string' && fontData.startsWith('http')) {
       fontData = await fetchRemoteFontData(fontData);
@@ -44,6 +44,11 @@ export const embedAndGetFont = (arg: {
     });
   })();
 
+  // Attach a no-op rejection handler so that if a caller creates this promise but
+  // unwinds before awaiting it (e.g. an earlier await throws for the same broken
+  // font data), the rejection doesn't escape as an unhandledRejection and crash
+  // the process (#1636). Callers that await the promise still receive the error.
+  pdfFontPromise.catch(() => {});
   pdfFontCache[fontName] = pdfFontPromise;
   return pdfFontPromise;
 };
