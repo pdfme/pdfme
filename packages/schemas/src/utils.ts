@@ -81,7 +81,24 @@ export const addAlphaToHex = (hex: string, alphaPercentage: number) => {
 export const isEditable = (mode: Mode, schema: Schema) =>
   mode === 'designer' || (mode === 'form' && schema.readOnly !== true);
 
+// Split a '#RGBA'/'#RRGGBBAA' hex into its opaque color and alpha channel, since
+// pdf-lib colors carry no alpha; alpha must be applied as draw opacity instead.
+// Colors without an alpha channel are passed through with alpha 1.
+export const splitHexAlpha = (hexColor: string): { color: string; alpha: number } => {
+  if (!hexColor.startsWith('#')) return { color: hexColor, alpha: 1 };
+  const hex = hexColor.slice(1);
+  if (hex.length !== 4 && hex.length !== 8) return { color: hexColor, alpha: 1 };
+  const rgbLength = hex.length === 4 ? 3 : 6;
+  const alphaHex = hex.slice(rgbLength);
+  return {
+    color: `#${hex.slice(0, rgbLength)}`,
+    alpha: parseInt(alphaHex.length === 1 ? alphaHex.repeat(2) : alphaHex, 16) / 255,
+  };
+};
+
 const hex2rgb = (hex: string) => {
+  // Drop any alpha channel; pdf-lib colors cannot represent it.
+  hex = splitHexAlpha(hex).color;
   if (hex.slice(0, 1) === '#') hex = hex.slice(1);
   if (hex.length === 3)
     hex =
@@ -93,17 +110,6 @@ const hex2rgb = (hex: string) => {
       hex.slice(2, 3);
 
   return [hex.slice(0, 2), hex.slice(2, 4), hex.slice(4, 6)].map((str) => parseInt(str, 16));
-};
-
-const getHexOpacity = (hex: string) => {
-  const normalized = hex.startsWith('#') ? hex.slice(1) : hex;
-  const opacityHex =
-    normalized.length === 4
-      ? normalized.slice(3, 4).repeat(2)
-      : normalized.length === 8
-        ? normalized.slice(6, 8)
-        : '';
-  return opacityHex ? parseInt(opacityHex, 16) / 255 : 1;
 };
 
 export const rgbColorToCmykColor = ({ red, green, blue }: RGB) => {
@@ -139,13 +145,8 @@ const hex2CmykColor = (hexString: string | undefined) => {
       throw new Error(`Invalid hex color value ${hexString}`);
     }
 
-    let [r, g, b] = hex2rgb(hexString).map((value) => value / 255);
-    const opacity = getHexOpacity(hexString);
-
-    // Apply the opacity
-    r = r * opacity + (1 - opacity);
-    g = g * opacity + (1 - opacity);
-    b = b * opacity + (1 - opacity);
+    // Alpha is not flattened here; callers apply it as draw opacity via splitHexAlpha.
+    const [r, g, b] = hex2rgb(hexString).map((value) => value / 255);
 
     return rgbColorToCmykColor(rgb(r, g, b));
   }

@@ -5,6 +5,7 @@ import {
   convertForPdfLayoutProps,
   createSvgStr,
   rotatePoint,
+  splitHexAlpha,
 } from '../utils.js';
 import { Circle, Square } from 'lucide';
 
@@ -47,13 +48,15 @@ const shape: Plugin<ShapeSchema> = {
     } = convertForPdfLayoutProps({ ...cArg, applyRotateTranslate: false });
     const borderWidth = schema.borderWidth ? mm2pt(schema.borderWidth) : 0;
 
+    const { color: fillHex, alpha: fillAlpha } = splitHexAlpha(schema.color ?? '');
+    const { color: borderHex, alpha: borderAlpha } = splitHexAlpha(schema.borderColor ?? '');
     const drawOptions = {
       rotate,
       borderWidth,
-      borderColor: hex2PrintingColor(schema.borderColor, colorType),
-      color: hex2PrintingColor(schema.color, colorType),
-      opacity,
-      borderOpacity: opacity,
+      borderColor: hex2PrintingColor(borderHex, colorType),
+      color: hex2PrintingColor(fillHex, colorType),
+      opacity: (opacity ?? 1) * fillAlpha,
+      borderOpacity: (opacity ?? 1) * borderAlpha,
     };
     if (schema.type === 'ellipse') {
       page.drawEllipse({

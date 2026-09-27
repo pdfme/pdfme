@@ -14,7 +14,7 @@ import {
   TextAlignment,
   type PDFRadioGroup,
 } from '@pdfme/pdf-lib';
-import { convertForPdfLayoutProps, hex2PrintingColor } from '@pdfme/schemas/utils';
+import { convertForPdfLayoutProps, hex2PrintingColor, splitHexAlpha } from '@pdfme/schemas/utils';
 
 type AcroFormSchema = Schema & {
   __acroRequired?: boolean;
@@ -48,6 +48,11 @@ type RadioGroupCacheState = {
 const DEFAULT_FONT_COLOR = '#000000';
 const DEFAULT_FONT_SIZE = 13;
 const DEFAULT_FORM_BORDER_COLOR = '#000000';
+
+// Known limitation: AcroForm field appearances accept plain colors with no per-color
+// opacity, so any alpha channel in a hex color is stripped and rendered opaque.
+const toOpaquePrintingColor = (hex: string, colorType: Parameters<typeof hex2PrintingColor>[1]) =>
+  hex2PrintingColor(splitHexAlpha(hex).color, colorType);
 const FIELD_NAME_COUNTS_CACHE_KEY = 'generateForm:fieldNameCounts';
 const RADIO_GROUPS_CACHE_KEY = 'generateForm:radioGroups';
 
@@ -195,9 +200,9 @@ const renderAcroText = async (arg: PDFRenderProps<Schema>) => {
     height,
     rotate,
     font: pdfFont,
-    textColor: hex2PrintingColor(textSchema.fontColor || DEFAULT_FONT_COLOR, options.colorType),
+    textColor: toOpaquePrintingColor(textSchema.fontColor || DEFAULT_FONT_COLOR, options.colorType),
     backgroundColor: textSchema.backgroundColor
-      ? hex2PrintingColor(textSchema.backgroundColor, options.colorType)
+      ? toOpaquePrintingColor(textSchema.backgroundColor, options.colorType)
       : undefined,
     borderWidth: 0,
   });
@@ -224,11 +229,11 @@ const renderAcroCheckbox = (arg: PDFRenderProps<Schema>) => {
     width,
     height,
     rotate,
-    textColor: hex2PrintingColor(color, options.colorType),
+    textColor: toOpaquePrintingColor(color, options.colorType),
     backgroundColor: checkboxSchema.backgroundColor
-      ? hex2PrintingColor(checkboxSchema.backgroundColor, options.colorType)
+      ? toOpaquePrintingColor(checkboxSchema.backgroundColor, options.colorType)
       : undefined,
-    borderColor: hex2PrintingColor(color, options.colorType),
+    borderColor: toOpaquePrintingColor(color, options.colorType),
     borderWidth: 1,
   });
   checkBox.updateAppearances();
@@ -254,11 +259,11 @@ const renderAcroRadioGroup = (arg: PDFRenderProps<Schema>) => {
     width,
     height,
     rotate,
-    textColor: hex2PrintingColor(color, options.colorType),
+    textColor: toOpaquePrintingColor(color, options.colorType),
     backgroundColor: radioGroupSchema.backgroundColor
-      ? hex2PrintingColor(radioGroupSchema.backgroundColor, options.colorType)
+      ? toOpaquePrintingColor(radioGroupSchema.backgroundColor, options.colorType)
       : undefined,
-    borderColor: hex2PrintingColor(color, options.colorType),
+    borderColor: toOpaquePrintingColor(color, options.colorType),
     borderWidth: 1,
   });
 

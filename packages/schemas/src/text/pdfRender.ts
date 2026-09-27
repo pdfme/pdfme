@@ -32,7 +32,12 @@ import { applyTextLineRange } from './measure.js';
 import { calculateDynamicRichTextFontSize, isInlineMarkdownTextSchema } from './richText.js';
 import { renderInlineMarkdownText } from './richTextPdfRender.js';
 import { shouldUseDynamicFontSize } from './overflow.js';
-import { convertForPdfLayoutProps, rotatePoint, hex2PrintingColor } from '../utils.js';
+import {
+  convertForPdfLayoutProps,
+  rotatePoint,
+  hex2PrintingColor,
+  splitHexAlpha,
+} from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 import { embedAndGetFont } from '../pdfFont.js';
@@ -57,7 +62,10 @@ const getFontProp = ({
     (shouldUseDynamicFontSize(schema, basePdf)
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE));
-  const color = hex2PrintingColor(schema.fontColor || DEFAULT_FONT_COLOR, colorType);
+  const { color: fontColorHex, alpha: colorAlpha } = splitHexAlpha(
+    schema.fontColor || DEFAULT_FONT_COLOR,
+  );
+  const color = hex2PrintingColor(fontColorHex, colorType);
 
   return {
     alignment: schema.alignment ?? DEFAULT_ALIGNMENT,
@@ -66,6 +74,7 @@ const getFontProp = ({
     characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
     fontSize,
     color,
+    colorAlpha,
   };
 };
 
@@ -122,7 +131,9 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     fontSize: dynamicRichTextFontSize,
   });
 
-  const { fontSize, color, alignment, verticalAlignment, lineHeight, characterSpacing } = fontProp;
+  const { fontSize, color, colorAlpha, alignment, verticalAlignment, lineHeight, characterSpacing } =
+    fontProp;
+  const textOpacity = (opacity ?? 1) * colorAlpha;
 
   if (enableInlineMarkdown) {
     await renderInlineMarkdownText({
@@ -149,6 +160,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       pivotPoint,
       rotate,
       opacity,
+      colorAlpha,
     });
     return;
   }
@@ -218,7 +230,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
         end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
         thickness: (1 / 12) * fontSize,
         color: color,
-        opacity,
+        opacity: textOpacity,
       });
     }
 
@@ -231,7 +243,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
         end: rotatePoint({ x: _x, y: _y }, pivotPoint, rotate.angle),
         thickness: (1 / 12) * fontSize,
         color: color,
-        opacity,
+        opacity: textOpacity,
       });
     }
 
@@ -255,7 +267,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       color,
       lineHeight: lineHeight * fontSize,
       font: pdfFontValue,
-      opacity,
+      opacity: textOpacity,
     });
   });
 };
@@ -281,6 +293,7 @@ const drawTextBoxDecoration = (arg: {
     width: number;
     height: number;
     color: NonNullable<ReturnType<typeof hex2PrintingColor>>;
+    alpha: number;
   }) => {
     if (rect.width <= 0 || rect.height <= 0) return;
     const point =
@@ -294,18 +307,20 @@ const drawTextBoxDecoration = (arg: {
       height: rect.height,
       rotate,
       color: rect.color,
-      opacity,
+      opacity: opacity * rect.alpha,
     });
   };
 
   if (schema.backgroundColor) {
-    const color = hex2PrintingColor(schema.backgroundColor, colorType);
-    if (color) drawRectangle({ x, y, width, height, color });
+    const { color: bgHex, alpha } = splitHexAlpha(schema.backgroundColor);
+    const color = hex2PrintingColor(bgHex, colorType);
+    if (color) drawRectangle({ x, y, width, height, color, alpha });
   }
 
   if (!schema.borderColor || !hasBoxDimension(schema.borderWidth)) return;
 
-  const color = hex2PrintingColor(schema.borderColor, colorType);
+  const { color: borderHex, alpha } = splitHexAlpha(schema.borderColor);
+  const color = hex2PrintingColor(borderHex, colorType);
   if (!color) return;
 
   const top = mm2pt(borderWidth.top);
@@ -313,8 +328,8 @@ const drawTextBoxDecoration = (arg: {
   const bottom = mm2pt(borderWidth.bottom);
   const left = mm2pt(borderWidth.left);
 
-  drawRectangle({ x, y: y + height - top, width, height: top, color });
-  drawRectangle({ x: x + width - right, y, width: right, height, color });
-  drawRectangle({ x, y, width, height: bottom, color });
-  drawRectangle({ x, y, width: left, height, color });
+  drawRectangle({ x, y: y + height - top, width, height: top, color, alpha });
+  drawRectangle({ x: x + width - right, y, width: right, height, color, alpha });
+  drawRectangle({ x, y, width, height: bottom, color, alpha });
+  drawRectangle({ x, y, width: left, height, color, alpha });
 };
