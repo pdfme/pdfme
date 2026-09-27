@@ -131,8 +131,15 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     fontSize: dynamicRichTextFontSize,
   });
 
-  const { fontSize, color, colorAlpha, alignment, verticalAlignment, lineHeight, characterSpacing } =
-    fontProp;
+  const {
+    fontSize,
+    color,
+    colorAlpha,
+    alignment,
+    verticalAlignment,
+    lineHeight,
+    characterSpacing,
+  } = fontProp;
   const textOpacity = (opacity ?? 1) * colorAlpha;
 
   if (enableInlineMarkdown) {
