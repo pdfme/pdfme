@@ -24,8 +24,28 @@ import {
   restoreZoomAnchor,
   setFontNameRecursively,
   getStickyScrollPageIndex,
+  isRotatableSchema,
 } from '../src/helper';
-import { text, image } from '@pdfme/schemas';
+import {
+  text,
+  image,
+  multiVariableText,
+  list,
+  signature,
+  svg,
+  table,
+  barcodes,
+  line,
+  rectangle,
+  ellipse,
+  dateTime,
+  date,
+  time,
+  select,
+  radioGroup,
+  checkbox,
+  circleMark,
+} from '@pdfme/schemas';
 
 const getSchema = (): Schema => ({
   name: 'a',
@@ -1046,6 +1066,59 @@ describe('getStickyScrollPageIndex', () => {
     );
 
     expect(getStickyScrollPageIndex(container, papers, 0)).toBe(1);
+  });
+});
+
+describe('isRotatableSchema (#1631)', () => {
+  test('rotate absent from defaultSchema returns false', () => {
+    expect(isRotatableSchema({ type: 'custom' })).toBe(false);
+  });
+
+  test('rotate: undefined (spread inheritance opt-out) returns false', () => {
+    expect(isRotatableSchema({ ...text.propPanel.defaultSchema, rotate: undefined })).toBe(false);
+  });
+
+  test('rotate: 0 returns true', () => {
+    expect(isRotatableSchema({ type: 'custom', rotate: 0 })).toBe(true);
+  });
+
+  test('rotate: 90 returns true', () => {
+    expect(isRotatableSchema({ type: 'custom', rotate: 90 })).toBe(true);
+  });
+
+  test('missing defaultSchema returns false', () => {
+    expect(isRotatableSchema(undefined)).toBe(false);
+  });
+
+  test('built-in plugins keep their current rotatability', () => {
+    const builtIns = {
+      text,
+      image,
+      multiVariableText,
+      list,
+      signature,
+      svg,
+      table,
+      line,
+      rectangle,
+      ellipse,
+      dateTime,
+      date,
+      time,
+      select,
+      radioGroup,
+      checkbox,
+      circleMark,
+      ...barcodes,
+    };
+    for (const [name, plugin] of Object.entries(builtIns)) {
+      const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
+      // The rule Canvas used before the fix ('rotate' in defaultSchema) must
+      // agree with the shared helper for every built-in, so none of them
+      // gains or loses its rotate handle.
+      const legacyCanvasRule = 'rotate' in defaultSchema;
+      expect(isRotatableSchema(defaultSchema), `plugin: ${name}`).toBe(legacyCanvasRule);
+    }
   });
 });
 

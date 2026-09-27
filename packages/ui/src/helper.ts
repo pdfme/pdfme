@@ -113,6 +113,15 @@ export const round = (number: number, precision: number) => {
 
 export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 
+/**
+ * Single source of truth for whether a schema type supports rotation in the
+ * Designer (rotate handle on the canvas and rotate input in the detail view).
+ * A plugin opts out by omitting `rotate` from its propPanel.defaultSchema or
+ * setting it to `undefined` (e.g. `{ ...text.propPanel.defaultSchema, rotate: undefined }`).
+ */
+export const isRotatableSchema = (defaultSchema?: Record<string, unknown>): boolean =>
+  typeof defaultSchema?.rotate !== 'undefined';
+
 const up = 'up';
 const shiftUp = 'shift+up';
 const down = 'down';

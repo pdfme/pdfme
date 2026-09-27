@@ -24,7 +24,7 @@ import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
-import { round, flatten, uuid } from '../../../helper.js';
+import { round, flatten, uuid, isRotatableSchema } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
 import Selecto from './Selecto.js';
@@ -359,10 +359,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       }
     });
 
-    // Check if all schema types have rotate property
+    // Check if all schema types support rotation
     return uniqueSchemaTypes.every((type) => {
       const matchingSchema = defaultSchemas.find((ds) => ds && 'type' in ds && ds.type === type);
-      return matchingSchema && 'rotate' in matchingSchema;
+      return isRotatableSchema(matchingSchema);
     });
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
 
