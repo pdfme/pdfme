@@ -955,6 +955,125 @@ test('undo after editing another page restores that page and redo lands there (#
   }
 });
 
+test('redo after multiple undos lands on the page where each change was made', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['renamedField1', 'field2']);
+    expect(designer.getPageCursor()).toBe(0);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1Page2',
+      );
+    });
+    renameCurrentPage(domContainer, ['renamedPage2', 'field2Page2']);
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeNull();
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeNull();
+    });
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['renamedField1', 'field2'],
+      ['field1Page2', 'field2Page2'],
+    ]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['renamedField1', 'field2'],
+      ['renamedPage2', 'field2Page2'],
+    ]);
+  } finally {
+    cleanup();
+  }
+});
+
+test('adding a page clears a selection from the previous page', async () => {
+  const { domContainer, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    clickFieldInList(domContainer, 'field1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+
+    await clickControl(domContainer, '.pdfme-ui-context-menu', 'Add Page After');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(0);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('undo landing on another page drops a selection from the page that was showing', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+    });
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1Page2',
+      );
+    });
+    renameCurrentPage(domContainer, ['renamedPage2', 'field2Page2']);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-prev')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1',
+      );
+    });
+    clickFieldInList(domContainer, 'field1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(0);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
 test('page add and delete are undoable and redo lands on the changed page', async () => {
   const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
     getOnePageBlankTemplate(),

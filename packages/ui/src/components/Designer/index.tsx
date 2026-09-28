@@ -67,21 +67,32 @@ type PendingScrollPage = {
 
 type DesignerHistoryEntry = {
   schemasList: SchemaForUI[][];
+  /** Page shown when this snapshot is restored. */
   pageCursor: number;
+  /**
+   * Page the action that left this snapshot landed on.
+   * Swapped with `pageCursor` when the entry moves to the other stack, so redo
+   * returns to the page where that step was applied.
+   */
+  appliedCursor: number;
 };
 
 type ApplySchemasOptions = {
   /** Undo/redo and page add/delete always notify. Schema commits do not. */
   notifyPageCursor: 'always' | 'never';
+  /** Keep a selection only when its schemas still exist on the landing page. */
   preserveSelection?: boolean;
 };
 
 const MAX_HISTORY_LENGTH = 100;
+/** Release scroll suppression if a pending page scroll never finishes. */
+const SCROLL_SUPPRESS_FALLBACK_MS = 1000;
 
 const pushHistory = (stack: DesignerHistoryEntry[], entry: DesignerHistoryEntry) => {
   stack.push({
     schemasList: cloneDeep(entry.schemasList),
     pageCursor: entry.pageCursor,
+    appliedCursor: entry.appliedCursor,
   });
   if (stack.length > MAX_HISTORY_LENGTH) {
     stack.splice(0, stack.length - MAX_HISTORY_LENGTH);
@@ -122,13 +133,12 @@ const TemplateEditor = ({
 }: TemplateEditorProps) => {
   const past = useRef<DesignerHistoryEntry[]>([]);
   const future = useRef<DesignerHistoryEntry[]>([]);
-  // Cursor applied by the latest history action. Scroll and toolbar navigation
-  // leave it unchanged so undo/redo return to the page where the change landed.
-  const lastAppliedPageCursorRef = useRef(0);
   const schemasListRef = useRef<SchemaForUI[][]>([[]]);
   const pageCursorRef = useRef(0);
   const pendingSelectionIdsRef = useRef<string[] | null>(null);
   const suppressScrollPageCursorRef = useRef(false);
+  const scrollSuppressTokenRef = useRef(0);
+  const scrollSuppressTimerRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const paperRefs = useRef<HTMLDivElement[]>([]);
 
@@ -294,11 +304,34 @@ const TemplateEditor = ({
     }
   }, [options.sidebarOpen]);
 
-  const releaseScrollCursorSuppression = () => {
+  const armScrollSuppression = (fallbackMs?: number) => {
+    const token = ++scrollSuppressTokenRef.current;
+    suppressScrollPageCursorRef.current = true;
+    if (scrollSuppressTimerRef.current !== null) {
+      window.clearTimeout(scrollSuppressTimerRef.current);
+      scrollSuppressTimerRef.current = null;
+    }
+    if (fallbackMs !== undefined) {
+      scrollSuppressTimerRef.current = window.setTimeout(() => {
+        scrollSuppressTimerRef.current = null;
+        if (scrollSuppressTokenRef.current !== token) return;
+        suppressScrollPageCursorRef.current = false;
+      }, fallbackMs);
+      return;
+    }
     requestAnimationFrame(() => {
+      if (scrollSuppressTokenRef.current !== token) return;
       suppressScrollPageCursorRef.current = false;
     });
   };
+
+  useEffect(() => {
+    return () => {
+      if (scrollSuppressTimerRef.current !== null) {
+        window.clearTimeout(scrollSuppressTimerRef.current);
+      }
+    };
+  }, []);
 
   useScrollPageCursor({
     ref: canvasRef,
@@ -337,9 +370,8 @@ const TemplateEditor = ({
     }
 
     setPendingScrollPage(null);
-    suppressScrollPageCursorRef.current = true;
+    armScrollSuppression();
     canvasRef.current.scrollTop = getPagesScrollTopByIndex(pageSizes, pendingPage, displayScale);
-    releaseScrollCursorSuppression();
     if (requestedPage !== undefined) {
       onUpdateTemplatePageApplied?.(requestedPage);
     }
@@ -370,19 +402,16 @@ const TemplateEditor = ({
   const applyDocument = useCallback(
     (nextSchemasList: SchemaForUI[][], nextPageCursor: number, options: ApplySchemasOptions) => {
       const basePdf = template.basePdf;
-      const next = normalizeSchemasListForBasePdf(
-        cloneDeep(nextSchemasList),
-        basePdf,
-        pageSizes.length,
-      );
+      const next = normalizeSchemasListForBasePdf(nextSchemasList, basePdf, pageSizes.length);
       const clampedCursor = clampPageCursor(nextPageCursor, next.length);
       const pageCountChanged = next.length !== schemasListRef.current.length;
       const cursorChanged = clampedCursor !== pageCursorRef.current;
 
       if (options.preserveSelection) {
+        const landingPage = next[clampedCursor] ?? [];
         const previousIds = activeElementsRef.current.map((element) => element.id);
         const survivingIds = previousIds.filter((id) =>
-          next.some((page) => page.some((schema) => schema.id === id)),
+          landingPage.some((schema) => schema.id === id),
         );
         if (survivingIds.length !== previousIds.length) {
           onEditEndRef.current();
@@ -392,7 +421,6 @@ const TemplateEditor = ({
 
       schemasListRef.current = next;
       pageCursorRef.current = clampedCursor;
-      lastAppliedPageCursorRef.current = clampedCursor;
       setSchemasList(next);
       setPageCursor(clampedCursor);
 
@@ -407,16 +435,15 @@ const TemplateEditor = ({
 
       if (cursorChanged) {
         if (pageCountChanged) {
-          suppressScrollPageCursorRef.current = true;
+          armScrollSuppression(SCROLL_SUPPRESS_FALLBACK_MS);
           setPendingScrollPage({ page: clampedCursor, queuedPageSizes: pageSizes });
         } else if (canvasRef.current) {
-          suppressScrollPageCursorRef.current = true;
+          armScrollSuppression();
           canvasRef.current.scrollTop = getPagesScrollTopByIndex(
             pageSizes,
             clampedCursor,
             displayScale,
           );
-          releaseScrollCursorSuppression();
         }
       }
     },
@@ -428,7 +455,11 @@ const TemplateEditor = ({
       future.current = [];
       const currentSchemas = schemasListRef.current;
       const currentPage = pageCursorRef.current;
-      pushHistory(past.current, { schemasList: currentSchemas, pageCursor: currentPage });
+      pushHistory(past.current, {
+        schemasList: currentSchemas,
+        pageCursor: currentPage,
+        appliedCursor: currentPage,
+      });
       const next = cloneDeep(currentSchemas);
       next[currentPage] = newSchemas;
       applyDocument(next, currentPage, { notifyPageCursor: 'never' });
@@ -465,14 +496,14 @@ const TemplateEditor = ({
     (mode: 'undo' | 'redo') => {
       const source = mode === 'undo' ? past : future;
       const destination = mode === 'undo' ? future : past;
-      if (source.current.length === 0) return;
+      const target = source.current.pop();
+      if (!target) return;
 
       pushHistory(destination.current, {
         schemasList: schemasListRef.current,
-        pageCursor: lastAppliedPageCursorRef.current,
+        pageCursor: target.appliedCursor,
+        appliedCursor: target.pageCursor,
       });
-      const target = source.current.pop();
-      if (!target) return;
       applyDocument(target.schemasList, target.pageCursor, {
         notifyPageCursor: 'always',
         preserveSelection: true,
@@ -597,26 +628,32 @@ const TemplateEditor = ({
 
     future.current = [];
     const currentSchemas = schemasListRef.current;
-    pushHistory(past.current, { schemasList: currentSchemas, pageCursor: currentPage });
+    pushHistory(past.current, {
+      schemasList: currentSchemas,
+      pageCursor: currentPage,
+      appliedCursor: currentPage - 1,
+    });
     const next = cloneDeep(currentSchemas);
     next.splice(currentPage, 1);
-    applyDocument(next, currentPage - 1, {
-      notifyPageCursor: 'always',
-      preserveSelection: true,
-    });
+    onEditEndRef.current();
+    pendingSelectionIdsRef.current = null;
+    applyDocument(next, currentPage - 1, { notifyPageCursor: 'always' });
   };
 
   const handleAddPageAfter = () => {
     future.current = [];
     const currentSchemas = schemasListRef.current;
     const currentPage = pageCursorRef.current;
-    pushHistory(past.current, { schemasList: currentSchemas, pageCursor: currentPage });
+    pushHistory(past.current, {
+      schemasList: currentSchemas,
+      pageCursor: currentPage,
+      appliedCursor: currentPage + 1,
+    });
     const next = cloneDeep(currentSchemas);
     next.splice(currentPage + 1, 0, []);
-    applyDocument(next, currentPage + 1, {
-      notifyPageCursor: 'always',
-      preserveSelection: true,
-    });
+    onEditEndRef.current();
+    pendingSelectionIdsRef.current = null;
+    applyDocument(next, currentPage + 1, { notifyPageCursor: 'always' });
   };
 
   if (prevTemplate !== template) {
