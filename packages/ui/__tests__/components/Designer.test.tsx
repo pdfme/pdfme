@@ -7,6 +7,7 @@ import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
 import {
   BLANK_A4_PDF,
+  BLANK_PDF,
   getDefaultFont,
   isBlankPdf,
   PAGE_SIZE_PRESETS,
@@ -1524,6 +1525,43 @@ test('synced height is rounded like Moveable so an unrounded sync is a no-op', a
     expect(events).toEqual([]);
     expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
     expect(heightOfType(designer.getTemplate(), 'syncHeight')).not.toBe(RAW_SYNC_HEIGHT);
+  } finally {
+    cleanup();
+  }
+});
+
+test('selecting expand text on a non-blank PDF rewrites overflow without touching history', async () => {
+  const template: Template = {
+    basePdf: BLANK_PDF,
+    schemas: [[{ ...textField('field1', 'hello'), overflow: 'expand' }]],
+  };
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(template);
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['renamedField1']);
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+
+    clickFieldInList(domContainer, 'renamedField1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+      expect(designer.getTemplate().schemas[0][0].overflow).toBe('visible');
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeNull();
+    });
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
   } finally {
     cleanup();
   }

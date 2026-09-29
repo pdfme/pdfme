@@ -769,6 +769,7 @@ const TemplateEditor = ({
             schemasList={schemasList}
             schemas={schemasList[pageCursor] ?? []}
             changeSchemas={changeSchemas}
+            syncSchemas={syncSchemas}
             onSortEnd={onSortEnd}
             onEdit={(id) => {
               const editingElem = document.getElementById(id);
