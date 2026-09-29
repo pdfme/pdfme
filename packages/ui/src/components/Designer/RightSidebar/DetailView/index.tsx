@@ -54,8 +54,15 @@ const getElementIds = (elements: HTMLElement[]) => elements.map(({ id }) => id);
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { schemasList, changeSchemas, syncSchemas, deselectSchema, activeSchema, pageSize, basePdf } =
-    props;
+  const {
+    schemasList,
+    changeSchemas,
+    syncSchemas,
+    deselectSchema,
+    activeSchema,
+    pageSize,
+    basePdf,
+  } = props;
   const formInstance = useForm();
   // form-render returns a new wrapper each render; keep one so schema updates do not reset focused fields.
   const formRef = useRef(formInstance);

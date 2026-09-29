@@ -547,7 +547,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                       // a user edit: keep Moveable resize (width/position/height
                       // together) on the history path, and round height the same
                       // way Moveable's fmt() does so a follow-up sync is a no-op.
-                      if (changes.length > 0 && changes.every((change) => change.key === 'height')) {
+                      if (
+                        changes.length > 0 &&
+                        changes.every((change) => change.key === 'height')
+                      ) {
                         syncSchemas(
                           changes.map((change) => ({
                             ...change,

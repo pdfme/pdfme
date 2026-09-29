@@ -105,7 +105,8 @@ const clampPageCursor = (pageCursor: number, pageCount: number) => {
   return Math.min(Math.max(normalized, 0), pageCount - 1);
 };
 
-const schemasEqual = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+const schemasEqual = (left: unknown, right: unknown) =>
+  JSON.stringify(left) === JSON.stringify(right);
 
 /**
  * When the canvas scales there is a displacement of the starting position of the dragged schema.
