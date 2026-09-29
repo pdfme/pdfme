@@ -597,9 +597,8 @@ interface UseInitEventsParams {
   commitSchemas: (newSchemas: SchemaForUI[]) => void;
   removeSchemas: (ids: string[]) => void;
   onSaveTemplate: (t: Template) => void;
-  past: React.MutableRefObject<SchemaForUI[][]>;
-  future: React.MutableRefObject<SchemaForUI[][]>;
-  setSchemasList: React.Dispatch<React.SetStateAction<SchemaForUI[][]>>;
+  undo: () => void;
+  redo: () => void;
   onEdit: (targets: Array<HTMLElement | null | undefined>) => void;
   onEditEnd: () => void;
 }
@@ -614,9 +613,8 @@ export const useInitEvents = ({
   commitSchemas,
   removeSchemas,
   onSaveTemplate,
-  past,
-  future,
-  setSchemasList,
+  undo,
+  redo,
   onEdit,
   onEditEnd,
 }: UseInitEventsParams) => {
@@ -632,15 +630,6 @@ export const useInitEvents = ({
       const ids = activeElements.map((ae) => ae.id);
 
       return schemasList[pageCursor].filter((s) => ids.includes(s.id));
-    };
-    const timeTravel = (mode: 'undo' | 'redo') => {
-      const isUndo = mode === 'undo';
-      const stack = isUndo ? past : future;
-      if (stack.current.length <= 0) return;
-      (isUndo ? future : past).current.push(cloneDeep(schemasList[pageCursor]));
-      const s = cloneDeep(schemasList);
-      s[pageCursor] = stack.current.pop()!;
-      setSchemasList(s);
     };
     initShortCuts({
       move: (command, isShift) => {
@@ -681,8 +670,8 @@ export const useInitEvents = ({
         });
         copiedSchemas.current = pasteSchemas;
       },
-      redo: () => timeTravel('redo'),
-      undo: () => timeTravel('undo'),
+      redo: () => redo(),
+      undo: () => undo(),
       save: () =>
         onSaveTemplate && onSaveTemplate(schemasList2template(schemasList, template.basePdf)),
       remove: () => removeSchemas(getActiveSchemas().map((s) => s.id)),
@@ -699,9 +688,8 @@ export const useInitEvents = ({
     schemasList,
     onSaveTemplate,
     removeSchemas,
-    past,
-    future,
-    setSchemasList,
+    undo,
+    redo,
     copiedSchemas,
     onEdit,
     onEditEnd,

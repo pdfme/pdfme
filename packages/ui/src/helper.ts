@@ -338,14 +338,7 @@ export const template2SchemasList = async (_template: Template) => {
     pageSizes = await pdf2size(pdfArrayBuffer);
   }
 
-  const ssl = schemasForUI.length;
-  const psl = pageSizes.length;
-
-  return (
-    ssl < psl
-      ? schemasForUI.concat(Array.from({ length: psl - ssl }, () => cloneDeep([])))
-      : schemasForUI.slice(0, pageSizes.length)
-  ).map((schema, i) => {
+  return alignSchemasListToPageCount(schemasForUI, pageSizes.length).map((schema, i) => {
     Object.values(schema).forEach((value) => {
       const { width, height } = pageSizes[i];
       const xEdge = value.position.x + value.width;
@@ -360,6 +353,36 @@ export const template2SchemasList = async (_template: Template) => {
 
     return schema;
   });
+};
+
+/**
+ * Pad or truncate schema pages so the list length matches `pageCount`.
+ * Empty pages are distinct arrays. This is the same alignment `template2SchemasList`
+ * uses when a base PDF's page count and the schema pages differ.
+ */
+export const alignSchemasListToPageCount = <T>(schemasList: T[][], pageCount: number): T[][] => {
+  if (schemasList.length === pageCount) return schemasList;
+  if (schemasList.length < pageCount) {
+    return schemasList.concat(
+      Array.from({ length: pageCount - schemasList.length }, () => [] as T[]),
+    );
+  }
+  return schemasList.slice(0, Math.max(pageCount, 0));
+};
+
+/**
+ * Fit a history snapshot to the pages of the current base PDF.
+ * Blank PDFs follow the snapshot length. A non-blank PDF keeps `pageSizes.length`,
+ * using the same pad/truncate as `template2SchemasList`. A zero page count means
+ * sizes are not loaded yet, so the snapshot is left unchanged.
+ */
+export const normalizeSchemasListForBasePdf = (
+  schemasList: SchemaForUI[][],
+  basePdf: BasePdf,
+  pageCount: number,
+): SchemaForUI[][] => {
+  if (isBlankPdf(basePdf) || pageCount <= 0) return schemasList;
+  return alignSchemasListToPageCount(schemasList, pageCount);
 };
 
 export const schemasList2template = (schemasList: SchemaForUI[][], basePdf: BasePdf): Template => ({

@@ -14,6 +14,8 @@ export type SidebarProps = {
   onEdit: (id: string) => void;
   onEditEnd: () => void;
   changeSchemas: ChangeSchemas;
+  /** Layout sync that must not enter undo history. */
+  syncSchemas: ChangeSchemas;
   deselectSchema: () => void;
   sidebarOpen: boolean;
   setSidebarOpen: (sidebarOpen: boolean) => void;

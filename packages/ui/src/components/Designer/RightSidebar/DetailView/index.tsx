@@ -41,6 +41,7 @@ type DetailViewProps = Pick<
   | 'pageSize'
   | 'basePdf'
   | 'changeSchemas'
+  | 'syncSchemas'
   | 'activeElements'
   | 'deselectSchema'
 > & {
@@ -53,7 +54,15 @@ const getElementIds = (elements: HTMLElement[]) => elements.map(({ id }) => id);
 const DetailView = (props: DetailViewProps) => {
   const { token } = theme.useToken();
 
-  const { schemasList, changeSchemas, deselectSchema, activeSchema, pageSize, basePdf } = props;
+  const {
+    schemasList,
+    changeSchemas,
+    syncSchemas,
+    deselectSchema,
+    activeSchema,
+    pageSize,
+    basePdf,
+  } = props;
   const formInstance = useForm();
   // form-render returns a new wrapper each render; keep one so schema updates do not reset focused fields.
   const formRef = useRef(formInstance);
@@ -150,8 +159,11 @@ const DetailView = (props: DetailViewProps) => {
     if (isBlankPdf(basePdf) || !TEXT_OVERFLOW_EXPAND_SCHEMA_TYPES.has(activeSchema.type)) return;
     if ((activeSchema as Record<string, unknown>).overflow !== TEXT_OVERFLOW_EXPAND) return;
 
-    changeSchemas([{ key: 'overflow', value: TEXT_OVERFLOW_VISIBLE, schemaId: activeSchema.id }]);
-  }, [activeSchema, basePdf, changeSchemas]);
+    // Non-blank PDFs cannot grow with the text, so expand is stored as visible.
+    // This is a normalization, not a user edit: keep it off the history stack
+    // or undo restores expand and this effect immediately commits it again.
+    syncSchemas([{ key: 'overflow', value: TEXT_OVERFLOW_VISIBLE, schemaId: activeSchema.id }]);
+  }, [activeSchema, basePdf, syncSchemas]);
 
   useEffect(() => {
     uniqueSchemaName.current = (value: string): boolean => {

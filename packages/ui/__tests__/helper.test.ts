@@ -5,6 +5,7 @@ import {
   SchemaForUI,
   Schema,
   Template,
+  BLANK_A4_PDF,
   BLANK_PDF,
   BasePdf,
   PAGE_SIZE_PRESETS,
@@ -16,6 +17,7 @@ import {
   stabilizeSchemaIds,
   getUniqueSchemaName,
   schemasList2template,
+  normalizeSchemasListForBasePdf,
   changeSchemas,
   clampZoomLevel,
   getFitZoomLevel,
@@ -273,6 +275,41 @@ describe('schemasList2template test', () => {
         ],
       ],
     });
+  });
+});
+
+describe('normalizeSchemasListForBasePdf', () => {
+  const page = (id: string): SchemaForUI[] => [
+    { id, name: id, type: 'text', position: { x: 0, y: 0 }, width: 10, height: 10 },
+  ];
+
+  test('pads a non-blank base PDF with distinct empty pages', () => {
+    const schemas = [page('a')];
+    const result = normalizeSchemasListForBasePdf(schemas, BLANK_PDF, 3);
+
+    expect(result).toHaveLength(3);
+    expect(result[0]).toBe(schemas[0]);
+    expect(result[1]).toEqual([]);
+    expect(result[2]).toEqual([]);
+    expect(result[1]).not.toBe(result[2]);
+  });
+
+  test('truncates a non-blank base PDF to the loaded page count', () => {
+    const schemas = [page('a'), page('b'), page('c')];
+
+    expect(normalizeSchemasListForBasePdf(schemas, BLANK_PDF, 1)).toEqual([schemas[0]]);
+  });
+
+  test('leaves a blank base PDF at the snapshot length', () => {
+    const schemas = [page('a'), page('b')];
+
+    expect(normalizeSchemasListForBasePdf(schemas, BLANK_A4_PDF, 1)).toBe(schemas);
+  });
+
+  test('does not wipe schemas when the base PDF page count is not loaded', () => {
+    const schemas = [page('a'), page('b')];
+
+    expect(normalizeSchemasListForBasePdf(schemas, BLANK_PDF, 0)).toBe(schemas);
   });
 });
 

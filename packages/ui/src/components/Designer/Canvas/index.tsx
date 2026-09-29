@@ -107,6 +107,8 @@ interface Props {
   activeElements: HTMLElement[];
   onEdit: (targets: HTMLElement[]) => void;
   changeSchemas: ChangeSchemas;
+  /** Layout-only updates (renderer height sync). Does not record history. */
+  syncSchemas: ChangeSchemas;
   removeSchemas: (ids: string[]) => void;
   paperRefs: MutableRefObject<HTMLDivElement[]>;
   sidebarOpen: boolean;
@@ -126,6 +128,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     hoveringSchemaId,
     onEdit,
     changeSchemas,
+    syncSchemas,
     removeSchemas,
     onChangeHoveringSchemaId,
     paperRefs,
@@ -535,9 +538,31 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                       // Use type assertion to safely handle the argument
                       type ChangeArg = { key: string; value: unknown };
                       const args = Array.isArray(arg) ? (arg as ChangeArg[]) : [arg as ChangeArg];
-                      changeSchemas(
-                        args.map(({ key, value }) => ({ key, value, schemaId: schema.id })),
-                      );
+                      const changes = args.map(({ key, value }) => ({
+                        key,
+                        value,
+                        schemaId: schema.id,
+                      }));
+                      // Table/List recompute height every render. That sync is not
+                      // a user edit: keep Moveable resize (width/position/height
+                      // together) on the history path, and round height the same
+                      // way Moveable's fmt() does so a follow-up sync is a no-op.
+                      if (
+                        changes.length > 0 &&
+                        changes.every((change) => change.key === 'height')
+                      ) {
+                        syncSchemas(
+                          changes.map((change) => ({
+                            ...change,
+                            value:
+                              typeof change.value === 'number' && Number.isFinite(change.value)
+                                ? round(change.value, 2)
+                                : change.value,
+                          })),
+                        );
+                        return;
+                      }
+                      changeSchemas(changes);
                     }
                   : undefined
               }

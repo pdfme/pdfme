@@ -7,11 +7,15 @@ import { i18n } from '../../src/i18n';
 import { DESIGNER_CLASSNAME, RIGHT_SIDEBAR_WIDTH, SELECTABLE_CLASSNAME } from '../../src/constants';
 import {
   BLANK_A4_PDF,
+  BLANK_PDF,
   getDefaultFont,
   isBlankPdf,
   PAGE_SIZE_PRESETS,
   pluginRegistry,
   ZOOM,
+  type Plugin,
+  type Plugins,
+  type Schema,
   type Template,
 } from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
@@ -758,4 +762,807 @@ test('Designer keeps {1+1} literal in readOnly table cells', async () => {
   expect(staticTable).toBeInTheDocument();
   expect(staticTable).toHaveTextContent('{1+1}');
   expect(staticTable).toHaveTextContent('{name}');
+});
+
+const textField = (name: string, content = name) => ({
+  name,
+  type: 'text',
+  content,
+  position: { x: 20, y: 20 },
+  width: 100,
+  height: 15,
+  alignment: 'left' as const,
+  fontSize: 13,
+  characterSpacing: 0,
+  lineHeight: 1,
+});
+
+const getOnePageBlankTemplate = (): Template => ({
+  basePdf: BLANK_A4_PDF,
+  schemas: [[textField('field1', 'hello')]],
+});
+
+const namesByPage = (template: Template) =>
+  template.schemas.map((page) => page.map((schema) => schema.name));
+
+const pressShortcut = (key: string) => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  fireEvent.keyDown(document.body, { key, code: `Key${key.toUpperCase()}`, ctrlKey: true });
+  fireEvent.keyUp(document.body, { key, code: `Key${key.toUpperCase()}`, ctrlKey: true });
+};
+
+const clickControl = async (container: HTMLElement, className: string, label: string) => {
+  const control = container.querySelector(className);
+  if (!(control instanceof HTMLElement)) {
+    throw new Error(`${label} control was not found`);
+  }
+  fireEvent.click(control);
+  const item = await waitFor(() => {
+    const match = Array.from(document.querySelectorAll('div')).find(
+      (element) => element.childElementCount === 0 && element.textContent === label,
+    );
+    if (!(match instanceof HTMLElement)) {
+      throw new Error(`${label} was not found`);
+    }
+    return match;
+  });
+  fireEvent.click(item);
+};
+
+const renameCurrentPage = (container: HTMLElement, names: string[]) => {
+  const open = container.querySelector(`.${DESIGNER_CLASSNAME}bulk-update`);
+  if (!(open instanceof HTMLElement)) throw new Error('bulk update was not found');
+  fireEvent.click(open);
+  const textarea = container.querySelector('textarea');
+  if (!(textarea instanceof HTMLTextAreaElement)) throw new Error('bulk editor was not found');
+  fireEvent.change(textarea, { target: { value: names.join('\n') } });
+  const commit = container.querySelector(`.${DESIGNER_CLASSNAME}bulk-commit`);
+  if (!(commit instanceof HTMLElement)) throw new Error('bulk commit was not found');
+  fireEvent.click(commit);
+};
+
+const clickFieldInList = (container: HTMLElement, name: string) => {
+  const list = container.querySelector(`.${DESIGNER_CLASSNAME}list-view`);
+  if (!(list instanceof HTMLElement)) throw new Error('field list was not found');
+  const match = Array.from(list.querySelectorAll('div, span')).find(
+    (element) => element.textContent === name,
+  );
+  if (!(match instanceof HTMLElement)) throw new Error(`${name} was not found in the field list`);
+  fireEvent.click(match);
+};
+
+const RAW_SYNC_HEIGHT = 10.1728;
+const SYNCED_HEIGHT = uiHelper.round(RAW_SYNC_HEIGHT, 2);
+
+const syncHeightPlugin: Plugin<Schema> = {
+  pdf: () => undefined,
+  ui: ({ onChange }) => {
+    if (!onChange) return;
+    onChange({ key: 'height', value: RAW_SYNC_HEIGHT });
+  },
+  propPanel: {
+    schema: {},
+    defaultSchema: {
+      name: 'syncHeight',
+      type: 'syncHeight',
+      content: 'sync',
+      position: { x: 10, y: 10 },
+      width: 40,
+      height: 10,
+    },
+  },
+};
+
+const syncHeightPlugins: Plugins = { ...plugins, syncHeight: syncHeightPlugin };
+
+const heightOfType = (template: Template, type: string) =>
+  template.schemas.flat().find((schema) => schema.type === type)?.height;
+
+const addSchemaFromSidebar = (container: HTMLElement, type: string) => {
+  const button = container.querySelector(`.${DESIGNER_CLASSNAME}plugin-${type}`);
+  if (!(button instanceof HTMLElement)) throw new Error(`plugin ${type} was not found`);
+  const pointer = {
+    button: 0,
+    isPrimary: true,
+    pointerId: 1,
+    pointerType: 'mouse' as const,
+  };
+  fireEvent.pointerDown(button, { ...pointer, clientX: 20, clientY: 20 });
+  fireEvent.pointerMove(document, { ...pointer, clientX: 80, clientY: 80 });
+  fireEvent.pointerUp(document, { ...pointer, clientX: 180, clientY: 180 });
+};
+
+const mountPublicDesigner = async (template: Template, designerPlugins: Plugins = plugins) => {
+  const originalResizeObserver = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+
+  const domContainer = document.createElement('div');
+  Object.defineProperty(domContainer, 'clientHeight', { configurable: true, value: 1200 });
+  Object.defineProperty(domContainer, 'clientWidth', { configurable: true, value: 1200 });
+  document.body.appendChild(domContainer);
+
+  const events: Array<'template' | 'page'> = [];
+  const designer = new PublicDesigner({
+    domContainer,
+    template,
+    plugins: designerPlugins,
+  });
+  await act(async () => {
+    designer.updateTemplate(template);
+  });
+  designer.onChangeTemplate(() => {
+    events.push('template');
+  });
+  designer.onPageChange((info) => {
+    events.push('page');
+    expect(designer.getTotalPages()).toBe(info.totalPages);
+    expect(designer.getTemplate().schemas.length).toBe(info.totalPages);
+  });
+
+  return {
+    designer,
+    domContainer,
+    events,
+    cleanup: () => {
+      act(() => {
+        designer.destroy();
+      });
+      domContainer.remove();
+      globalThis.ResizeObserver = originalResizeObserver;
+    },
+  };
+};
+
+test('undo after editing another page restores that page and redo lands there (#1397)', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1Page2',
+      );
+    });
+
+    events.length = 0;
+    renameCurrentPage(domContainer, ['renamedPage2', 'field2Page2']);
+    expect(events).toEqual(['template']);
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['field1', 'field2'],
+      ['renamedPage2', 'field2Page2'],
+    ]);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-prev')!);
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1',
+      );
+    });
+
+    events.length = 0;
+    pressShortcut('z');
+
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeNull();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['field1', 'field2'],
+      ['field1Page2', 'field2Page2'],
+    ]);
+    expect(designer.getPageCursor()).toBe(1);
+
+    const saved: Template[] = [];
+    designer.onSaveTemplate((template) => {
+      saved.push(template);
+    });
+    designer.saveTemplate();
+    expect(namesByPage(saved[0])).toEqual(namesByPage(designer.getTemplate()));
+
+    events.length = 0;
+    pressShortcut('y');
+
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(1);
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['field1', 'field2'],
+      ['renamedPage2', 'field2Page2'],
+    ]);
+    expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+      'renamedPage2',
+    );
+    expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).not.toHaveTextContent(
+      'field1Page2',
+    );
+  } finally {
+    cleanup();
+  }
+});
+
+test('redo after multiple undos lands on the page where each change was made', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['renamedField1', 'field2']);
+    expect(designer.getPageCursor()).toBe(0);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1Page2',
+      );
+    });
+    renameCurrentPage(domContainer, ['renamedPage2', 'field2Page2']);
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeNull();
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeNull();
+    });
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['renamedField1', 'field2'],
+      ['field1Page2', 'field2Page2'],
+    ]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="renamedPage2"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['renamedField1', 'field2'],
+      ['renamedPage2', 'field2Page2'],
+    ]);
+  } finally {
+    cleanup();
+  }
+});
+
+test('adding a page clears a selection from the previous page', async () => {
+  const { domContainer, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    clickFieldInList(domContainer, 'field1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+
+    await clickControl(domContainer, '.pdfme-ui-context-menu', 'Add Page After');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(0);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('undo landing on another page drops a selection from the page that was showing', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+    });
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1Page2',
+      );
+    });
+    renameCurrentPage(domContainer, ['renamedPage2', 'field2Page2']);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-prev')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(0);
+      expect(domContainer.querySelector(`.${DESIGNER_CLASSNAME}list-view`)).toHaveTextContent(
+        'field1',
+      );
+    });
+    clickFieldInList(domContainer, 'field1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(0);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('page add and delete are undoable and redo lands on the changed page', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
+    getOnePageBlankTemplate(),
+  );
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+  try {
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('field1');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    const fieldId = (domContainer.querySelector('[title="field1"]') as HTMLElement).id;
+
+    events.length = 0;
+    await clickControl(domContainer, '.pdfme-ui-context-menu', 'Add Page After');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(1);
+    expect(designer.getTotalPages()).toBe(2);
+    expect((domContainer.querySelector('[title="field1"]') as HTMLElement).id).toBe(fieldId);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1'], []]);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(0);
+    expect(designer.getTotalPages()).toBe(1);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(1);
+    expect(designer.getTotalPages()).toBe(2);
+
+    const twoPageFieldId = (domContainer.querySelector('[title="field1"]') as HTMLElement).id;
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-prev')!);
+    await waitFor(() => expect(designer.getPageCursor()).toBe(0));
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => {
+      expect(designer.getPageCursor()).toBe(1);
+      expect(domContainer).toHaveTextContent('2/2');
+    });
+
+    events.length = 0;
+    await clickControl(domContainer, '.pdfme-ui-context-menu', 'Remove Current Page');
+    expect(confirm).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(0);
+    expect(designer.getTotalPages()).toBe(1);
+    expect((domContainer.querySelector('[title="field1"]') as HTMLElement).id).toBe(twoPageFieldId);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(1);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1'], []]);
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(designer.getPageCursor()).toBe(0);
+    expect(designer.getTotalPages()).toBe(1);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+  } finally {
+    cleanup();
+  }
+});
+
+test('undo keeps a schema selected and drops a selection whose schema is gone', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+  const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['field1', 'renamedField2']);
+    clickFieldInList(domContainer, 'field1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+    const fieldId = (domContainer.querySelector('[title="field1"]') as HTMLElement).id;
+
+    pressShortcut('z');
+
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field2"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField2"]')).toBeNull();
+    });
+    expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    expect((domContainer.querySelector('[title="field1"]') as HTMLElement).id).toBe(fieldId);
+    expect(designer.getPageCursor()).toBe(0);
+
+    fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+    await waitFor(() => expect(designer.getPageCursor()).toBe(1));
+    clickFieldInList(domContainer, 'field1Page2');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    });
+
+    await clickControl(domContainer, '.pdfme-ui-context-menu', 'Remove Current Page');
+    expect(confirm).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeNull();
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(0);
+    expect(designer.getPageCursor()).toBe(0);
+  } finally {
+    cleanup();
+  }
+});
+
+test('external updateTemplate does not clear history and undo keeps the canvas in sync', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['renamedField1', 'field2']);
+    expect(namesByPage(designer.getTemplate())[0]).toEqual(['renamedField1', 'field2']);
+
+    await act(async () => {
+      designer.updateTemplate(designer.getTemplate());
+    });
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeNull();
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['field1', 'field2'],
+      ['field1Page2', 'field2Page2'],
+    ]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+    });
+    expect(designer.getPageCursor()).toBe(0);
+
+    const fewerPages = designer.getTemplate();
+    fewerPages.schemas = [fewerPages.schemas[0]];
+    await act(async () => {
+      designer.updateTemplate(fewerPages);
+    });
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer).toHaveTextContent('1/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="field1Page2"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([
+      ['field1', 'field2'],
+      ['field1Page2', 'field2Page2'],
+    ]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('.pdfme-ui-pager')).toBeNull();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1', 'field2']]);
+    expect(designer.getTotalPages()).toBe(1);
+    expect(designer.getPageCursor()).toBe(0);
+  } finally {
+    cleanup();
+  }
+});
+
+test('renderer height sync does not push history, so one undo removes the added schema', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
+    getOnePageBlankTemplate(),
+    syncHeightPlugins,
+  );
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    addSchemaFromSidebar(domContainer, 'syncHeight');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    expect(namesByPage(designer.getTemplate())[0]).toContain('field1');
+    expect(events.filter((event) => event === 'template').length).toBeGreaterThan(0);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBeUndefined();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+    expect(events).toEqual(['template', 'page']);
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    expect(events).toEqual(['template', 'page']);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBeUndefined();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+    expect(events).toEqual(['template', 'page']);
+  } finally {
+    cleanup();
+  }
+});
+
+test('loading a template with a stale dynamic height does not create history', async () => {
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [
+      [
+        {
+          name: 'field1',
+          type: 'text',
+          content: 'hello',
+          position: { x: 20, y: 20 },
+          width: 100,
+          height: 15,
+        },
+        {
+          name: 'syncHeight',
+          type: 'syncHeight',
+          content: 'sync',
+          position: { x: 10, y: 10 },
+          width: 40,
+          height: 10,
+        },
+      ],
+    ],
+  };
+  const { designer, cleanup } = await mountPublicDesigner(template, syncHeightPlugins);
+
+  try {
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    const synced = JSON.stringify(designer.getTemplate().schemas);
+
+    pressShortcut('z');
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(JSON.stringify(designer.getTemplate().schemas)).toBe(synced);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+  } finally {
+    cleanup();
+  }
+});
+
+test('a renderer height sync leaves an existing redo in place', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
+    getOnePageBlankTemplate(),
+    syncHeightPlugins,
+  );
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    renameCurrentPage(domContainer, ['renamedField1']);
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    const withStaleHeight = designer.getTemplate();
+    withStaleHeight.schemas[0].push({
+      name: 'syncHeight',
+      type: 'syncHeight',
+      content: 'sync',
+      position: { x: 10, y: 10 },
+      width: 40,
+      height: 10,
+    });
+    await act(async () => {
+      designer.updateTemplate(withStaleHeight);
+    });
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+    });
+    expect(events[0]).toBe('template');
+  } finally {
+    cleanup();
+  }
+});
+
+test('deep-equal no-op commits are skipped and preserve redo', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    renameCurrentPage(domContainer, ['renamedField1']);
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    renameCurrentPage(domContainer, ['field1']);
+    expect(events).toEqual([]);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+  } finally {
+    cleanup();
+  }
+});
+
+test('synced height is rounded like Moveable so an unrounded sync is a no-op', async () => {
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [
+      [
+        {
+          name: 'syncHeight',
+          type: 'syncHeight',
+          content: 'sync',
+          position: { x: 10, y: 10 },
+          width: 40,
+          height: SYNCED_HEIGHT,
+        },
+      ],
+    ],
+  };
+  const { designer, events, cleanup } = await mountPublicDesigner(template, syncHeightPlugins);
+
+  try {
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(events).toEqual([]);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).not.toBe(RAW_SYNC_HEIGHT);
+  } finally {
+    cleanup();
+  }
+});
+
+test('selecting expand text on a non-blank PDF rewrites overflow without touching history', async () => {
+  const template: Template = {
+    basePdf: BLANK_PDF,
+    schemas: [[{ ...textField('field1', 'hello'), overflow: 'expand' }]],
+  };
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(template);
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    renameCurrentPage(domContainer, ['renamedField1']);
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+
+    clickFieldInList(domContainer, 'renamedField1');
+    await waitFor(() => {
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+      expect(designer.getTemplate().schemas[0][0].overflow).toBe('visible');
+    });
+
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeNull();
+    });
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+  } finally {
+    cleanup();
+  }
 });
