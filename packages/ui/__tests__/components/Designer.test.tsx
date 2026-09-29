@@ -12,6 +12,9 @@ import {
   PAGE_SIZE_PRESETS,
   pluginRegistry,
   ZOOM,
+  type Plugin,
+  type Plugins,
+  type Schema,
   type Template,
 } from '@pdfme/common';
 import { normalizeElementIdsForSnapshot } from '../assets/normalizeSnapshot';
@@ -829,7 +832,48 @@ const clickFieldInList = (container: HTMLElement, name: string) => {
   fireEvent.click(match);
 };
 
-const mountPublicDesigner = async (template: Template) => {
+const RAW_SYNC_HEIGHT = 10.1728;
+const SYNCED_HEIGHT = uiHelper.round(RAW_SYNC_HEIGHT, 2);
+
+const syncHeightPlugin: Plugin<Schema> = {
+  pdf: () => undefined,
+  ui: ({ onChange }) => {
+    if (!onChange) return;
+    onChange({ key: 'height', value: RAW_SYNC_HEIGHT });
+  },
+  propPanel: {
+    schema: {},
+    defaultSchema: {
+      name: 'syncHeight',
+      type: 'syncHeight',
+      content: 'sync',
+      position: { x: 10, y: 10 },
+      width: 40,
+      height: 10,
+    },
+  },
+};
+
+const syncHeightPlugins: Plugins = { ...plugins, syncHeight: syncHeightPlugin };
+
+const heightOfType = (template: Template, type: string) =>
+  template.schemas.flat().find((schema) => schema.type === type)?.height;
+
+const addSchemaFromSidebar = (container: HTMLElement, type: string) => {
+  const button = container.querySelector(`.${DESIGNER_CLASSNAME}plugin-${type}`);
+  if (!(button instanceof HTMLElement)) throw new Error(`plugin ${type} was not found`);
+  const pointer = {
+    button: 0,
+    isPrimary: true,
+    pointerId: 1,
+    pointerType: 'mouse' as const,
+  };
+  fireEvent.pointerDown(button, { ...pointer, clientX: 20, clientY: 20 });
+  fireEvent.pointerMove(document, { ...pointer, clientX: 80, clientY: 80 });
+  fireEvent.pointerUp(document, { ...pointer, clientX: 180, clientY: 180 });
+};
+
+const mountPublicDesigner = async (template: Template, designerPlugins: Plugins = plugins) => {
   const originalResizeObserver = globalThis.ResizeObserver;
   globalThis.ResizeObserver = class {
     observe() {}
@@ -846,7 +890,7 @@ const mountPublicDesigner = async (template: Template) => {
   const designer = new PublicDesigner({
     domContainer,
     template,
-    plugins,
+    plugins: designerPlugins,
   });
   await act(async () => {
     designer.updateTemplate(template);
@@ -1281,6 +1325,205 @@ test('external updateTemplate does not clear history and undo keeps the canvas i
     expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1', 'field2']]);
     expect(designer.getTotalPages()).toBe(1);
     expect(designer.getPageCursor()).toBe(0);
+  } finally {
+    cleanup();
+  }
+});
+
+test('renderer height sync does not push history, so one undo removes the added schema', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
+    getOnePageBlankTemplate(),
+    syncHeightPlugins,
+  );
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    addSchemaFromSidebar(domContainer, 'syncHeight');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    expect(namesByPage(designer.getTemplate())[0]).toContain('field1');
+    expect(events.filter((event) => event === 'template').length).toBeGreaterThan(0);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBeUndefined();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+    expect(events).toEqual(['template', 'page']);
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    expect(events).toEqual(['template', 'page']);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(events).toEqual(['template', 'page']);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+
+    events.length = 0;
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBeUndefined();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+    expect(events).toEqual(['template', 'page']);
+  } finally {
+    cleanup();
+  }
+});
+
+test('loading a template with a stale dynamic height does not create history', async () => {
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [
+      [
+        {
+          name: 'field1',
+          type: 'text',
+          content: 'hello',
+          position: { x: 20, y: 20 },
+          width: 100,
+          height: 15,
+        },
+        {
+          name: 'syncHeight',
+          type: 'syncHeight',
+          content: 'sync',
+          position: { x: 10, y: 10 },
+          width: 40,
+          height: 10,
+        },
+      ],
+    ],
+  };
+  const { designer, cleanup } = await mountPublicDesigner(template, syncHeightPlugins);
+
+  try {
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    const synced = JSON.stringify(designer.getTemplate().schemas);
+
+    pressShortcut('z');
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(JSON.stringify(designer.getTemplate().schemas)).toBe(synced);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+  } finally {
+    cleanup();
+  }
+});
+
+test('a renderer height sync leaves an existing redo in place', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
+    getOnePageBlankTemplate(),
+    syncHeightPlugins,
+  );
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    renameCurrentPage(domContainer, ['renamedField1']);
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    const withStaleHeight = designer.getTemplate();
+    withStaleHeight.schemas[0].push({
+      name: 'syncHeight',
+      type: 'syncHeight',
+      content: 'sync',
+      position: { x: 10, y: 10 },
+      width: 40,
+      height: 10,
+    });
+    await act(async () => {
+      designer.updateTemplate(withStaleHeight);
+    });
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+
+    events.length = 0;
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+    });
+    expect(events[0]).toBe('template');
+  } finally {
+    cleanup();
+  }
+});
+
+test('deep-equal no-op commits are skipped and preserve redo', async () => {
+  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+
+  try {
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    renameCurrentPage(domContainer, ['renamedField1']);
+    pressShortcut('z');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+
+    events.length = 0;
+    renameCurrentPage(domContainer, ['field1']);
+    expect(events).toEqual([]);
+    expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+
+    pressShortcut('y');
+    await waitFor(() => {
+      expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
+    });
+    expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+  } finally {
+    cleanup();
+  }
+});
+
+test('synced height is rounded like Moveable so an unrounded sync is a no-op', async () => {
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [
+      [
+        {
+          name: 'syncHeight',
+          type: 'syncHeight',
+          content: 'sync',
+          position: { x: 10, y: 10 },
+          width: 40,
+          height: SYNCED_HEIGHT,
+        },
+      ],
+    ],
+  };
+  const { designer, events, cleanup } = await mountPublicDesigner(template, syncHeightPlugins);
+
+  try {
+    await waitFor(() => {
+      expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    });
+    expect(events).toEqual([]);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+    expect(heightOfType(designer.getTemplate(), 'syncHeight')).not.toBe(RAW_SYNC_HEIGHT);
   } finally {
     cleanup();
   }

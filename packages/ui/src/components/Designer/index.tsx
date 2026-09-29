@@ -105,6 +105,8 @@ const clampPageCursor = (pageCursor: number, pageCount: number) => {
   return Math.min(Math.max(normalized, 0), pageCount - 1);
 };
 
+const schemasEqual = (left: unknown, right: unknown) => JSON.stringify(left) === JSON.stringify(right);
+
 /**
  * When the canvas scales there is a displacement of the starting position of the dragged schema.
  * It moves left or right from the top-left corner of the drag icon depending on the scale.
@@ -452,9 +454,11 @@ const TemplateEditor = ({
 
   const commitSchemas = useCallback(
     (newSchemas: SchemaForUI[]) => {
-      future.current = [];
       const currentSchemas = schemasListRef.current;
       const currentPage = pageCursorRef.current;
+      if (schemasEqual(currentSchemas[currentPage], newSchemas)) return;
+
+      future.current = [];
       pushHistory(past.current, {
         schemasList: currentSchemas,
         pageCursor: currentPage,
@@ -465,6 +469,34 @@ const TemplateEditor = ({
       applyDocument(next, currentPage, { notifyPageCursor: 'never' });
     },
     [applyDocument],
+  );
+
+  // Renderer layout sync (table/list height). The live document is what the
+  // next undo stores, so updating it here keeps redo from restoring a stale
+  // height and syncing again. History stacks are left untouched.
+  const syncSchemas: ChangeSchemas = useCallback(
+    (objs) => {
+      const currentPage = pageCursorRef.current;
+      const pageSize = pageSizes[currentPage];
+      if (!pageSize || objs.length === 0) return;
+
+      _changeSchemas({
+        objs,
+        schemas: schemasListRef.current[currentPage] ?? [],
+        basePdf: template.basePdf,
+        pluginsRegistry,
+        pageSize,
+        commitSchemas: (newSchemas) => {
+          const currentSchemas = schemasListRef.current;
+          if (schemasEqual(currentSchemas[currentPage], newSchemas)) return;
+
+          const next = cloneDeep(currentSchemas);
+          next[currentPage] = newSchemas;
+          applyDocument(next, currentPage, { notifyPageCursor: 'never' });
+        },
+      });
+    },
+    [applyDocument, pageSizes, pluginsRegistry, template.basePdf],
   );
 
   const removeSchemas = useCallback(
@@ -766,6 +798,7 @@ const TemplateEditor = ({
             activeElements={activeElements}
             schemasList={schemasList}
             changeSchemas={changeSchemas}
+            syncSchemas={syncSchemas}
             removeSchemas={removeSchemas}
             sidebarOpen={sidebarOpen}
             onEdit={onEdit}
