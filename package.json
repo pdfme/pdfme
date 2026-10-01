@@ -64,7 +64,7 @@
     "typescript": "^7.0.2",
     "vite": "^8.2.2",
     "vite-plus": "^0.3.0",
-    "vitest": "^4.1.10",
+    "vitest": "^5.0.2",
     "vitest-image-snapshot": "^0.6.52"
   },
   "packageManager": "npm@11.12.1"
