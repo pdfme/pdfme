@@ -130,6 +130,53 @@ export function base64ToBytes(base64: string): Uint8Array {
 }
 
 /**
+ * Compose two matrices the way a PDF `cm` operator does.
+ *
+ * A PDF point is a row vector: `p * M`. A new `cm` post-multiplies, so
+ * `CTM' = M * CTM_old` in that convention, where the *new* matrix is applied
+ * first. This differs from the SVG/CSS convention `multiplyMatrix` uses, which
+ * composes column vectors, so it is spelled out here rather than reusing it.
+ */
+function composeCtm(m: Matrix, previous: Matrix): Matrix {
+  return [
+    m[0] * previous[0] + m[1] * previous[2],
+    m[0] * previous[1] + m[1] * previous[3],
+    m[2] * previous[0] + m[3] * previous[2],
+    m[2] * previous[1] + m[3] * previous[3],
+    m[4] * previous[0] + m[5] * previous[2] + previous[4],
+    m[4] * previous[1] + m[5] * previous[3] + previous[5],
+  ];
+}
+
+/**
+ * Map an axis-aligned box through `m` into default page space.
+ *
+ * A rotation or skew turns the box into a general quadrilateral, which a
+ * `/Rect` cannot express, so the corners are mapped and re-bounded.
+ */
+function transformBoxToPage(m: Matrix, box: [number, number, number, number]): number[] {
+  const points: [number, number][] = [
+    [box[0], box[1]],
+    [box[2], box[1]],
+    [box[0], box[3]],
+    [box[2], box[3]],
+  ];
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of points) {
+    const px = m[0] * x + m[2] * y + m[4];
+    const py = m[1] * x + m[3] * y + m[5];
+    if (px < minX) minX = px;
+    if (px > maxX) maxX = px;
+    if (py < minY) minY = py;
+    if (py > maxY) maxY = py;
+  }
+  return [minX, minY, maxX, maxY];
+}
+
+/**
  * A resource name that is not yet used in `dict`, in pdf-lib's `tag-n` style.
  */
 function uniqueKey(dict: PDFDict, tag: string): string {
@@ -295,10 +342,9 @@ export class Renderer {
 
   transform(m: Matrix): void {
     this.emitNow(concatTransformationMatrix(m[0], m[1], m[2], m[3], m[4], m[5]));
-    // A `cm` operator post-multiplies the CTM, so the new matrix goes on
-    // the left. Tiling patterns need this matrix to place themselves in
-    // the page's default coordinate system.
-    this.ctm = multiplyMatrix(m, this.ctm);
+    // Tiling patterns and link annotations need the transform in effect so
+    // far, so it is tracked the way PDF composes it.
+    this.ctm = composeCtm(m, this.ctm);
   }
 
   /* ------------------------------------------------------------------ */
@@ -1024,7 +1070,10 @@ export class Renderer {
         this.context.obj({
           Type: 'Annot',
           Subtype: 'Link',
-          Rect: bbox,
+          // Annotations live in default page space, not in the current user
+          // space, so the box has to go through the CTM. That includes the
+          // root px->pt scale and y-flip as well as any element transforms.
+          Rect: transformBoxToPage(this.ctm, bbox),
           Border: [0, 0, 0],
           A: { S: 'URI', URI: PDFString.of(url) },
         }),

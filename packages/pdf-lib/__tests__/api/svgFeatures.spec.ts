@@ -1,4 +1,11 @@
-import { PDFContentStream, PDFDict, PDFDocument, PDFName, PDFRef } from '../../src/index';
+import {
+  PDFContentStream,
+  PDFDict,
+  PDFDocument,
+  PDFName,
+  PDFRef,
+  StandardFonts,
+} from '../../src/index';
 import type { PDFPage } from '../../src/index';
 
 const content = (page: PDFPage) => {
@@ -464,6 +471,39 @@ describe('PDFPage.drawSvg features', () => {
       expect(Object.values(resources(p, 'XObject')).join(' ')).toContain('/Subtype /Image');
       void reloadedDoc;
     }
+  });
+
+  it('places a text link over the text, in page coordinates', async () => {
+    // Annotations live in default page space, so the box has to go through the
+    // root scale and y-flip. In user space the text is at x 40..70.8, y 50.
+    const f = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    await page.drawSvg(
+      `<svg width="200" height="100">
+        <a href="https://example.com/">
+          <text x="40" y="50" font-family="Helvetica" font-size="16">click</text>
+        </a>
+      </svg>`,
+      { width: 200, height: 100, x: 20, y: 300 },
+    );
+
+    const annots = page.node.Annots();
+    expect(annots.size()).toBe(1);
+    const annot = page.node.context.lookup(annots.asArray()[0] as PDFRef);
+    const rect = (
+      /\/Rect \[([^\]]+)\]/.exec(String((annot as { toString(): string }).toString())) as RegExpExecArray
+    )[1]
+      .trim()
+      .split(/\s+/)
+      .map(Number);
+
+    // root CTM is translate(20, 300) then scale(0.75, -0.75)
+    const X = (u: number): number => 20 + u * 0.75;
+    const Y = (u: number): number => 300 - u * 0.75;
+    const width = f.widthOfTextAtSize('click', 16);
+    expect(rect[0]).toBeCloseTo(X(40), 2);
+    expect(rect[2]).toBeCloseTo(X(40 + width), 2);
+    expect(rect[1]).toBeCloseTo(Y(50 + 0.207 * 16), 1);
+    expect(rect[3]).toBeCloseTo(Y(50 - 0.718 * 16), 1);
   });
 
   it('converts a cmyk() paint to rgb before handing it to mapColor', async () => {
