@@ -248,6 +248,7 @@ export class Renderer {
   private readonly groupBBoxes: [number, number, number, number][] = [];
 
   private groupCounter = 0;
+  private alphaPatternCounter = 0;
   private gradientCounter = 0;
   private patternCounter = 0;
   private imageCounter = 0;
@@ -360,8 +361,21 @@ export class Renderer {
     this.paint(stroke());
   }
 
+  /**
+   * Fill and stroke the current path.
+   *
+   * This has to be a single `B`/`B*` operator: `f` terminates the path, so a
+   * following `S` would have nothing left to stroke.
+   */
   fillAndStroke(rule: 'nonzero' | 'evenodd'): void {
-    this.paint(rule === 'evenodd' ? fillEvenOdd() : fill(), stroke());
+    this.paint(
+      op(
+        this.context,
+        rule === 'evenodd'
+          ? PDFOperatorNames.FillEvenOddAndStroke
+          : PDFOperatorNames.FillNonZeroAndStroke,
+      ),
+    );
   }
 
   clip(rule: 'nonzero' | 'evenodd'): void {
@@ -785,7 +799,9 @@ export class Renderer {
         Matrix: gradient.matrix,
       }),
     );
-    return { name: '', ref };
+    // The alpha shading is referenced only from the soft-mask form's own
+    // Resources, so it is named there rather than on the current target.
+    return { name: `GSAP${++this.alphaPatternCounter}`, ref };
   }
 
   private createColorFunction(stops: GradientSpec['stops'], cmyk: boolean): PDFRef {
@@ -909,14 +925,28 @@ export class Renderer {
   /* Images                                                              */
   /* ------------------------------------------------------------------ */
 
-  /** Decode a data URI, or return `undefined` for unsupported sources. */
+  /** Decode a data URI or bare base64 payload, or return `undefined`. */
   loadImage(src: string): RasterImage | undefined {
-    const png = src.match(/^data:image\/png;base64,([A-Za-z0-9+/=]+)$/i);
-    if (png) return this.decode(() => decodePng(base64ToBytes(png[1])), 'PNG');
-    const jpeg = src.match(/^data:image\/(?:jpeg|jpg);base64,([A-Za-z0-9+/=]+)$/i);
-    if (jpeg) return this.decode(() => decodeJpeg(base64ToBytes(jpeg[1])), 'JPEG');
-    this.warn('svg4pdf-lib: unsupported raster image source');
-    return undefined;
+    // Both are accepted, for compatibility with the previous image path: the
+    // format comes from the media type when there is one, and is sniffed
+    // otherwise.
+    const dataUri = /^data:image\/(png|jpeg|jpg);base64,([A-Za-z0-9+/=\s]+)$/i.exec(src);
+    const bare = /^(?!data:)[A-Za-z0-9+/=\s]+$/.test(src.trim());
+    if (!dataUri && !bare) {
+      this.warn('svg4pdf-lib: unsupported raster image source');
+      return undefined;
+    }
+
+    const payload = (dataUri ? dataUri[2] : src).replace(/\s+/g, '');
+    const bytes = base64ToBytes(payload);
+    const declared = dataUri ? dataUri[1].toLowerCase() : undefined;
+    const isJpeg =
+      declared === 'jpeg' ||
+      declared === 'jpg' ||
+      (declared === undefined && bytes.length > 2 && bytes[0] === 0xff && bytes[1] === 0xd8);
+
+    if (isJpeg) return this.decode(() => decodeJpeg(bytes), 'JPEG');
+    return this.decode(() => decodePng(bytes), 'PNG');
   }
 
   private decode(load: () => RasterImage, kind: string): RasterImage | undefined {

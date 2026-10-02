@@ -147,6 +147,24 @@ export class Conversion {
     this.precision = Math.ceil(Math.max(1, options.precision ?? 0)) || 3;
   }
 
+  /**
+   * Paint-server elements currently being constructed, so an `href` chain that
+   * loops back on itself stops instead of recursing forever.
+   */
+  readonly paintServerStack: SvgNode[] = [];
+
+  /** Enter a paint server; returns false if it is already being built. */
+  pushPaintServer(node: SvgNode): boolean {
+    if (this.paintServerStack.includes(node)) return false;
+    this.paintServerStack.push(node);
+    return true;
+  }
+
+  popPaintServer(node: SvgNode): void {
+    const index = this.paintServerStack.lastIndexOf(node);
+    if (index >= 0) this.paintServerStack.splice(index, 1);
+  }
+
   warn(message: string): void {
     this.renderer.warn(message);
   }
@@ -908,9 +926,10 @@ export class SvgElemPattern extends SvgElemHasChildren implements PaintServer {
     super(obj, inherits, conversionRef);
     const target = this.getUrl('href') ?? this.getUrl('xlink:href');
     this.ref =
-      target && target.nodeName === obj.nodeName
+      target && target.nodeName === obj.nodeName && conversionRef.pushPaintServer(obj)
         ? new SvgElemPattern(target, inherits, fallback, conversionRef)
         : null;
+    conversionRef.popPaintServer(obj);
 
     // Attribute and child lookups fall through to the referenced pattern.
     this.baseAttr = super.attr.bind(this);
@@ -1029,9 +1048,10 @@ export class SvgElemGradient extends SvgElem implements PaintServer {
     this.allowedChildren = ['stop'];
     const target = this.getUrl('href') ?? this.getUrl('xlink:href');
     this.ref =
-      target && target.nodeName === obj.nodeName
+      target && target.nodeName === obj.nodeName && conversion.pushPaintServer(obj)
         ? new SvgElemGradient(target, inherits, fallback, conversion)
         : null;
+    conversion.popPaintServer(obj);
 
     this.baseAttr = super.attr.bind(this);
     this.attr = (key: string) => {
@@ -1101,11 +1121,8 @@ export class SvgElemGradient extends SvgElem implements PaintServer {
       x1 = this.getLength('x1', bBoxUnits ? 1 : this.getVWidth(), 0);
       x2 = this.getLength('x2', bBoxUnits ? 1 : this.getVWidth(), bBoxUnits ? 1 : this.getVWidth());
       y1 = this.getLength('y1', bBoxUnits ? 1 : this.getVHeight(), 0);
-      y2 = this.getLength(
-        'y2',
-        bBoxUnits ? 1 : this.getVHeight(),
-        bBoxUnits ? 1 : this.getVHeight(),
-      );
+      // Per spec the default gradient vector is horizontal.
+      y2 = this.getLength('y2', bBoxUnits ? 1 : this.getVHeight(), 0);
     } else {
       x2 = this.getLength(
         'cx',
@@ -1718,13 +1735,14 @@ export class SvgElemMask extends SvgElemHasChildren {
       w = this.getLength('width', this.getVWidth(), 1.2) * (bBox[2] - bBox[0]);
       h = this.getLength('height', this.getVHeight(), 1.2) * (bBox[3] - bBox[1]);
     }
+    // The mask region bounds the mask: content outside it does not contribute,
+    // so it is clipped away. The region is in the referring element's user
+    // space, i.e. before the maskContentUnits transform.
+    renderer.rect(x, y, w, h);
+    renderer.clip('nonzero');
     if (this.attr('maskContentUnits') === 'objectBoundingBox') {
       renderer.transform([bBox[2] - bBox[0], 0, 0, bBox[3] - bBox[1], bBox[0], bBox[1]]);
     }
-    void x;
-    void y;
-    void w;
-    void h;
     this.clip();
     this.drawChildren(false, true);
     renderer.restore();

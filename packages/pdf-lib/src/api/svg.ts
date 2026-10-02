@@ -1,9 +1,13 @@
-import { colorToComponents, componentsToColor, type Color, type RGB } from './colors.js';
+import { colorToComponents, componentsToColor, rgb, type Color, type RGB } from './colors.js';
 import type PDFFont from './PDFFont.js';
 import type PDFPage from './PDFPage.js';
 import type { PDFPageDrawSVGElementOptions, SvgColorMapper } from './PDFPageOptions.js';
 import { drawSvgToPage } from '../svg/convert.js';
 import type { ParsedColor, PaintKind } from '../svg/color.js';
+
+/** Convert 0-1 CMYK components to pdf-lib's 0-1 RGB. */
+const cmykToRgb = ([c, m, y, k]: [number, number, number, number]): RGB =>
+  rgb(1 - Math.min(1, c + k), 1 - Math.min(1, m + k), 1 - Math.min(1, y + k));
 
 /**
  * Adapt {@link SvgColorMapper} to the converter's color callback.
@@ -20,10 +24,16 @@ const toColorCallback =
     if (typeof components === 'string') return color;
     if (!mapColor) return color;
 
+    // `parsed.rgb` is always RGB, so a CMYK paint has to be converted first:
+    // its components are 0-1, not 0-255 like the converter's RGB form.
+    const rgb: RGB =
+      components.length === 4
+        ? cmykToRgb(components as [number, number, number, number])
+        : (componentsToColor(components, 1 / 255) as RGB);
     const mapped = mapColor({
       color: raw ?? '',
       parsed: {
-        rgb: componentsToColor(components.slice(0, 3), 1 / 255) as RGB,
+        rgb,
         alpha: alpha === 1 ? undefined : alpha,
       },
       kind: kind ?? 'fill',
@@ -39,12 +49,37 @@ const toColorCallback =
  * Resolve a CSS font family against the `fonts` option, falling back to the
  * page font the way the previous implementation did.
  */
+/**
+ * Resolve a CSS font family, weight and slant against the `fonts` option.
+ *
+ * Keys may carry a variant suffix (`Helvetica_bold_italic`), matching the
+ * lookup the previous implementation did, so callers keep working.
+ */
 const toFontCallback =
   (fonts: { [fontName: string]: PDFFont } | undefined, page: PDFPage) =>
-  (family: string): PDFFont => {
-    const normalized = family.toLowerCase().replace(/["']/g, '').split(',')[0].trim();
-    const found = (fonts && (fonts[normalized] ?? fonts[family])) || page.getFont()[0];
-    return found;
+  (family: string, bold: boolean, italic: boolean): PDFFont => {
+    // SVG font lists may be quoted and comma separated; the first family is
+    // the one to match, and it is matched case-insensitively as CSS requires.
+    const requested = family.toLowerCase().replace(/["']/g, '').split(',')[0].trim();
+    if (!fonts) return page.getFont()[0];
+
+    // Accept the keys both as written by the caller and lower-cased, so that
+    // `fonts: { Helvetica_bold }` and `fonts: { 'helvetica_bold' }` both work.
+    const names = Object.keys(fonts);
+    const match = (b: boolean, i: boolean): PDFFont | undefined => {
+      const wanted = `${requested}${b ? '_bold' : ''}${i ? '_italic' : ''}`;
+      const key = names.find((n) => n.toLowerCase() === wanted);
+      return key === undefined ? undefined : fonts[key];
+    };
+    const prefixed = names.find((name) => name.toLowerCase().startsWith(requested));
+    return (
+      match(bold, italic) ??
+      match(bold, false) ??
+      match(false, italic) ??
+      match(false, false) ??
+      (prefixed ? fonts[prefixed] : undefined) ??
+      page.getFont()[0]
+    );
   };
 
 /**

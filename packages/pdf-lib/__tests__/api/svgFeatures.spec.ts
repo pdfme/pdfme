@@ -335,6 +335,157 @@ describe('PDFPage.drawSvg features', () => {
     expect(Object.values(resources(page, 'XObject')).join(' ')).toContain('/Subtype /Image');
   });
 
+  it('strokes a shape that also has a fill', async () => {
+    // `f` terminates the PDF path, so `f` followed by `S` loses the stroke.
+    // fill and stroke have to be a single `B`/`B*`.
+    await page.drawSvg(
+      `<svg width="40" height="40">
+        <rect x="5" y="5" width="30" height="30" fill="red" stroke="blue" stroke-width="4"/>
+      </svg>`,
+      { width: 40, height: 40 },
+    );
+
+    const stream = content(page);
+    expect(stream).toMatch(/\nB\n/);
+    expect(stream).not.toMatch(/\nf\n/);
+    expect(stream).not.toMatch(/\nS\n/);
+  });
+
+  it('selects a bold or italic font from the fonts option', async () => {
+    // The old implementation matched `family_bold`, `family_italic` keys, so
+    // callers rely on that naming.
+    const regular = await pdfDoc.embedFont('Helvetica');
+    const bold = await pdfDoc.embedFont('Helvetica-Bold');
+    await page.drawSvg(
+      `<svg width="100" height="100">
+        <text x="10" y="50" font-family="F" font-weight="bold">B</text>
+        <text x="10" y="90" font-family="F">R</text>
+      </svg>`,
+      { width: 100, height: 100, fonts: { F: regular, F_bold: bold } },
+    );
+
+    const fonts = page.node.Resources()?.get(PDFName.of('Font'));
+    const refOf = (name: string): string => String(fonts.get(PDFName.of(name)));
+    const used = [...content(page).matchAll(/\/(Font-\d+) [\d.]+ Tf/g)].map((m) => m[1]);
+    expect(used).toHaveLength(2);
+    expect(refOf(used[0])).toBe(bold.ref.toString());
+    expect(refOf(used[1])).toBe(regular.ref.toString());
+  });
+
+  it('runs a coordinate-less linearGradient horizontally', async () => {
+    await page.drawSvg(
+      `<svg width="40" height="40">
+        <defs><linearGradient id="g"><stop offset="0" stop-color="red"/><stop offset="1" stop-color="blue"/></linearGradient></defs>
+        <rect width="40" height="40" fill="url(#g)"/>
+      </svg>`,
+      { width: 40, height: 40 },
+    );
+
+    let coords: string | undefined;
+    for (const [, object] of page.node.context.enumerateIndirectObjects()) {
+      const match = /\/Coords \[ ([^\]]+)\]/.exec(String((object as { toString(): string }).toString()).replace(/\s+/g, ' '));
+      if (match) {
+        coords = match[1];
+        break;
+      }
+    }
+    expect(coords).toBeDefined();
+    expect(coords!.trim().split(/\s+/).map(Number)).toEqual([0, 0, 1, 0]);
+  });
+
+  it('clips mask content to the mask region', async () => {
+    await page.drawSvg(
+      `<svg width="60" height="60">
+        <defs>
+          <mask id="m" x="0" y="0" width="20" height="20" maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="60" height="60" fill="white"/>
+          </mask>
+        </defs>
+        <rect width="60" height="60" fill="black" mask="url(#m)"/>
+      </svg>`,
+      { width: 60, height: 60 },
+    );
+
+    let body = '';
+    const states = page.node.Resources()!.get(PDFName.of('ExtGState')) as unknown as {
+      entries(): Iterable<[unknown, unknown]>;
+    };
+    for (const [, value] of states.entries()) {
+      const resolved = value instanceof PDFRef ? page.node.context.lookup(value) : value;
+      const ref = /\/G (\d+) 0 R/.exec(String((resolved as { toString(): string }).toString()));
+      if (!ref) continue;
+      for (const [objRef, object] of page.node.context.enumerateIndirectObjects()) {
+        if (
+          objRef.objectNumber === Number(ref[1]) &&
+          typeof (object as { getContentsString?: () => string }).getContentsString === 'function'
+        ) {
+          body = (object as { getContentsString: () => string }).getContentsString();
+        }
+      }
+    }
+    // The region is clipped away before the mask's own content is painted.
+    expect(body).toMatch(/0 0 20 20 re\nW\nn/);
+  });
+
+  it('does not overflow the stack on cyclic gradient or pattern href', async () => {
+    await expect(
+      page.drawSvg(
+        `<svg width="20" height="20">
+          <defs>
+            <linearGradient id="a" href="#b"><stop offset="0" stop-color="red"/></linearGradient>
+            <linearGradient id="b" href="#a"><stop offset="1" stop-color="blue"/></linearGradient>
+            <pattern id="p1" width="10" height="10" patternUnits="userSpaceOnUse" href="#p2">
+              <rect width="5" height="5" fill="red"/>
+            </pattern>
+            <pattern id="p2" width="10" height="10" patternUnits="userSpaceOnUse" href="#p1">
+              <rect width="5" height="5" fill="blue"/>
+            </pattern>
+          </defs>
+          <rect width="20" height="20" fill="url(#a)"/>
+          <rect y="10" width="20" height="10" fill="url(#p1)"/>
+        </svg>`,
+        { width: 20, height: 20 },
+      ),
+    ).resolves.not.toThrow();
+  });
+
+  it('embeds an image given as a bare base64 payload', async () => {
+    const bare =
+      'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAABRJREFUGFdjZGBg+M+ACB4z4lPAAgA2yQP7lW6i6QAAAABJRU5ErkJggg==';
+
+    for (const href of [bare, `data:image/png;base64,${bare}`]) {
+      const d = await PDFDocument.create();
+      const p = d.addPage([200, 200]);
+      await p.drawSvg(
+        `<svg width="40" height="40"><image href="${href}" x="0" y="0" width="40" height="40"/></svg>`,
+        { width: 40, height: 40 },
+      );
+      const reloadedDoc = await PDFDocument.load(await d.save());
+      expect(Object.values(resources(p, 'XObject')).join(' ')).toContain('/Subtype /Image');
+      void reloadedDoc;
+    }
+  });
+
+  it('converts a cmyk() paint to rgb before handing it to mapColor', async () => {
+    let seen: { red: number; green: number; blue: number } | undefined;
+    await page.drawSvg(
+      `<svg width="20" height="20"><rect width="20" height="20" fill="cmyk(0, 100, 100, 0)"/></svg>`,
+      {
+        width: 20,
+        height: 20,
+        mapColor: ({ parsed }) => {
+          seen = parsed.rgb;
+          return undefined;
+        },
+      },
+    );
+
+    // cmyk(0, 100%, 100%, 0) is red.
+    expect(seen!.red).toBeCloseTo(1, 6);
+    expect(seen!.green).toBeCloseTo(0, 6);
+    expect(seen!.blue).toBeCloseTo(0, 6);
+  });
+
   it('positions the drawing by its top edge, as before', async () => {
     await page.drawSvg(`<svg width="20" height="20"><rect width="20" height="20" fill="red"/></svg>`, {
       x: 30,
