@@ -28,6 +28,7 @@ import {
   setupUIMock,
 } from '../assets/helper';
 import { text, image, multiVariableText, table } from '@pdfme/schemas';
+import { emitFormWatch, useForm } from 'form-render';
 import * as uiHelper from '../../src/helper';
 
 const plugins = { text, image };
@@ -920,7 +921,8 @@ const mountPublicDesigner = async (template: Template, designerPlugins: Plugins 
 };
 
 test('undo after editing another page restores that page and redo lands there (#1397)', async () => {
-  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(getTwoPageTemplate());
+  const { designer, domContainer, events, cleanup } =
+    await mountPublicDesigner(getTwoPageTemplate());
 
   try {
     await waitFor(() => {
@@ -1120,9 +1122,8 @@ test('undo landing on another page drops a selection from the page that was show
 });
 
 test('page add and delete are undoable and redo lands on the changed page', async () => {
-  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(
-    getOnePageBlankTemplate(),
-  );
+  const { designer, domContainer, events, cleanup } =
+    await mountPublicDesigner(getOnePageBlankTemplate());
   const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
 
   try {
@@ -1470,7 +1471,8 @@ test('a renderer height sync leaves an existing redo in place', async () => {
 });
 
 test('deep-equal no-op commits are skipped and preserve redo', async () => {
-  const { designer, domContainer, events, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+  const { designer, domContainer, events, cleanup } =
+    await mountPublicDesigner(getOnePageBlankTemplate());
 
   try {
     await waitFor(() => {
@@ -1525,6 +1527,91 @@ test('synced height is rounded like Moveable so an unrounded sync is a no-op', a
     expect(events).toEqual([]);
     expect(heightOfType(designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
     expect(heightOfType(designer.getTemplate(), 'syncHeight')).not.toBe(RAW_SYNC_HEIGHT);
+  } finally {
+    cleanup();
+  }
+});
+
+const getResizeFieldTemplate = (): Template => ({
+  basePdf: BLANK_A4_PDF,
+  schemas: [[{ ...textField('field1', 'hello'), width: 45, height: 10 }]],
+});
+
+const resizeSelectedField = async () => {
+  const handle = await waitFor(() => {
+    const control = document.querySelector('.moveable-control.moveable-se');
+    if (!(control instanceof HTMLElement)) {
+      throw new Error('southeast resize handle was not found');
+    }
+    return control;
+  });
+
+  // jsdom has no layout hit testing. Moveable calls elementFromPoint while dragging a control.
+  const originalElementFromPoint = document.elementFromPoint;
+  document.elementFromPoint = () => handle;
+  try {
+    fireEvent.mouseDown(handle, { clientX: 200, clientY: 200, button: 0, buttons: 1 });
+    fireEvent.mouseMove(window, { clientX: 280, clientY: 250, button: 0, buttons: 1 });
+    fireEvent.mouseMove(window, { clientX: 360, clientY: 300, button: 0, buttons: 1 });
+    fireEvent.mouseUp(window, { clientX: 360, clientY: 300, button: 0, buttons: 1 });
+  } finally {
+    if (originalElementFromPoint) document.elementFromPoint = originalElementFromPoint;
+    else Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+};
+
+const selectField1 = async (domContainer: HTMLElement) => {
+  await waitFor(() => {
+    expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+  });
+  clickFieldInList(domContainer, 'field1');
+  await waitFor(() => {
+    expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    expect(useForm().getValues().width).toBe(45);
+    expect(useForm().getValues().height).toBe(10);
+  });
+};
+
+test('Moveable resize re-syncs the prop panel form (#1654)', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+
+  try {
+    await selectField1(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(45);
+      expect(useForm().getValues().width).toBe(field.width);
+      expect(useForm().getValues().height).toBe(field.height);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('editing a panel property after a Moveable resize keeps the new size (#1654/#1645)', async () => {
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+
+  try {
+    await selectField1(domContainer);
+    await resizeSelectedField();
+
+    const resized = await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(45);
+      return { width: field.width, height: field.height };
+    });
+
+    emitFormWatch({ fontSize: 20 });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
+
+    const field = designer.getTemplate().schemas[0][0];
+    expect(field.fontSize).toBe(20);
+    expect(field.width).toBe(resized.width);
+    expect(field.height).toBe(resized.height);
   } finally {
     cleanup();
   }
