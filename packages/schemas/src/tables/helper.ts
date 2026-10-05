@@ -194,3 +194,55 @@ export const getBodyWithSchemaRange = (
   schema: TableSchema,
   range = getTableBodyRange(schema),
 ) => getBodyWithRange(value, range);
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const prototype: unknown = Object.getPrototypeOf(value);
+  return prototype === Object.prototype || prototype === null;
+};
+
+// Column indexes are canonical decimal keys ("0", "1", "10"), not "01" or "1.5".
+const columnIndexFromKey = (key: string): number | undefined => {
+  if (!/^(0|[1-9]\d*)$/.test(key)) return undefined;
+  const index = Number(key);
+  return Number.isSafeInteger(index) ? index : undefined;
+};
+
+// A per-column map is a plain object keyed only by column index.
+// Other values stay untouched so non-map columnStyles fields are not rewritten.
+const isColumnIndexMap = (value: unknown): value is Record<string, unknown> => {
+  if (!isPlainObject(value)) return false;
+  return Object.keys(value).every((key) => columnIndexFromKey(key) !== undefined);
+};
+
+const remapColumnIndexMap = (
+  columnMap: Record<string, unknown>,
+  removedIndex: number,
+): Record<string, unknown> => {
+  const remapped: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(columnMap)) {
+    const columnIndex = columnIndexFromKey(key);
+    if (columnIndex === undefined || columnIndex === removedIndex) continue;
+    const nextIndex = columnIndex > removedIndex ? columnIndex - 1 : columnIndex;
+    remapped[nextIndex] = value;
+  }
+  return remapped;
+};
+
+// Per-column style maps are keyed by column index. Every map on columnStyles
+// — including keys this version does not define, such as fontName or image
+// cell settings — must drop the removed column and close the gap. Values that
+// are not column-index maps are preserved unchanged.
+export const remapColumnStylesOnRemove = (
+  columnStyles: TableSchema['columnStyles'],
+  removedIndex: number,
+): TableSchema['columnStyles'] => {
+  const source = columnStyles as Record<string, unknown>;
+  const next: Record<string, unknown> = {};
+  for (const [styleKey, styleValue] of Object.entries(source)) {
+    next[styleKey] = isColumnIndexMap(styleValue)
+      ? remapColumnIndexMap(styleValue, removedIndex)
+      : styleValue;
+  }
+  return next as TableSchema['columnStyles'];
+};

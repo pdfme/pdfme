@@ -1,6 +1,7 @@
 import { getDefaultFont } from '@pdfme/common';
 import type { Schema } from '@pdfme/common';
 import { describe, expect, test } from 'vitest';
+import { remapColumnStylesOnRemove } from '../src/tables/helper.js';
 import { createSingleTable } from '../src/tables/tableHelper.js';
 import type { TableSchema } from '../src/tables/types.js';
 
@@ -127,5 +128,128 @@ describe('createSingleTable style merge', () => {
     expect(bodyCell.styles.lineWidth).toEqual({ top: 0.6, right: 0.7, bottom: 0.8, left: 0.9 });
 
     expectFiniteGeometry(table);
+  });
+});
+
+type ColumnStylesWithExtras = TableSchema['columnStyles'] & Record<string, unknown>;
+
+const asColumnStyles = (value: Record<string, unknown>): ColumnStylesWithExtras =>
+  value as ColumnStylesWithExtras;
+
+describe('remapColumnStylesOnRemove', () => {
+  test('moves alignment from column 2 to column 1 when the first column is removed', () => {
+    const columnStyles = asColumnStyles({
+      alignment: { 0: 'left', 1: 'center', 2: 'right' },
+    });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 0)).toEqual({
+      alignment: { 0: 'center', 1: 'right' },
+    });
+  });
+
+  test('keeps a trailing alignment on the same column after the first column is removed', () => {
+    const columnStyles = asColumnStyles({ alignment: { 2: 'right' } });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 0)).toEqual({
+      alignment: { 1: 'right' },
+    });
+  });
+
+  test('closes the gap when a middle column is removed', () => {
+    const columnStyles = asColumnStyles({
+      alignment: { 0: 'left', 1: 'center', 2: 'right' },
+    });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 1)).toEqual({
+      alignment: { 0: 'left', 1: 'right' },
+    });
+  });
+
+  test('drops the last column style and leaves earlier indexes in place', () => {
+    const columnStyles = asColumnStyles({
+      alignment: { 0: 'left', 1: 'center', 2: 'right' },
+    });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 2)).toEqual({
+      alignment: { 0: 'left', 1: 'center' },
+    });
+  });
+
+  test('shifts sparse maps across a missing index', () => {
+    const columnStyles = asColumnStyles({
+      alignment: { 0: 'left', 3: 'right' },
+    });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 1)).toEqual({
+      alignment: { 0: 'left', 2: 'right' },
+    });
+    expect(remapColumnStylesOnRemove(columnStyles, 0)).toEqual({
+      alignment: { 2: 'right' },
+    });
+    expect(remapColumnStylesOnRemove(columnStyles, 3)).toEqual({
+      alignment: { 0: 'left' },
+    });
+    expect(remapColumnStylesOnRemove(columnStyles, 5)).toEqual({
+      alignment: { 0: 'left', 3: 'right' },
+    });
+  });
+
+  test('remaps unknown column style keys with the same index rule', () => {
+    const columnStyles = asColumnStyles({
+      alignment: { 2: 'right' },
+      fontName: { 0: 'Roboto', 2: 'Noto Sans' },
+      cellType: { 1: 'image', 2: 'text' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 12, 2: 0 },
+    });
+
+    expect(remapColumnStylesOnRemove(columnStyles, 0)).toEqual({
+      alignment: { 1: 'right' },
+      fontName: { 1: 'Noto Sans' },
+      cellType: { 0: 'image', 1: 'text' },
+      imageHeightMode: { 0: 'fixed' },
+      imageHeight: { 0: 12, 1: 0 },
+    });
+  });
+
+  test('preserves non-map values and does not mutate the input', () => {
+    const meta = { label: 'not-a-column-map' };
+    const tags = ['keep'];
+    const columnStyles = asColumnStyles({
+      alignment: { 0: 'left', 2: 'right' },
+      legacyFlag: true,
+      note: 'keep',
+      count: 3,
+      empty: null,
+      tags,
+      meta,
+    });
+    Object.freeze(columnStyles.alignment);
+    Object.freeze(columnStyles);
+
+    const result = asColumnStyles(remapColumnStylesOnRemove(columnStyles, 0));
+
+    expect(result).toEqual({
+      alignment: { 1: 'right' },
+      legacyFlag: true,
+      note: 'keep',
+      count: 3,
+      empty: null,
+      tags,
+      meta,
+    });
+    expect(result).not.toBe(columnStyles);
+    expect(result.alignment).not.toBe(columnStyles.alignment);
+    expect(result.meta).toBe(meta);
+    expect(result.tags).toBe(tags);
+    expect(columnStyles).toEqual({
+      alignment: { 0: 'left', 2: 'right' },
+      legacyFlag: true,
+      note: 'keep',
+      count: 3,
+      empty: null,
+      tags,
+      meta,
+    });
   });
 });
