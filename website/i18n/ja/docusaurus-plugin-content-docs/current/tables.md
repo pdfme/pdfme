@@ -171,9 +171,9 @@ generate({
 `imageHeightMode` と `imageHeight` は別々に保存されるので、`fixed` と `auto` を切り替えてもミリメートルの値は消えません。
 
 - `fixed`（既定）は、その列のすべてのセルを同じ画像の高さにします。`imageHeight` を省略したとき、または 0 より大きい有限の数でないときは 20mm です。空や無効な値でもこの高さを保つので、行はつぶれず、改ページが予測しやすくなります。20mm なら、既定の 1 行が 1 ページを超えることもありません。
-- `auto` の画像の高さは `内側の幅 × 画像の高さ / 画像の幅` です。空や無効な値の画像の高さは 0 で、行の高さは他のセルに従います。空白の `basePdf` では、行、ヘッダ（`showHead` が true のとき）、セルの上下の padding と border、0.5mm の余白がページの内容領域に収まるように高さを上限で切ります。カスタム PDF の `basePdf` は折り返さないので、この上限は使いません。
+- `auto` の画像の高さは `内側の幅 × 画像の高さ / 画像の幅` です。空や無効な値の画像の高さは 0 で、行の高さは他のセルに従います。空白の `basePdf` では、行、ヘッダ（`showHead` が true のとき）、セルの上下の padding と border、1mm の余白がページの内容領域に収まるように高さを上限で切ります。カスタム PDF の `basePdf` は折り返さないので、この上限は使いません。
 
-描画されるのは `data:image/png;base64,...` と `data:image/jpeg;base64,...`（または `image/jpg`）だけです。`http` の URL、gif、webp、svg、それ以外の文字列、壊れた base64 は描きません。`null` はサポート外です。描かず、警告も出しません。`""` も同じです。ヘッダは読めても埋め込めない PNG / JPEG も、同じようにスキップします。それ以外の無効な値は、値ごとに 1 回だけ次の警告を出します。
+描画されるのは `data:image/png;base64,...` と `data:image/jpeg;base64,...`（または `image/jpg`）だけです。`http` の URL、gif、webp、svg、それ以外の文字列、壊れた base64 は描きません。`null` はサポート外です。描かず、警告も出しません。`""` も同じです。ヘッダは読めても埋め込みに失敗した PNG / JPEG は、警告を 1 回出してスキップします。それ以外の無効な値は、値ごとに 1 回だけ次の警告を出します。
 
 ```text
 [@pdfme/schemas/table] unsupported image in column N; only PNG/JPEG data URL is supported

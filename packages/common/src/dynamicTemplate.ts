@@ -187,6 +187,7 @@ function placeUnitsOnPages(
     ) {
       currentUnitIndex = 0;
       if (pages[currentPageIndex].length === 0) {
+        // Only avoidFirstUnitOnly layouts (tables) reach this restart.
         currentYInPage = 0;
       } else {
         currentPageIndex++;

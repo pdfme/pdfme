@@ -49,6 +49,8 @@ export const getDynamicHeightsForTable = async (
   );
   const headRowCount = schema.showHead ? table.head.length : 0;
   const SAFETY_MARGIN = 0.5;
+  // Same tolerance as placeUnitsOnPages in @pdfme/common.
+  const EPSILON = 0.01;
 
   let currentPageIndex = initialPageIndex;
   let currentPageY = schema.position.y;
@@ -73,7 +75,7 @@ export const getDynamicHeightsForTable = async (
         !headerTravelsWithBody;
       const totalRowHeight = rowHeight + (needsHeader ? headerHeight : 0);
 
-      if (totalRowHeight > remainingHeight - SAFETY_MARGIN) {
+      if (totalRowHeight > remainingHeight - SAFETY_MARGIN + EPSILON) {
         if (rowsOnCurrentPage === 0 && Math.abs(currentPageY - currentPageStartY) < SAFETY_MARGIN) {
           result.push(totalRowHeight);
           currentPageY += totalRowHeight;

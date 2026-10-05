@@ -2,7 +2,7 @@ import { Buffer } from 'buffer';
 import { afterEach } from 'vitest';
 import { getDefaultFont, getDynamicTemplate, type Schema, type Template } from '@pdfme/common';
 import { PDFDocument } from '@pdfme/pdf-lib';
-import { getDynamicLayoutForTable, table, text } from '@pdfme/schemas';
+import { getDynamicHeightsForTable, getDynamicLayoutForTable, table, text } from '@pdfme/schemas';
 import { createBoxDimension } from '../../schemas/src/box.js';
 import { getTableBodyRange } from '../../schemas/src/splitRange.js';
 import { getBodyWithSchemaRange } from '../../schemas/src/tables/helper.js';
@@ -60,10 +60,7 @@ const imageTableSchema = (overrides: Partial<TableSchema> = {}): TableSchema =>
 
 describe('table image columns', () => {
   test('repeats the head when fixed 20mm rows cross a page', async () => {
-    const body = Array.from({ length: 20 }, (_, index) => [
-      `Row ${index + 1}`,
-      WIDE_3_1_PNG,
-    ]);
+    const body = Array.from({ length: 20 }, (_, index) => [`Row ${index + 1}`, WIDE_3_1_PNG]);
     const schema = imageTableSchema({
       content: JSON.stringify(body),
       columnStyles: { alignment: { 1: 'center' }, cellType: { 1: 'image' } },
@@ -262,6 +259,11 @@ describe('table image column page breaks', () => {
     ['Two', TALL_1_3_PNG],
   ];
 
+  const defaultStyles = () => ({
+    headStyles: structuredClone(table.propPanel.defaultSchema.headStyles),
+    bodyStyles: structuredClone(table.propPanel.defaultSchema.bodyStyles),
+  });
+
   const cappedSchema = (repeatHead: boolean): TableSchema =>
     imageTableSchema({
       content: JSON.stringify(tallBody),
@@ -269,6 +271,7 @@ describe('table image column page breaks', () => {
       width: 160,
       headWidthPercentages: [25, 75],
       repeatHead,
+      ...defaultStyles(),
       columnStyles: {
         cellType: { 1: 'image' },
         imageHeightMode: { 1: 'auto' },
@@ -315,6 +318,42 @@ describe('table image column page breaks', () => {
       }
     },
   );
+
+  test('keeps a default-style capped auto row with its header when the table starts below the page top', async () => {
+    const body = [['One', TALL_1_3_PNG]];
+    const schema = imageTableSchema({
+      content: JSON.stringify(body),
+      position: { x: 15, y: 20 },
+      width: 180,
+      headWidthPercentages: [30, 70],
+      repeatHead: true,
+      ...defaultStyles(),
+      columnStyles: {
+        cellType: { 1: 'image' },
+        imageHeightMode: { 1: 'auto' },
+      },
+    });
+    const template: Template = {
+      basePdf: { width: 210, height: 297, padding: [15, 15, 15, 15] },
+      schemas: [[schema]],
+    };
+    const input = { items: JSON.stringify(body) };
+    const heights = await getDynamicHeightsForTable(input.items, {
+      schema,
+      basePdf: template.basePdf,
+      options: { font: FONT },
+      _cache: new Map(),
+    });
+    const dynamicTemplate = await layoutTemplate(template, input);
+    const pdf = await generatePages(template, input);
+    const pageContentHeight = 297 - 15 - 15;
+
+    expect(heights.length).toBe(2);
+    expect(heights[0] + heights[1]).toBeLessThan(pageContentHeight);
+    expect(pdf.getPageCount()).toBe(1);
+    expect(pdf.getPageCount()).toBe(dynamicTemplate.schemas.length);
+    expect(dynamicTemplate.schemas[0].find((item) => item.name === 'items')?.position.y).toBe(15);
+  });
 
   test('does not emit a blank or header-only page when a capped row starts below the page top', async () => {
     const input = { items: JSON.stringify(tallBody) };

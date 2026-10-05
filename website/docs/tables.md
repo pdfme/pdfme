@@ -171,9 +171,9 @@ A column can opt in to images. Columns without `cellType` stay text, and existin
 `imageHeightMode` and `imageHeight` are stored separately, so switching between `fixed` and `auto` does not clear the millimeter value.
 
 - `fixed` (the default) gives every cell in the column the same image height. That height is 20mm when `imageHeight` is omitted or is not a finite number greater than 0. Empty and invalid values keep that height, so the row does not collapse and page breaks stay predictable. 20mm also keeps a single default row from growing past one page.
-- `auto` sets the image height to `inner width × image height / image width`. An empty or invalid value contributes no image height, and the row follows the other cells. On a blank `basePdf`, the height is capped so the row, the header (when `showHead` is true), the cell's vertical padding and border, and a 0.5mm margin still fit in the page content box. A custom PDF `basePdf` is not reflowed, so that cap is not applied.
+- `auto` sets the image height to `inner width × image height / image width`. An empty or invalid value contributes no image height, and the row follows the other cells. On a blank `basePdf`, the height is capped so the row, the header (when `showHead` is true), the cell's vertical padding and border, and a 1mm margin still fit in the page content box. A custom PDF `basePdf` is not reflowed, so that cap is not applied.
 
-Only `data:image/png;base64,...` and `data:image/jpeg;base64,...` (or `image/jpg`) are drawn. `http` URLs, gif, webp, svg, any other string, and broken base64 are not drawn. `null` is unsupported: it is not drawn and does not warn. `""` is the same. A PNG or JPEG whose header is readable but whose bytes cannot be embedded is skipped the same way. Any other invalid value logs this warning once per distinct value:
+Only `data:image/png;base64,...` and `data:image/jpeg;base64,...` (or `image/jpg`) are drawn. `http` URLs, gif, webp, svg, any other string, and broken base64 are not drawn. `null` is unsupported: it is not drawn and does not warn. `""` is the same. A PNG or JPEG whose header is readable but whose bytes fail during embedding is skipped, and the warning below is logged once. Any other invalid value logs this warning once per distinct value:
 
 ```text
 [@pdfme/schemas/table] unsupported image in column N; only PNG/JPEG data URL is supported
