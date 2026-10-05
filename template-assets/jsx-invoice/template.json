@@ -304,7 +304,8 @@
           "company",
           "name",
           "email"
-        ]
+        ],
+        "contentSnapshot": true
       },
       {
         "name": "box_2",
