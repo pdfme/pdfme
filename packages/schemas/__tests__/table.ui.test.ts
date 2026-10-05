@@ -84,6 +84,10 @@ describe('table column removal', () => {
       expect.arrayContaining([
         { key: 'head', value: ['City', 'Description'] },
         {
+          key: 'headWidthPercentages',
+          value: [expect.closeTo(42.857142857, 5), expect.closeTo(57.142857143, 5)],
+        },
+        {
           key: 'content',
           value: JSON.stringify([
             ['New York', 'Designer'],

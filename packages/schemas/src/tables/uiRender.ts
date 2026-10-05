@@ -374,7 +374,10 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
               key: 'content',
               value: JSON.stringify(bodyWidthRange.map((row) => row.filter((_, j) => j !== i))),
             },
-            { key: 'columnStyles', value: remapColumnStylesOnRemove(schema.columnStyles, i) },
+            {
+              key: 'columnStyles',
+              value: remapColumnStylesOnRemove(schema.columnStyles ?? {}, i),
+            },
           ]);
         },
       });

@@ -215,6 +215,7 @@ describe('remapColumnStylesOnRemove', () => {
   test('preserves non-map values and does not mutate the input', () => {
     const meta = { label: 'not-a-column-map' };
     const tags = ['keep'];
+    const mixed = { 0: 'left', label: 'stay' };
     const columnStyles = asColumnStyles({
       alignment: { 0: 'left', 2: 'right' },
       legacyFlag: true,
@@ -223,6 +224,7 @@ describe('remapColumnStylesOnRemove', () => {
       empty: null,
       tags,
       meta,
+      mixed,
     });
     Object.freeze(columnStyles.alignment);
     Object.freeze(columnStyles);
@@ -237,11 +239,13 @@ describe('remapColumnStylesOnRemove', () => {
       empty: null,
       tags,
       meta,
+      mixed,
     });
     expect(result).not.toBe(columnStyles);
     expect(result.alignment).not.toBe(columnStyles.alignment);
     expect(result.meta).toBe(meta);
     expect(result.tags).toBe(tags);
+    expect(result.mixed).toBe(mixed);
     expect(columnStyles).toEqual({
       alignment: { 0: 'left', 2: 'right' },
       legacyFlag: true,
@@ -250,6 +254,12 @@ describe('remapColumnStylesOnRemove', () => {
       empty: null,
       tags,
       meta,
+      mixed,
     });
+  });
+
+  test('treats missing columnStyles as an empty object', () => {
+    expect(remapColumnStylesOnRemove(undefined, 0)).toEqual({});
+    expect(remapColumnStylesOnRemove(null, 1)).toEqual({});
   });
 });

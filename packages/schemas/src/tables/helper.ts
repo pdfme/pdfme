@@ -208,8 +208,8 @@ const columnIndexFromKey = (key: string): number | undefined => {
   return Number.isSafeInteger(index) ? index : undefined;
 };
 
-// A per-column map is a plain object keyed only by column index.
-// Other values stay untouched so non-map columnStyles fields are not rewritten.
+// Treat a value as a per-column map only when every key is a column index.
+// A map that mixes in any non-numeric key is left unchanged.
 const isColumnIndexMap = (value: unknown): value is Record<string, unknown> => {
   if (!isPlainObject(value)) return false;
   return Object.keys(value).every((key) => columnIndexFromKey(key) !== undefined);
@@ -234,9 +234,10 @@ const remapColumnIndexMap = (
 // cell settings — must drop the removed column and close the gap. Values that
 // are not column-index maps are preserved unchanged.
 export const remapColumnStylesOnRemove = (
-  columnStyles: TableSchema['columnStyles'],
+  columnStyles: TableSchema['columnStyles'] | null | undefined,
   removedIndex: number,
 ): TableSchema['columnStyles'] => {
+  if (columnStyles == null) return {};
   const source = columnStyles as Record<string, unknown>;
   const next: Record<string, unknown> = {};
   for (const [styleKey, styleValue] of Object.entries(source)) {
