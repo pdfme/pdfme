@@ -31,7 +31,7 @@ This builds the playground locally and publishes `dist` with gh-pages to the `pl
 `SENTRY_AUTH_TOKEN` and `VITE_SENTRY_DSN` are both read at that local build, from `playground/.env` (see `.env.example`; `.env` is gitignored), mode-specific files such as `.env.production`, or exported environment variables.
 
 - `SENTRY_AUTH_TOKEN` turns on source maps and the Sentry upload plugin. With no token, the build emits no source maps and skips the plugin.
-- `VITE_SENTRY_DSN` is inlined as `import.meta.env.VITE_SENTRY_DSN`. `src/index.tsx` calls `Sentry.init` only when it is set.
+- `VITE_SENTRY_DSN` is inlined as `import.meta.env.VITE_SENTRY_DSN`. `playground/src/index.tsx` calls `Sentry.init` only when it is set.
 
 ---
 
