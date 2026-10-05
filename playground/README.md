@@ -18,6 +18,18 @@ $ npm run dev
 If you are developing a pdfme library, please refer to the following document.
 https://github.com/pdfme/pdfme/blob/main/DEVELOPMENT.md
 
+### Deploy
+
+From the repo root:
+
+```bash
+npm --prefix playground run deploy
+```
+
+This builds the playground and publishes `dist` with gh-pages to the `playground` branch, which Vercel serves as static files.
+
+Source maps are uploaded to Sentry only when `SENTRY_AUTH_TOKEN` is set. Put it in `playground/.env` (see `.env.example`; `.env` is gitignored) or export it in the environment. `vite build` also reads mode-specific files such as `.env.production`. Without a token, the build emits no source maps and skips the Sentry plugin.
+
 ---
 
 ## How to Add Sample Templates
