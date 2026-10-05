@@ -64,8 +64,13 @@
     "typescript": "^7.0.2",
     "vite": "^8.3.1",
     "vite-plus": "^0.3.0",
-    "vitest": "^4.1.10",
+    "vitest": "^5.0.3",
     "vitest-image-snapshot": "^0.6.52"
   },
-  "packageManager": "npm@11.12.1"
+  "packageManager": "npm@11.12.1",
+  "overrides": {
+    "vitest-image-snapshot": {
+      "vitest": "$vitest"
+    }
+  }
 }
