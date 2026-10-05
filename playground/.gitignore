@@ -31,5 +31,7 @@ scripts/authoring-starter-asset-hash-map.json
 scripts/thumbnail-hash-map.json
 e2e-error-screenshot.png
 .env
+.env.*
+!.env.example
 # Sentry Config File
 .env.sentry-build-plugin

@@ -266,15 +266,6 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       { key: 'width', value: fmt(width), schemaId: id },
       { key: 'height', value: fmt(height), schemaId: id },
     ]);
-
-    const targetSchema = schemasList[pageCursor].find((schema) => schema.id === id);
-
-    if (!targetSchema) return;
-
-    targetSchema.position.x = fmt(left);
-    targetSchema.position.y = fmt(top);
-    targetSchema.width = fmt(width);
-    targetSchema.height = fmt(height);
   };
 
   const onResizeEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
