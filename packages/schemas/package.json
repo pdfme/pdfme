@@ -96,7 +96,6 @@
   },
   "devDependencies": {
     "@pdfme/common": "*",
-    "@types/bwip-js": "^3.2.1",
     "@types/fontkit": "^2.0.9",
     "@types/pngjs": "^6.0.2",
     "csstype": "^3.2.3",
