@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => {
   const sentryAuthToken = env.SENTRY_AUTH_TOKEN || process.env.SENTRY_AUTH_TOKEN;
 
   return {
+    // Client env files (VITE_SENTRY_DSN) load from the same directory as loadEnv.
+    envDir: playgroundDir,
     build: {
       target: 'esnext',
       // Source maps are only needed for the Sentry upload; emitting them without a
