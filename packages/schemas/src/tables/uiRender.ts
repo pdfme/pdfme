@@ -2,7 +2,7 @@ import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
 import { px2mm, ZOOM } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
-import { getBody, getBodyWithSchemaRange } from './helper.js';
+import { getBody, getBodyWithSchemaRange, remapColumnStylesOnRemove } from './helper.js';
 import cell from './cell.js';
 import { Row } from './classes.js';
 import { getTableBodyRange } from '../splitRange.js';
@@ -362,7 +362,6 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
             0,
           );
 
-          // TODO Should also remove the deleted columnStyles when deleting
           onChange([
             { key: 'head', value: schema.head.filter((_, j) => j !== i) },
             {
@@ -374,6 +373,10 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
             {
               key: 'content',
               value: JSON.stringify(bodyWidthRange.map((row) => row.filter((_, j) => j !== i))),
+            },
+            {
+              key: 'columnStyles',
+              value: remapColumnStylesOnRemove(schema.columnStyles ?? {}, i),
             },
           ]);
         },
