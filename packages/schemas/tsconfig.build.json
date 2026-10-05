@@ -6,6 +6,7 @@
     "emitDeclarationOnly": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "customConditions": ["node"],
     "outDir": "./dist",
     "rootDir": "./src",
     "skipLibCheck": true
