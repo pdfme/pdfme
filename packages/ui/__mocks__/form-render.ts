@@ -1,5 +1,9 @@
 const formState: Record<string, unknown> = {};
 
+type FormWatch = Record<string, (...args: unknown[]) => void>;
+
+let formWatch: FormWatch | undefined;
+
 export const useForm = () => ({
   resetFields: () => {
     Object.keys(formState).forEach((key) => {
@@ -13,6 +17,14 @@ export const useForm = () => ({
   validateFields: () => Promise.resolve(formState),
 });
 
-const FormRender = () => null;
+export const emitFormWatch = (patch: Record<string, unknown>) => {
+  Object.assign(formState, patch);
+  formWatch?.['#']?.(formState, patch);
+};
+
+const FormRender = ({ watch }: { watch?: FormWatch }) => {
+  formWatch = watch;
+  return null;
+};
 
 export default FormRender;
