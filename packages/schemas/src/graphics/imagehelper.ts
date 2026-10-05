@@ -145,7 +145,12 @@ export const hashImageDataUrl = (value: string): string => {
   return (hash >>> 0).toString(16).padStart(8, '0');
 };
 
-export const getImageDimension = (value: string): { height: number; width: number } => {
+export const getImageDimension = (
+  value: string | Uint8Array,
+): { height: number; width: number } => {
+  if (typeof value !== 'string') {
+    return imageSize(Buffer.from(value));
+  }
   const dataUriPrefix = ';base64,';
   const idx = value.indexOf(dataUriPrefix);
   const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);

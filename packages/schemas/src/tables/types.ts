@@ -30,6 +30,7 @@ export type CellSchema = Schema &
     cellType?: TableCellType;
     imageHeightMode?: TableImageHeightMode;
     imageHeight?: number;
+    columnIndex?: number;
   };
 
 export type TableSchema = Schema & {
@@ -89,6 +90,9 @@ export interface Settings {
   margin: Spacing;
   tableWidth: number;
   showHead: boolean;
+  // Template showHead before a split segment hides the header. Auto image limits
+  // use this so planning and drawing stay on the same row height.
+  templateShowHead: boolean;
   tableLineWidth: number;
   tableLineColor: string;
 }

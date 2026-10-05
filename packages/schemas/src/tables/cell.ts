@@ -7,7 +7,11 @@ import imagePlugin, { type ImageSchema } from '../graphics/image.js';
 import type { CellSchema } from './types.js';
 import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
 import { createBoxDimension, getBoxContentArea } from '../box.js';
-import { getTableImageObjectPosition, resolveImageDimension } from './imageCell.js';
+import {
+  getTableImageObjectPosition,
+  resolveImageDimension,
+  warnInvalidTableImageOnce,
+} from './imageCell.js';
 const imagePdfRender = imagePlugin.pdf;
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
@@ -99,7 +103,7 @@ const cellSchema: Plugin<CellSchema> = {
       renderLine(arg, schema, { x: position.x, y: position.y }, borderWidth.left, height),
     ]);
     if (schema.cellType === 'image') {
-      // Broken base64 must not throw; only a resolved PNG/JPEG is painted.
+      // A readable header can still fail while embedding a truncated PNG/JPEG.
       if (arg.value && resolveImageDimension(arg.value, arg._cache)) {
         const imageSchema: ImageSchema = {
           name: schema.name,
@@ -113,7 +117,11 @@ const cellSchema: Plugin<CellSchema> = {
           objectFit: 'contain',
           objectPosition: getTableImageObjectPosition(schema.alignment, schema.verticalAlignment),
         };
-        await imagePdfRender({ ...arg, value: arg.value, schema: imageSchema });
+        try {
+          await imagePdfRender({ ...arg, value: arg.value, schema: imageSchema });
+        } catch {
+          warnInvalidTableImageOnce(arg.value, schema.columnIndex ?? 0, arg._cache);
+        }
       }
       return;
     }

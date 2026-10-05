@@ -19,6 +19,7 @@ export type TableImageDimension = { width: number; height: number };
 
 const DIMENSION_CACHE_PREFIX = 'tableImageDim:';
 const WARN_CACHE_PREFIX = 'tableImageWarned:';
+const FAILED_DIMENSION = null;
 
 const isTableCellType = (value: unknown): value is TableCellType =>
   typeof value === 'string' && TABLE_CELL_TYPES.some((cellType) => cellType === value);
@@ -57,19 +58,24 @@ const applyOrientation = (
 export const isTableImageDataUrl = (value: string): boolean =>
   TABLE_IMAGE_DATA_URL_PATTERN.test(value);
 
+const imageCacheSuffix = (value: string) => `${value.length}:${hashImageDataUrl(value)}`;
+
 export const resolveImageDimension = (
   value: string,
   cache: Map<string | number, unknown>,
 ): TableImageDimension | undefined => {
   if (!isTableImageDataUrl(value)) return undefined;
-  const key = `${DIMENSION_CACHE_PREFIX}${hashImageDataUrl(value)}`;
+  const key = `${DIMENSION_CACHE_PREFIX}${imageCacheSuffix(value)}`;
   const cached = cache.get(key);
+  if (cached === FAILED_DIMENSION) return undefined;
   if (isDimension(cached)) return cached;
   try {
-    const dimension = applyOrientation(getImageDimension(value), dataUrlToBytes(value));
+    const bytes = dataUrlToBytes(value);
+    const dimension = applyOrientation(getImageDimension(bytes), bytes);
     cache.set(key, dimension);
     return dimension;
   } catch {
+    cache.set(key, FAILED_DIMENSION);
     return undefined;
   }
 };
@@ -80,7 +86,7 @@ export const warnInvalidTableImageOnce = (
   cache: Map<string | number, unknown>,
 ) => {
   if (value == null || value === '') return;
-  const key = `${WARN_CACHE_PREFIX}${hashImageDataUrl(value)}`;
+  const key = `${WARN_CACHE_PREFIX}${imageCacheSuffix(value)}`;
   if (cache.has(key)) return;
   cache.set(key, true);
   console.warn(
@@ -93,7 +99,8 @@ export const normalizeTableCellType = (
   columnIndex: number,
   cache: Map<string | number, unknown>,
 ): TableCellType | undefined => {
-  if (value === undefined) return undefined;
+  // null is unsupported and stays text, without a warning.
+  if (value == null) return undefined;
   if (isTableCellType(value)) return value;
   const warnKey = `tableCellTypeWarned:${String(value)}`;
   if (!cache.has(warnKey)) {

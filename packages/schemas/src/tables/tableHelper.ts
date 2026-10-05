@@ -265,6 +265,7 @@ function parseInput(
   schema: TableSchema,
   body: string[][],
   cache: Map<string | number, unknown>,
+  templateShowHead: boolean,
 ): TableInput {
   const options = getTableOptions(schema, body, cache);
   const styles = parseStyles(options);
@@ -273,6 +274,7 @@ function parseInput(
     margin: options.margin,
     tableWidth: options.tableWidth,
     showHead: options.showHead,
+    templateShowHead,
     tableLineWidth: options.tableLineWidth ?? 0,
     tableLineColor: options.tableLineColor ?? '',
   };
@@ -301,10 +303,12 @@ export function createSingleTable(body: string[][], args: CreateTableArgs) {
     schema.bodyStyles.alternateBackgroundColor = schema.bodyStyles.backgroundColor;
     schema.bodyStyles.backgroundColor = alternateBackgroundColor;
   }
+  // Captured before split segments hide the header. Auto limits must not follow that override.
+  const templateShowHead = schema.showHead !== false;
   schema.showHead =
     schema.showHead === false ? false : !schema.__isSplit || schema.repeatHead === true;
 
-  const input = parseInput(schema, body, _cache);
+  const input = parseInput(schema, body, _cache, templateShowHead);
 
   const font = options.font || getDefaultFont();
 

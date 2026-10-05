@@ -283,7 +283,8 @@ const autoImageHeightLimit = (table: Table, cell: Cell, basePdf: BasePdf): numbe
   const [paddingTop, , paddingBottom] = basePdf.padding;
   const pageContentHeight = basePdf.height - paddingTop - paddingBottom;
   // cell.height is assigned after fit, so the in-progress head size is the row height.
-  const headHeight = table.settings.showHead
+  // Split segments may hide the header; the cap still follows the template showHead.
+  const headHeight = table.settings.templateShowHead
     ? table.head.reduce((sum, row) => sum + row.height, 0)
     : 0;
   const verticalInset = getBoxVerticalInset(getCellBoxStyle(cell));

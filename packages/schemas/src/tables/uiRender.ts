@@ -162,8 +162,11 @@ const renderRowUi = (args: {
 
       drawBorder(div, row, colIndex, rowIndex, rows.length, arg, value.length);
 
-      div.style.cursor =
-        arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
+      div.style.cursor = cell.isImage()
+        ? 'default'
+        : arg.mode === 'designer' || (arg.mode === 'form' && section === 'body')
+          ? 'text'
+          : 'default';
 
       div.addEventListener('click', () => {
         if (arg.mode === 'viewer') return;
@@ -178,7 +181,8 @@ const renderRowUi = (args: {
       } else if (arg.mode === 'designer') {
         mode = isEditing ? 'designer' : 'form';
       }
-      // Image editing UI is not part of this change, so idle image cells stay display-only.
+      // The image renderer always paints an <img>. Idle cells stay in viewer so a
+      // later editor is not mounted on every cell; selecting one still has no editor.
       if (cell.isImage() && !isEditing) {
         mode = 'viewer';
       }

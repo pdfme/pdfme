@@ -145,4 +145,54 @@ describe('table image cells', () => {
       expect(rootElement.querySelector('input[type="file"]')).toBeNull();
     }
   });
+
+  test('keeps an image cell display-only when selected and still edits text cells', async () => {
+    const schema = getSchema();
+    schema.columnStyles = {
+      ...schema.columnStyles,
+      alignment: { 1: 'center' },
+      cellType: { 1: 'image' },
+    };
+    const value = JSON.stringify([
+      ['Alice', WIDE_3_1_PNG, 'Designer'],
+      ['Bob', 'not-an-image', 'Illustrator'],
+    ]);
+    const rootElement = document.createElement('div');
+    await uiRender({
+      value,
+      schema,
+      rootElement,
+      mode: 'designer',
+      onChange: vi.fn(),
+      basePdf,
+      options: { font: getDefaultFont() },
+      theme: { colorPrimary: '#1677ff' },
+      i18n: (key: string) => key,
+      scale: 1,
+      _cache: new Map(),
+    });
+
+    const image = rootElement.querySelector('img');
+    expect(image).not.toBeNull();
+    expect(image!.parentElement!.parentElement!.style.cursor).toBe('default');
+
+    const isEditor = (element: HTMLElement) =>
+      element.contentEditable === 'plaintext-only' || element.contentEditable === 'true';
+    const editors = () => [...rootElement.querySelectorAll('div')].filter(isEditor);
+    await vi.waitFor(() => {
+      expect(editors().length).toBeGreaterThan(0);
+    });
+
+    const before = rootElement.querySelector('img')!;
+    before.click();
+    await vi.waitFor(() => {
+      const imageCell = rootElement.querySelector('img')?.parentElement?.parentElement;
+      expect(rootElement.querySelector('img')).not.toBe(before);
+      expect(imageCell).toBeDefined();
+      expect([...imageCell!.querySelectorAll('div')].some(isEditor)).toBe(false);
+      expect(editors().length).toBeGreaterThan(0);
+      expect(rootElement.querySelector('input[type="file"]')).toBeNull();
+      expect(imageCell!.style.cursor).toBe('default');
+    });
+  });
 });

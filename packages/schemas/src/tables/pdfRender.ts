@@ -19,7 +19,7 @@ type Pos = { x: number; y: number };
 const rectanglePdfRender = rectangle.pdf;
 const cellPdfRender = cell.pdf;
 
-async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
+async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell, columnIndex: number) {
   await cellPdfRender({
     ...arg,
     value: cell.raw,
@@ -41,6 +41,7 @@ async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
       borderWidth: cell.styles.lineWidth,
       padding: cell.styles.cellPadding,
       cellType: cell.isImage() ? 'image' : 'text',
+      columnIndex,
     },
   });
 }
@@ -63,7 +64,7 @@ async function drawRow(
     cell.x = cursor.x;
     cell.y = cursor.y;
 
-    await drawCell(arg, cell);
+    await drawCell(arg, cell, column.index);
 
     cursor.x += column.width;
   }

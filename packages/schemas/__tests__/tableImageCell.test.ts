@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createBoxDimension } from '../src/box.js';
 import * as imageHelper from '../src/graphics/imagehelper.js';
 import { TABLE_IMAGE_AUTO_SAFETY_MARGIN } from '../src/tables/constants.js';
-import { isTableImageDataUrl } from '../src/tables/imageCell.js';
+import { isTableImageDataUrl, resolveImageDimension } from '../src/tables/imageCell.js';
 import { createSingleTable } from '../src/tables/tableHelper.js';
 import type { CellStyle, TableSchema } from '../src/tables/types.js';
 import {
@@ -305,6 +305,16 @@ describe('table image cells', () => {
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
+  test('caches a failed dimension read and does not decode it again', () => {
+    const spy = vi.spyOn(imageHelper, 'getImageDimension');
+    const cache = new Map<string | number, unknown>();
+    const broken = 'data:image/png;base64,aaaa';
+
+    expect(resolveImageDimension(broken, cache)).toBeUndefined();
+    expect(resolveImageDimension(broken, cache)).toBeUndefined();
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
   test('warns once per invalid image value and stays quiet for empty values', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const schema = createSchema({
@@ -363,5 +373,18 @@ describe('table image cells', () => {
     expect(messages.filter((message) => message.includes('unsupported cell type'))).toEqual([
       '[@pdfme/schemas/table] unsupported cell type "qrcode" in column 0; treating as text',
     ]);
+  });
+
+  test('treats a null cell type as text and does not warn', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const schema = createSchema({
+      showHead: false,
+      columnStyles: { cellType: { 0: null } } as unknown as TableSchema['columnStyles'],
+    });
+    const table = await createTable(schema, [['City']]);
+
+    expect(table.body[0].cells[0].isImage()).toBe(false);
+    expect(table.body[0].cells[0].text.join('')).toContain('City');
+    expect(warn.mock.calls.map((call) => String(call[0]))).toEqual([]);
   });
 });
