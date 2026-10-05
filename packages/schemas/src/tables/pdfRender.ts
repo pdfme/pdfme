@@ -40,6 +40,7 @@ async function drawCell(arg: PDFRenderProps<TableSchema>, cell: Cell) {
       borderColor: cell.styles.lineColor,
       borderWidth: cell.styles.lineWidth,
       padding: cell.styles.cellPadding,
+      cellType: cell.isImage() ? 'image' : 'text',
     },
   });
 }

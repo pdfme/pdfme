@@ -3,9 +3,12 @@ import { uiRender as textUiRender } from '../text/uiRender.js';
 import { pdfRender as textPdfRender } from '../text/pdfRender.js';
 import line from '../shapes/line.js';
 import { rectangle } from '../shapes/rectAndEllipse.js';
+import imagePlugin, { type ImageSchema } from '../graphics/image.js';
 import type { CellSchema } from './types.js';
 import { getCellPropPanelSchema, getDefaultCellStyles } from './helper.js';
 import { createBoxDimension, getBoxContentArea } from '../box.js';
+import { getTableImageObjectPosition, resolveImageDimension } from './imageCell.js';
+const imagePdfRender = imagePlugin.pdf;
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
 
@@ -95,6 +98,25 @@ const cellSchema: Plugin<CellSchema> = {
       // LEFT
       renderLine(arg, schema, { x: position.x, y: position.y }, borderWidth.left, height),
     ]);
+    if (schema.cellType === 'image') {
+      // Broken base64 must not throw; only a resolved PNG/JPEG is painted.
+      if (arg.value && resolveImageDimension(arg.value, arg._cache)) {
+        const imageSchema: ImageSchema = {
+          name: schema.name,
+          type: 'image',
+          content: arg.value,
+          position: contentArea.position,
+          width: contentArea.width,
+          height: contentArea.height,
+          rotate: 0,
+          opacity: 1,
+          objectFit: 'contain',
+          objectPosition: getTableImageObjectPosition(schema.alignment, schema.verticalAlignment),
+        };
+        await imagePdfRender({ ...arg, value: arg.value, schema: imageSchema });
+      }
+      return;
+    }
     // TEXT
     await textPdfRender({
       ...arg,
@@ -116,19 +138,38 @@ const cellSchema: Plugin<CellSchema> = {
     const { borderWidth, width, height, borderColor, backgroundColor } = schema;
     rootElement.style.backgroundColor = backgroundColor;
 
-    const textDiv = createTextDiv(schema);
-    await textUiRender({
-      ...arg,
-      schema: {
-        ...schema,
-        backgroundColor: '',
-        borderColor: '',
-        borderWidth: createBoxDimension(0),
-        padding: createBoxDimension(0),
-      },
-      rootElement: textDiv,
-    });
-    rootElement.appendChild(textDiv);
+    if (schema.cellType === 'image') {
+      const dimension = arg.value ? resolveImageDimension(arg.value, arg._cache) : undefined;
+      if (dimension) {
+        const imageFrame = createTextDiv(schema);
+        const img = document.createElement('img');
+        img.alt = '';
+        img.src = arg.value;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.objectPosition = getTableImageObjectPosition(
+          schema.alignment,
+          schema.verticalAlignment,
+        );
+        imageFrame.appendChild(img);
+        rootElement.appendChild(imageFrame);
+      }
+    } else {
+      const textDiv = createTextDiv(schema);
+      await textUiRender({
+        ...arg,
+        schema: {
+          ...schema,
+          backgroundColor: '',
+          borderColor: '',
+          borderWidth: createBoxDimension(0),
+          padding: createBoxDimension(0),
+        },
+        rootElement: textDiv,
+      });
+      rootElement.appendChild(textDiv);
+    }
 
     const lines = [
       createLineDiv(`${width}mm`, `${borderWidth.top}mm`, '0mm', null, null, '0mm', borderColor),

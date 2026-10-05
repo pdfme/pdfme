@@ -20,6 +20,8 @@ export type {
   Spacing,
   Styles,
   StylesProps,
+  TableCellType,
+  TableImageHeightMode,
   TableInput,
   TableSchema,
 } from './tables/types.js';

@@ -114,6 +114,7 @@ const drawBorder = (
   rowIndex: number,
   rowsLength: number,
   arg: UIRenderProps<TableSchema>,
+  bodyLength: number,
 ) => {
   const isFirstColumn = colIndex === 0;
   const isLastColumn = colIndex === Object.values(row.cells).length - 1;
@@ -123,7 +124,7 @@ const drawBorder = (
     setBorder(div, 'Top', arg);
     if (isFirstColumn) setBorder(div, 'Left', arg);
     if (isLastColumn) setBorder(div, 'Right', arg);
-    if ((JSON.parse(arg.value || '[]') as string[][]).length === 0) {
+    if (bodyLength === 0) {
       setBorder(div, 'Bottom', arg);
     }
   } else if (row.section === 'body') {
@@ -159,7 +160,7 @@ const renderRowUi = (args: {
       div.style.height = `${cell.height}mm`;
       div.style.boxSizing = 'border-box';
 
-      drawBorder(div, row, colIndex, rowIndex, rows.length, arg);
+      drawBorder(div, row, colIndex, rowIndex, rows.length, arg, value.length);
 
       div.style.cursor =
         arg.mode === 'designer' || (arg.mode === 'form' && section === 'body') ? 'text' : 'default';
@@ -176,6 +177,10 @@ const renderRowUi = (args: {
         mode = section === 'body' && isEditing && !arg.schema.readOnly ? 'designer' : 'viewer';
       } else if (arg.mode === 'designer') {
         mode = isEditing ? 'designer' : 'form';
+      }
+      // Image editing UI is not part of this change, so idle image cells stay display-only.
+      if (cell.isImage() && !isEditing) {
+        mode = 'viewer';
       }
 
       void cellUiRender({
@@ -210,6 +215,7 @@ const renderRowUi = (args: {
           width: cell.width,
           height: cell.height,
           ...convertToCellStyle(cell.styles),
+          cellType: cell.isImage() ? 'image' : 'text',
         },
       });
       colOffsetX += cell.width;

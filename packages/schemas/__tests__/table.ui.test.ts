@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { getDefaultFont } from '@pdfme/common';
+import { WIDE_3_1_PNG } from './assets/tableImages.js';
 import { getDefaultCellStyles } from '../src/tables/helper.js';
 import { uiRender } from '../src/tables/uiRender.js';
 import type { TableSchema } from '../src/tables/types.js';
@@ -103,5 +104,45 @@ describe('table column removal', () => {
         },
       ]),
     );
+  });
+});
+
+describe('table image cells', () => {
+  test('shows an img and no file input in viewer, form, and designer', async () => {
+    const schema = getSchema();
+    schema.columnStyles = {
+      ...schema.columnStyles,
+      alignment: { 1: 'center' },
+      cellType: { 1: 'image' },
+    };
+    schema.bodyStyles = { ...schema.bodyStyles, verticalAlignment: 'middle' };
+    const value = JSON.stringify([
+      ['Alice', WIDE_3_1_PNG, 'Designer'],
+      ['Bob', 'not-an-image', 'Illustrator'],
+    ]);
+
+    for (const mode of ['viewer', 'form', 'designer'] as const) {
+      const rootElement = document.createElement('div');
+      await uiRender({
+        value,
+        schema,
+        rootElement,
+        mode,
+        onChange: vi.fn(),
+        basePdf,
+        options: { font: getDefaultFont() },
+        theme: { colorPrimary: '#1677ff' },
+        i18n: (key: string) => key,
+        scale: 1,
+        _cache: new Map(),
+      });
+
+      const images = [...rootElement.querySelectorAll('img')];
+      expect(images).toHaveLength(1);
+      expect(images[0].getAttribute('src')).toBe(WIDE_3_1_PNG);
+      expect(images[0].style.objectFit).toBe('contain');
+      expect(images[0].style.objectPosition).toBe('center center');
+      expect(rootElement.querySelector('input[type="file"]')).toBeNull();
+    }
   });
 });
