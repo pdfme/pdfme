@@ -290,7 +290,7 @@ describe(`PDFForm`, () => {
 
     expect(() => form.updateFieldAppearances()).not.toThrow();
 
-    expect(
+    await expect(
       pdfDoc.save({ updateFieldAppearances: true }),
     ).resolves.toBeInstanceOf(Uint8Array);
   });
