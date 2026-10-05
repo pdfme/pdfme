@@ -26,9 +26,12 @@ From the repo root:
 npm --prefix playground run deploy
 ```
 
-This builds the playground and publishes `dist` with gh-pages to the `playground` branch, which Vercel serves as static files.
+This builds the playground locally and publishes `dist` with gh-pages to the `playground` branch. Vercel serves that prebuilt branch as static files, so Vercel project environment variables are not applied.
 
-Source maps are uploaded to Sentry only when `SENTRY_AUTH_TOKEN` is set. Put it in `playground/.env` (see `.env.example`; `.env` is gitignored) or export it in the environment. `vite build` also reads mode-specific files such as `.env.production`. Without a token, the build emits no source maps and skips the Sentry plugin.
+`SENTRY_AUTH_TOKEN` and `VITE_SENTRY_DSN` are both read at that local build, from `playground/.env` (see `.env.example`; `.env` is gitignored), mode-specific files such as `.env.production`, or exported environment variables.
+
+- `SENTRY_AUTH_TOKEN` turns on source maps and the Sentry upload plugin. With no token, the build emits no source maps and skips the plugin.
+- `VITE_SENTRY_DSN` is inlined as `import.meta.env.VITE_SENTRY_DSN`. `src/index.tsx` calls `Sentry.init` only when it is set.
 
 ---
 
