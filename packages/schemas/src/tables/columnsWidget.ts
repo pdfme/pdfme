@@ -105,16 +105,22 @@ const ensurePanelControlStyles = (
   rootElement: HTMLElement,
   metrics: ReturnType<typeof panelControlMetrics>,
 ) => {
+  rootElement.style.setProperty('--pdfme-border', metrics.colorBorder);
   rootElement.style.setProperty('--pdfme-hover-border', metrics.colorPrimaryHover);
   rootElement.style.setProperty('--pdfme-active-border', metrics.colorPrimary);
   rootElement.style.setProperty('--pdfme-outline', metrics.controlOutline);
   rootElement.style.setProperty('--pdfme-outline-width', `${metrics.outlineWidth}px`);
   rootElement.style.setProperty('--pdfme-handle-width', `${metrics.handleWidth}px`);
   rootElement.style.setProperty('--pdfme-handle-hover', metrics.colorPrimary);
+  rootElement.style.setProperty('--pdfme-padding-inline', `${metrics.paddingInline}px`);
   if (rootElement.querySelector('style[data-pdfme-column-controls]')) return;
   const style = document.createElement('style');
   style.dataset.pdfmeColumnControls = 'true';
   style.textContent = `
+.pdfme-column-select,
+.pdfme-column-number {
+  border-color: var(--pdfme-border);
+}
 .pdfme-column-select:hover,
 .pdfme-column-number:hover {
   border-color: var(--pdfme-hover-border);
@@ -136,6 +142,12 @@ const ensurePanelControlStyles = (
 .pdfme-column-number-input {
   appearance: textfield;
   -moz-appearance: textfield;
+  padding-left: var(--pdfme-padding-inline);
+  padding-right: var(--pdfme-padding-inline);
+}
+.pdfme-column-number:hover .pdfme-column-number-input,
+.pdfme-column-number:focus-within .pdfme-column-number-input {
+  padding-right: calc(var(--pdfme-handle-width) + var(--pdfme-padding-inline));
 }
 .pdfme-column-number-input::-webkit-outer-spin-button,
 .pdfme-column-number-input::-webkit-inner-spin-button {
@@ -337,7 +349,8 @@ const appendSelect = (
   shell.style.alignItems = 'center';
   shell.style.boxSizing = 'border-box';
   shell.style.height = `${metrics.controlHeight}px`;
-  shell.style.border = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+  shell.style.borderWidth = `${metrics.lineWidth}px`;
+  shell.style.borderStyle = 'solid';
   shell.style.borderRadius = `${metrics.borderRadius}px`;
   shell.style.background = metrics.colorBg;
   shell.style.overflow = 'hidden';
@@ -416,7 +429,8 @@ const appendNumberInput = (
   shell.style.width = '72px';
   shell.style.height = `${metrics.controlHeight}px`;
   shell.style.flexShrink = '0';
-  shell.style.border = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+  shell.style.borderWidth = `${metrics.lineWidth}px`;
+  shell.style.borderStyle = 'solid';
   shell.style.borderRadius = `${metrics.borderRadius}px`;
   shell.style.background = metrics.colorBg;
   shell.style.transition = `all ${metrics.motion}`;
@@ -437,7 +451,6 @@ const appendNumberInput = (
   input.style.border = '0';
   input.style.borderRadius = '0';
   input.style.background = 'transparent';
-  input.style.padding = `0 ${metrics.paddingInline}px`;
   input.style.font = 'inherit';
   input.style.fontSize = `${metrics.fontSize}px`;
   input.style.lineHeight = '22px';

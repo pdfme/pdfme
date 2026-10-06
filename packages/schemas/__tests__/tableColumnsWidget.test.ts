@@ -327,7 +327,7 @@ describe('TableColumns widget', () => {
     expect(shell.style.height).toBe('40px');
     expect(shell.style.borderRadius).toBe('8px');
     expect(shell.style.borderWidth).toBe('2px');
-    expect(shell.style.borderColor).toBe('rgb(170, 187, 204)');
+    expect(shell.style.borderStyle).toBe('solid');
     expect(shell.style.backgroundColor).toBe('rgb(254, 254, 254)');
     expect(select.style.fontSize).toBe('16px');
     expect(select.style.paddingLeft).toBe('12px');
@@ -347,6 +347,7 @@ describe('TableColumns widget', () => {
     expect(numberShell.querySelector('[aria-label="Increase Value"]')).not.toBeNull();
     expect(numberShell.querySelector('[aria-label="Decrease Value"]')).not.toBeNull();
 
+    expect(rootElement.style.getPropertyValue('--pdfme-border')).toBe('#aabbcc');
     expect(rootElement.style.getPropertyValue('--pdfme-hover-border')).toBe('#445566');
     expect(rootElement.style.getPropertyValue('--pdfme-active-border')).toBe('#112233');
     expect(rootElement.style.getPropertyValue('--pdfme-outline')).toBe('rgba(1, 2, 3, 0.2)');
