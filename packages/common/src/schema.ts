@@ -128,7 +128,6 @@ export const Dict = z.object({
   'schemas.table.headStyle': z.string(),
   'schemas.table.bodyStyle': z.string(),
   'schemas.table.columnStyle': z.string(),
-  'schemas.table.columns': z.string(),
   'schemas.table.columnLabel': z.string(),
   'schemas.table.cellType.text': z.string(),
   'schemas.table.cellType.image': z.string(),

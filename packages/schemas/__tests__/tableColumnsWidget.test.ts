@@ -54,8 +54,26 @@ const stylesChange = (changeSchemas: ReturnType<typeof vi.fn>) => {
   return changes;
 };
 
+const alignButton = (row: HTMLElement, control: string, value: string) =>
+  row.querySelector<HTMLButtonElement>(`[data-control="${control}"] [data-value="${value}"]`);
+
+const wideTable = (count: number) => {
+  const table = baseTable();
+  table.head = Array.from({ length: count }, (_, index) => `Col ${index + 1}`);
+  table.headWidthPercentages = Array.from({ length: count }, () => 100 / count);
+  table.content = JSON.stringify([Array.from({ length: count }, () => '')]);
+  table.columnStyles = {
+    alignment: { 1: 'right' },
+    verticalAlignment: { 1: 'bottom' },
+    cellType: { 1: 'image' },
+    imageHeightMode: { 1: 'fixed' },
+    imageHeight: { 1: 20 },
+  };
+  return table;
+};
+
 describe('TableColumns widget', () => {
-  test('prop panel places the Columns card immediately before Column Style', () => {
+  test('prop panel uses one Column Style card and does not bind columnStyles', () => {
     if (typeof propPanel.schema !== 'function') {
       throw new Error('table propPanel schema should be a function');
     }
@@ -69,9 +87,10 @@ describe('TableColumns widget', () => {
       i18n,
     } as unknown as Omit<PropPanelWidgetProps, 'rootElement'>);
     const keys = Object.keys(schema);
-    expect(keys.indexOf('tableColumns')).toBe(keys.indexOf('columnStyles') - 1);
+    expect(keys).not.toContain('columnStyles');
+    expect(keys.indexOf('tableColumns')).toBeGreaterThan(keys.indexOf('bodyStyles'));
     expect(schema.tableColumns).toMatchObject({
-      title: 'schemas.table.columns',
+      title: 'schemas.table.columnStyle',
       type: 'object',
       widget: 'Card',
       bind: false,
@@ -107,7 +126,114 @@ describe('TableColumns widget', () => {
     expect(height.value).toBe('20');
     expect(height.min).toBe('1');
     expect(height.step).toBe('1');
+    expect(alignButton(rendered[0], 'alignment', 'left')).not.toBeNull();
+    expect(alignButton(rendered[0], 'verticalAlignment', 'top')).not.toBeNull();
+    expect(rendered[0].querySelector('[data-control="summary"]')).toBeNull();
+    expect(rendered[0].querySelector('[data-control="collapse"]')).toBeNull();
     expect(changeSchemas).not.toHaveBeenCalled();
+  });
+
+  test('changing alignment keeps image settings and unknown column style keys', () => {
+    const table = baseTable();
+    table.columnStyles = {
+      alignment: { 1: 'center' },
+      verticalAlignment: { 1: 'middle' },
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+      fontName: { 0: 'Roboto' },
+    } as TableSchema['columnStyles'];
+    const { rootElement, changeSchemas } = renderColumns(table);
+    const row = rows(rootElement)[1];
+    const current = alignButton(row, 'alignment', 'center');
+    expect(current?.getAttribute('aria-pressed')).toBe('true');
+    current?.click();
+    expect(changeSchemas).not.toHaveBeenCalled();
+
+    alignButton(row, 'alignment', 'right')?.click();
+    expect(stylesChange(changeSchemas)).toEqual([
+      {
+        key: 'columnStyles',
+        value: {
+          alignment: { 1: 'right' },
+          verticalAlignment: { 1: 'middle' },
+          cellType: { 1: 'image' },
+          imageHeightMode: { 1: 'fixed' },
+          imageHeight: { 1: 20 },
+          fontName: { 0: 'Roboto' },
+        },
+        schemaId: 'table-1',
+      },
+    ]);
+  });
+
+  test('changing vertical alignment keeps cell type and horizontal alignment', () => {
+    const table = baseTable();
+    table.columnStyles = {
+      alignment: { 0: 'left' },
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'auto' },
+      imageHeight: { 1: 25 },
+    };
+    const { rootElement, changeSchemas } = renderColumns(table);
+    const row = rows(rootElement)[1];
+    expect(alignButton(row, 'verticalAlignment', 'top')?.getAttribute('aria-pressed')).toBe(
+      'false',
+    );
+    alignButton(row, 'verticalAlignment', 'top')?.click();
+
+    expect(stylesChange(changeSchemas)).toEqual([
+      {
+        key: 'columnStyles',
+        value: {
+          alignment: { 0: 'left' },
+          verticalAlignment: { 1: 'top' },
+          cellType: { 1: 'image' },
+          imageHeightMode: { 1: 'auto' },
+          imageHeight: { 1: 25 },
+        },
+        schemaId: 'table-1',
+      },
+    ]);
+  });
+
+  test('six columns stay expanded and seven start collapsed', () => {
+    const six = renderColumns(wideTable(6));
+    expect(six.rootElement.querySelector('[data-control="summary"]')).toBeNull();
+    expect(six.rootElement.querySelector('[data-control="collapse"]')).toBeNull();
+    expect(
+      (six.rootElement.querySelector('[data-control="column-body"]') as HTMLElement).hidden,
+    ).toBe(false);
+
+    const seven = renderColumns(wideTable(7));
+    const blocks = rows(seven.rootElement);
+    expect(blocks).toHaveLength(7);
+    const image = blocks[1];
+    const summary = image.querySelector<HTMLButtonElement>('[data-control="summary"]');
+    const body = image.querySelector<HTMLElement>('[data-control="column-body"]');
+    expect(summary).not.toBeNull();
+    expect(summary?.hidden).toBe(false);
+    expect(body?.hidden).toBe(true);
+    expect(summary?.querySelector('[data-control="summary-name"]')?.textContent).toBe('Col 2');
+    expect(summary?.querySelector('[data-control="summary-type"]')?.textContent).toBe(
+      'schemas.table.cellType.image',
+    );
+    expect(summary?.querySelector('[data-control="summary-alignment"]')?.getAttribute('data-value')).toBe(
+      'right',
+    );
+    expect(
+      summary?.querySelector('[data-control="summary-vertical-alignment"]')?.getAttribute('data-value'),
+    ).toBe('bottom');
+    expect(summary?.querySelector('[data-control="summary-height"]')?.textContent).toBe('20mm');
+    expect(blocks[0].querySelector('[data-control="summary-alignment"]')).toBeNull();
+
+    summary?.click();
+    expect(summary?.hidden).toBe(true);
+    expect(body?.hidden).toBe(false);
+    image.querySelector<HTMLButtonElement>('[data-control="collapse"]')?.click();
+    expect(summary?.hidden).toBe(false);
+    expect(body?.hidden).toBe(true);
+    expect(seven.changeSchemas).not.toHaveBeenCalled();
   });
 
   test('text to image sets defaults, centers only a missing alignment, and clears that column', () => {

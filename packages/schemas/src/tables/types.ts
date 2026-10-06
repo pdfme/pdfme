@@ -50,6 +50,7 @@ export type TableSchema = Schema & {
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
+    verticalAlignment?: { [colIndex: number]: VERTICAL_ALIGNMENT };
     cellType?: { [colIndex: number]: TableCellType };
     imageHeightMode?: { [colIndex: number]: TableImageHeightMode };
     imageHeight?: { [colIndex: number]: number };

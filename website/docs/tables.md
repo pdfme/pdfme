@@ -160,6 +160,7 @@ A column can opt in to images. Columns without `cellType` stay text, and existin
   "headWidthPercentages": [30, 30, 40],
   "columnStyles": {
     "alignment": { "1": "center" },
+    "verticalAlignment": { "1": "middle" },
     "cellType": { "1": "image" },
     "imageHeightMode": { "1": "fixed" },
     "imageHeight": { "1": 20 }
@@ -187,12 +188,13 @@ Older pdfme versions ignore `cellType` and show the data URL as text.
 
 ### Choosing an image column
 
-Select the table in the Designer. The **Columns** card sits above Column Style, with one row per column. The row label is the heading, or "Column N" when the heading is empty.
+Select the table in the Designer. The **Column Style** card has one block per column. The name is the heading, or "Column N" when the heading is empty. Each block sets the cell type, horizontal alignment, and vertical alignment. An image column also sets the height mode. With more than six columns, each block starts collapsed and the summary line shows the name, type, and alignments. Six columns or fewer stay expanded, with no collapse control.
 
 - **Text** is the default. An unknown type is shown as Text until you change it.
 - **Image** sets that column's `cellType` to `"image"` and clears every body cell in the column. The heading is not changed, and header cells stay text.
 - The first time a column becomes an image, pdfme writes `imageHeightMode: "fixed"` and `imageHeight: 20` when they are missing, and `alignment: "center"` only when alignment is missing. An alignment you already set is kept.
-- Switching the column back to Text removes that column's `cellType`, `imageHeightMode`, and `imageHeight`. Empty maps are removed. Alignment is left as it is, and the body cells are cleared again.
+- Switching the column back to Text removes that column's `cellType`, `imageHeightMode`, and `imageHeight`. Empty maps are removed. Alignment and vertical alignment are left as they are, and the body cells are cleared again.
+- Horizontal alignment writes only that column's `columnStyles.alignment`. Vertical alignment writes `columnStyles.verticalAlignment` the same way. Either value overrides the matching Head Style or Body Style for that column, including the header. A column with no value leaves the existing header and body alignment unchanged. Image cells use the same pair for `objectPosition`. Removing or renaming a column remaps `verticalAlignment` with the other per-column maps.
 
 An image column also has a height mode:
 

@@ -22,10 +22,7 @@ import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
 import ColorWidget from './ColorWidget.js';
 import type { ColorWidgetProps } from './ColorWidget.js';
-import {
-  expandSameTypeBulkUpdateChanges,
-  mergeColumnStylesFormValue,
-} from './schemaChangeHelpers.js';
+import { expandSameTypeBulkUpdateChanges } from './schemaChangeHelpers.js';
 import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
 import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '../layout.js';
 
@@ -236,11 +233,6 @@ const DetailView = (props: DetailViewProps) => {
       if (['id', 'content'].includes(key)) continue;
 
       let value = formSchema[key];
-      if (key === 'columnStyles') {
-        const stored = (activeSchema as Record<string, unknown>).columnStyles;
-        const merged = mergeColumnStylesFormValue(stored, value);
-        if (!formAndSchemaValuesDiffer(merged, stored)) continue;
-      }
       if (formAndSchemaValuesDiffer(value, (activeSchema as Record<string, unknown>)[key])) {
         // FIXME memo: https://github.com/pdfme/pdfme/pull/367#issuecomment-1857468274
         if (value === null && ['rotate', 'opacity'].includes(key)) {

@@ -41,6 +41,7 @@ const getSchema = (): TableSchema =>
     },
     columnStyles: {
       alignment: { 2: 'right' },
+      verticalAlignment: { 2: 'bottom' },
       fontName: { 2: 'NotoSans' },
     },
   }) as TableSchema;
@@ -99,6 +100,7 @@ describe('table column removal', () => {
           key: 'columnStyles',
           value: {
             alignment: { 1: 'right' },
+            verticalAlignment: { 1: 'bottom' },
             fontName: { 1: 'NotoSans' },
           },
         },
@@ -217,6 +219,18 @@ describe('table image cells', () => {
     expect(buttonByLabel(rootElement, 'schemas.table.imageCell.select')).toBeNull();
     expect(buttonByLabel(rootElement, 'schemas.table.imageCell.remove')).toBeNull();
     expect(images[0].parentElement!.parentElement!.style.cursor).toBe('default');
+  });
+
+  test('image objectPosition follows column verticalAlignment', async () => {
+    const schema = getImageSchema();
+    schema.columnStyles = {
+      ...schema.columnStyles,
+      verticalAlignment: { 1: 'top' },
+    };
+    const { rootElement } = await renderImageTable({ mode: 'viewer', schema });
+    const images = [...rootElement.querySelectorAll('img')];
+    expect(images).toHaveLength(1);
+    expect(images[0].style.objectPosition).toBe('center top');
   });
 
   test('designer edits only the selected image cell', async () => {

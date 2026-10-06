@@ -13,9 +13,9 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> => {
 const columnStylesOf = (schema: SchemaForUI): unknown =>
   (schema as SchemaForUI & { columnStyles?: unknown }).columnStyles;
 
-// The Column Style card only registers `alignment`. form-render then submits that
-// object alone, which would drop cellType, image heights, and unknown keys.
-// Overlay the form value onto each table's stored columnStyles.
+// Column Style is a custom widget that commits a full columnStyles clone.
+// A partial payload (or a same-type bulk apply of one) still has to keep keys
+// it does not send, such as cellType, image heights, and unknown maps.
 export const mergeColumnStylesFormValue = (stored: unknown, formValue: unknown): unknown => {
   if (!isPlainObject(formValue) || !isPlainObject(stored)) return formValue;
   const next: Record<string, unknown> = { ...stored };
