@@ -13,6 +13,7 @@ import {
   PDFRawStream,
   PDFRef,
   decodePDFRawStream,
+  parseFont,
 } from '../../../src/index';
 
 const ubuntuFont = fs.readFileSync('./assets/fonts/ubuntu/Ubuntu-R.ttf');
@@ -27,6 +28,78 @@ describe(`CustomFontEmbedder`, () => {
   it(`can be constructed with CustomFontEmbedder.for(...)`, async () => {
     const embedder = await CustomFontEmbedder.for(fontkit, ubuntuFont);
     expect(embedder).toBeInstanceOf(CustomFontEmbedder);
+  });
+
+  describe(`parseFont`, () => {
+    // Each call gets its own view of the font; the views of one parse have it as their prototype.
+    // The parse owns fontkit's tables: a font that is not a view (no caching) fails here.
+    const parsedFontOf = (font: object) => {
+      const parsed = Object.getPrototypeOf(font);
+      expect(Object.hasOwn(parsed, '_tables')).toBe(true);
+      return parsed;
+    };
+
+    const toUnicodeOf = async (text: string) => {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.registerFontkit(fontkit);
+      const font = await pdfDoc.embedFont(sourceHansFont, { subset: true });
+      pdfDoc.addPage().drawText(text, { font, size: 24 });
+      await pdfDoc.save();
+      const type0 = pdfDoc.context
+        .enumerateIndirectObjects()
+        .map(([, obj]) => obj)
+        .find((obj): obj is PDFDict => obj instanceof PDFDict && obj.has(PDFName.of('ToUnicode')));
+      const cmapObj = pdfDoc.context.lookup(type0!.get(PDFName.of('ToUnicode')));
+      return new TextDecoder('latin1').decode(decodePDFRawStream(cmapObj as PDFRawStream).decode());
+    };
+
+    it(`parses the same bytes once, but gives each embedder its own glyphs`, async () => {
+      const first = await CustomFontEmbedder.for(fontkit, ubuntuFont);
+      const second = await CustomFontEmbedder.for(fontkit, ubuntuFont);
+      expect(second.font).not.toBe(first.font);
+      expect(parsedFontOf(second.font)).toBe(parsedFontOf(first.font));
+
+      first.encodeText('Stuff');
+      expect(Object.keys(parsedFontOf(first.font)._glyphs)).toEqual([]);
+
+      // other bytes are parsed on their own
+      const copy = await CustomFontEmbedder.for(fontkit, new Uint8Array(ubuntuFont));
+      expect(parsedFontOf(copy.font)).not.toBe(parsedFontOf(first.font));
+    });
+
+    it(`calls fontkit.create once for the same bytes`, () => {
+      const counting = { ...fontkit, create: vi.fn(fontkit.create) };
+      const bytes = new Uint8Array(ubuntuFont);
+      parseFont(counting, bytes);
+      parseFont(counting, bytes);
+      parseFont(counting, new Uint8Array(bytes.buffer));
+      expect(counting.create).toHaveBeenCalledTimes(1);
+      parseFont(counting, bytes.slice());
+      expect(counting.create).toHaveBeenCalledTimes(2);
+    });
+
+    it(`finds bytes again when each call wraps the same ArrayBuffer anew`, () => {
+      const { buffer } = new Uint8Array(ubuntuFont);
+      const first = parseFont(fontkit, new Uint8Array(buffer));
+      expect(parsedFontOf(parseFont(fontkit, new Uint8Array(buffer)))).toBe(parsedFontOf(first));
+    });
+
+    it(`parses bytes again once they are overwritten with another font`, () => {
+      const bytes = new Uint8Array(Math.max(ubuntuFont.length, sarabunFont.length));
+      bytes.set(ubuntuFont);
+      expect(parseFont(fontkit, bytes).postscriptName).toBe('Ubuntu');
+      bytes.fill(0);
+      bytes.set(sarabunFont);
+      expect(parseFont(fontkit, bytes).postscriptName).toBe('Sarabun-Regular');
+    });
+
+    it(`keeps a glyph's code points to the document that laid it out (regression)`, async () => {
+      // U+2F00 (KANGXI RADICAL ONE) and U+4E00 (CJK one) share a glyph in Source Han.
+      expect(await toUnicodeOf('⼀')).toContain('<2F00>');
+      const cmap = await toUnicodeOf('一');
+      expect(cmap).toContain('<4E00>');
+      expect(cmap).not.toContain('<2F00>');
+    });
   });
 
   it(`exposes the font's name`, async () => {
