@@ -14,6 +14,7 @@ import {
   createSvgStr,
 } from '../utils.js';
 import { DEFAULT_OPACITY } from '../constants.js';
+import { hashImageDataUrl } from './imagehelper.js';
 import { detectImageFormat, normalizeImageOrientation } from './orientation.js';
 
 /**
@@ -31,15 +32,8 @@ import { detectImageFormat, normalizeImageOrientation } from './orientation.js';
  * cost, without retaining any slice of the input as a Map key. Keys stay
  * well under ~40 chars regardless of input size.
  */
-const getCacheKey = (schema: Schema, input: string) => {
-  let hash = 0x811c9dc5;
-  for (let i = 0; i < input.length; i++) {
-    hash ^= input.charCodeAt(i);
-    hash = Math.imul(hash, 0x01000193);
-  }
-  const hex = (hash >>> 0).toString(16).padStart(8, '0');
-  return `${schema.type}:${input.length}:${hex}`;
-};
+const getCacheKey = (schema: Schema, input: string) =>
+  `${schema.type}:${input.length}:${hashImageDataUrl(input)}`;
 
 const dataUrlToBytes = (value: string): Uint8Array => {
   const prefix = ';base64,';
@@ -87,10 +81,7 @@ export const getEffectiveObjectPosition = (schema: ImageSchema): ImageObjectPosi
     : normalizeObjectPosition(schema.objectPosition);
 };
 
-const alignOffset = (
-  space: number,
-  position: 'left' | 'center' | 'right' | 'top' | 'bottom',
-) => {
+const alignOffset = (space: number, position: 'left' | 'center' | 'right' | 'top' | 'bottom') => {
   if (position === 'right' || position === 'bottom') return space;
   if (position === 'center') return space / 2;
   return 0;

@@ -174,7 +174,8 @@ function placeUnitsOnPages(
 
     // Some schemas, such as tables with headers, should not leave the first unit
     // alone on a page without any following data units.
-    // BUT: if already at page top, don't move (prevents infinite loop when data row is too large)
+    // BUT: if already at page top, don't move (prevents infinite loop when data row is too large).
+    // An empty page has nothing to protect, so restart at its top instead of inserting a blank page.
     const isAtPageTop = currentYInPage <= EPSILON;
     if (
       dynamicLayout.avoidFirstUnitOnly &&
@@ -185,8 +186,13 @@ function placeUnitsOnPages(
       !isAtPageTop
     ) {
       currentUnitIndex = 0;
-      currentPageIndex++;
-      currentYInPage = 0;
+      if (pages[currentPageIndex].length === 0) {
+        // Only avoidFirstUnitOnly layouts (tables) reach this restart.
+        currentYInPage = 0;
+      } else {
+        currentPageIndex++;
+        currentYInPage = 0;
+      }
       continue;
     }
 

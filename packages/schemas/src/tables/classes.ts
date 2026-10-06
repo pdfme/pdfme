@@ -1,7 +1,9 @@
-import { Font, mm2pt, pt2mm } from '@pdfme/common';
+import { Font, isBlankPdf, mm2pt, pt2mm, type BasePdf } from '@pdfme/common';
 import type { Font as FontKitFont } from 'fontkit';
 import { getBoxContentArea, getBoxVerticalInset, type BoxStyleSchema } from '../box.js';
 import { splitTextToSize, getFontKitFont, widthOfTextAtSize } from '../text/helper.js';
+import { DEFAULT_TABLE_IMAGE_HEIGHT_MODE, TABLE_IMAGE_AUTO_SAFETY_MARGIN } from './constants.js';
+import { resolveTableImageContentHeight } from './imageCell.js';
 import type { Styles, TableInput, Settings, Section, StylesProps } from './types.js';
 
 type ContentSettings = { body: Row[]; head: Row[]; columns: Column[] };
@@ -16,6 +18,7 @@ export class Cell {
   wrappedWidth = 0;
   minReadableWidth = 0;
   minWidth = 0;
+  imageContentHeight = 0;
 
   width = 0;
   height = 0;
@@ -30,10 +33,18 @@ export class Cell {
     this.text = raw.split(splitRegex);
   }
 
+  isImage() {
+    return this.section !== 'head' && this.styles.cellType === 'image';
+  }
+
   getContentHeight() {
+    const verticalInset = getBoxVerticalInset(getCellBoxStyle(this));
+    if (this.isImage()) {
+      return Math.max(this.imageContentHeight + verticalInset, this.styles.minCellHeight);
+    }
     const lineCount = Array.isArray(this.text) ? this.text.length : 1;
     const lineHeight = pt2mm(this.styles.fontSize) * this.styles.lineHeight;
-    const height = lineCount * lineHeight + getBoxVerticalInset(getCellBoxStyle(this));
+    const height = lineCount * lineHeight + verticalInset;
     return Math.max(height, this.styles.minCellHeight);
   }
 
@@ -119,12 +130,13 @@ export class Table {
     input: TableInput;
     content: ContentSettings;
     font: Font;
-    _cache: Map<string | number, FontKitFont>;
+    basePdf: BasePdf;
+    _cache: Map<string | number, unknown>;
   }) {
-    const { input, content, font, _cache } = arg;
+    const { input, content, font, basePdf, _cache } = arg;
     const table = new Table(input, content);
 
-    await calculateWidths({ table, font, _cache });
+    await calculateWidths({ table, font, basePdf, _cache });
 
     return table;
   }
@@ -153,12 +165,13 @@ export class Table {
 async function calculateWidths(arg: {
   table: Table;
   font: Font;
-  _cache: Map<string | number, FontKitFont>;
+  basePdf: BasePdf;
+  _cache: Map<string | number, unknown>;
 }) {
-  const { table, font, _cache } = arg;
+  const { table, font, basePdf, _cache } = arg;
 
   const getFontKitFontByFontName = (fontName: string | undefined) =>
-    getFontKitFont(fontName, font, _cache);
+    getFontKitFont(fontName, font, _cache as Map<string | number, FontKitFont>);
 
   await calculate(table, getFontKitFontByFontName);
 
@@ -196,7 +209,7 @@ async function calculateWidths(arg: {
   resizeWidth = Math.abs(resizeWidth);
 
   applyColSpans(table);
-  await fitContent(table, getFontKitFontByFontName);
+  await fitContent(table, getFontKitFontByFontName, basePdf, _cache);
   applyRowSpans(table);
 }
 
@@ -264,9 +277,25 @@ function applyColSpans(table: Table) {
   }
 }
 
+const autoImageHeightLimit = (table: Table, cell: Cell, basePdf: BasePdf): number | undefined => {
+  // Custom base PDFs are not reflowed, so an auto image may be taller than one page.
+  if (!isBlankPdf(basePdf)) return undefined;
+  const [paddingTop, , paddingBottom] = basePdf.padding;
+  const pageContentHeight = basePdf.height - paddingTop - paddingBottom;
+  // cell.height is assigned after fit, so the in-progress head size is the row height.
+  // Split segments may hide the header; the cap still follows the template showHead.
+  const headHeight = table.settings.templateShowHead
+    ? table.head.reduce((sum, row) => sum + row.height, 0)
+    : 0;
+  const verticalInset = getBoxVerticalInset(getCellBoxStyle(cell));
+  return pageContentHeight - headHeight - verticalInset - TABLE_IMAGE_AUTO_SAFETY_MARGIN;
+};
+
 async function fitContent(
   table: Table,
   getFontKitFontByFontName: (fontName: string | undefined) => Promise<FontKitFont>,
+  basePdf: BasePdf,
+  cache: Map<string | number, unknown>,
 ) {
   const rowSpanHeight = { count: 0, height: 0 };
   for (const row of table.allRows()) {
@@ -274,20 +303,39 @@ async function fitContent(
       const cell: Cell = row.cells[column.index];
       if (!cell) continue;
 
-      const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
       const contentArea = getBoxContentArea({
         position: { x: 0, y: 0 },
         width: cell.width,
         height: cell.height,
         ...getCellBoxStyle(cell),
       });
-      cell.text = splitTextToSize({
-        value: cell.raw,
-        characterSpacing: cell.styles.characterSpacing,
-        boxWidthInPt: mm2pt(contentArea.width),
-        fontSize: cell.styles.fontSize,
-        fontKitFont,
-      });
+      if (cell.isImage()) {
+        cell.text = [];
+        let imageContentHeight = resolveTableImageContentHeight({
+          value: cell.raw,
+          mode: cell.styles.imageHeightMode,
+          imageHeight: cell.styles.imageHeight,
+          contentWidth: contentArea.width,
+          columnIndex: column.index,
+          cache,
+        });
+        if ((cell.styles.imageHeightMode ?? DEFAULT_TABLE_IMAGE_HEIGHT_MODE) === 'auto') {
+          const limit = autoImageHeightLimit(table, cell, basePdf);
+          if (limit !== undefined) {
+            imageContentHeight = Math.min(imageContentHeight, Math.max(0, limit));
+          }
+        }
+        cell.imageContentHeight = imageContentHeight;
+      } else {
+        const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
+        cell.text = splitTextToSize({
+          value: cell.raw,
+          characterSpacing: cell.styles.characterSpacing,
+          boxWidthInPt: mm2pt(contentArea.width),
+          fontSize: cell.styles.fontSize,
+          fontKitFont,
+        });
+      }
 
       cell.contentHeight = cell.getContentHeight();
 
@@ -356,6 +404,14 @@ async function calculate(
       if (!cell) continue;
 
       const hPadding = cell.padding('right') + cell.padding('left');
+      // A data URL must not widen the column the way a long string would.
+      if (cell.isImage()) {
+        cell.contentWidth = hPadding;
+        cell.minReadableWidth = hPadding;
+        cell.minWidth = cell.styles.cellWidth;
+        cell.wrappedWidth = cell.styles.cellWidth;
+        continue;
+      }
       const fontKitFont = await getFontKitFontByFontName(cell.styles.fontName);
 
       cell.contentWidth = getStringWidth(cell, fontKitFont) + hPadding;

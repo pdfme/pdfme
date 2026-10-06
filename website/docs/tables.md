@@ -150,6 +150,41 @@ If the input data spans multiple pages, automatic page breaks will be inserted.
 
 ![Table with page breaks](/img/table-generated-pdf3.png)
 
+## Image columns
+
+A column can opt in to images. Columns without `cellType` stay text, and existing templates render the same way. `inputs` and `content` are still `string[][]`. An image cell's value is a PNG or JPEG data URL.
+
+```json
+{
+  "head": ["Name", "Photo", "Note"],
+  "headWidthPercentages": [30, 30, 40],
+  "columnStyles": {
+    "alignment": { "1": "center" },
+    "cellType": { "1": "image" },
+    "imageHeightMode": { "1": "fixed" },
+    "imageHeight": { "1": 20 }
+  },
+  "content": "[[\"Alice\",\"data:image/png;base64,iVBORw0KGgo...\",\"Workshop\"]]"
+}
+```
+
+`imageHeightMode` and `imageHeight` are stored separately, so switching between `fixed` and `auto` does not clear the millimeter value.
+
+- `fixed` (the default) gives every cell in the column the same image height. That height is 20mm when `imageHeight` is omitted or is not a finite number greater than 0. Empty and invalid values keep that height, so the row does not collapse and page breaks stay predictable. 20mm also keeps a single default row from growing past one page.
+- `auto` sets the image height to `inner width × image height / image width`. An empty or invalid value contributes no image height, and the row follows the other cells. On a blank `basePdf`, the height is capped so the row, the header (when `showHead` is true), the cell's vertical padding and border, and a 1mm margin still fit in the page content box. A custom PDF `basePdf` is not reflowed, so that cap is not applied.
+
+Only `data:image/png;base64,...` and `data:image/jpeg;base64,...` (or `image/jpg`) are drawn. `http` URLs, gif, webp, svg, any other string, and broken base64 are not drawn. `null` is unsupported: it is not drawn and does not warn. `""` is the same. A PNG or JPEG whose header is readable but whose bytes fail during embedding is skipped, and the warning below is logged once. Any other invalid value logs this warning once per distinct value:
+
+```text
+[@pdfme/schemas/table] unsupported image in column N; only PNG/JPEG data URL is supported
+```
+
+Keep sample images small (about 100KB or less). The data URL is copied into the template or the inputs.
+
+Header cells are always text, even in an image column. A `cellType` of `null` is unsupported and is treated as text, without a warning. A column type this version does not know (for example a future `qrcode`) is treated as text, and that unknown value is warned about once.
+
+Older pdfme versions ignore `cellType` and show the data URL as text. The Designer control for image columns is not in this version; set `columnStyles` in the template until that UI ships.
+
 ## About Table Settings
 
 Using the Designer, you can easily set the number of columns and rows in a table. You can also freely configure the table's style.

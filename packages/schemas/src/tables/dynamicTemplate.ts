@@ -49,10 +49,15 @@ export const getDynamicHeightsForTable = async (
   );
   const headRowCount = schema.showHead ? table.head.length : 0;
   const SAFETY_MARGIN = 0.5;
+  // Same tolerance as placeUnitsOnPages in @pdfme/common.
+  const EPSILON = 0.01;
 
   let currentPageIndex = initialPageIndex;
   let currentPageY = schema.position.y;
   let rowsOnCurrentPage = 0;
+  // avoidFirstUnitOnly moves the header unit with the first body row. That row
+  // must not also include a repeated header, or the fresh page cannot fit it.
+  let headerTravelsWithBody = false;
 
   const result: number[] = [];
 
@@ -64,30 +69,50 @@ export const getDynamicHeightsForTable = async (
       const currentPageStartY = getPageStartY(currentPageIndex);
       const remainingHeight = currentPageStartY + pageContentHeight - currentPageY;
       const needsHeader =
-        isBodyRow && rowsOnCurrentPage === 0 && currentPageIndex > initialPageIndex;
+        isBodyRow &&
+        rowsOnCurrentPage === 0 &&
+        currentPageIndex > initialPageIndex &&
+        !headerTravelsWithBody;
       const totalRowHeight = rowHeight + (needsHeader ? headerHeight : 0);
 
-      if (totalRowHeight > remainingHeight - SAFETY_MARGIN) {
+      if (totalRowHeight > remainingHeight - SAFETY_MARGIN + EPSILON) {
         if (rowsOnCurrentPage === 0 && Math.abs(currentPageY - currentPageStartY) < SAFETY_MARGIN) {
           result.push(totalRowHeight);
           currentPageY += totalRowHeight;
           rowsOnCurrentPage++;
+          headerTravelsWithBody = false;
           break;
         }
+        const headerWouldBeAlone =
+          !headerTravelsWithBody &&
+          currentPageIndex === initialPageIndex &&
+          isBodyRow &&
+          headRowCount > 0 &&
+          result.length === headRowCount &&
+          rowsOnCurrentPage === headRowCount;
         currentPageIndex++;
-        currentPageY = getPageStartY(currentPageIndex);
-        rowsOnCurrentPage = 0;
+        if (headerWouldBeAlone) {
+          headerTravelsWithBody = true;
+          currentPageY = getPageStartY(currentPageIndex) + headerHeight;
+          rowsOnCurrentPage = headRowCount;
+        } else {
+          headerTravelsWithBody = false;
+          currentPageY = getPageStartY(currentPageIndex);
+          rowsOnCurrentPage = 0;
+        }
         continue;
       }
 
       result.push(totalRowHeight);
       currentPageY += totalRowHeight;
       rowsOnCurrentPage++;
+      if (isBodyRow) headerTravelsWithBody = false;
 
       if (currentPageY >= currentPageStartY + pageContentHeight - SAFETY_MARGIN) {
         currentPageIndex++;
         currentPageY = getPageStartY(currentPageIndex);
         rowsOnCurrentPage = 0;
+        headerTravelsWithBody = false;
       }
       break;
     }

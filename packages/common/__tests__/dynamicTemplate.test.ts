@@ -605,9 +605,9 @@ describe('getDynamicTemplate', () => {
         }),
       });
 
-      expect(tableLikeTemplate.schemas[0]).toEqual([]);
-      expect(tableLikeTemplate.schemas[1][0].height).toBe(40);
-      expect(tableLikeTemplate.schemas[1][0].position.y).toBe(10);
+      expect(tableLikeTemplate.schemas).toHaveLength(1);
+      expect(tableLikeTemplate.schemas[0][0].height).toBe(40);
+      expect(tableLikeTemplate.schemas[0][0].position.y).toBe(10);
     });
   });
 

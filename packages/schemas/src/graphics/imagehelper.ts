@@ -132,7 +132,25 @@ function detector(input: Uint8Array): ImageKind | undefined {
   return keys.find((key: ImageKind) => typeHandlers[key].validate(input));
 }
 
-export const getImageDimension = (value: string): { height: number; width: number } => {
+/**
+ * FNV-1a 32-bit fingerprint of an image data URL.
+ * Image embed cache keys are `${type}:${length}:${hash}` and must keep this hash.
+ */
+export const hashImageDataUrl = (value: string): string => {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+};
+
+export const getImageDimension = (
+  value: string | Uint8Array,
+): { height: number; width: number } => {
+  if (typeof value !== 'string') {
+    return imageSize(Buffer.from(value));
+  }
   const dataUriPrefix = ';base64,';
   const idx = value.indexOf(dataUriPrefix);
   const imgBase64 = value.substring(idx + dataUriPrefix.length, value.length);
