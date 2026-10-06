@@ -219,11 +219,13 @@ describe('TableColumns widget', () => {
     expect(summary?.querySelector('[data-control="summary-type"]')?.textContent).toBe(
       'schemas.table.cellType.image',
     );
-    expect(summary?.querySelector('[data-control="summary-alignment"]')?.getAttribute('data-value')).toBe(
-      'right',
-    );
     expect(
-      summary?.querySelector('[data-control="summary-vertical-alignment"]')?.getAttribute('data-value'),
+      summary?.querySelector('[data-control="summary-alignment"]')?.getAttribute('data-value'),
+    ).toBe('right');
+    expect(
+      summary
+        ?.querySelector('[data-control="summary-vertical-alignment"]')
+        ?.getAttribute('data-value'),
     ).toBe('bottom');
     expect(summary?.querySelector('[data-control="summary-height"]')?.textContent).toBe('20mm');
     expect(blocks[0].querySelector('[data-control="summary-alignment"]')).toBeNull();
@@ -242,21 +244,24 @@ describe('TableColumns widget', () => {
   test('keeps an expanded column open across re-renders', () => {
     const table = wideTable(7);
     const first = renderColumns(table);
-    rows(first.rootElement)[2].querySelector<HTMLButtonElement>('[data-control="summary"]')?.click();
+    rows(first.rootElement)[2]
+      .querySelector<HTMLButtonElement>('[data-control="summary"]')
+      ?.click();
 
     const second = renderColumns(table);
     const again = rows(second.rootElement)[2];
     expect(again.querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(false);
     expect(again.querySelector<HTMLElement>('[data-control="summary"]')?.hidden).toBe(true);
-    expect(rows(second.rootElement)[0].querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(
-      true,
-    );
+    expect(
+      rows(second.rootElement)[0].querySelector<HTMLElement>('[data-control="column-body"]')
+        ?.hidden,
+    ).toBe(true);
 
     again.querySelector<HTMLButtonElement>('[data-control="collapse"]')?.click();
     const third = renderColumns(table);
-    expect(rows(third.rootElement)[2].querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(
-      true,
-    );
+    expect(
+      rows(third.rootElement)[2].querySelector<HTMLElement>('[data-control="column-body"]')?.hidden,
+    ).toBe(true);
   });
 
   test('uses theme tokens for alignment borders, icons, and dividers', () => {
@@ -282,6 +287,97 @@ describe('TableColumns widget', () => {
       encodeURIComponent('#123456'),
     );
     expect(rows(rootElement)[0].style.borderBottomColor).toBe('rgb(221, 238, 255)');
+  });
+
+  test('styles selects and the height input like antd controls', () => {
+    const table = baseTable();
+    table.columnStyles = {
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+    };
+    const rootElement = document.createElement('div');
+    TableColumns({
+      rootElement,
+      changeSchemas: vi.fn(),
+      activeSchema: table,
+      i18n,
+      theme: {
+        colorPrimary: '#112233',
+        colorPrimaryHover: '#445566',
+        colorBorder: '#aabbcc',
+        colorBgContainer: '#fefefe',
+        colorText: '#123456',
+        colorTextQuaternary: '#778899',
+        colorIcon: '#99aabb',
+        controlOutline: 'rgba(1, 2, 3, 0.2)',
+        borderRadius: 8,
+        controlHeight: 40,
+        fontSize: 16,
+        lineWidth: 2,
+        paddingSM: 14,
+        controlHeightSM: 28,
+        controlOutlineWidth: 3,
+      },
+    } as unknown as PropPanelWidgetProps);
+
+    const select = control(rows(rootElement)[0], 'cellType') as HTMLSelectElement;
+    const shell = select.parentElement as HTMLElement;
+    expect(shell.className).toBe('pdfme-column-select');
+    expect(shell.style.height).toBe('40px');
+    expect(shell.style.borderRadius).toBe('8px');
+    expect(shell.style.borderWidth).toBe('2px');
+    expect(shell.style.borderColor).toBe('rgb(170, 187, 204)');
+    expect(shell.style.backgroundColor).toBe('rgb(254, 254, 254)');
+    expect(select.style.fontSize).toBe('16px');
+    expect(select.style.paddingLeft).toBe('12px');
+    expect(select.style.paddingRight).toBe('30px');
+    expect(select.style.color).toBe('rgb(18, 52, 86)');
+    expect(shell.querySelector('.pdfme-column-select-arrow svg')).not.toBeNull();
+    expect((shell.querySelector('.pdfme-column-select-arrow') as HTMLElement).style.color).toBe(
+      'rgb(119, 136, 153)',
+    );
+
+    const input = control(rows(rootElement)[1], 'imageHeight') as HTMLInputElement;
+    const numberShell = input.parentElement as HTMLElement;
+    expect(numberShell.className).toBe('pdfme-column-number');
+    expect(numberShell.style.height).toBe('40px');
+    expect(numberShell.style.borderRadius).toBe('8px');
+    expect(input.style.borderWidth).toBe('0px');
+    expect(numberShell.querySelector('[aria-label="Increase Value"]')).not.toBeNull();
+    expect(numberShell.querySelector('[aria-label="Decrease Value"]')).not.toBeNull();
+
+    expect(rootElement.style.getPropertyValue('--pdfme-hover-border')).toBe('#445566');
+    expect(rootElement.style.getPropertyValue('--pdfme-active-border')).toBe('#112233');
+    expect(rootElement.style.getPropertyValue('--pdfme-outline')).toBe('rgba(1, 2, 3, 0.2)');
+    expect(rootElement.style.getPropertyValue('--pdfme-outline-width')).toBe('3px');
+    expect(rootElement.style.getPropertyValue('--pdfme-handle-width')).toBe('24px');
+    const css = rootElement.querySelector('style')?.textContent ?? '';
+    expect(css).toContain('.pdfme-column-select:hover');
+    expect(css).toContain('.pdfme-column-number:focus-within');
+    expect(css).toContain('appearance: none');
+    expect(css).toContain('appearance: textfield');
+  });
+
+  test('height steppers commit one millimeter and stop at 1', () => {
+    const table = baseTable();
+    table.columnStyles = {
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+    };
+    const { rootElement, changeSchemas } = renderColumns(table);
+    const row = rows(rootElement)[1];
+    const input = control(row, 'imageHeight') as HTMLInputElement;
+    row.querySelector<HTMLButtonElement>('[data-control="imageHeightUp"]')?.click();
+    expect(input.value).toBe('21');
+    expect(stylesChange(changeSchemas)[0].value).toMatchObject({ imageHeight: { 1: 21 } });
+
+    changeSchemas.mockClear();
+    input.value = '1';
+    row.querySelector<HTMLButtonElement>('[data-control="imageHeightDown"]')?.click();
+    expect(input.value).toBe('1');
+    expect(changeSchemas).not.toHaveBeenCalled();
   });
 
   test('text to image sets defaults, centers only a missing alignment, and clears that column', () => {

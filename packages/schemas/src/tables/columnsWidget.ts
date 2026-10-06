@@ -32,14 +32,131 @@ const expandedColumnBlocks = new Set<string>();
 
 const columnBlockKey = (schemaId: string, columnIndex: number) => `${schemaId}:${columnIndex}`;
 
+const themeRecord = (theme: PropPanelWidgetProps['theme'] | undefined) =>
+  (theme as unknown as Record<string, unknown> | undefined) ?? undefined;
+
 const themeToken = (
   theme: PropPanelWidgetProps['theme'] | undefined,
   key: string,
   fallback: string,
 ) => {
-  if (!theme) return fallback;
-  const value = (theme as unknown as Record<string, unknown>)[key];
+  const value = themeRecord(theme)?.[key];
   return typeof value === 'string' && value.length > 0 ? value : fallback;
+};
+
+const themeNumber = (
+  theme: PropPanelWidgetProps['theme'] | undefined,
+  key: string,
+  fallback: number,
+) => {
+  const value = themeRecord(theme)?.[key];
+  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+};
+
+/** antd outlined Select / InputNumber metrics, read from the Designer token when present. */
+const panelControlMetrics = (theme: PropPanelWidgetProps['theme'] | undefined) => {
+  const lineWidth = themeNumber(theme, 'lineWidth', 1);
+  const controlHeight = themeNumber(theme, 'controlHeight', 32);
+  const paddingSm = themeNumber(theme, 'paddingSM', 12);
+  const controlHeightSm = themeNumber(theme, 'controlHeightSM', 24);
+  const fontSize = themeNumber(theme, 'fontSize', 14);
+  const outlineWidth = themeNumber(theme, 'controlOutlineWidth', 2);
+  return {
+    lineWidth,
+    controlHeight,
+    borderRadius: themeNumber(theme, 'borderRadius', 6),
+    fontSize,
+    paddingInline: Math.max(0, paddingSm - lineWidth),
+    handleWidth: Math.max(0, controlHeightSm - lineWidth * 2),
+    handleFontSize: fontSize / 2,
+    outlineWidth,
+    colorBorder: themeToken(theme, 'colorBorder', '#d9d9d9'),
+    colorBg: themeToken(theme, 'colorBgContainer', '#ffffff'),
+    colorText: themeToken(theme, 'colorText', 'rgba(0, 0, 0, 0.88)'),
+    colorArrow: themeToken(theme, 'colorTextQuaternary', 'rgba(0, 0, 0, 0.25)'),
+    colorIcon: themeToken(theme, 'colorIcon', 'rgba(0, 0, 0, 0.45)'),
+    colorPrimary: themeToken(theme, 'colorPrimary', '#1677ff'),
+    colorPrimaryHover: themeToken(theme, 'colorPrimaryHover', '#4096ff'),
+    controlOutline: themeToken(theme, 'controlOutline', 'rgba(5, 145, 255, 0.1)'),
+    motion: themeToken(theme, 'motionDurationMid', '0.2s'),
+  };
+};
+
+const ANT_DOWN_PATH =
+  'M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z';
+const ANT_UP_PATH =
+  'M890.5 755.3L537.9 269.2c-12.8-17.6-39-17.6-51.7 0L133.5 755.3A8 8 0 00140 768h75c5.1 0 9.9-2.5 12.9-6.6L512 369.8l284.1 391.6c3 4.1 7.8 6.6 12.9 6.6h75c6.5 0 10.3-7.4 6.5-12.7z';
+
+const appendSvgIcon = (parent: HTMLElement, path: string, size: number) => {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '64 64 896 896');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('fill', 'currentColor');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  const shape = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  shape.setAttribute('d', path);
+  svg.appendChild(shape);
+  parent.appendChild(svg);
+};
+
+const ensurePanelControlStyles = (
+  rootElement: HTMLElement,
+  metrics: ReturnType<typeof panelControlMetrics>,
+) => {
+  rootElement.style.setProperty('--pdfme-hover-border', metrics.colorPrimaryHover);
+  rootElement.style.setProperty('--pdfme-active-border', metrics.colorPrimary);
+  rootElement.style.setProperty('--pdfme-outline', metrics.controlOutline);
+  rootElement.style.setProperty('--pdfme-outline-width', `${metrics.outlineWidth}px`);
+  rootElement.style.setProperty('--pdfme-handle-width', `${metrics.handleWidth}px`);
+  rootElement.style.setProperty('--pdfme-handle-hover', metrics.colorPrimary);
+  if (rootElement.querySelector('style[data-pdfme-column-controls]')) return;
+  const style = document.createElement('style');
+  style.dataset.pdfmeColumnControls = 'true';
+  style.textContent = `
+.pdfme-column-select:hover,
+.pdfme-column-number:hover {
+  border-color: var(--pdfme-hover-border);
+}
+.pdfme-column-select:focus-within,
+.pdfme-column-number:focus-within {
+  border-color: var(--pdfme-active-border);
+  box-shadow: 0 0 0 var(--pdfme-outline-width) var(--pdfme-outline);
+  outline: 0;
+}
+.pdfme-column-select-input,
+.pdfme-column-number-input {
+  outline: none;
+}
+.pdfme-column-select-input {
+  appearance: none;
+  -webkit-appearance: none;
+}
+.pdfme-column-number-input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.pdfme-column-number-input::-webkit-outer-spin-button,
+.pdfme-column-number-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.pdfme-column-number-handlers {
+  opacity: 0;
+  width: 0;
+}
+.pdfme-column-number:hover .pdfme-column-number-handlers,
+.pdfme-column-number:focus-within .pdfme-column-number-handlers {
+  opacity: 1;
+  width: var(--pdfme-handle-width);
+}
+.pdfme-column-number-handler:hover {
+  color: var(--pdfme-handle-hover);
+  height: 60%;
+}
+`;
+  rootElement.appendChild(style);
 };
 
 type ColumnStyleMap<T> = { [colIndex: number]: T } | undefined;
@@ -209,14 +326,46 @@ const appendSelect = (
   value: string,
   control: string,
   columnIndex: number,
-  width: string,
+  metrics: ReturnType<typeof panelControlMetrics>,
+  layout: { width?: string; flex?: string },
   onChange: (value: string) => void,
 ) => {
+  const shell = document.createElement('div');
+  shell.className = 'pdfme-column-select';
+  shell.style.position = 'relative';
+  shell.style.display = 'inline-flex';
+  shell.style.alignItems = 'center';
+  shell.style.boxSizing = 'border-box';
+  shell.style.height = `${metrics.controlHeight}px`;
+  shell.style.border = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+  shell.style.borderRadius = `${metrics.borderRadius}px`;
+  shell.style.background = metrics.colorBg;
+  shell.style.overflow = 'hidden';
+  shell.style.transition = `all ${metrics.motion}`;
+  shell.style.flexShrink = layout.flex ? '1' : '0';
+  if (layout.width) shell.style.width = layout.width;
+  if (layout.flex) {
+    shell.style.flex = layout.flex;
+    shell.style.minWidth = '0';
+  }
+
   const select = document.createElement('select');
+  select.className = 'pdfme-column-select-input';
   select.dataset.control = control;
   select.dataset.columnIndex = String(columnIndex);
-  select.style.width = width;
-  select.style.flexShrink = '0';
+  select.style.width = '100%';
+  select.style.height = '100%';
+  select.style.boxSizing = 'border-box';
+  select.style.margin = '0';
+  select.style.border = '0';
+  select.style.borderRadius = `${metrics.borderRadius}px`;
+  select.style.background = 'transparent';
+  select.style.padding = `0 ${metrics.paddingInline + 18}px 0 ${metrics.paddingInline}px`;
+  select.style.font = 'inherit';
+  select.style.fontSize = `${metrics.fontSize}px`;
+  select.style.lineHeight = `${metrics.controlHeight - metrics.lineWidth * 2}px`;
+  select.style.color = metrics.colorText;
+  select.style.cursor = 'pointer';
   options.forEach((option) => {
     const element = document.createElement('option');
     element.value = option.value;
@@ -227,8 +376,136 @@ const appendSelect = (
   select.addEventListener('change', () => {
     onChange(select.value);
   });
-  parent.appendChild(select);
+
+  const arrow = document.createElement('span');
+  arrow.className = 'pdfme-column-select-arrow';
+  arrow.setAttribute('aria-hidden', 'true');
+  arrow.style.position = 'absolute';
+  arrow.style.top = '50%';
+  arrow.style.right = `${metrics.paddingInline}px`;
+  arrow.style.transform = 'translateY(-50%)';
+  arrow.style.display = 'flex';
+  arrow.style.width = '12px';
+  arrow.style.height = '12px';
+  arrow.style.color = metrics.colorArrow;
+  arrow.style.fontSize = '12px';
+  arrow.style.lineHeight = '1';
+  arrow.style.pointerEvents = 'none';
+  appendSvgIcon(arrow, ANT_DOWN_PATH, 12);
+
+  shell.appendChild(select);
+  shell.appendChild(arrow);
+  parent.appendChild(shell);
   return select;
+};
+
+const appendNumberInput = (
+  parent: HTMLElement,
+  value: string,
+  columnIndex: number,
+  ariaLabel: string,
+  metrics: ReturnType<typeof panelControlMetrics>,
+  onCommit: (input: HTMLInputElement) => void,
+) => {
+  const shell = document.createElement('div');
+  shell.className = 'pdfme-column-number';
+  shell.style.position = 'relative';
+  shell.style.display = 'inline-flex';
+  shell.style.alignItems = 'center';
+  shell.style.boxSizing = 'border-box';
+  shell.style.width = '72px';
+  shell.style.height = `${metrics.controlHeight}px`;
+  shell.style.flexShrink = '0';
+  shell.style.border = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+  shell.style.borderRadius = `${metrics.borderRadius}px`;
+  shell.style.background = metrics.colorBg;
+  shell.style.transition = `all ${metrics.motion}`;
+  shell.style.overflow = 'hidden';
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '1';
+  input.step = '1';
+  input.className = 'pdfme-column-number-input';
+  input.dataset.control = 'imageHeight';
+  input.dataset.columnIndex = String(columnIndex);
+  input.setAttribute('aria-label', ariaLabel);
+  input.style.width = '100%';
+  input.style.height = '100%';
+  input.style.boxSizing = 'border-box';
+  input.style.margin = '0';
+  input.style.border = '0';
+  input.style.borderRadius = '0';
+  input.style.background = 'transparent';
+  input.style.padding = `0 ${metrics.paddingInline}px`;
+  input.style.font = 'inherit';
+  input.style.fontSize = `${metrics.fontSize}px`;
+  input.style.lineHeight = '22px';
+  input.style.color = metrics.colorText;
+  input.value = value;
+  input.addEventListener('change', () => {
+    onCommit(input);
+  });
+
+  const handlers = document.createElement('div');
+  handlers.className = 'pdfme-column-number-handlers';
+  handlers.style.position = 'absolute';
+  handlers.style.top = '0';
+  handlers.style.right = '0';
+  handlers.style.bottom = '0';
+  handlers.style.display = 'flex';
+  handlers.style.flexDirection = 'column';
+  handlers.style.overflow = 'hidden';
+  handlers.style.background = metrics.colorBg;
+  handlers.style.borderRadius = `0 ${metrics.borderRadius}px ${metrics.borderRadius}px 0`;
+  handlers.style.transition = `all ${metrics.motion}`;
+
+  const step = (delta: number) => {
+    const current = Number(input.value);
+    const base = Number.isFinite(current) ? current : Number(value);
+    const next = Math.max(1, base + delta);
+    if (next === base) return;
+    input.value = String(next);
+    input.dispatchEvent(new Event('change'));
+  };
+
+  const addHandler = (direction: 'up' | 'down', path: string, label: string) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'pdfme-column-number-handler';
+    button.dataset.control = direction === 'up' ? 'imageHeightUp' : 'imageHeightDown';
+    button.setAttribute('aria-label', label);
+    button.style.flex = '1 1 50%';
+    button.style.display = 'flex';
+    button.style.alignItems = 'center';
+    button.style.justifyContent = 'center';
+    button.style.margin = '0';
+    button.style.padding = '0';
+    button.style.border = '0';
+    button.style.borderLeft = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+    button.style.background = 'transparent';
+    button.style.color = metrics.colorIcon;
+    button.style.cursor = 'pointer';
+    button.style.lineHeight = '0';
+    if (direction === 'down') {
+      button.style.borderTop = `${metrics.lineWidth}px solid ${metrics.colorBorder}`;
+    }
+    button.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+    });
+    button.addEventListener('click', () => {
+      step(direction === 'up' ? 1 : -1);
+    });
+    appendSvgIcon(button, path, metrics.handleFontSize);
+    handlers.appendChild(button);
+  };
+
+  addHandler('up', ANT_UP_PATH, 'Increase Value');
+  addHandler('down', ANT_DOWN_PATH, 'Decrease Value');
+  shell.appendChild(input);
+  shell.appendChild(handlers);
+  parent.appendChild(shell);
+  return input;
 };
 
 const appendButtonGroup = (
@@ -288,6 +565,8 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
   const table = activeSchema as unknown as TableSchema;
   const head = table.head || [];
   const columnStyles = table.columnStyles ?? {};
+  const metrics = panelControlMetrics(props.theme);
+  ensurePanelControlStyles(rootElement, metrics);
   const colors = {
     primary: themeToken(props.theme, 'colorPrimary', '#1677ff'),
     border: themeToken(props.theme, 'colorBorder', '#d9d9d9'),
@@ -443,7 +722,8 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       cellType,
       'cellType',
       index,
-      '110px',
+      metrics,
+      { width: '110px' },
       (value) => {
         if (value !== 'text' && value !== 'image') return;
         if (value === cellType) return;
@@ -500,40 +780,32 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
         mode,
         'imageHeightMode',
         index,
-        'auto',
+        metrics,
+        { flex: '1' },
         (value) => {
           if (value !== 'fixed' && value !== 'auto') return;
           if (value === mode) return;
           setImageHeightMode(props, table, index, value);
         },
       );
-      const modeSelect = imageRow.querySelector('select');
-      if (modeSelect) {
-        modeSelect.style.flex = '1';
-        modeSelect.style.minWidth = '0';
-      }
 
       if (mode === 'fixed') {
         const displayHeight = resolveFixedTableImageHeight(columnStyles.imageHeight?.[index]);
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.min = '1';
-        input.step = '1';
-        input.dataset.control = 'imageHeight';
-        input.dataset.columnIndex = String(index);
-        input.setAttribute('aria-label', i18n('schemas.table.imageHeightMode.fixed'));
-        input.style.width = '72px';
-        input.style.flexShrink = '0';
-        input.value = String(displayHeight);
-        input.addEventListener('change', () => {
-          const parsed = Number(input.value);
-          if (!Number.isFinite(parsed) || parsed <= 0) {
-            input.value = String(displayHeight);
-            return;
-          }
-          setImageHeight(props, table, index, parsed);
-        });
-        imageRow.appendChild(input);
+        appendNumberInput(
+          imageRow,
+          String(displayHeight),
+          index,
+          i18n('schemas.table.imageHeightMode.fixed'),
+          metrics,
+          (input) => {
+            const parsed = Number(input.value);
+            if (!Number.isFinite(parsed) || parsed <= 0) {
+              input.value = String(displayHeight);
+              return;
+            }
+            setImageHeight(props, table, index, parsed);
+          },
+        );
       }
       body.appendChild(imageRow);
     }
