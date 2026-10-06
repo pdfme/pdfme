@@ -1,0 +1,59 @@
+{
+  "author": "pdfme",
+  "basePdf": {
+    "width": 210,
+    "height": 297,
+    "padding": [20, 10, 20, 10]
+  },
+  "schemas": [
+    [
+      {
+        "name": "items",
+        "type": "table",
+        "position": { "x": 15, "y": 20 },
+        "width": 180,
+        "height": 140,
+        "content": "[[\"Notebook\",\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEklEQVR4nGMQW+wlttiLAUIBABuSBA0L9DOQAAAAAElFTkSuQmCC\",\"Ruled, 80 pages\"],[\"Cable\",\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAABCAIAAACUgoPjAAAADUlEQVR4nGO4o6YGQQAThAN5L3l43QAAAABJRU5ErkJggg==\",\"USB-C, 2m\"],[\"Stand\",\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAADCAIAAADdv/LVAAAADklEQVR4nGNQTX7NAMUAF9AEWqONmRYAAAAASUVORK5CYII=\",\"Aluminum\"],[\"Adapter\",\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAIAAAB7QOjdAAAAD0lEQVR4nGO4Wc52s5wNAAsHAq2beG3HAAAAAElFTkSuQmCC\",\"30W\"]]",
+        "showHead": true,
+        "repeatHead": true,
+        "head": ["Item", "Photo", "Note"],
+        "headWidthPercentages": [30, 30, 40],
+        "tableStyles": {
+          "borderColor": "#000000",
+          "borderWidth": 0.3
+        },
+        "headStyles": {
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 13,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#ffffff",
+          "backgroundColor": "#2980ba",
+          "borderColor": "",
+          "borderWidth": { "top": 0, "right": 0, "bottom": 0, "left": 0 },
+          "padding": { "top": 5, "right": 5, "bottom": 5, "left": 5 }
+        },
+        "bodyStyles": {
+          "alignment": "left",
+          "verticalAlignment": "middle",
+          "fontSize": 13,
+          "lineHeight": 1,
+          "characterSpacing": 0,
+          "fontColor": "#000000",
+          "backgroundColor": "",
+          "alternateBackgroundColor": "#f5f5f5",
+          "borderColor": "#888888",
+          "borderWidth": { "top": 0.1, "right": 0.1, "bottom": 0.1, "left": 0.1 },
+          "padding": { "top": 5, "right": 5, "bottom": 5, "left": 5 }
+        },
+        "columnStyles": {
+          "alignment": { "1": "center" },
+          "cellType": { "1": "image" },
+          "imageHeightMode": { "1": "fixed" },
+          "imageHeight": { "1": 20 }
+        }
+      }
+    ]
+  ]
+}

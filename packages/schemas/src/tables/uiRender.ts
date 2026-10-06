@@ -162,8 +162,12 @@ const renderRowUi = (args: {
 
       drawBorder(div, row, colIndex, rowIndex, rows.length, arg, value.length);
 
+      const imageCellEditable =
+        arg.mode === 'designer' || (arg.mode === 'form' && !arg.schema.readOnly);
       div.style.cursor = cell.isImage()
-        ? 'default'
+        ? imageCellEditable && section === 'body'
+          ? 'pointer'
+          : 'default'
         : arg.mode === 'designer' || (arg.mode === 'form' && section === 'body')
           ? 'text'
           : 'default';
@@ -181,8 +185,8 @@ const renderRowUi = (args: {
       } else if (arg.mode === 'designer') {
         mode = isEditing ? 'designer' : 'form';
       }
-      // The image renderer always paints an <img>. Idle cells stay in viewer so a
-      // later editor is not mounted on every cell; selecting one still has no editor.
+      // Idle image cells stay in viewer so the file control is mounted only on the
+      // selected cell. Selecting one uses designer mode, which opens the editor.
       if (cell.isImage() && !isEditing) {
         mode = 'viewer';
       }
@@ -220,6 +224,7 @@ const renderRowUi = (args: {
           height: cell.height,
           ...convertToCellStyle(cell.styles),
           cellType: cell.isImage() ? 'image' : 'text',
+          columnIndex: colIndex,
         },
       });
       colOffsetX += cell.width;

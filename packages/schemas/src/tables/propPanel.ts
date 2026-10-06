@@ -7,6 +7,7 @@ import {
   getColumnStylesPropPanelSchema,
 } from './helper.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { TableColumns } from './columnsWidget.js';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
@@ -67,6 +68,20 @@ export const propPanel: PropPanel<TableSchema> = {
         span: 24,
         properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
       },
+      tableColumns: {
+        title: i18n('schemas.table.columns'),
+        type: 'object',
+        widget: 'Card',
+        span: 24,
+        properties: {
+          columns: {
+            type: 'void',
+            widget: 'TableColumns',
+            bind: false,
+            span: 24,
+          },
+        },
+      },
       columnStyles: {
         title: i18n('schemas.table.columnStyle'),
         type: 'object',
@@ -76,6 +91,7 @@ export const propPanel: PropPanel<TableSchema> = {
       },
     };
   },
+  widgets: { TableColumns },
   defaultSchema: {
     name: '',
     type: 'table',

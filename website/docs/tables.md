@@ -183,7 +183,27 @@ Keep sample images small (about 100KB or less). The data URL is copied into the 
 
 Header cells are always text, even in an image column. A `cellType` of `null` is unsupported and is treated as text, without a warning. A column type this version does not know (for example a future `qrcode`) is treated as text, and that unknown value is warned about once.
 
-Older pdfme versions ignore `cellType` and show the data URL as text. The Designer control for image columns is not in this version; set `columnStyles` in the template until that UI ships.
+Older pdfme versions ignore `cellType` and show the data URL as text.
+
+### Choosing an image column
+
+Select the table in the Designer. The **Columns** card sits above Column Style, with one row per column. The row label is the heading, or "Column N" when the heading is empty.
+
+- **Text** is the default. An unknown type is shown as Text until you change it.
+- **Image** sets that column's `cellType` to `"image"` and clears every body cell in the column. The heading is not changed, and header cells stay text.
+- The first time a column becomes an image, pdfme writes `imageHeightMode: "fixed"` and `imageHeight: 20` when they are missing, and `alignment: "center"` only when alignment is missing. An alignment you already set is kept.
+- Switching the column back to Text removes that column's `cellType`, `imageHeightMode`, and `imageHeight`. Empty maps are removed. Alignment is left as it is, and the body cells are cleared again.
+
+An image column also has a height mode:
+
+- **Fixed height (mm)** uses one image height for every row. The field shows the stored height, or 20 when the stored value is missing or is not a finite number greater than 0. A value that is not a finite number greater than 0 is discarded and the field returns to the height it was showing.
+- **Auto (fit width)** sizes the image from its aspect ratio. Switching between fixed and auto changes only `imageHeightMode` and keeps the millimeter value.
+
+### Editing an image cell
+
+Click a body cell in an image column. In the Designer, and in the Form when the table is not read-only, that cell shows **Select image**. **Remove image** appears once the cell has a value and sets the cell to `""`. The file input accepts PNG and JPEG only. An empty cell opens the file dialog once; if the browser does not open it, use Select image. A resolved PNG or JPEG is shown in the cell. An empty or invalid value shows the dotted placeholder.
+
+Cells you are not editing stay as a picture, with no button and no file input. Header cells stay text. A read-only Form table and the Viewer do the same: the picture only, and the cursor is the default arrow. An editable image cell uses a pointer cursor.
 
 ## About Table Settings
 
