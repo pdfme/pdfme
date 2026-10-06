@@ -162,6 +162,7 @@ export default class PDFDocument {
           (fileIds.get(0) as PDFHexString).asBytes(),
           password,
         ),
+        context.trailerInfo.Encrypt instanceof PDFRef ? context.trailerInfo.Encrypt : undefined,
       ).parseDocument();
       return new PDFDocument(decryptedContext, true, updateMetadata);
     } else {
