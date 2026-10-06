@@ -486,7 +486,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
             )}
           </>
         )}
-        renderSchema={({ schema, index }) => {
+        renderSchema={({ schema, pageIndex }) => {
           const mode =
             editing && activeElements.map((ae) => ae.id).includes(schema.id)
               ? 'designer'
@@ -505,7 +505,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                 {} as Record<string, string>,
               ),
               totalPages: schemasList.length,
-              currentPage: index + 1,
+              currentPage: pageIndex + 1,
             };
 
             value = resolveReadOnlyContent({

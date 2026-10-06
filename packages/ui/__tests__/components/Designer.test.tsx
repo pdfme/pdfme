@@ -1653,3 +1653,41 @@ test('selecting expand text on a non-blank PDF rewrites overflow without touchin
     cleanup();
   }
 });
+
+test('Designer resolves {currentPage} in read-only fields to the page number', async () => {
+  setupUIMock(2);
+  mockStableUuids();
+  const template = getTwoPageTemplate();
+  template.schemas[1] = [
+    {
+      name: 'pageLabel',
+      type: 'text',
+      content: '{currentPage}/{totalPages}',
+      readOnly: true,
+      position: { x: 20, y: 20 },
+      width: 100,
+      height: 15,
+    },
+  ];
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <Designer
+            template={template}
+            onSaveTemplate={console.log}
+            onChangeTemplate={console.log}
+            size={{ width: 1200, height: 1200 }}
+            onPageCursorChange={() => undefined}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  // page 1 holds two fields: the schema's index across pages would give "3/2"
+  expect(template.schemas[0].length).toBe(2);
+  await waitFor(() => {
+    expect(getSelectableByTitle(container, 'pageLabel')).toHaveTextContent('2/2');
+  });
+});
