@@ -1,4 +1,4 @@
-import { replacePlaceholders, resolveReadOnlyContent } from '../src/expression.js';
+import { mayBeJson, replacePlaceholders, resolveReadOnlyContent } from '../src/expression.js';
 import { SchemaPageArray } from '../src/index.js';
 
 describe('replacePlaceholders', () => {
@@ -809,4 +809,116 @@ describe('replacePlaceholders memory safety', () => {
     // strings (e.g. inline source maps in test fixtures).
     expect(retainedLargeStringBytes).toBeLessThan(2_000_000);
   }, 60_000);
+});
+
+describe('mayBeJson', () => {
+  const jsonParseAccepts = (value: string): boolean => {
+    try {
+      JSON.parse(value);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  // Strings that start like JSON but are not: mayBeJson lets them through and JSON.parse rejects them.
+  const leftToJsonParse = new Set(['"', '[', '{"a"']);
+
+  it('is false exactly for the strings JSON.parse rejects, so skipping the parse changes nothing', () => {
+    const samples = [
+      '',
+      ' ',
+      '0',
+      '-0',
+      '00',
+      '0012',
+      '1',
+      '-1',
+      '1.5',
+      '1.',
+      '.5',
+      '5.620',
+      '25,60',
+      '0.35',
+      '1e5',
+      '1E-5',
+      '1e',
+      '-',
+      '+1',
+      ' 42 ',
+      '\n7\t',
+      ' 7',
+      '7 ',
+      'NaN',
+      'Infinity',
+      'true',
+      'false',
+      'null',
+      ' true ',
+      'True',
+      'nul',
+      'nullx',
+      'truthy',
+      'f',
+      '"quoted"',
+      '"',
+      '{"a":1}',
+      '{a:1}',
+      '[1,2]',
+      '[',
+      '{',
+      '{}',
+      ' { } ',
+      '{"a"',
+      '{x}',
+      '{ "a": [1] }',
+      ' [1] ',
+      '<svg/>',
+      'data:image/png;base64,AA',
+      '1.250,50 €',
+      '€ 4.146',
+      'Via Esempio 2',
+      '+41 00 000 00 01',
+      '01/10/2026',
+      '30%',
+      '8.10',
+      '0.00',
+      '-01',
+      '-.5',
+      '1.5e',
+      '1e+',
+      '0x10',
+      '1_000',
+      'fals',
+      'nullnull',
+      '\ttrue\n',
+      'false ',
+      ' null',
+    ];
+    for (const sample of samples) {
+      const expected = jsonParseAccepts(sample) || leftToJsonParse.has(sample);
+      expect(mayBeJson(sample), JSON.stringify(sample)).toBe(expected);
+    }
+  });
+
+  it('lets replacePlaceholders call JSON.parse only for values that can be JSON', () => {
+    const schemas = [
+      [
+        { name: 'title', type: 'text', content: '{name}: {items.length}', readOnly: true },
+        { name: 'note', type: 'text', content: 'Via Roma 1', readOnly: true },
+      ],
+    ] as unknown as SchemaPageArray;
+    const variables = { name: 'Acme', address: 'Via Roma 1', items: '["a","b"]', count: '2' };
+    const parse = vi.spyOn(JSON, 'parse');
+    try {
+      expect(replacePlaceholders({ content: '{name}: {items.length}', variables, schemas })).toBe(
+        'Acme: 2',
+      );
+      // `items` and `count` are the only values that can be JSON; the placeholders, the address
+      // and the schema contents used to make JSON.parse throw, once each per field
+      expect(parse).toHaveBeenCalledTimes(2);
+    } finally {
+      parse.mockRestore();
+    }
+  });
 });
