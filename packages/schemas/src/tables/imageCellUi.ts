@@ -7,6 +7,42 @@ import type { CellSchema } from './types.js';
 
 const buttonSize = 18;
 
+type ImagePickerRequest = { rowIndex: number; colIndex: number; schemaKey: string };
+
+let pendingImagePicker: ImagePickerRequest | null = null;
+
+export const tableSchemaKey = (schema: { name: string; id?: unknown }): string =>
+  typeof schema.id === 'string' && schema.id !== '' ? schema.id : schema.name;
+
+export const noteRenderingTable = (schema: { name: string; id?: unknown }) => {
+  const schemaKey = tableSchemaKey(schema);
+  if (pendingImagePicker && pendingImagePicker.schemaKey !== schemaKey) {
+    pendingImagePicker = null;
+  }
+};
+
+export const clearImagePickerRequest = () => {
+  pendingImagePicker = null;
+};
+
+export const requestImagePicker = (request: ImagePickerRequest) => {
+  pendingImagePicker = request;
+};
+
+const consumePendingImagePicker = (request: ImagePickerRequest): boolean => {
+  const pending = pendingImagePicker;
+  if (
+    !pending ||
+    pending.rowIndex !== request.rowIndex ||
+    pending.colIndex !== request.colIndex ||
+    pending.schemaKey !== request.schemaKey
+  ) {
+    return false;
+  }
+  pendingImagePicker = null;
+  return true;
+};
+
 const createImageButton = (options: {
   text: string;
   ariaLabel: string;
@@ -106,9 +142,14 @@ export const renderTableImageCellUi = (arg: UIRenderProps<CellSchema>) => {
     event.stopPropagation();
   });
   input.addEventListener('change', () => {
+    if (!input.files || input.files.length === 0) return;
     readFile(input.files)
       .then((result) => {
-        if (typeof result === 'string' && TABLE_IMAGE_DATA_URL_PATTERN.test(result)) {
+        if (
+          typeof result === 'string' &&
+          TABLE_IMAGE_DATA_URL_PATTERN.test(result) &&
+          resolveImageDimension(result, _cache)
+        ) {
           onChange?.({ key: 'content', value: result });
           return;
         }
@@ -145,7 +186,13 @@ export const renderTableImageCellUi = (arg: UIRenderProps<CellSchema>) => {
     );
   }
 
-  if (!hasValue) {
+  const { rowIndex, columnIndex, pickerSchemaKey } = schema;
+  const openedByCellClick =
+    typeof rowIndex === 'number' &&
+    typeof columnIndex === 'number' &&
+    typeof pickerSchemaKey === 'string' &&
+    consumePendingImagePicker({ rowIndex, colIndex: columnIndex, schemaKey: pickerSchemaKey });
+  if (openedByCellClick && !hasValue) {
     input.click();
   }
 };

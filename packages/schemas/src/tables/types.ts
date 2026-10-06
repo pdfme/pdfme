@@ -31,6 +31,9 @@ export type CellSchema = Schema &
     imageHeightMode?: TableImageHeightMode;
     imageHeight?: number;
     columnIndex?: number;
+    rowIndex?: number;
+    // Render-only identity of the table being painted. Not stored on the template.
+    pickerSchemaKey?: string;
   };
 
 export type TableSchema = Schema & {

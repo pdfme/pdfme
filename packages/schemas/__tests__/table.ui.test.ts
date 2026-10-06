@@ -151,7 +151,11 @@ const renderImageTable = async (options: {
   await uiRender({ ...arg, mode: 'viewer', onChange: () => undefined });
   rootElement.innerHTML = '';
   await uiRender({ ...arg, mode: options.mode });
-  return { rootElement, onChange, schema };
+  const rerender = async (nextValue?: string) => {
+    if (nextValue !== undefined) arg.value = nextValue;
+    await uiRender({ ...arg, mode: options.mode });
+  };
+  return { rootElement, onChange, schema, rerender };
 };
 
 const fileList = (file: File): FileList => {
@@ -166,6 +170,24 @@ const setInputFile = (input: HTMLInputElement, file: File) => {
   Object.defineProperty(input, 'files', { configurable: true, value: fileList(file) });
   input.dispatchEvent(new Event('change'));
 };
+
+const emptyFileList = (): FileList => {
+  const list = Object.create(FileList.prototype) as FileList;
+  Object.defineProperty(list, 'length', { value: 0 });
+  list.item = () => null;
+  return list;
+};
+
+const fileFromDataUrl = (dataUrl: string, name: string, type: string) => {
+  const encoded = dataUrl.split(',')[1] ?? '';
+  const bytes = Uint8Array.from(atob(encoded), (char) => char.charCodeAt(0));
+  return new File([bytes], name, { type });
+};
+
+const emptyImageCell = (root: ParentNode) =>
+  [...root.querySelectorAll<HTMLDivElement>('div')].find(
+    (element) => element.style.cursor === 'pointer' && element.querySelector('img') === null,
+  );
 
 const isEditor = (element: HTMLElement) =>
   element.contentEditable === 'plaintext-only' || element.contentEditable === 'true';
@@ -235,48 +257,76 @@ describe('table image cells', () => {
     click.mockRestore();
   });
 
-  test('opens the file dialog once for an empty designer cell', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click').mockImplementation(() => undefined);
-    const value = JSON.stringify([
-      ['Alice', '', 'Designer'],
-      ['Bob', WIDE_3_1_PNG, 'Illustrator'],
-    ]);
-    const { rootElement } = await renderImageTable({ mode: 'designer', value });
-    const emptyCell = [...rootElement.querySelectorAll<HTMLDivElement>('div')].find(
-      (element) => element.style.cursor === 'pointer' && element.querySelector('img') === null,
-    );
-    expect(emptyCell).toBeDefined();
+  test.each(['designer', 'form'] as const)(
+    '%s opens the file dialog only when an empty image cell is clicked',
+    async (mode) => {
+      const click = vi
+        .spyOn(HTMLInputElement.prototype, 'click')
+        .mockImplementation(() => undefined);
+      const value = JSON.stringify([
+        ['Alice', '', 'Designer'],
+        ['Bob', WIDE_3_1_PNG, 'Illustrator'],
+      ]);
+      const { rootElement, onChange, rerender } = await renderImageTable({ mode, value });
+      const emptyCell = emptyImageCell(rootElement);
+      expect(emptyCell).toBeDefined();
 
-    emptyCell!.click();
-    await vi.waitFor(() => {
+      emptyCell!.click();
+      await vi.waitFor(() => {
+        expect(fileInputs(rootElement)).toHaveLength(1);
+      });
+
+      const editor = fileInputs(rootElement)[0].parentElement!;
+      expect(editor.textContent).toContain('schemas.table.imageCell.placeholder');
+      expect(buttonByLabel(editor, 'schemas.table.imageCell.select')).not.toBeNull();
+      expect(buttonByLabel(editor, 'schemas.table.imageCell.remove')).toBeNull();
+      expect(editor.querySelector('img')).toBeNull();
+      expect(click).toHaveBeenCalledTimes(1);
+
+      await rerender();
+      await rerender();
+      expect(click).toHaveBeenCalledTimes(1);
       expect(fileInputs(rootElement)).toHaveLength(1);
-    });
 
-    const editor = fileInputs(rootElement)[0].parentElement!;
-    expect(editor.textContent).toContain('schemas.table.imageCell.placeholder');
-    expect(buttonByLabel(editor, 'schemas.table.imageCell.select')).not.toBeNull();
-    expect(buttonByLabel(editor, 'schemas.table.imageCell.remove')).toBeNull();
-    expect(editor.querySelector('img')).toBeNull();
-    expect(click).toHaveBeenCalledTimes(1);
-    click.mockRestore();
-  });
+      emptyImageCell(rootElement)!.click();
+      await vi.waitFor(() => {
+        expect(fileInputs(rootElement)).toHaveLength(1);
+      });
+      expect(click).toHaveBeenCalledTimes(1);
 
-  test('an empty cell does not reopen itself after the file dialog click', async () => {
-    const value = JSON.stringify([['Alice', '', 'Designer']]);
-    const { rootElement } = await renderImageTable({ mode: 'designer', value });
-    const emptyCell = [...rootElement.querySelectorAll<HTMLDivElement>('div')].find(
-      (element) => element.style.cursor === 'pointer',
-    );
-    expect(emptyCell).toBeDefined();
+      const beforeAdd = contentChanges(onChange).length;
+      buttonByLabel(rootElement, 'Add row')!.click();
+      expect(contentChanges(onChange).length).toBe(beforeAdd + 1);
+      await rerender(contentChanges(onChange).at(-1).value as string);
+      await rerender();
+      expect(click).toHaveBeenCalledTimes(1);
+      click.mockRestore();
+    },
+  );
 
-    emptyCell!.click();
-    await vi.waitFor(() => {
+  test.each(['designer', 'form'] as const)(
+    '%s does not open the file dialog when a removed image rerenders',
+    async (mode) => {
+      const click = vi
+        .spyOn(HTMLInputElement.prototype, 'click')
+        .mockImplementation(() => undefined);
+      const { rootElement, onChange, rerender } = await renderImageTable({ mode });
+      rootElement.querySelector('img')!.click();
+      await vi.waitFor(() => {
+        expect(buttonByLabel(rootElement, 'schemas.table.imageCell.remove')).not.toBeNull();
+      });
+      expect(click).not.toHaveBeenCalled();
+
+      buttonByLabel(rootElement, 'schemas.table.imageCell.remove')!.click();
+      const cleared = JSON.parse(contentChanges(onChange).at(-1).value as string) as string[][];
+      expect(cleared[0][1]).toBe('');
+      await rerender(JSON.stringify(cleared));
+      await rerender();
+      expect(click).not.toHaveBeenCalled();
       expect(fileInputs(rootElement)).toHaveLength(1);
-    });
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(fileInputs(rootElement)).toHaveLength(1);
-    expect(buttonByLabel(rootElement, 'schemas.table.imageCell.select')).not.toBeNull();
-  });
+      click.mockRestore();
+    },
+  );
 
   test('writes a PNG data URL into the selected cell and ignores a gif', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
@@ -287,7 +337,7 @@ describe('table image cells', () => {
     });
 
     const input = fileInputs(rootElement)[0];
-    const png = new File([new Uint8Array([1, 2, 3])], 'photo.png', { type: 'image/png' });
+    const png = fileFromDataUrl(WIDE_3_1_PNG, 'photo.png', 'image/png');
     setInputFile(input, png);
 
     await vi.waitFor(() => {
@@ -306,6 +356,43 @@ describe('table image cells', () => {
       expect(warn).toHaveBeenCalled();
     });
     expect(contentChanges(onChange)).toHaveLength(beforeGif);
+    warn.mockRestore();
+  });
+
+  test('canceling the file dialog does not warn', async () => {
+    const { rootElement, onChange } = await renderImageTable({ mode: 'designer' });
+    rootElement.querySelector('img')!.click();
+    await vi.waitFor(() => {
+      expect(fileInputs(rootElement)).toHaveLength(1);
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    const before = contentChanges(onChange).length;
+    const input = fileInputs(rootElement)[0];
+    Object.defineProperty(input, 'files', { configurable: true, value: emptyFileList() });
+    input.dispatchEvent(new Event('change'));
+    await Promise.resolve();
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(contentChanges(onChange)).toHaveLength(before);
+    warn.mockRestore();
+  });
+
+  test('does not write a PNG whose header cannot be read', async () => {
+    const { rootElement, onChange } = await renderImageTable({ mode: 'designer' });
+    rootElement.querySelector('img')!.click();
+    await vi.waitFor(() => {
+      expect(fileInputs(rootElement)).toHaveLength(1);
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    const before = contentChanges(onChange).length;
+    const png = new File([new Uint8Array([1, 2, 3])], 'photo.png', { type: 'image/png' });
+    setInputFile(fileInputs(rootElement)[0], png);
+    await vi.waitFor(() => {
+      expect(warn).toHaveBeenCalled();
+    });
+    expect(contentChanges(onChange)).toHaveLength(before);
     warn.mockRestore();
   });
 

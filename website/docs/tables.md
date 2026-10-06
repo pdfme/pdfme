@@ -201,7 +201,7 @@ An image column also has a height mode:
 
 ### Editing an image cell
 
-Click a body cell in an image column. In the Designer, and in the Form when the table is not read-only, that cell shows **Select image**. **Remove image** appears once the cell has a value and sets the cell to `""`. The file input accepts PNG and JPEG only. An empty cell opens the file dialog once; if the browser does not open it, use Select image. A resolved PNG or JPEG is shown in the cell. An empty or invalid value shows the dotted placeholder.
+Click a body cell in an image column. In the Designer, and in the Form when the table is not read-only, that cell shows **Select image**. **Remove image** appears once the cell has a value and sets the cell to `""`. The file input accepts PNG and JPEG only. Clicking an empty image cell opens the file dialog; if the browser does not open it, use Select image. A resolved PNG or JPEG is shown in the cell. An empty or invalid value shows the dotted placeholder.
 
 Cells you are not editing stay as a picture, with no button and no file input. Header cells stay text. A read-only Form table and the Viewer do the same: the picture only, and the cursor is the default arrow. An editable image cell uses a pointer cursor.
 
