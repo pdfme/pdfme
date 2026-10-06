@@ -245,6 +245,7 @@ describe('TableColumns widget', () => {
   test('writes a positive height and ignores 0, -1, and NaN', () => {
     const table = baseTable();
     table.columnStyles = {
+      alignment: { 1: 'center' },
       cellType: { 1: 'image' },
       imageHeightMode: { 1: 'fixed' },
       imageHeight: { 1: 20 },
@@ -258,6 +259,7 @@ describe('TableColumns widget', () => {
       {
         key: 'columnStyles',
         value: {
+          alignment: { 1: 'center' },
           cellType: { 1: 'image' },
           imageHeightMode: { 1: 'fixed' },
           imageHeight: { 1: 25 },

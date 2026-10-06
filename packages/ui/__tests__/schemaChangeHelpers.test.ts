@@ -5,6 +5,7 @@ import {
   expandSameTypeBulkUpdateChanges,
   getSameTypeBulkUpdateSchemas,
   isSingleSchemaOnlyChange,
+  mergeColumnStylesFormValue,
 } from '../src/components/Designer/RightSidebar/DetailView/schemaChangeHelpers.js';
 
 const schema = (id: string, type = 'text'): SchemaForUI => ({
@@ -124,6 +125,77 @@ describe('schema change helpers', () => {
         changes,
       }),
       changes,
+    );
+  });
+
+  it('keeps image column settings when the Column Style form sends alignment only', () => {
+    const stored = {
+      alignment: { 1: 'center' },
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+      fontName: { 0: 'Roboto' },
+    };
+    const formValue = { alignment: { 0: 'left', 1: 'right' } };
+
+    assert.deepEqual(mergeColumnStylesFormValue(stored, formValue), {
+      alignment: { 0: 'left', 1: 'right' },
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+      fontName: { 0: 'Roboto' },
+    });
+    assert.deepEqual(mergeColumnStylesFormValue(stored, { alignment: { 1: 'center' } }), stored);
+
+    const activeSchema = schema('table-1', 'table');
+    (activeSchema as SchemaForUI & { columnStyles: unknown }).columnStyles = stored;
+    const other = schema('table-2', 'table');
+    (other as SchemaForUI & { columnStyles: unknown }).columnStyles = {
+      alignment: { 1: 'left' },
+      cellType: { 1: 'image', 2: 'text' },
+      imageHeightMode: { 1: 'auto' },
+      imageHeight: { 1: 30 },
+    };
+
+    assert.deepEqual(
+      expandSameTypeBulkUpdateChanges({
+        activeSchema,
+        activeSchemas: [activeSchema],
+        changes: [{ key: 'columnStyles', value: formValue, schemaId: activeSchema.id }],
+      }),
+      [
+        {
+          key: 'columnStyles',
+          schemaId: 'table-1',
+          value: {
+            alignment: { 0: 'left', 1: 'right' },
+            cellType: { 1: 'image' },
+            imageHeightMode: { 1: 'fixed' },
+            imageHeight: { 1: 20 },
+            fontName: { 0: 'Roboto' },
+          },
+        },
+      ],
+    );
+
+    const expanded = expandSameTypeBulkUpdateChanges({
+      activeSchema,
+      activeSchemas: [activeSchema, other],
+      changes: [{ key: 'columnStyles', value: formValue, schemaId: activeSchema.id }],
+    });
+    assert.equal(expanded.length, 2);
+    assert.deepEqual(
+      (expanded[0].value as { cellType: unknown; alignment: unknown }).cellType,
+      { 1: 'image' },
+    );
+    assert.deepEqual(
+      (expanded[1].value as { cellType: unknown; imageHeight: unknown; alignment: unknown }),
+      {
+        alignment: { 0: 'left', 1: 'right' },
+        cellType: { 1: 'image', 2: 'text' },
+        imageHeightMode: { 1: 'auto' },
+        imageHeight: { 1: 30 },
+      },
     );
   });
 });
