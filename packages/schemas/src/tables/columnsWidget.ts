@@ -1,4 +1,4 @@
-import { cloneDeep, type PropPanelWidgetProps } from '@pdfme/common';
+import { cloneDeep, type ChangeSchemaItem, type PropPanelWidgetProps } from '@pdfme/common';
 import { DEFAULT_TABLE_IMAGE_HEIGHT, DEFAULT_TABLE_IMAGE_HEIGHT_MODE } from './constants.js';
 import {
   normalizeTableCellType,
@@ -54,7 +54,7 @@ const commitStyles = (
   content?: string,
 ) => {
   const schemaId = props.activeSchema.id;
-  const changes = [{ key: 'columnStyles', value: columnStyles, schemaId }];
+  const changes: ChangeSchemaItem[] = [{ key: 'columnStyles', value: columnStyles, schemaId }];
   if (content !== undefined) {
     changes.push({ key: 'content', value: content, schemaId });
   }

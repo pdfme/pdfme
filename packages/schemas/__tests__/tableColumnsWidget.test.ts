@@ -74,6 +74,7 @@ describe('TableColumns widget', () => {
       title: 'schemas.table.columns',
       type: 'object',
       widget: 'Card',
+      bind: false,
       span: 24,
     });
     expect(schema.tableColumns.properties).toMatchObject({

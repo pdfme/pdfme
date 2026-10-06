@@ -72,6 +72,7 @@ export const propPanel: PropPanel<TableSchema> = {
         title: i18n('schemas.table.columns'),
         type: 'object',
         widget: 'Card',
+        bind: false,
         span: 24,
         properties: {
           columns: {
