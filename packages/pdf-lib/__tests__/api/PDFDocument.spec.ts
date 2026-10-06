@@ -243,6 +243,33 @@ describe(`PDFDocument`, () => {
       pdfDoc.setLanguage('');
       expect(String(pdfDoc.catalog.get(PDFName.of('Lang')))).toBe('()');
     });
+
+    it(`escapes parens and backslashes in the language`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage();
+      const language = 'x-odd) (tag \\';
+      pdfDoc.setLanguage(language);
+
+      const reloaded = await PDFDocument.load(await pdfDoc.save());
+      expect(reloaded.catalog.lookup(PDFName.of('Lang'), PDFString).decodeText()).toBe(language);
+    });
+  });
+
+  describe(`attach() method`, () => {
+    it(`escapes parens and backslashes in the file name`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage();
+      const fileName = 'notes) draft \\.txt';
+      await pdfDoc.attach(new Uint8Array([104, 105]), fileName, { mimeType: 'text/plain' });
+
+      const reloaded = await PDFDocument.load(await pdfDoc.save());
+      const names = reloaded.catalog
+        .lookup(PDFName.of('Names'), PDFDict)
+        .lookup(PDFName.of('EmbeddedFiles'), PDFDict)
+        .lookup(PDFName.of('Names'), PDFArray);
+      const fileSpec = names.lookup(1, PDFDict);
+      expect(fileSpec.lookup(PDFName.of('F'), PDFString).decodeText()).toBe(fileName);
+    });
   });
 
   describe(`getPageCount() method`, () => {
