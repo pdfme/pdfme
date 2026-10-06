@@ -4,51 +4,6 @@ import type { ChangeSchemaItem, SchemaForUI } from '@pdfme/common';
 // these can duplicate names, rewrite field values, replace schema shapes, or stack fields.
 const singleSchemaOnlyChangeKeys = new Set(['id', 'name', 'type', 'content', 'position']);
 
-const isPlainObject = (value: unknown): value is Record<string, unknown> => {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-  const prototype: unknown = Object.getPrototypeOf(value);
-  return prototype === Object.prototype || prototype === null;
-};
-
-const columnStylesOf = (schema: SchemaForUI): unknown =>
-  (schema as SchemaForUI & { columnStyles?: unknown }).columnStyles;
-
-// Column Style is a custom widget that commits a full columnStyles clone.
-// A partial payload (or a same-type bulk apply of one) still has to keep keys
-// it does not send, such as cellType, image heights, and unknown maps.
-export const mergeColumnStylesFormValue = (stored: unknown, formValue: unknown): unknown => {
-  if (!isPlainObject(formValue) || !isPlainObject(stored)) return formValue;
-  const next: Record<string, unknown> = { ...stored };
-  for (const key of Object.keys(formValue)) {
-    next[key] = formValue[key];
-  }
-  return structuredClone(next);
-};
-
-const preserveColumnStyles = (
-  changes: ChangeSchemaItem[],
-  schemas: SchemaForUI[],
-): ChangeSchemaItem[] => {
-  if (!changes.some((change) => change.key === 'columnStyles')) {
-    if (schemas.length <= 1) return changes;
-    return changes.flatMap((change) =>
-      schemas.map((schema) => ({ ...change, schemaId: schema.id })),
-    );
-  }
-
-  return changes.flatMap((change) =>
-    schemas.map((schema) =>
-      change.key === 'columnStyles'
-        ? {
-            ...change,
-            schemaId: schema.id,
-            value: mergeColumnStylesFormValue(columnStylesOf(schema), change.value),
-          }
-        : { ...change, schemaId: schema.id },
-    ),
-  );
-};
-
 export const getSameTypeBulkUpdateSchemas = ({
   activeSchema,
   activeSchemas,
@@ -79,16 +34,16 @@ export const expandSameTypeBulkUpdateChanges = ({
   changes: ChangeSchemaItem[];
 }): ChangeSchemaItem[] => {
   const targetSchemas = getSameTypeBulkUpdateSchemas({ activeSchema, activeSchemas });
-  if (targetSchemas.length <= 1) return preserveColumnStyles(changes, [activeSchema]);
+  if (targetSchemas.length <= 1) return changes;
 
   const isActiveSchemaOnlyChange = changes.every((change) => change.schemaId === activeSchema.id);
   if (!isActiveSchemaOnlyChange) return changes;
 
   // Some widgets send dependent updates in one batch. If any part of that batch must stay
   // single-schema-only, keep the whole batch together to avoid partial cross-schema state.
-  if (changes.some((change) => isSingleSchemaOnlyChange(change.key))) {
-    return preserveColumnStyles(changes, [activeSchema]);
-  }
+  if (changes.some((change) => isSingleSchemaOnlyChange(change.key))) return changes;
 
-  return preserveColumnStyles(changes, targetSchemas);
+  return changes.flatMap((change) => {
+    return targetSchemas.map((schema) => ({ ...change, schemaId: schema.id }));
+  });
 };

@@ -188,7 +188,7 @@ Older pdfme versions ignore `cellType` and show the data URL as text.
 
 ### Choosing an image column
 
-Select the table in the Designer. The **Column Style** card has one block per column. The name is the heading, or "Column N" when the heading is empty. Each block sets the cell type, horizontal alignment, and vertical alignment. An image column also sets the height mode. With more than six columns, each block starts collapsed and the summary line shows the name, type, and alignments. Six columns or fewer stay expanded, with no collapse control.
+Select the table in the Designer. The **Column Style** card has one block per column. The name is the heading, or "Column N" when the heading is empty. Each block sets the cell type, horizontal alignment, and vertical alignment. An image column also sets the height mode. With more than six columns, each block starts collapsed and the summary line shows the name, type, and alignments. Opening a block keeps it open across later edits of that table. Six columns or fewer stay expanded, with no collapse control.
 
 - **Text** is the default. An unknown type is shown as Text until you change it.
 - **Image** sets that column's `cellType` to `"image"` and clears every body cell in the column. The heading is not changed, and header cells stay text.

@@ -214,6 +214,7 @@ describe('TableColumns widget', () => {
     expect(summary).not.toBeNull();
     expect(summary?.hidden).toBe(false);
     expect(body?.hidden).toBe(true);
+    expect(summary?.getAttribute('aria-label')).toBe('Expand Col 2');
     expect(summary?.querySelector('[data-control="summary-name"]')?.textContent).toBe('Col 2');
     expect(summary?.querySelector('[data-control="summary-type"]')?.textContent).toBe(
       'schemas.table.cellType.image',
@@ -230,10 +231,57 @@ describe('TableColumns widget', () => {
     summary?.click();
     expect(summary?.hidden).toBe(true);
     expect(body?.hidden).toBe(false);
-    image.querySelector<HTMLButtonElement>('[data-control="collapse"]')?.click();
+    const collapse = image.querySelector<HTMLButtonElement>('[data-control="collapse"]');
+    expect(collapse?.getAttribute('aria-label')).toBe('Collapse Col 2');
+    collapse?.click();
     expect(summary?.hidden).toBe(false);
     expect(body?.hidden).toBe(true);
     expect(seven.changeSchemas).not.toHaveBeenCalled();
+  });
+
+  test('keeps an expanded column open across re-renders', () => {
+    const table = wideTable(7);
+    const first = renderColumns(table);
+    rows(first.rootElement)[2].querySelector<HTMLButtonElement>('[data-control="summary"]')?.click();
+
+    const second = renderColumns(table);
+    const again = rows(second.rootElement)[2];
+    expect(again.querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(false);
+    expect(again.querySelector<HTMLElement>('[data-control="summary"]')?.hidden).toBe(true);
+    expect(rows(second.rootElement)[0].querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(
+      true,
+    );
+
+    again.querySelector<HTMLButtonElement>('[data-control="collapse"]')?.click();
+    const third = renderColumns(table);
+    expect(rows(third.rootElement)[2].querySelector<HTMLElement>('[data-control="column-body"]')?.hidden).toBe(
+      true,
+    );
+  });
+
+  test('uses theme tokens for alignment borders, icons, and dividers', () => {
+    const table = baseTable();
+    const rootElement = document.createElement('div');
+    TableColumns({
+      rootElement,
+      changeSchemas: vi.fn(),
+      activeSchema: table,
+      i18n,
+      theme: {
+        colorPrimary: '#112233',
+        colorPrimaryBg: '#ffffff',
+        colorWhite: '#ffffff',
+        colorBorder: '#aabbcc',
+        colorText: '#123456',
+        colorSplit: '#ddeeff',
+      },
+    } as unknown as PropPanelWidgetProps);
+    const button = alignButton(rows(rootElement)[0], 'alignment', 'left');
+    expect(button?.style.borderColor).toBe('rgb(170, 187, 204)');
+    expect(button?.querySelector('img')?.getAttribute('src')).toContain(
+      encodeURIComponent('#123456'),
+    );
+    expect(rows(rootElement)[0].style.borderBottomColor).toBe('rgb(221, 238, 255)');
   });
 
   test('text to image sets defaults, centers only a missing alignment, and clears that column', () => {

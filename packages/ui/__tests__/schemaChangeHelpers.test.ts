@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'vitest';
-import type { ChangeSchemaItem, SchemaForUI } from '@pdfme/common';
+import type { ChangeSchemaItem, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { TableColumns } from '../../schemas/src/tables/columnsWidget.js';
 import {
   expandSameTypeBulkUpdateChanges,
   getSameTypeBulkUpdateSchemas,
   isSingleSchemaOnlyChange,
-  mergeColumnStylesFormValue,
 } from '../src/components/Designer/RightSidebar/DetailView/schemaChangeHelpers.js';
 
 const schema = (id: string, type = 'text'): SchemaForUI => ({
@@ -128,74 +128,50 @@ describe('schema change helpers', () => {
     );
   });
 
-  it('keeps image column settings when the Column Style form sends alignment only', () => {
+  it('does not restore cellType when the widget clears the last image column', () => {
     const stored = {
       alignment: { 1: 'center' },
       cellType: { 1: 'image' },
       imageHeightMode: { 1: 'fixed' },
       imageHeight: { 1: 20 },
-      fontName: { 0: 'Roboto' },
     };
-    const formValue = { alignment: { 0: 'left', 1: 'right' } };
-
-    assert.deepEqual(mergeColumnStylesFormValue(stored, formValue), {
-      alignment: { 0: 'left', 1: 'right' },
-      cellType: { 1: 'image' },
-      imageHeightMode: { 1: 'fixed' },
-      imageHeight: { 1: 20 },
-      fontName: { 0: 'Roboto' },
-    });
-    assert.deepEqual(mergeColumnStylesFormValue(stored, { alignment: { 1: 'center' } }), stored);
-
     const activeSchema = schema('table-1', 'table');
-    (activeSchema as SchemaForUI & { columnStyles: unknown }).columnStyles = stored;
-    const other = schema('table-2', 'table');
-    (other as SchemaForUI & { columnStyles: unknown }).columnStyles = {
-      alignment: { 1: 'left' },
-      cellType: { 1: 'image', 2: 'text' },
-      imageHeightMode: { 1: 'auto' },
-      imageHeight: { 1: 30 },
-    };
+    Object.assign(activeSchema, {
+      content: JSON.stringify([['Pen', 'photo', 'Blue']]),
+      head: ['Item', 'Photo', 'Note'],
+      showHead: true,
+      columnStyles: stored,
+    });
 
-    assert.deepEqual(
-      expandSameTypeBulkUpdateChanges({
-        activeSchema,
-        activeSchemas: [activeSchema],
-        changes: [{ key: 'columnStyles', value: formValue, schemaId: activeSchema.id }],
-      }),
-      [
-        {
-          key: 'columnStyles',
-          schemaId: 'table-1',
-          value: {
-            alignment: { 0: 'left', 1: 'right' },
-            cellType: { 1: 'image' },
-            imageHeightMode: { 1: 'fixed' },
-            imageHeight: { 1: 20 },
-            fontName: { 0: 'Roboto' },
-          },
-        },
-      ],
-    );
+    const rootElement = document.createElement('div');
+    const changeSchemas = vi.fn();
+    TableColumns({
+      rootElement,
+      changeSchemas,
+      activeSchema,
+      i18n: (key: string) => key,
+    } as unknown as PropPanelWidgetProps);
 
+    const select = rootElement.querySelectorAll<HTMLSelectElement>(
+      'select[data-control="cellType"]',
+    )[1];
+    select.value = 'text';
+    select.dispatchEvent(new Event('change'));
+
+    const payload = changeSchemas.mock.calls[0][0] as ChangeSchemaItem[];
     const expanded = expandSameTypeBulkUpdateChanges({
       activeSchema,
-      activeSchemas: [activeSchema, other],
-      changes: [{ key: 'columnStyles', value: formValue, schemaId: activeSchema.id }],
+      activeSchemas: [activeSchema],
+      changes: payload,
     });
-    assert.equal(expanded.length, 2);
-    assert.deepEqual(
-      (expanded[0].value as { cellType: unknown; alignment: unknown }).cellType,
-      { 1: 'image' },
-    );
-    assert.deepEqual(
-      (expanded[1].value as { cellType: unknown; imageHeight: unknown; alignment: unknown }),
-      {
-        alignment: { 0: 'left', 1: 'right' },
-        cellType: { 1: 'image', 2: 'text' },
-        imageHeightMode: { 1: 'auto' },
-        imageHeight: { 1: 30 },
-      },
-    );
+    const columnStyles = expanded.find((change) => change.key === 'columnStyles')?.value as Record<
+      string,
+      unknown
+    >;
+
+    assert.equal(Object.hasOwn(columnStyles, 'cellType'), false);
+    assert.equal(Object.hasOwn(columnStyles, 'imageHeightMode'), false);
+    assert.equal(Object.hasOwn(columnStyles, 'imageHeight'), false);
+    assert.deepEqual(columnStyles.alignment, { 1: 'center' });
   });
 });

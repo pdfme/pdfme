@@ -24,8 +24,23 @@ import {
 
 const cellTypeWarnCache = new Map<string | number, unknown>();
 
-/** More than this many columns, and each block starts collapsed. */
+/** More than this many columns, and each block can collapse. */
 const COLLAPSE_WHEN_MORE_THAN = 6;
+
+// Survives widget re-renders so an open block stays open after the next edit.
+const expandedColumnBlocks = new Set<string>();
+
+const columnBlockKey = (schemaId: string, columnIndex: number) => `${schemaId}:${columnIndex}`;
+
+const themeToken = (
+  theme: PropPanelWidgetProps['theme'] | undefined,
+  key: string,
+  fallback: string,
+) => {
+  if (!theme) return fallback;
+  const value = (theme as unknown as Record<string, unknown>)[key];
+  return typeof value === 'string' && value.length > 0 ? value : fallback;
+};
 
 type ColumnStyleMap<T> = { [colIndex: number]: T } | undefined;
 
@@ -222,7 +237,7 @@ const appendButtonGroup = (
   buttons: AlignButton[],
   current: string | undefined,
   columnIndex: number,
-  primary: string,
+  colors: { primary: string; border: string; text: string },
   i18n: (key: string) => string,
   onSelect: (value: string) => void,
 ) => {
@@ -244,13 +259,13 @@ const appendButtonGroup = (
     element.style.lineHeight = '0';
     element.style.background = 'transparent';
     element.style.cursor = 'pointer';
-    element.style.border = `1px solid ${active ? primary : '#d9d9d9'}`;
+    element.style.border = `1px solid ${active ? colors.primary : colors.border}`;
     element.style.marginLeft = index === 0 ? '0' : '-1px';
     element.style.borderRadius =
       index === 0 ? '6px 0 0 6px' : index === buttons.length - 1 ? '0 6px 6px 0' : '0';
     element.style.position = 'relative';
     element.style.zIndex = active ? '1' : '0';
-    appendIcon(element, button.icon, active ? primary : '#000000');
+    appendIcon(element, button.icon, active ? colors.primary : colors.text);
     element.addEventListener('click', () => {
       if (current === button.value) return;
       onSelect(button.value);
@@ -273,7 +288,12 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
   const table = activeSchema as unknown as TableSchema;
   const head = table.head || [];
   const columnStyles = table.columnStyles ?? {};
-  const primary = props.theme?.colorPrimary || '#1677ff';
+  const colors = {
+    primary: themeToken(props.theme, 'colorPrimary', '#1677ff'),
+    border: themeToken(props.theme, 'colorBorder', '#d9d9d9'),
+    text: themeToken(props.theme, 'colorText', '#000000'),
+    split: themeToken(props.theme, 'colorSplit', '#f0f0f0'),
+  };
   const collapsible = head.length > COLLAPSE_WHEN_MORE_THAN;
 
   head.forEach((_, index) => {
@@ -293,16 +313,20 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
     block.dataset.columnIndex = String(index);
     block.style.marginBottom = index === head.length - 1 ? '0' : '10px';
     block.style.paddingBottom = index === head.length - 1 ? '0' : '10px';
-    if (index !== head.length - 1) block.style.borderBottom = '1px solid #f0f0f0';
+    if (index !== head.length - 1) block.style.borderBottom = `1px solid ${colors.split}`;
 
     const body = document.createElement('div');
     body.dataset.control = 'column-body';
+
+    const expanded =
+      collapsible && expandedColumnBlocks.has(columnBlockKey(activeSchema.id, index));
 
     if (collapsible) {
       const summary = document.createElement('button');
       summary.type = 'button';
       summary.dataset.control = 'summary';
-      summary.setAttribute('aria-expanded', 'false');
+      summary.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      summary.setAttribute('aria-label', `Expand ${label}`);
       summary.title = label;
       summary.style.display = 'flex';
       summary.style.alignItems = 'center';
@@ -338,7 +362,7 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
         icon.dataset.value = alignmentIcon.value;
         icon.style.lineHeight = '0';
         icon.style.flexShrink = '0';
-        appendIcon(icon, alignmentIcon.icon, '#000000', 14);
+        appendIcon(icon, alignmentIcon.icon, colors.text, 14);
         summary.appendChild(icon);
       }
       const verticalIcon = VERTICAL_ALIGNMENTS.find((button) => button.value === verticalAlignment);
@@ -348,7 +372,7 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
         icon.dataset.value = verticalIcon.value;
         icon.style.lineHeight = '0';
         icon.style.flexShrink = '0';
-        appendIcon(icon, verticalIcon.icon, '#000000', 14);
+        appendIcon(icon, verticalIcon.icon, colors.text, 14);
         summary.appendChild(icon);
       }
       if (cellType === 'image' && mode === 'fixed') {
@@ -361,10 +385,13 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       }
 
       summary.addEventListener('click', () => {
+        expandedColumnBlocks.add(columnBlockKey(activeSchema.id, index));
         summary.hidden = true;
+        summary.setAttribute('aria-expanded', 'true');
         body.hidden = false;
       });
-      body.hidden = true;
+      summary.hidden = expanded;
+      body.hidden = !expanded;
       block.appendChild(summary);
     }
 
@@ -378,7 +405,7 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       collapse.type = 'button';
       collapse.dataset.control = 'collapse';
       collapse.setAttribute('aria-expanded', 'true');
-      collapse.setAttribute('aria-label', label);
+      collapse.setAttribute('aria-label', `Collapse ${label}`);
       collapse.textContent = '▾';
       collapse.style.border = 'none';
       collapse.style.background = 'transparent';
@@ -386,8 +413,12 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       collapse.style.padding = '0 2px 0 0';
       collapse.style.lineHeight = '1';
       collapse.addEventListener('click', () => {
+        expandedColumnBlocks.delete(columnBlockKey(activeSchema.id, index));
         const summary = block.querySelector<HTMLButtonElement>('[data-control="summary"]');
-        if (summary) summary.hidden = false;
+        if (summary) {
+          summary.hidden = false;
+          summary.setAttribute('aria-expanded', 'false');
+        }
         body.hidden = true;
       });
       header.appendChild(collapse);
@@ -432,7 +463,7 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       HORIZONTAL_ALIGNMENTS,
       alignment,
       index,
-      primary,
+      colors,
       i18n,
       (value) => {
         if (value !== 'left' && value !== 'center' && value !== 'right') return;
@@ -445,7 +476,7 @@ export const TableColumns = (props: PropPanelWidgetProps) => {
       VERTICAL_ALIGNMENTS,
       verticalAlignment,
       index,
-      primary,
+      colors,
       i18n,
       (value) => {
         if (value !== 'top' && value !== 'middle' && value !== 'bottom') return;
