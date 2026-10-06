@@ -844,6 +844,27 @@
     "title": "Social Insurance Enrollment Form"
   },
   {
+    "name": "table-image-column",
+    "author": "pdfme",
+    "path": "table-image-column/template.json",
+    "thumbnailPath": "table-image-column/thumbnail.png",
+    "pageCount": 1,
+    "fieldCount": 1,
+    "schemaTypes": [
+      "table"
+    ],
+    "fontNames": [],
+    "hasCJK": false,
+    "basePdfKind": "blank",
+    "description": "A table with a centered PNG photo column at a fixed 20mm height.",
+    "sourceKind": "designer",
+    "tags": [
+      "Table",
+      "Image"
+    ],
+    "title": "Table with image column"
+  },
+  {
     "name": "z-fold-brochure",
     "author": "hitomi-t260g",
     "path": "z-fold-brochure/template.json",
