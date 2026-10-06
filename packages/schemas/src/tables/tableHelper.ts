@@ -185,6 +185,7 @@ function getTableOptions(
   );
 
   const alignmentMap = schema.columnStyles.alignment || {};
+  const verticalAlignmentMap = schema.columnStyles.verticalAlignment || {};
   const cellTypeMap = schema.columnStyles.cellType || {};
   const imageHeightModeMap = schema.columnStyles.imageHeightMode || {};
   const imageHeightMap = schema.columnStyles.imageHeight || {};
@@ -192,10 +193,15 @@ function getTableOptions(
     (acc, [key, value]) => ({ ...acc, [key]: { alignment: value } }),
     {} as Record<number, Partial<Styles>>,
   );
+  const columnStylesVerticalAlignment = Object.entries(verticalAlignmentMap).reduce(
+    (acc, [key, value]) => ({ ...acc, [key]: { verticalAlignment: value } }),
+    {} as Record<number, Partial<Styles>>,
+  );
 
   const allKeys = new Set([
     ...Object.keys(columnStylesWidth).map(Number),
     ...Object.keys(columnStylesAlignment).map(Number),
+    ...Object.keys(columnStylesVerticalAlignment).map(Number),
     ...Object.keys(cellTypeMap).map(Number),
     ...Object.keys(imageHeightModeMap).map(Number),
     ...Object.keys(imageHeightMap).map(Number),
@@ -204,6 +210,7 @@ function getTableOptions(
     (acc, key) => {
       const widthStyle = columnStylesWidth[key] || {};
       const alignmentStyle = columnStylesAlignment[key] || {};
+      const verticalAlignmentStyle = columnStylesVerticalAlignment[key] || {};
       const cellType = normalizeTableCellType(cellTypeMap[key], key, cache);
       const imageHeightMode = normalizeTableImageHeightMode(imageHeightModeMap[key]);
       const imageHeight = normalizeTableImageHeight(imageHeightMap[key]);
@@ -212,7 +219,10 @@ function getTableOptions(
         ...(imageHeightMode ? { imageHeightMode } : {}),
         ...(imageHeight !== undefined ? { imageHeight } : {}),
       };
-      return { ...acc, [key]: { ...widthStyle, ...alignmentStyle, ...imageStyle } };
+      return {
+        ...acc,
+        [key]: { ...widthStyle, ...alignmentStyle, ...verticalAlignmentStyle, ...imageStyle },
+      };
     },
     {} as Record<number, Partial<Styles>>,
   );

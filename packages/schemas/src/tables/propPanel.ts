@@ -1,18 +1,14 @@
 import type { PropPanel } from '@pdfme/common';
 import type { TableSchema } from './types.js';
 import { getFallbackFontName, DEFAULT_FONT_NAME } from '@pdfme/common';
-import {
-  getDefaultCellStyles,
-  getCellPropPanelSchema,
-  getColumnStylesPropPanelSchema,
-} from './helper.js';
+import { getDefaultCellStyles, getCellPropPanelSchema } from './helper.js';
 import { HEX_COLOR_PATTERN } from '../constants.js';
+import { TableColumns } from './columnsWidget.js';
 
 export const propPanel: PropPanel<TableSchema> = {
   schema: ({ activeSchema, options, i18n }) => {
     // @ts-expect-error Type casting is necessary here as the activeSchema type is generic
     const tableSchema = activeSchema as TableSchema;
-    const head = tableSchema.head || [];
     const showHead = tableSchema.showHead || false;
     const font = options.font || { [DEFAULT_FONT_NAME]: { data: '', fallback: true } };
     const fontNames = Object.keys(font);
@@ -67,15 +63,24 @@ export const propPanel: PropPanel<TableSchema> = {
         span: 24,
         properties: getCellPropPanelSchema({ i18n, fallbackFontName, fontNames, isBody: true }),
       },
-      columnStyles: {
+      tableColumns: {
         title: i18n('schemas.table.columnStyle'),
         type: 'object',
         widget: 'Card',
+        bind: false,
         span: 24,
-        properties: getColumnStylesPropPanelSchema({ head, i18n }),
+        properties: {
+          columns: {
+            type: 'void',
+            widget: 'TableColumns',
+            bind: false,
+            span: 24,
+          },
+        },
       },
     };
   },
+  widgets: { TableColumns },
   defaultSchema: {
     name: '',
     type: 'table',

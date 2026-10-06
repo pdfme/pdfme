@@ -4,6 +4,12 @@ import { px2mm, ZOOM } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
 import { getBody, getBodyWithSchemaRange, remapColumnStylesOnRemove } from './helper.js';
 import cell from './cell.js';
+import {
+  clearImagePickerRequest,
+  noteRenderingTable,
+  requestImagePicker,
+  tableSchemaKey,
+} from './imageCellUi.js';
 import { Row } from './classes.js';
 import { getTableBodyRange } from '../splitRange.js';
 
@@ -162,15 +168,35 @@ const renderRowUi = (args: {
 
       drawBorder(div, row, colIndex, rowIndex, rows.length, arg, value.length);
 
+      const imageCellEditable =
+        arg.mode === 'designer' || (arg.mode === 'form' && !arg.schema.readOnly);
       div.style.cursor = cell.isImage()
-        ? 'default'
+        ? imageCellEditable && section === 'body'
+          ? 'pointer'
+          : 'default'
         : arg.mode === 'designer' || (arg.mode === 'form' && section === 'body')
           ? 'text'
           : 'default';
 
       div.addEventListener('click', () => {
         if (arg.mode === 'viewer') return;
+        const enteringEmptyImageCell =
+          cell.isImage() &&
+          section === 'body' &&
+          imageCellEditable &&
+          cell.raw === '' &&
+          (editingPosition.rowIndex !== rowIndex || editingPosition.colIndex !== colIndex);
         onChangeEditingPosition({ rowIndex, colIndex });
+        // uiRender awaits table layout before painting, so this request is set after
+        // the editing-position reset inside onChangeEditingPosition and is still
+        // waiting when the editor mounts.
+        if (enteringEmptyImageCell) {
+          requestImagePicker({
+            rowIndex,
+            colIndex,
+            schemaKey: tableSchemaKey(arg.schema),
+          });
+        }
       });
       arg.rootElement.appendChild(div);
       const isEditing =
@@ -181,8 +207,8 @@ const renderRowUi = (args: {
       } else if (arg.mode === 'designer') {
         mode = isEditing ? 'designer' : 'form';
       }
-      // The image renderer always paints an <img>. Idle cells stay in viewer so a
-      // later editor is not mounted on every cell; selecting one still has no editor.
+      // Idle image cells stay in viewer so the file control is mounted only on the
+      // selected cell. Selecting one uses designer mode, which opens the editor.
       if (cell.isImage() && !isEditing) {
         mode = 'viewer';
       }
@@ -220,6 +246,9 @@ const renderRowUi = (args: {
           height: cell.height,
           ...convertToCellStyle(cell.styles),
           cellType: cell.isImage() ? 'image' : 'text',
+          columnIndex: colIndex,
+          rowIndex,
+          pickerSchemaKey: tableSchemaKey(arg.schema),
         },
       });
       colOffsetX += cell.width;
@@ -235,10 +264,12 @@ const resetEditingPosition = () => {
   headEditingPosition.colIndex = -1;
   bodyEditingPosition.rowIndex = -1;
   bodyEditingPosition.colIndex = -1;
+  clearImagePickerRequest();
 };
 
 export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
   const { rootElement, onChange, schema, value, mode, scale } = arg;
+  noteRenderingTable(schema);
   const body = getBody(value);
   const bodyRange = getTableBodyRange(schema);
   const bodyWidthRange = getBodyWithSchemaRange(value, schema, bodyRange);

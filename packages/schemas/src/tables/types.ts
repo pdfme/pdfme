@@ -31,6 +31,9 @@ export type CellSchema = Schema &
     imageHeightMode?: TableImageHeightMode;
     imageHeight?: number;
     columnIndex?: number;
+    rowIndex?: number;
+    // Render-only identity of the table being painted. Not stored on the template.
+    pickerSchemaKey?: string;
   };
 
 export type TableSchema = Schema & {
@@ -47,6 +50,7 @@ export type TableSchema = Schema & {
   bodyStyles: CellStyle & { alternateBackgroundColor: string };
   columnStyles: {
     alignment?: { [colIndex: number]: ALIGNMENT };
+    verticalAlignment?: { [colIndex: number]: VERTICAL_ALIGNMENT };
     cellType?: { [colIndex: number]: TableCellType };
     imageHeightMode?: { [colIndex: number]: TableImageHeightMode };
     imageHeight?: { [colIndex: number]: number };

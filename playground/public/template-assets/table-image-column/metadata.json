@@ -1,0 +1,6 @@
+{
+  "title": "Table with image column",
+  "description": "A table with a centered PNG photo column at a fixed 20mm height.",
+  "sourceKind": "designer",
+  "tags": ["Table", "Image"]
+}

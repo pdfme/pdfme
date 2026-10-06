@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'vitest';
-import type { ChangeSchemaItem, SchemaForUI } from '@pdfme/common';
+import type { ChangeSchemaItem, PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { TableColumns } from '../../schemas/src/tables/columnsWidget.js';
 import {
   expandSameTypeBulkUpdateChanges,
   getSameTypeBulkUpdateSchemas,
@@ -125,5 +126,52 @@ describe('schema change helpers', () => {
       }),
       changes,
     );
+  });
+
+  it('does not restore cellType when the widget clears the last image column', () => {
+    const stored = {
+      alignment: { 1: 'center' },
+      cellType: { 1: 'image' },
+      imageHeightMode: { 1: 'fixed' },
+      imageHeight: { 1: 20 },
+    };
+    const activeSchema = schema('table-1', 'table');
+    Object.assign(activeSchema, {
+      content: JSON.stringify([['Pen', 'photo', 'Blue']]),
+      head: ['Item', 'Photo', 'Note'],
+      showHead: true,
+      columnStyles: stored,
+    });
+
+    const rootElement = document.createElement('div');
+    const changeSchemas = vi.fn();
+    TableColumns({
+      rootElement,
+      changeSchemas,
+      activeSchema,
+      i18n: (key: string) => key,
+    } as unknown as PropPanelWidgetProps);
+
+    const select = rootElement.querySelectorAll<HTMLSelectElement>(
+      'select[data-control="cellType"]',
+    )[1];
+    select.value = 'text';
+    select.dispatchEvent(new Event('change'));
+
+    const payload = changeSchemas.mock.calls[0][0] as ChangeSchemaItem[];
+    const expanded = expandSameTypeBulkUpdateChanges({
+      activeSchema,
+      activeSchemas: [activeSchema],
+      changes: payload,
+    });
+    const columnStyles = expanded.find((change) => change.key === 'columnStyles')?.value as Record<
+      string,
+      unknown
+    >;
+
+    assert.equal(Object.hasOwn(columnStyles, 'cellType'), false);
+    assert.equal(Object.hasOwn(columnStyles, 'imageHeightMode'), false);
+    assert.equal(Object.hasOwn(columnStyles, 'imageHeight'), false);
+    assert.deepEqual(columnStyles.alignment, { 1: 'center' });
   });
 });

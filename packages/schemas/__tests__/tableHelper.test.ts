@@ -129,6 +129,34 @@ describe('createSingleTable style merge', () => {
 
     expectFiniteGeometry(table);
   });
+
+  test('column verticalAlignment overrides head and body, and an unset column stays unchanged', async () => {
+    const without = getPartialTableSchema();
+    without.headStyles.verticalAlignment = 'bottom';
+    without.bodyStyles.verticalAlignment = 'middle';
+
+    const withColumn = getPartialTableSchema();
+    withColumn.headStyles.verticalAlignment = 'bottom';
+    withColumn.bodyStyles.verticalAlignment = 'middle';
+    withColumn.columnStyles = { verticalAlignment: { 0: 'top' } };
+
+    const base = await createTable(without);
+    const styled = await createTable(withColumn);
+
+    expect(base.head[0].cells[0].styles.verticalAlignment).toBe('bottom');
+    expect(base.body[0].cells[0].styles.verticalAlignment).toBe('middle');
+    expect(base.head[0].cells[1].styles.verticalAlignment).toBe('bottom');
+    expect(base.body[0].cells[1].styles.verticalAlignment).toBe('middle');
+
+    expect(styled.head[0].cells[0].styles.verticalAlignment).toBe('top');
+    expect(styled.body[0].cells[0].styles.verticalAlignment).toBe('top');
+    expect(styled.head[0].cells[1].styles.verticalAlignment).toBe(
+      base.head[0].cells[1].styles.verticalAlignment,
+    );
+    expect(styled.body[0].cells[1].styles.verticalAlignment).toBe(
+      base.body[0].cells[1].styles.verticalAlignment,
+    );
+  });
 });
 
 type ColumnStylesWithExtras = TableSchema['columnStyles'] & Record<string, unknown>;
@@ -197,6 +225,7 @@ describe('remapColumnStylesOnRemove', () => {
   test('remaps unknown column style keys with the same index rule', () => {
     const columnStyles = asColumnStyles({
       alignment: { 2: 'right' },
+      verticalAlignment: { 0: 'top', 2: 'bottom' },
       fontName: { 0: 'Roboto', 2: 'Noto Sans' },
       cellType: { 1: 'image', 2: 'text' },
       imageHeightMode: { 1: 'fixed' },
@@ -205,6 +234,7 @@ describe('remapColumnStylesOnRemove', () => {
 
     expect(remapColumnStylesOnRemove(columnStyles, 0)).toEqual({
       alignment: { 1: 'right' },
+      verticalAlignment: { 1: 'bottom' },
       fontName: { 1: 'Noto Sans' },
       cellType: { 0: 'image', 1: 'text' },
       imageHeightMode: { 0: 'fixed' },

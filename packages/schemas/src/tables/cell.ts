@@ -12,6 +12,7 @@ import {
   resolveImageDimension,
   warnInvalidTableImageOnce,
 } from './imageCell.js';
+import { renderTableImageCellUi } from './imageCellUi.js';
 const imagePdfRender = imagePlugin.pdf;
 const linePdfRender = line.pdf;
 const rectanglePdfRender = rectangle.pdf;
@@ -147,21 +148,25 @@ const cellSchema: Plugin<CellSchema> = {
     rootElement.style.backgroundColor = backgroundColor;
 
     if (schema.cellType === 'image') {
-      const dimension = arg.value ? resolveImageDimension(arg.value, arg._cache) : undefined;
-      if (dimension) {
-        const imageFrame = createTextDiv(schema);
-        const img = document.createElement('img');
-        img.alt = '';
-        img.src = arg.value;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'contain';
-        img.style.objectPosition = getTableImageObjectPosition(
-          schema.alignment,
-          schema.verticalAlignment,
-        );
-        imageFrame.appendChild(img);
-        rootElement.appendChild(imageFrame);
+      if (arg.mode === 'designer') {
+        renderTableImageCellUi(arg);
+      } else {
+        const dimension = arg.value ? resolveImageDimension(arg.value, arg._cache) : undefined;
+        if (dimension) {
+          const imageFrame = createTextDiv(schema);
+          const img = document.createElement('img');
+          img.alt = '';
+          img.src = arg.value;
+          img.style.width = '100%';
+          img.style.height = '100%';
+          img.style.objectFit = 'contain';
+          img.style.objectPosition = getTableImageObjectPosition(
+            schema.alignment,
+            schema.verticalAlignment,
+          );
+          imageFrame.appendChild(img);
+          rootElement.appendChild(imageFrame);
+        }
       }
     } else {
       const textDiv = createTextDiv(schema);
