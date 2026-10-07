@@ -882,3 +882,34 @@ test('Preview(as Form) leaves editable tables on input[name]', async () => {
   expect(container).toHaveTextContent('Angela');
   expect(container).not.toHaveTextContent('Alice');
 });
+
+test('Preview resolves {currentPage} in read-only fields to the page number', async () => {
+  setupUIMock(2);
+  const template = getTwoPageTemplate();
+  template.schemas[1] = [
+    {
+      name: 'pageLabel',
+      type: 'text',
+      content: '{currentPage}/{totalPages}',
+      readOnly: true,
+      position: { x: 20, y: 20 },
+      width: 100,
+      height: 15,
+    },
+  ];
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview template={template} inputs={[{}]} size={{ width: 1200, height: 1200 }} />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  // page 1 holds two fields: the schema's index across pages would give "3/2"
+  expect(template.schemas[0].length).toBe(2);
+  await waitFor(() => {
+    expect(getSelectableElement(container, 'pageLabel')).toHaveTextContent('2/2');
+  });
+});
