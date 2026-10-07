@@ -3,6 +3,18 @@
 import { uiRender } from '../src/barcodes/uiRender.js';
 import type { BarcodeSchema } from '../src/barcodes/types.js';
 
+vi.mock('../src/barcodes/helper.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/barcodes/helper.js')>();
+  const tinyPng = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  return {
+    ...actual,
+    createBarCode: async () => tinyPng,
+  };
+});
+
 const getBarcodeSchema = (overrides: Partial<BarcodeSchema> = {}): BarcodeSchema => ({
   name: 'barcode',
   type: 'code128',
@@ -15,10 +27,10 @@ const getBarcodeSchema = (overrides: Partial<BarcodeSchema> = {}): BarcodeSchema
   ...overrides,
 });
 
-const renderBarcodeContainer = async (schema: BarcodeSchema) => {
+const renderBarcodeContainer = async (schema: BarcodeSchema, value = '') => {
   const rootElement = document.createElement('div');
   await uiRender({
-    value: '',
+    value,
     schema,
     rootElement,
     mode: 'viewer',
@@ -43,5 +55,27 @@ describe('barcode UI rendering', () => {
   test('keeps the container transparent when no background color is set', async () => {
     const container = await renderBarcodeContainer(getBarcodeSchema({ backgroundColor: '' }));
     expect(container.style.backgroundColor).toBe('transparent');
+  });
+
+  test('fit contain renders an SVG image with object-fit contain', async () => {
+    const container = await renderBarcodeContainer(
+      getBarcodeSchema({ type: 'qrcode', width: 60, height: 30, fit: 'contain' }),
+      'https://pdfme.com/',
+    );
+    const img = container.querySelector('img');
+    expect(img).toBeTruthy();
+    expect(img?.style.objectFit).toBe('contain');
+    expect(img?.src.startsWith('data:image/svg+xml')).toBe(true);
+  });
+
+  test('unset fit renders a stretched PNG', async () => {
+    const container = await renderBarcodeContainer(
+      getBarcodeSchema({ type: 'qrcode', width: 60, height: 30 }),
+      'https://pdfme.com/',
+    );
+    const img = container.querySelector('img');
+    expect(img).toBeTruthy();
+    expect(img?.src.startsWith('data:image/png')).toBe(true);
+    expect(img?.style.objectFit).not.toBe('contain');
   });
 });

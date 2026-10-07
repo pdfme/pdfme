@@ -1,7 +1,13 @@
 import type * as CSS from 'csstype';
 import { UIRenderProps } from '@pdfme/common';
 import type { BarcodeSchema } from './types.js';
-import { validateBarcodeInput, createBarCode, ensureHexColorHash } from './helper.js';
+import {
+  validateBarcodeInput,
+  createBarCode,
+  createBarCodeSvg,
+  ensureHexColorHash,
+  normalizeBarcodeFit,
+} from './helper.js';
 import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 
 const fullSize = { width: '100%', height: '100%' };
@@ -26,8 +32,24 @@ const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
 };
 
 const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
-  const barcodeDataURL = await createBarcodeImage(schema, value);
   const img = document.createElement('img');
+  const fit = normalizeBarcodeFit(schema.fit);
+  if (fit === 'contain') {
+    // Natural-size SVG, letterboxed by the browser. A raster at scale 5 is
+    // unbounded by the box and can exceed canvas limits for long 1D content.
+    const svg = createBarCodeSvg({
+      ...schema,
+      fit,
+      backgroundColor: undefined,
+      input: value,
+    });
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    const imgStyle: CSS.Properties = { ...fullSize, objectFit: 'contain', borderRadius: 0 };
+    Object.assign(img.style, imgStyle);
+    return img;
+  }
+
+  const barcodeDataURL = await createBarcodeImage(schema, value);
   img.src = barcodeDataURL;
   const imgStyle: CSS.Properties = { ...fullSize, borderRadius: 0 };
   Object.assign(img.style, imgStyle);

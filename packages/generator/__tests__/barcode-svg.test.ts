@@ -422,4 +422,118 @@ describe('barcode SVG PDF rendering', () => {
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-backgrounds-svg-1'));
   });
+
+  test('letterboxes contain barcodes and still stretches when fit is stretch', async () => {
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'qrWide',
+            type: 'qrcode',
+            content: '',
+            position: { x: 15, y: 15 },
+            width: 60,
+            height: 30,
+            fit: 'contain',
+            backgroundColor: '#ff66cc',
+            barColor: '#000000',
+          },
+          {
+            name: 'qrTall',
+            type: 'qrcode',
+            content: '',
+            position: { x: 90, y: 15 },
+            width: 30,
+            height: 60,
+            fit: 'contain',
+            backgroundColor: '#66ccff',
+            barColor: '#000000',
+          },
+          {
+            name: 'pdf417',
+            type: 'pdf417',
+            content: '',
+            position: { x: 135, y: 15 },
+            width: 55,
+            height: 30,
+            fit: 'contain',
+            backgroundColor: '#ffe066',
+            barColor: '#000000',
+          },
+          {
+            name: 'code128',
+            type: 'code128',
+            content: '',
+            position: { x: 15, y: 90 },
+            width: 30,
+            height: 40,
+            fit: 'contain',
+            backgroundColor: '#99e699',
+            barColor: '#000000',
+          },
+          {
+            name: 'japanpost',
+            type: 'japanpost',
+            content: '',
+            position: { x: 60, y: 90 },
+            width: 40,
+            height: 20,
+            fit: 'contain',
+            backgroundColor: '#ff9933',
+            barColor: '#000000',
+          },
+          {
+            name: 'qrRotated',
+            type: 'qrcode',
+            content: '',
+            position: { x: 120, y: 95 },
+            width: 50,
+            height: 28,
+            rotate: 20,
+            fit: 'contain',
+            backgroundColor: '#cc99ff',
+            barColor: '#000000',
+          },
+          {
+            name: 'qrStretch',
+            type: 'qrcode',
+            content: '',
+            position: { x: 15, y: 160 },
+            width: 60,
+            height: 30,
+            fit: 'stretch',
+            backgroundColor: '#dddddd',
+            barColor: '#000000',
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [
+        {
+          qrWide: 'https://pdfme.com/fit-wide',
+          qrTall: 'https://pdfme.com/fit-tall',
+          pdf417: 'PDF417 contain',
+          code128: 'ABC-123',
+          japanpost: '10000131-3-2-B503',
+          qrRotated: 'https://pdfme.com/fit-rotated',
+          qrStretch: 'https://pdfme.com/fit-stretch',
+        },
+      ],
+      plugins: {
+        qrcode: barcodes.qrcode,
+        pdf417: barcodes.pdf417,
+        code128: barcodes.code128,
+        japanpost: barcodes.japanpost,
+      },
+    });
+    const { pdfDoc, page } = await loadFirstPageContent(pdf);
+    const images = await pdfToImages(pdf);
+
+    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-fit-contain-1'));
+  });
 });

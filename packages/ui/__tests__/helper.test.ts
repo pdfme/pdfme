@@ -27,6 +27,7 @@ import {
   setFontNameRecursively,
   getStickyScrollPageIndex,
   isRotatableSchema,
+  isAspectRatioLockedSchema,
 } from '../src/helper';
 import {
   text,
@@ -1155,6 +1156,46 @@ describe('isRotatableSchema (#1631)', () => {
       // gains or loses its rotate handle.
       const legacyCanvasRule = 'rotate' in defaultSchema;
       expect(isRotatableSchema(defaultSchema), `plugin: ${name}`).toBe(legacyCanvasRule);
+    }
+  });
+});
+
+describe('isAspectRatioLockedSchema', () => {
+  test('contain locks the box ratio', () => {
+    expect(isAspectRatioLockedSchema({ fit: 'contain' })).toBe(true);
+  });
+
+  test('stretch, empty, and missing schemas stay unlocked', () => {
+    expect(isAspectRatioLockedSchema({ fit: 'stretch' })).toBe(false);
+    expect(isAspectRatioLockedSchema({})).toBe(false);
+    expect(isAspectRatioLockedSchema(undefined)).toBe(false);
+  });
+
+  test('only new 2D barcode defaults are locked', () => {
+    const builtIns = {
+      text,
+      image,
+      multiVariableText,
+      list,
+      signature,
+      svg,
+      table,
+      line,
+      rectangle,
+      ellipse,
+      dateTime,
+      date,
+      time,
+      select,
+      radioGroup,
+      checkbox,
+      circleMark,
+      ...barcodes,
+    };
+    const locked = new Set(['qrcode', 'gs1datamatrix', 'pdf417']);
+    for (const [name, plugin] of Object.entries(builtIns)) {
+      const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
+      expect(isAspectRatioLockedSchema(defaultSchema), `plugin: ${name}`).toBe(locked.has(name));
     }
   });
 });

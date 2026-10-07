@@ -122,6 +122,11 @@ export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 export const isRotatableSchema = (defaultSchema?: Record<string, unknown>): boolean =>
   typeof defaultSchema?.rotate !== 'undefined';
 
+/** Schemas rendered with object-fit "contain" semantics (e.g. barcodes with fit: 'contain')
+ *  keep their box aspect ratio when resized on the canvas without holding Shift. */
+export const isAspectRatioLockedSchema = (schema?: Record<string, unknown>): boolean =>
+  schema?.fit === 'contain';
+
 const up = 'up';
 const shiftUp = 'shift+up';
 const down = 'down';

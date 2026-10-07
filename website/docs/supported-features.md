@@ -118,6 +118,7 @@ Exceptions:
   - Background Color
   - Text Color
   - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
+- **Fit (stretch / contain)**: `contain` keeps the symbol's intrinsic aspect ratio and locks Designer resizing to the field's box ratio. Hold Shift while dragging a resize handle to keep the ratio for any field.
 
 ### Table (table){#table}
 

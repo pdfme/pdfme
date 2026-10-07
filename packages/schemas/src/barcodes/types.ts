@@ -1,5 +1,7 @@
 import { Schema } from '@pdfme/common';
-import { BARCODE_TYPES } from './constants.js';
+import { BARCODE_FITS, BARCODE_TYPES } from './constants.js';
+
+export type BarcodeFit = (typeof BARCODE_FITS)[number];
 
 export type BarcodeSchema = Schema & {
   type: (typeof BARCODE_TYPES)[number];
@@ -7,6 +9,7 @@ export type BarcodeSchema = Schema & {
   barColor: string;
   textColor?: string;
   includetext?: boolean;
+  fit?: BarcodeFit;
 };
 
 export type BarcodeTypes = (typeof BARCODE_TYPES)[number];

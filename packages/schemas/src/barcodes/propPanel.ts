@@ -1,8 +1,10 @@
 import type { PropPanel } from '@pdfme/common';
 import type { BarcodeSchema } from './types.js';
 import {
+  BARCODE_2D_TYPES,
   DEFAULT_BARCODE_COLOR,
   DEFAULT_BARCODE_BG_COLOR,
+  DEFAULT_BARCODE_FIT,
   DEFAULT_BARCODE_INCLUDETEXT,
 } from './constants.js';
 import { DEFAULT_OPACITY, HEX_COLOR_PATTERN, OPAQUE_HEX_COLOR_PATTERN } from '../constants.js';
@@ -187,6 +189,13 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
   },
 ];
 
+const barcode2dTypes: readonly string[] = BARCODE_2D_TYPES;
+for (const { defaultSchema } of barcodeDefaults) {
+  if (barcode2dTypes.includes(defaultSchema.type)) {
+    defaultSchema.fit = 'contain';
+  }
+}
+
 export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<BarcodeSchema> => {
   const barcodeHasText =
     barcodeType !== 'qrcode' && barcodeType !== 'gs1datamatrix' && barcodeType !== 'pdf417';
@@ -198,6 +207,19 @@ export const getPropPanelByBarcodeType = (barcodeType: string): PropPanel<Barcod
 
   return {
     schema: ({ i18n }) => ({
+      fit: {
+        title: i18n('schemas.barcodes.fit'),
+        type: 'string',
+        widget: 'select',
+        default: DEFAULT_BARCODE_FIT,
+        props: {
+          options: [
+            { label: i18n('schemas.barcodes.fit.stretch'), value: 'stretch' },
+            { label: i18n('schemas.barcodes.fit.contain'), value: 'contain' },
+          ],
+        },
+        span: 8,
+      },
       // bar/text colors are rendered by bwip-js, which has no alpha support, so
       // they stay restricted to opaque 6-digit hex (see OPAQUE_HEX_COLOR_PATTERN).
       barColor: {

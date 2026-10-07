@@ -3,7 +3,7 @@ import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 import { splitHexAlpha } from '../utils.js';
 import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
-import { BarcodeTypes } from './types.js';
+import { BarcodeFit, BarcodeTypes } from './types.js';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {
@@ -221,6 +221,69 @@ const renderBarcodeToNodeBuffer = async (options: RenderOptions): Promise<Buffer
   return toBuffer(options);
 };
 
+/** `'contain'` only when the value is exactly that; unset and unknown values stay `'stretch'`. */
+export const normalizeBarcodeFit = (value: unknown): BarcodeFit =>
+  value === 'contain' ? 'contain' : 'stretch';
+
+const SVG_VIEW_BOX_PATTERN = /viewBox="\s*(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s*"/;
+
+const positiveSize = (value: string | undefined) => {
+  const size = Number(value);
+  return Number.isFinite(size) && size > 0 ? size : undefined;
+};
+
+/** Root `viewBox` width/height, then `width`/`height` attributes. `undefined` when neither parses. */
+export const getSvgViewBoxSize = (svg: string): { width: number; height: number } | undefined => {
+  const viewBox = svg.match(SVG_VIEW_BOX_PATTERN);
+  if (viewBox) {
+    const width = positiveSize(viewBox[3]);
+    const height = positiveSize(viewBox[4]);
+    if (width !== undefined && height !== undefined) return { width, height };
+  }
+
+  const openTag = svg.match(/<svg\b[^>]*>/)?.[0];
+  if (!openTag) return undefined;
+  const width = positiveSize(openTag.match(/\bwidth="([^"]+)"/)?.[1]);
+  const height = positiveSize(openTag.match(/\bheight="([^"]+)"/)?.[1]);
+  if (width === undefined || height === undefined) return undefined;
+  return { width, height };
+};
+
+export const getBarcodeFitLayout = ({
+  fit,
+  boxWidth,
+  boxHeight,
+  naturalWidth,
+  naturalHeight,
+}: {
+  fit?: unknown;
+  boxWidth: number;
+  boxHeight: number;
+  naturalWidth?: number;
+  naturalHeight?: number;
+}): { width: number; height: number; offsetX: number; offsetY: number } => {
+  const stretch = { width: boxWidth, height: boxHeight, offsetX: 0, offsetY: 0 };
+  if (
+    normalizeBarcodeFit(fit) !== 'contain' ||
+    naturalWidth === undefined ||
+    naturalHeight === undefined ||
+    naturalWidth <= 0 ||
+    naturalHeight <= 0
+  ) {
+    return stretch;
+  }
+
+  const scale = Math.min(boxWidth / naturalWidth, boxHeight / naturalHeight);
+  const width = naturalWidth * scale;
+  const height = naturalHeight * scale;
+  return {
+    width,
+    height,
+    offsetX: (boxWidth - width) / 2,
+    offsetY: (boxHeight - height) / 2,
+  };
+};
+
 type CreateBarCodeArg = {
   type: BarcodeTypes;
   input: string;
@@ -230,6 +293,7 @@ type CreateBarCodeArg = {
   barColor?: string;
   textColor?: string;
   includetext?: boolean;
+  fit?: BarcodeFit;
 };
 
 const createBwipJsRenderOptions = (arg: CreateBarCodeArg): RenderOptions => {
@@ -242,6 +306,7 @@ const createBwipJsRenderOptions = (arg: CreateBarCodeArg): RenderOptions => {
     barColor,
     textColor,
     includetext = DEFAULT_BARCODE_INCLUDETEXT,
+    fit,
   } = arg;
 
   const bcid = barCodeType2Bcid(type);
@@ -249,12 +314,16 @@ const createBwipJsRenderOptions = (arg: CreateBarCodeArg): RenderOptions => {
   const bwipjsArg: RenderOptions = {
     bcid,
     text: input,
-    width,
-    height,
     scale,
     includetext,
     textxalign: 'center',
   };
+  // Contain renders the natural symbol (scale only) and letterboxes it into the box.
+  // Stretch keeps passing width/height so bwip-js scales each axis independently.
+  if (normalizeBarcodeFit(fit) !== 'contain') {
+    bwipjsArg.width = width;
+    bwipjsArg.height = height;
+  }
 
   if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);

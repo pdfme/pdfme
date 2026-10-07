@@ -27,7 +27,18 @@ import {
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image, multiVariableText, table } from '@pdfme/schemas';
+import { text, image, multiVariableText, table, barcodes } from '@pdfme/schemas';
+
+vi.mock('bwip-js', () => ({
+  default: {
+    toCanvas: () => {
+      throw new Error('bwip-js toCanvas is unavailable in jsdom');
+    },
+    toSVG: () => {
+      throw new Error('bwip-js toSVG is unavailable in jsdom');
+    },
+  },
+}));
 import { emitFormWatch, useForm } from 'form-render';
 import * as uiHelper from '../../src/helper';
 
@@ -1649,6 +1660,78 @@ test('selecting expand text on a non-blank PDF rewrites overflow without touchin
       expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
     });
     expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+  } finally {
+    cleanup();
+  }
+});
+
+const qrPlugins = { ...plugins, qrcode: barcodes.qrcode };
+
+const getQrResizeTemplate = (fit?: 'contain'): Template => ({
+  basePdf: BLANK_A4_PDF,
+  schemas: [
+    [
+      {
+        name: 'field1',
+        type: 'qrcode',
+        content: 'https://pdfme.com/',
+        position: { x: 10, y: 10 },
+        width: 30,
+        height: 30,
+        backgroundColor: '#ffffff',
+        barColor: '#000000',
+        ...(fit ? { fit } : {}),
+      },
+    ],
+  ],
+});
+
+const selectQrField = async (domContainer: HTMLElement) => {
+  await waitFor(() => {
+    expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+  });
+  clickFieldInList(domContainer, 'field1');
+  await waitFor(() => {
+    expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+  });
+};
+
+test('contain barcodes keep a square box when resized without Shift', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(
+    getQrResizeTemplate('contain'),
+    qrPlugins,
+  );
+
+  try {
+    await selectQrField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(uiHelper.round(field.width / field.height, 2)).toBe(1);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('barcodes without fit resize freely', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(
+    getQrResizeTemplate(),
+    qrPlugins,
+  );
+
+  try {
+    await selectQrField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(30);
+      expect(uiHelper.round(field.width / field.height, 2)).not.toBe(1);
+    });
   } finally {
     cleanup();
   }

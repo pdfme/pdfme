@@ -9,10 +9,19 @@ import {
   splitHexAlpha,
 } from '../utils.js';
 import type { BarcodeSchema } from './types.js';
-import { createBarCodeSvg, ensureHexColorHash, validateBarcodeInput } from './helper.js';
+import {
+  createBarCodeSvg,
+  ensureHexColorHash,
+  getBarcodeFitLayout,
+  getSvgViewBoxSize,
+  normalizeBarcodeFit,
+  validateBarcodeInput,
+} from './helper.js';
 
 const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
-  return `svg:${schema.type}:${schema.width}:${schema.height}:${schema.barColor}:${schema.textColor}:${schema.includetext}:${value}`;
+  const fit = normalizeBarcodeFit(schema.fit);
+  const size = fit === 'contain' ? 'natural' : `${schema.width}:${schema.height}`;
+  return `svg:${schema.type}:${fit}:${size}:${schema.barColor}:${schema.textColor}:${schema.includetext}:${value}`;
 };
 
 const addSvgOpacity = (svg: string, opacity?: number) => {
@@ -41,10 +50,15 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
       type: schema.type,
       input: value,
     });
-    // Stretch to the schema box like the pre-SVG raster rendering did.
+    // pdf-lib's preserveAspectRatio "meet" picks scale by target orientation
+    // (scale = targetWidth > targetHeight ? scaleY : scaleX) instead of
+    // min(scaleX, scaleY), so a wide symbol in a less-wide box overflows and
+    // gets clipped. Compute the contain rect in pdfme and always inject "none".
     svg = svg.replace(/<svg\b/, '<svg preserveAspectRatio="none"');
     _cache.set(inputBarcodeCacheKey, svg);
   }
+
+  const fit = normalizeBarcodeFit(schema.fit);
 
   const pageHeight = page.getHeight();
   const {
@@ -83,11 +97,20 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
       }
     }
 
+    const natural = fit === 'contain' ? getSvgViewBoxSize(svg) : undefined;
+    const layout = getBarcodeFitLayout({
+      fit,
+      boxWidth: width,
+      boxHeight: height,
+      naturalWidth: natural?.width,
+      naturalHeight: natural?.height,
+    });
     await page.drawSvg(addSvgOpacity(svg, opacity), {
-      x,
-      y: y + height,
-      width,
-      height,
+      x: x + layout.offsetX,
+      // drawSvg's y is the top edge of the graphic (PDF y grows upward).
+      y: y + height - layout.offsetY,
+      width: layout.width,
+      height: layout.height,
       mapColor: getSvgColorMapper(options.colorType),
     });
   } finally {
