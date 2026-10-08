@@ -6,11 +6,15 @@
 
 <h4 align="center">
   <a href="https://pdfme.com/">Website</a> |
+  <a href="https://playground.pdfme.com/">Playground</a> |
   <a href="https://app.pdfme.com?utm_source=github&utm_content=readme-top">pdfme Cloud</a> |
   <a href="https://discord.gg/xWPTJbmgNV">Discord</a>
 </h4>
 
 <p align="center">
+  <a href="https://github.com/pdfme/pdfme">
+    <img src="https://img.shields.io/github/stars/pdfme/pdfme?style=social" alt="Star pdfme on GitHub" />
+  </a>
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
@@ -23,6 +27,10 @@
   <a href="https://npmcharts.com/compare/@pdfme/common?minimal=true">
     <img src="https://img.shields.io/npm/dm/@pdfme/common.svg" alt="Downloads per month on npm." />
   </a>
+</p>
+
+<p align="center">
+  ⭐ pdfme is open source. If it saves you time, please <a href="https://github.com/pdfme/pdfme">star us on GitHub</a> to help more developers discover it.
 </p>
 
 <p align="center">
