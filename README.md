@@ -18,9 +18,6 @@
   <a href="https://github.com/pdfme/pdfme/blob/master/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="pdfme is released under the MIT license." />
   </a>
-  <a href="https://deepwiki.com/pdfme/pdfme">
-    <img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki">
-  </a>
   <a href="https://www.npmjs.com/package/@pdfme/generator">
     <img src="https://img.shields.io/npm/v/@pdfme/generator.svg" alt="Current npm package version." />
   </a>
