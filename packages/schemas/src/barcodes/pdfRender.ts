@@ -13,15 +13,28 @@ import {
   createBarCodeSvg,
   ensureHexColorHash,
   getBarcodeFitLayout,
-  getSvgViewBoxSize,
-  normalizeBarcodeFit,
+  getNaturalBarcodeSize,
+  isAspectRatioLockedBarcodeType,
   validateBarcodeInput,
 } from './helper.js';
 
-const getBarcodeCacheKey = (schema: BarcodeSchema, value: string) => {
-  const fit = normalizeBarcodeFit(schema.fit);
-  const size = fit === 'contain' ? 'natural' : `${schema.width}:${schema.height}`;
-  return `svg:${schema.type}:${fit}:${size}:${schema.barColor}:${schema.textColor}:${schema.includetext}:${value}`;
+type Size = { width: number; height: number };
+
+const getBarcodeCacheKey = (schema: BarcodeSchema, size: Size, value: string) => {
+  return `svg:${schema.type}:${size.width}:${size.height}:${schema.barColor}:${schema.textColor}:${schema.includetext}:${value}`;
+};
+
+const getNaturalSize = (
+  schema: BarcodeSchema,
+  value: string,
+  cache: Map<string | number, unknown>,
+): Size | undefined => {
+  if (!isAspectRatioLockedBarcodeType(schema.type)) return undefined;
+  const key = `svg-natural:${schema.type}:${schema.includetext}:${value}`;
+  if (cache.has(key)) return cache.get(key) as Size | undefined;
+  const size = getNaturalBarcodeSize(schema, value);
+  cache.set(key, size);
+  return size;
 };
 
 const addSvgOpacity = (svg: string, opacity?: number) => {
@@ -41,11 +54,22 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
   const { value, schema, page, options, _cache } = arg;
   if (!validateBarcodeInput(schema.type, value)) return;
 
-  const inputBarcodeCacheKey = getBarcodeCacheKey(schema, value);
+  // Locked types are fitted to their natural ratio (in mm) before bwip-js renders them,
+  // so a box that already has that ratio renders exactly as a plain stretch would.
+  const natural = getNaturalSize(schema, value, _cache);
+  const fitted = getBarcodeFitLayout({
+    boxWidth: schema.width,
+    boxHeight: schema.height,
+    naturalWidth: natural?.width,
+    naturalHeight: natural?.height,
+  });
+  const inputBarcodeCacheKey = getBarcodeCacheKey(schema, fitted, value);
   let svg = _cache.get(inputBarcodeCacheKey) as string | undefined;
   if (!svg) {
     svg = createBarCodeSvg({
       ...schema,
+      width: fitted.width,
+      height: fitted.height,
       backgroundColor: undefined,
       type: schema.type,
       input: value,
@@ -57,8 +81,6 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
     svg = svg.replace(/<svg\b/, '<svg preserveAspectRatio="none"');
     _cache.set(inputBarcodeCacheKey, svg);
   }
-
-  const fit = normalizeBarcodeFit(schema.fit);
 
   const pageHeight = page.getHeight();
   const {
@@ -97,9 +119,7 @@ export const pdfRender = async (arg: PDFRenderProps<BarcodeSchema>) => {
       }
     }
 
-    const natural = fit === 'contain' ? getSvgViewBoxSize(svg) : undefined;
     const layout = getBarcodeFitLayout({
-      fit,
       boxWidth: width,
       boxHeight: height,
       naturalWidth: natural?.width,

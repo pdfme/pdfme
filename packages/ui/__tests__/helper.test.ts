@@ -11,6 +11,7 @@ import {
   PAGE_SIZE_PRESETS,
   ZOOM,
   pluginRegistry,
+  type Plugin,
 } from '@pdfme/common';
 import {
   uuid,
@@ -27,7 +28,7 @@ import {
   setFontNameRecursively,
   getStickyScrollPageIndex,
   isRotatableSchema,
-  isAspectRatioLockedSchema,
+  isAspectRatioLockedPlugin,
 } from '../src/helper';
 import {
   text,
@@ -1160,18 +1161,14 @@ describe('isRotatableSchema (#1631)', () => {
   });
 });
 
-describe('isAspectRatioLockedSchema', () => {
-  test('contain locks the box ratio', () => {
-    expect(isAspectRatioLockedSchema({ fit: 'contain' })).toBe(true);
+describe('isAspectRatioLockedPlugin', () => {
+  test('a plugin with getAspectRatio is locked; missing plugins are not', () => {
+    expect(isAspectRatioLockedPlugin({ ...text, getAspectRatio: () => 1 })).toBe(true);
+    expect(isAspectRatioLockedPlugin(text)).toBe(false);
+    expect(isAspectRatioLockedPlugin(undefined)).toBe(false);
   });
 
-  test('stretch, empty, and missing schemas stay unlocked', () => {
-    expect(isAspectRatioLockedSchema({ fit: 'stretch' })).toBe(false);
-    expect(isAspectRatioLockedSchema({})).toBe(false);
-    expect(isAspectRatioLockedSchema(undefined)).toBe(false);
-  });
-
-  test('only new 2D barcode defaults are locked', () => {
+  test('only 2D barcode built-ins are locked', () => {
     const builtIns = {
       text,
       image,
@@ -1194,9 +1191,77 @@ describe('isAspectRatioLockedSchema', () => {
     };
     const locked = new Set(['qrcode', 'gs1datamatrix', 'pdf417']);
     for (const [name, plugin] of Object.entries(builtIns)) {
-      const defaultSchema = plugin.propPanel.defaultSchema as Record<string, unknown>;
-      expect(isAspectRatioLockedSchema(defaultSchema), `plugin: ${name}`).toBe(locked.has(name));
+      expect(isAspectRatioLockedPlugin(plugin as Plugin), `plugin: ${name}`).toBe(locked.has(name));
     }
+  });
+});
+
+describe('changeSchemas aspect ratio', () => {
+  const pageSize = PAGE_SIZE_PRESETS.A4;
+  const basePdf: BasePdf = BLANK_PDF;
+  const ratioPlugin = {
+    ...text,
+    propPanel: { ...text.propPanel, defaultSchema: { ...getSchema(), type: 'ratio' } },
+    getAspectRatio: (schema: Schema) => (schema.content === 'wide' ? 4 : 2),
+  } as Plugin;
+  const pluginsRegistry = pluginRegistry({ text, ratio: ratioPlugin });
+  const ratioSchema = (): SchemaForUI => ({
+    id: 'ratio',
+    ...getSchema(),
+    type: 'ratio',
+    content: 'normal',
+    position: { x: 10, y: 10 },
+    width: 40,
+    height: 20,
+  });
+
+  const run = (objs: { key: string; value: unknown }[], schema = ratioSchema()) => {
+    const commitSchemas = vi.fn();
+    changeSchemas({
+      objs: objs.map((obj) => ({ ...obj, schemaId: schema.id })),
+      schemas: [schema],
+      basePdf,
+      pluginsRegistry,
+      pageSize,
+      commitSchemas,
+    });
+    return (commitSchemas.mock.calls[0][0] as SchemaForUI[])[0];
+  };
+
+  test('width edit derives the height', () => {
+    expect(run([{ key: 'width', value: 60 }])).toMatchObject({ width: 60, height: 30 });
+  });
+
+  test('height edit derives the width', () => {
+    expect(run([{ key: 'height', value: 15 }])).toMatchObject({ width: 30, height: 15 });
+  });
+
+  test('a canvas resize with both sides keeps the width and derives the height', () => {
+    expect(
+      run([
+        { key: 'position.x', value: 10 },
+        { key: 'width', value: 50 },
+        { key: 'height', value: 26 },
+      ]),
+    ).toMatchObject({ width: 50, height: 25 });
+  });
+
+  test('content change re-derives the height from the width', () => {
+    expect(run([{ key: 'content', value: 'wide' }])).toMatchObject({ width: 40, height: 10 });
+  });
+
+  test('page bounds clamp the derived side and shrink the edited side to match', () => {
+    const schema = { ...ratioSchema(), position: { x: 10, y: pageSize.height - 30 } };
+    expect(run([{ key: 'width', value: 100 }], schema)).toMatchObject({ width: 60, height: 30 });
+  });
+
+  test('position-only edits and unlocked plugins are untouched', () => {
+    expect(run([{ key: 'position.x', value: 20 }])).toMatchObject({ width: 40, height: 20 });
+    const textSchema: SchemaForUI = { ...ratioSchema(), type: 'text' };
+    expect(run([{ key: 'width', value: 60 }], textSchema)).toMatchObject({
+      width: 60,
+      height: 20,
+    });
   });
 });
 

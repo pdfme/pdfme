@@ -10,6 +10,7 @@ import {
   SchemaForUI,
   Size,
   isBlankPdf,
+  Plugin,
   PluginRegistry,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
@@ -122,10 +123,9 @@ export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 export const isRotatableSchema = (defaultSchema?: Record<string, unknown>): boolean =>
   typeof defaultSchema?.rotate !== 'undefined';
 
-/** Schemas rendered with object-fit "contain" semantics (e.g. barcodes with fit: 'contain')
- *  keep their box aspect ratio when resized on the canvas without holding Shift. */
-export const isAspectRatioLockedSchema = (schema?: Record<string, unknown>): boolean =>
-  schema?.fit === 'contain';
+/** Plugins with an intrinsic aspect ratio keep their box ratio on canvas resize without Shift. */
+export const isAspectRatioLockedPlugin = (plugin?: Plugin): boolean =>
+  typeof plugin?.getAspectRatio === 'function';
 
 const up = 'up';
 const shiftUp = 'shift+up';
@@ -709,6 +709,34 @@ const handleTypeChange = (
   }
 };
 
+const ASPECT_RATIO_TRIGGER_KEYS = ['width', 'height', 'content', 'type'];
+
+/**
+ * Snap the box to the plugin's intrinsic ratio. A height-only edit derives the width;
+ * every other trigger (width, both sides from a canvas resize, content, type) derives
+ * the height. If the page bounds clamp the derived side, the edited side shrinks to match.
+ */
+const applyAspectRatio = (
+  schema: SchemaForUI,
+  changedKeys: Set<string>,
+  pluginsRegistry: PluginRegistry,
+  basePdf: BasePdf,
+  pageSize: Size,
+) => {
+  if (!ASPECT_RATIO_TRIGGER_KEYS.some((key) => changedKeys.has(key))) return;
+  const ratio = pluginsRegistry.findByType(schema.type)?.getAspectRatio?.(schema);
+  if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return;
+
+  const fromHeight = changedKeys.has('height') && !changedKeys.has('width');
+  if (fromHeight) {
+    handlePositionSizeChange(schema, 'width', round(schema.height * ratio, 2), basePdf, pageSize);
+    handlePositionSizeChange(schema, 'height', round(schema.width / ratio, 2), basePdf, pageSize);
+  } else {
+    handlePositionSizeChange(schema, 'height', round(schema.width / ratio, 2), basePdf, pageSize);
+    handlePositionSizeChange(schema, 'width', round(schema.height * ratio, 2), basePdf, pageSize);
+  }
+};
+
 export const changeSchemas = (args: {
   objs: { key: string; value: unknown; schemaId: string }[];
   schemas: SchemaForUI[];
@@ -718,6 +746,7 @@ export const changeSchemas = (args: {
   commitSchemas: (newSchemas: SchemaForUI[]) => void;
 }) => {
   const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas } = args;
+  const changedKeysById = new Map<string, Set<string>>();
   const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
     const tgt = acc.find((s) => s.id === schemaId);
     if (!tgt) return acc;
@@ -730,8 +759,17 @@ export const changeSchemas = (args: {
       handlePositionSizeChange(tgt, key, value, basePdf, pageSize);
     }
 
+    const changedKeys = changedKeysById.get(schemaId) ?? new Set<string>();
+    changedKeys.add(key);
+    changedKeysById.set(schemaId, changedKeys);
+
     return acc;
   }, cloneDeep(schemas));
+
+  for (const schema of newSchemas) {
+    const changedKeys = changedKeysById.get(schema.id);
+    if (changedKeys) applyAspectRatio(schema, changedKeys, pluginsRegistry, basePdf, pageSize);
+  }
   commitSchemas(newSchemas);
 };
 

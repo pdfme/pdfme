@@ -118,9 +118,6 @@ export const Dict = z.object({
   'schemas.mvt.variablesSampleData': z.string(),
   'schemas.mvt.placeholderDynamicVariable': z.string(),
 
-  'schemas.barcodes.fit': z.string(),
-  'schemas.barcodes.fit.stretch': z.string(),
-  'schemas.barcodes.fit.contain': z.string(),
   'schemas.barcodes.barColor': z.string(),
   'schemas.barcodes.includetext': z.string(),
 

@@ -1,7 +1,7 @@
 import jsQR, { QRCode } from 'jsqr';
 import { PNG } from 'pngjs';
 import barcodes from '../src/barcodes/index.js';
-import { BARCODE_2D_TYPES, BARCODE_TYPES } from '../src/barcodes/constants.js';
+import { ASPECT_RATIO_LOCKED_BARCODE_TYPES, BARCODE_TYPES } from '../src/barcodes/constants.js';
 import {
   validateBarcodeInput,
   createBarCode,
@@ -9,9 +9,10 @@ import {
   barCodeType2Bcid,
   mapHexColorForBwipJsLib,
   resolveBarcodeRenderRuntime,
+  getBarcodeAspectRatio,
   getBarcodeFitLayout,
+  getNaturalBarcodeSize,
   getSvgViewBoxSize,
-  normalizeBarcodeFit,
 } from '../src/barcodes/helper.js';
 
 describe('validateBarcodeInput test', () => {
@@ -524,35 +525,39 @@ describe('mapHexColorForBwipJsLib text', () => {
   });
 });
 
-describe('barcode fit', () => {
-  test('contain QR svg keeps the natural square viewBox', () => {
-    const svg = createBarCodeSvg({
-      type: 'qrcode',
-      input: 'https://pdfme.com/',
-      width: 60,
-      height: 30,
-      fit: 'contain',
-    });
-    expect(svg).toContain('viewBox="0 0 250 250"');
-  });
-
-  test('unset fit stretches QR to a non-square viewBox', () => {
-    const svg = createBarCodeSvg({
+describe('barcode aspect ratio', () => {
+  test('omitting width and height renders the natural symbol', () => {
+    const natural = createBarCodeSvg({ type: 'qrcode', input: 'https://pdfme.com/' });
+    expect(natural).toContain('viewBox="0 0 250 250"');
+    const stretched = createBarCodeSvg({
       type: 'qrcode',
       input: 'https://pdfme.com/',
       width: 60,
       height: 30,
     });
-    expect(svg).toContain('viewBox="0 0 850 425"');
+    expect(stretched).toContain('viewBox="0 0 850 425"');
   });
 
-  test('contain QR png is square and still decodes', async () => {
+  test('getNaturalBarcodeSize ignores the schema box', () => {
+    const schema = {
+      name: '',
+      type: 'qrcode' as const,
+      position: { x: 0, y: 0 },
+      width: 60,
+      height: 30,
+      backgroundColor: '#ffffff',
+      barColor: '#000000',
+    };
+    expect(getNaturalBarcodeSize(schema, 'https://pdfme.com/')).toEqual({
+      width: 250,
+      height: 250,
+    });
+  });
+
+  test('natural QR png is square and still decodes', async () => {
     const buffer = await createBarCode({
       type: 'qrcode',
       input: 'https://pdfme.com/',
-      width: 60,
-      height: 30,
-      fit: 'contain',
       backgroundColor: 'ffffff',
     });
     const png = PNG.sync.read(buffer);
@@ -562,57 +567,36 @@ describe('barcode fit', () => {
     expect(Buffer.from(qr.binaryData).toString('utf8')).toEqual('https://pdfme.com/');
   });
 
-  test('getBarcodeFitLayout letterboxes contain and stretches otherwise', () => {
+  test('getBarcodeFitLayout letterboxes a natural size and falls back to the box', () => {
     expect(
-      getBarcodeFitLayout({
-        fit: 'stretch',
-        boxWidth: 60,
-        boxHeight: 30,
-        naturalWidth: 250,
-        naturalHeight: 250,
-      }),
-    ).toEqual({ width: 60, height: 30, offsetX: 0, offsetY: 0 });
+      getBarcodeFitLayout({ boxWidth: 30, boxHeight: 30, naturalWidth: 250, naturalHeight: 250 }),
+    ).toEqual({ width: 30, height: 30, offsetX: 0, offsetY: 0 });
 
     expect(
-      getBarcodeFitLayout({
-        fit: 'contain',
-        boxWidth: 60,
-        boxHeight: 30,
-        naturalWidth: 250,
-        naturalHeight: 250,
-      }),
+      getBarcodeFitLayout({ boxWidth: 60, boxHeight: 30, naturalWidth: 250, naturalHeight: 250 }),
     ).toEqual({ width: 30, height: 30, offsetX: 15, offsetY: 0 });
 
     expect(
-      getBarcodeFitLayout({
-        fit: 'contain',
-        boxWidth: 30,
-        boxHeight: 60,
-        naturalWidth: 250,
-        naturalHeight: 250,
-      }),
+      getBarcodeFitLayout({ boxWidth: 30, boxHeight: 60, naturalWidth: 250, naturalHeight: 250 }),
     ).toEqual({ width: 30, height: 30, offsetX: 0, offsetY: 15 });
 
-    const japanpost = getBarcodeFitLayout({
-      fit: 'contain',
+    const wide = getBarcodeFitLayout({
       boxWidth: 40,
       boxHeight: 20,
       naturalWidth: 1101,
       naturalHeight: 104,
     });
-    expect(japanpost.width).toBeCloseTo(40);
-    expect(japanpost.height).toBeCloseTo((104 * 40) / 1101);
-    expect(japanpost.height).toBeLessThan(20);
-    expect(japanpost.offsetX).toBeCloseTo(0);
-    expect(japanpost.offsetY).toBeCloseTo((20 - japanpost.height) / 2);
+    expect(wide.width).toBeCloseTo(40);
+    expect(wide.height).toBeCloseTo((104 * 40) / 1101);
+    expect(wide.offsetX).toBeCloseTo(0);
+    expect(wide.offsetY).toBeCloseTo((20 - wide.height) / 2);
 
-    expect(
-      getBarcodeFitLayout({
-        fit: 'contain',
-        boxWidth: 40,
-        boxHeight: 20,
-      }),
-    ).toEqual({ width: 40, height: 20, offsetX: 0, offsetY: 0 });
+    expect(getBarcodeFitLayout({ boxWidth: 40, boxHeight: 20 })).toEqual({
+      width: 40,
+      height: 20,
+      offsetX: 0,
+      offsetY: 0,
+    });
   });
 
   test('getSvgViewBoxSize parses a viewBox and returns undefined when it is absent', () => {
@@ -623,37 +607,46 @@ describe('barcode fit', () => {
     expect(getSvgViewBoxSize('<svg></svg>')).toBeUndefined();
   });
 
-  test('normalizeBarcodeFit defaults everything except contain to stretch', () => {
-    expect(normalizeBarcodeFit(undefined)).toBe('stretch');
-    expect(normalizeBarcodeFit('contain')).toBe('contain');
-    expect(normalizeBarcodeFit('cover')).toBe('stretch');
+  test('getBarcodeAspectRatio follows the content for locked types only', () => {
+    const base = { position: { x: 0, y: 0 }, width: 40, height: 20, name: '' };
+    const colors = { backgroundColor: '#ffffff', barColor: '#000000' };
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'qrcode', content: 'https://pdfme.com/' }),
+    ).toBe(1);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: 'This is PDF417!' }),
+    ).toBeCloseTo(515 / 150);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'gs1datamatrix', content: 'invalid' }),
+    ).toBeUndefined();
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'code128', content: 'ABC-123' }),
+    ).toBeUndefined();
   });
 
-  test('every barcode propPanel exposes a fit select, and only 2D defaults contain', () => {
-    const i18n = (key: string) => key;
-    const twoD = new Set<string>(BARCODE_2D_TYPES);
+  test('only locked plugins expose getAspectRatio, and their defaults already match it', () => {
+    const locked = new Set<string>(ASPECT_RATIO_LOCKED_BARCODE_TYPES);
+    for (const type of BARCODE_TYPES) {
+      const plugin = barcodes[type];
+      if (!locked.has(type)) {
+        expect(plugin.getAspectRatio, type).toBeUndefined();
+        continue;
+      }
+      const { defaultSchema } = plugin.propPanel;
+      const ratio = plugin.getAspectRatio?.(defaultSchema);
+      expect(ratio, type).toBeDefined();
+      expect(defaultSchema.width / defaultSchema.height, type).toBeCloseTo(ratio!, 2);
+    }
+  });
 
+  test('no barcode exposes a fit option', () => {
+    const i18n = (key: string) => key;
     for (const type of BARCODE_TYPES) {
       const panel = barcodes[type].propPanel;
       const schemaFn = panel.schema;
-      if (typeof schemaFn !== 'function') {
-        throw new Error(`${type} propPanel schema is not a function`);
-      }
-      const schema = schemaFn({ i18n } as Parameters<typeof schemaFn>[0]);
-      const fit = schema.fit;
-      expect(fit?.widget, type).toBe('select');
-      expect(fit?.default, type).toBe('stretch');
-      const options = (fit?.props?.options ?? []) as { value: string }[];
-      expect(options.map((option) => option.value)).toEqual(['stretch', 'contain']);
-      expect(Object.keys(schema).indexOf('fit'), type).toBeLessThan(
-        Object.keys(schema).indexOf('barColor'),
-      );
-
-      if (twoD.has(type)) {
-        expect(panel.defaultSchema.fit, type).toBe('contain');
-      } else {
-        expect(panel.defaultSchema, type).not.toHaveProperty('fit');
-      }
+      if (typeof schemaFn !== 'function') throw new Error(`${type} schema is not a function`);
+      expect(schemaFn({ i18n } as Parameters<typeof schemaFn>[0]), type).not.toHaveProperty('fit');
+      expect(panel.defaultSchema, type).not.toHaveProperty('fit');
     }
   });
 });

@@ -6,7 +6,7 @@ import {
   createBarCode,
   createBarCodeSvg,
   ensureHexColorHash,
-  normalizeBarcodeFit,
+  isAspectRatioLockedBarcodeType,
 } from './helper.js';
 import { addAlphaToHex, isEditable, createErrorElm } from '../utils.js';
 
@@ -33,13 +33,13 @@ const createBarcodeImage = async (schema: BarcodeSchema, value: string) => {
 
 const createBarcodeImageElm = async (schema: BarcodeSchema, value: string) => {
   const img = document.createElement('img');
-  const fit = normalizeBarcodeFit(schema.fit);
-  if (fit === 'contain') {
-    // Natural-size SVG, letterboxed by the browser. A raster at scale 5 is
-    // unbounded by the box and can exceed canvas limits for long 1D content.
+  if (isAspectRatioLockedBarcodeType(schema.type)) {
+    // Natural-size SVG letterboxed by the browser: crisp at any zoom and not
+    // bounded by canvas size limits like a natural-size raster would be.
     const svg = createBarCodeSvg({
       ...schema,
-      fit,
+      width: undefined,
+      height: undefined,
       backgroundColor: undefined,
       input: value,
     });

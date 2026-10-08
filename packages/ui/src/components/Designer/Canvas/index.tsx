@@ -29,7 +29,7 @@ import {
   flatten,
   uuid,
   isRotatableSchema,
-  isAspectRatioLockedSchema,
+  isAspectRatioLockedPlugin,
 } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
@@ -372,9 +372,9 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const selected = (schemasList[pageCursor] || []).filter((s) => ids.includes(s.id));
     return (
       selected.length > 0 &&
-      selected.every((s) => isAspectRatioLockedSchema(s as Record<string, unknown>))
+      selected.every((s) => isAspectRatioLockedPlugin(pluginsRegistry.findByType(s.type)))
     );
-  }, [isPressShiftKey, activeElements, pageCursor, schemasList]);
+  }, [isPressShiftKey, activeElements, pageCursor, schemasList, pluginsRegistry]);
 
   return (
     <div

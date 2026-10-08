@@ -19,7 +19,6 @@ export const DEFAULT_BARCODE_COLOR = '#000000';
 
 export const DEFAULT_BARCODE_INCLUDETEXT = true;
 
-export const BARCODE_FITS = ['stretch', 'contain'] as const;
-export const DEFAULT_BARCODE_FIT = 'stretch';
-// Matrix/stacked symbologies whose modules must stay square → new fields default to 'contain'.
-export const BARCODE_2D_TYPES = ['qrcode', 'gs1datamatrix', 'pdf417'] as const;
+// Matrix/stacked symbologies whose modules must not be distorted: rendered at their
+// intrinsic aspect ratio and letterboxed into the box. 1D symbologies stretch freely.
+export const ASPECT_RATIO_LOCKED_BARCODE_TYPES = ['qrcode', 'gs1datamatrix', 'pdf417'] as const;

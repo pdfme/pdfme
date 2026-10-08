@@ -118,7 +118,7 @@ Exceptions:
   - Background Color
   - Text Color
   - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
-- **Fit (stretch / contain)**: `contain` keeps the symbol's intrinsic aspect ratio and locks Designer resizing to the field's box ratio. Hold Shift while dragging a resize handle to keep the ratio for any field.
+- **Aspect ratio**: qrcode, gs1datamatrix, and pdf417 always keep the symbol's intrinsic aspect ratio. In the Designer, resizing keeps the field's ratio, and changing the width (or height, or the content) adjusts the other side automatically. If a field's box has a different ratio, the symbol is centered inside it. 1D barcodes stretch to fill the field. Hold Shift while dragging a resize handle to keep the ratio for any field.
 
 ### Table (table){#table}
 

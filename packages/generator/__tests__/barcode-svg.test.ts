@@ -423,7 +423,7 @@ describe('barcode SVG PDF rendering', () => {
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-backgrounds-svg-1'));
   });
 
-  test('letterboxes contain barcodes and still stretches when fit is stretch', async () => {
+  test('letterboxes 2D barcodes at their intrinsic ratio while 1D barcodes stretch', async () => {
     const template: Template = {
       basePdf: BLANK_PDF,
       schemas: [
@@ -435,7 +435,6 @@ describe('barcode SVG PDF rendering', () => {
             position: { x: 15, y: 15 },
             width: 60,
             height: 30,
-            fit: 'contain',
             backgroundColor: '#ff66cc',
             barColor: '#000000',
           },
@@ -446,7 +445,6 @@ describe('barcode SVG PDF rendering', () => {
             position: { x: 90, y: 15 },
             width: 30,
             height: 60,
-            fit: 'contain',
             backgroundColor: '#66ccff',
             barColor: '#000000',
           },
@@ -457,30 +455,17 @@ describe('barcode SVG PDF rendering', () => {
             position: { x: 135, y: 15 },
             width: 55,
             height: 30,
-            fit: 'contain',
             backgroundColor: '#ffe066',
             barColor: '#000000',
           },
           {
-            name: 'code128',
-            type: 'code128',
+            name: 'gs1datamatrix',
+            type: 'gs1datamatrix',
             content: '',
             position: { x: 15, y: 90 },
-            width: 30,
-            height: 40,
-            fit: 'contain',
+            width: 50,
+            height: 25,
             backgroundColor: '#99e699',
-            barColor: '#000000',
-          },
-          {
-            name: 'japanpost',
-            type: 'japanpost',
-            content: '',
-            position: { x: 60, y: 90 },
-            width: 40,
-            height: 20,
-            fit: 'contain',
-            backgroundColor: '#ff9933',
             barColor: '#000000',
           },
           {
@@ -491,19 +476,27 @@ describe('barcode SVG PDF rendering', () => {
             width: 50,
             height: 28,
             rotate: 20,
-            fit: 'contain',
             backgroundColor: '#cc99ff',
             barColor: '#000000',
           },
           {
-            name: 'qrStretch',
-            type: 'qrcode',
+            name: 'code128',
+            type: 'code128',
             content: '',
             position: { x: 15, y: 160 },
-            width: 60,
-            height: 30,
-            fit: 'stretch',
+            width: 80,
+            height: 20,
             backgroundColor: '#dddddd',
+            barColor: '#000000',
+          },
+          {
+            name: 'japanpost',
+            type: 'japanpost',
+            content: '',
+            position: { x: 110, y: 160 },
+            width: 70,
+            height: 20,
+            backgroundColor: '#ff9933',
             barColor: '#000000',
           },
         ],
@@ -514,18 +507,19 @@ describe('barcode SVG PDF rendering', () => {
       template,
       inputs: [
         {
-          qrWide: 'https://pdfme.com/fit-wide',
-          qrTall: 'https://pdfme.com/fit-tall',
-          pdf417: 'PDF417 contain',
+          qrWide: 'https://pdfme.com/ratio-wide',
+          qrTall: 'https://pdfme.com/ratio-tall',
+          pdf417: 'PDF417 ratio',
+          gs1datamatrix: '(01)12345678901231',
+          qrRotated: 'https://pdfme.com/ratio-rotated',
           code128: 'ABC-123',
           japanpost: '10000131-3-2-B503',
-          qrRotated: 'https://pdfme.com/fit-rotated',
-          qrStretch: 'https://pdfme.com/fit-stretch',
         },
       ],
       plugins: {
         qrcode: barcodes.qrcode,
         pdf417: barcodes.pdf417,
+        gs1datamatrix: barcodes.gs1datamatrix,
         code128: barcodes.code128,
         japanpost: barcodes.japanpost,
       },
@@ -534,6 +528,6 @@ describe('barcode SVG PDF rendering', () => {
     const images = await pdfToImages(pdf);
 
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
-    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-fit-contain-1'));
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-aspect-ratio-1'));
   });
 });

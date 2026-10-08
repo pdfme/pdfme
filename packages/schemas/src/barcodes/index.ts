@@ -3,6 +3,7 @@ import { getPropPanelByBarcodeType } from './propPanel.js';
 import { uiRender } from './uiRender.js';
 import type { BarcodeSchema, BarcodeTypes } from './types.js';
 import { BARCODE_TYPES } from './constants.js';
+import { getBarcodeAspectRatio, isAspectRatioLockedBarcodeType } from './helper.js';
 import { createSvgStr } from '../utils.js';
 import { Plugin } from '@pdfme/common';
 import { QrCode, Barcode } from 'lucide';
@@ -15,6 +16,7 @@ const barcodes = BARCODE_TYPES.reduce(
         ui: uiRender,
         propPanel: getPropPanelByBarcodeType(type),
         icon: createSvgStr(type == 'qrcode' ? QrCode : Barcode),
+        ...(isAspectRatioLockedBarcodeType(type) ? { getAspectRatio: getBarcodeAspectRatio } : {}),
       },
     }),
   {} as Record<BarcodeTypes, Plugin<BarcodeSchema>>,

@@ -57,9 +57,9 @@ describe('barcode UI rendering', () => {
     expect(container.style.backgroundColor).toBe('transparent');
   });
 
-  test('fit contain renders an SVG image with object-fit contain', async () => {
+  test('locked types render an SVG image with object-fit contain', async () => {
     const container = await renderBarcodeContainer(
-      getBarcodeSchema({ type: 'qrcode', width: 60, height: 30, fit: 'contain' }),
+      getBarcodeSchema({ type: 'qrcode', width: 60, height: 30 }),
       'https://pdfme.com/',
     );
     const img = container.querySelector('img');
@@ -68,10 +68,10 @@ describe('barcode UI rendering', () => {
     expect(img?.src.startsWith('data:image/svg+xml')).toBe(true);
   });
 
-  test('unset fit renders a stretched PNG', async () => {
+  test('1D types render a stretched PNG', async () => {
     const container = await renderBarcodeContainer(
-      getBarcodeSchema({ type: 'qrcode', width: 60, height: 30 }),
-      'https://pdfme.com/',
+      getBarcodeSchema({ type: 'code128', width: 60, height: 30 }),
+      'ABC-123',
     );
     const img = container.querySelector('img');
     expect(img).toBeTruthy();
