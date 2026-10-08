@@ -7,7 +7,6 @@
 <h4 align="center">
   <a href="https://pdfme.com/">Website</a> |
   <a href="https://playground.pdfme.com/">Playground</a> |
-  <a href="https://app.pdfme.com?utm_source=github&utm_content=readme-top">pdfme Cloud</a> |
   <a href="https://discord.gg/xWPTJbmgNV">Discord</a>
 </h4>
 
@@ -67,21 +66,6 @@ For agentic workflows, local verification, or JSON-first template iteration, use
 ## Examples Using pdfme
 
 If you're looking for code examples to get started with pdfme, check out the [pdfme-playground website](https://playground.pdfme.com/) and the [playground source code](https://github.com/pdfme/pdfme/tree/main/playground). Setup instructions can be found in the [DEVELOPMENT.md](DEVELOPMENT.md) file.
-
-## Cloud Service Option
-
-While pdfme is a powerful open-source library, we understand that some users might prefer a managed solution. For those looking for a ready-to-use, scalable PDF generation service without the hassle of setup and maintenance, we offer pdfme Cloud.
-
-**[Try pdfme Cloud - Hassle-free PDF Generation](https://app.pdfme.com?utm_source=github&utm_content=readme-cloud)**
-
-pdfme Cloud provides all the features of the open-source library, plus:
-
-- PDF generation at scale without infrastructure management
-- Hosted WYSIWYG template designer
-- Simple API integration
-- Automatic updates and maintenance
-
-_pdfme will always remain open source. The cloud service is an optional offering for those who prefer a managed solution._
 
 ## Sponsors
 
