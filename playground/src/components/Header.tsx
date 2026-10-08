@@ -201,6 +201,21 @@ export default function Navigation() {
           Help
         </button>
 
+        <a
+          href="https://github.com/pdfme/pdfme"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Star pdfme on GitHub"
+          className="ml-auto flex shrink-0 items-center py-2 hover:opacity-80"
+        >
+          <img
+            src="https://img.shields.io/github/stars/pdfme/pdfme?style=social"
+            alt="Star pdfme on GitHub"
+            height={20}
+            className="h-5 w-auto"
+          />
+        </a>
+
         <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
       </nav>
     </div>
