@@ -118,7 +118,7 @@ Exceptions:
   - Background Color
   - Text Color
   - [Include text option (planned support)](https://github.com/pdfme/pdfme/issues/23)
-- **Aspect ratio**: qrcode, gs1datamatrix, and pdf417 always keep the symbol's intrinsic aspect ratio. In the Designer, resizing keeps the field's ratio, and changing the width (or height, or the content) adjusts the other side automatically. If a field's box has a different ratio, the symbol is centered inside it. 1D barcodes stretch to fill the field. Hold Shift while dragging a resize handle to keep the ratio for any field.
+- **Aspect ratio**: qrcode, gs1datamatrix, and pdf417 always keep the symbol's intrinsic aspect ratio. In the Designer, resizing keeps the field's ratio, and changing the width (or height, or the content) adjusts the other side automatically. If a field's box has a different ratio, the symbol is centered inside it. A pdf417 ratio depends on the encoded data: the Designer follows the field's sample content, so a generated value of a different length is centered inside the box. Existing templates are not changed on load; a field snaps to its ratio the next time its size or content is edited. 1D barcodes stretch to fill the field. Hold Shift while dragging a resize handle to keep the ratio for any field.
 
 ### Table (table){#table}
 

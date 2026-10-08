@@ -1202,7 +1202,8 @@ describe('changeSchemas aspect ratio', () => {
   const ratioPlugin = {
     ...text,
     propPanel: { ...text.propPanel, defaultSchema: { ...getSchema(), type: 'ratio' } },
-    getAspectRatio: (schema: Schema) => (schema.content === 'wide' ? 4 : 2),
+    getAspectRatio: (schema: Schema) =>
+      schema.content === 'wide' ? 4 : schema.content === 'unknown' ? undefined : 2,
   } as Plugin;
   const pluginsRegistry = pluginRegistry({ text, ratio: ratioPlugin });
   const ratioSchema = (): SchemaForUI => ({
@@ -1253,6 +1254,54 @@ describe('changeSchemas aspect ratio', () => {
   test('page bounds clamp the derived side and shrink the edited side to match', () => {
     const schema = { ...ratioSchema(), position: { x: 10, y: pageSize.height - 30 } };
     expect(run([{ key: 'width', value: 100 }], schema)).toMatchObject({ width: 60, height: 30 });
+  });
+
+  test('a height edit clamped on the derived width shrinks the height to match', () => {
+    const schema = { ...ratioSchema(), position: { x: pageSize.width - 40, y: 10 } };
+    expect(run([{ key: 'height', value: 30 }], schema)).toMatchObject({ width: 40, height: 20 });
+  });
+
+  test('rounding the derived side never alters the typed value', () => {
+    expect(run([{ key: 'width', value: 40.01 }])).toMatchObject({ width: 40.01, height: 20.01 });
+    expect(run([{ key: 'width', value: 40.03 }])).toMatchObject({ width: 40.03, height: 20.02 });
+    expect(run([{ key: 'height', value: 15.555 }])).toMatchObject({
+      width: 31.11,
+      height: 15.555,
+    });
+  });
+
+  test('a type change derives the height from the new default width', () => {
+    const textSchema: SchemaForUI = { ...ratioSchema(), type: 'text' };
+    expect(run([{ key: 'type', value: 'ratio' }], textSchema)).toMatchObject({
+      type: 'ratio',
+      width: 100,
+      height: 50,
+    });
+  });
+
+  test('each schema in a bulk width edit derives its own height', () => {
+    const a = { ...ratioSchema(), id: 'a' };
+    const b = { ...ratioSchema(), id: 'b', content: 'wide' };
+    const commitSchemas = vi.fn();
+    changeSchemas({
+      objs: [
+        { key: 'width', value: 80, schemaId: 'a' },
+        { key: 'width', value: 80, schemaId: 'b' },
+      ],
+      schemas: [a, b],
+      basePdf,
+      pluginsRegistry,
+      pageSize,
+      commitSchemas,
+    });
+    const [nextA, nextB] = commitSchemas.mock.calls[0][0] as SchemaForUI[];
+    expect(nextA).toMatchObject({ width: 80, height: 40 });
+    expect(nextB).toMatchObject({ width: 80, height: 20 });
+  });
+
+  test('an undefined ratio leaves the edit as typed', () => {
+    const schema = { ...ratioSchema(), content: 'unknown' };
+    expect(run([{ key: 'width', value: 60 }], schema)).toMatchObject({ width: 60, height: 20 });
   });
 
   test('position-only edits and unlocked plugins are untouched', () => {

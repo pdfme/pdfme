@@ -709,7 +709,7 @@ const handleTypeChange = (
   }
 };
 
-const ASPECT_RATIO_TRIGGER_KEYS = ['width', 'height', 'content', 'type'];
+const ASPECT_RATIO_TRIGGER_KEYS = new Set(['width', 'height', 'content', 'type']);
 
 /**
  * Snap the box to the plugin's intrinsic ratio. A height-only edit derives the width;
@@ -723,17 +723,23 @@ const applyAspectRatio = (
   basePdf: BasePdf,
   pageSize: Size,
 ) => {
-  if (!ASPECT_RATIO_TRIGGER_KEYS.some((key) => changedKeys.has(key))) return;
+  if (![...changedKeys].some((key) => ASPECT_RATIO_TRIGGER_KEYS.has(key))) return;
   const ratio = pluginsRegistry.findByType(schema.type)?.getAspectRatio?.(schema);
   if (!ratio || !Number.isFinite(ratio) || ratio <= 0) return;
 
   const fromHeight = changedKeys.has('height') && !changedKeys.has('width');
-  if (fromHeight) {
-    handlePositionSizeChange(schema, 'width', round(schema.height * ratio, 2), basePdf, pageSize);
-    handlePositionSizeChange(schema, 'height', round(schema.width / ratio, 2), basePdf, pageSize);
-  } else {
-    handlePositionSizeChange(schema, 'height', round(schema.width / ratio, 2), basePdf, pageSize);
-    handlePositionSizeChange(schema, 'width', round(schema.height * ratio, 2), basePdf, pageSize);
+  const [edited, derived] = fromHeight
+    ? (['height', 'width'] as const)
+    : (['width', 'height'] as const);
+  const deriveFrom = (key: 'width' | 'height') =>
+    round(key === 'width' ? schema.width / ratio : schema.height * ratio, 2);
+
+  const target = deriveFrom(edited);
+  handlePositionSizeChange(schema, derived, target, basePdf, pageSize);
+  // Re-derive the edited side only when bounds clamped the derived one; otherwise
+  // rounding would alter the value the user just typed.
+  if (schema[derived] !== target) {
+    handlePositionSizeChange(schema, edited, deriveFrom(derived), basePdf, pageSize);
   }
 };
 

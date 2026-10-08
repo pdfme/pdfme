@@ -15,6 +15,7 @@ import {
   getBarcodeFitLayout,
   getNaturalBarcodeSize,
   isAspectRatioLockedBarcodeType,
+  isSquareBarcodeType,
   validateBarcodeInput,
 } from './helper.js';
 
@@ -30,7 +31,9 @@ const getNaturalSize = (
   cache: Map<string | number, unknown>,
 ): Size | undefined => {
   if (!isAspectRatioLockedBarcodeType(schema.type)) return undefined;
-  const key = `svg-natural:${schema.type}:${schema.includetext}:${value}`;
+  // Only the ratio matters for fitting, so square types skip the extra bwip-js encode.
+  if (isSquareBarcodeType(schema.type)) return { width: 1, height: 1 };
+  const key = `svg-natural:${schema.type}:${value}`;
   if (cache.has(key)) return cache.get(key) as Size | undefined;
   const size = getNaturalBarcodeSize(schema, value);
   cache.set(key, size);

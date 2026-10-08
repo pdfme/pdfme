@@ -13,6 +13,7 @@ import {
   getBarcodeFitLayout,
   getNaturalBarcodeSize,
   getSvgViewBoxSize,
+  isSquareBarcodeType,
 } from '../src/barcodes/helper.js';
 
 describe('validateBarcodeInput test', () => {
@@ -568,9 +569,13 @@ describe('barcode aspect ratio', () => {
   });
 
   test('getBarcodeFitLayout letterboxes a natural size and falls back to the box', () => {
-    expect(
-      getBarcodeFitLayout({ boxWidth: 30, boxHeight: 30, naturalWidth: 250, naturalHeight: 250 }),
-    ).toEqual({ width: 30, height: 30, offsetX: 0, offsetY: 0 });
+    // A box at the natural ratio must come back unchanged (exact equality), which keeps
+    // its PDF output identical to the plain stretch path.
+    for (const box of [30, 15, 33.33, 47.1]) {
+      expect(
+        getBarcodeFitLayout({ boxWidth: box, boxHeight: box, naturalWidth: 1, naturalHeight: 1 }),
+      ).toEqual({ width: box, height: box, offsetX: 0, offsetY: 0 });
+    }
 
     expect(
       getBarcodeFitLayout({ boxWidth: 60, boxHeight: 30, naturalWidth: 250, naturalHeight: 250 }),
@@ -607,21 +612,46 @@ describe('barcode aspect ratio', () => {
     expect(getSvgViewBoxSize('<svg></svg>')).toBeUndefined();
   });
 
-  test('getBarcodeAspectRatio follows the content for locked types only', () => {
+  test('getBarcodeAspectRatio: square types are 1 for any content, pdf417 follows content', () => {
     const base = { position: { x: 0, y: 0 }, width: 40, height: 20, name: '' };
     const colors = { backgroundColor: '#ffffff', barColor: '#000000' };
     expect(
       getBarcodeAspectRatio({ ...base, ...colors, type: 'qrcode', content: 'https://pdfme.com/' }),
     ).toBe(1);
+    expect(getBarcodeAspectRatio({ ...base, ...colors, type: 'qrcode', content: '' })).toBe(1);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'gs1datamatrix', content: 'invalid' }),
+    ).toBe(1);
     expect(
       getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: 'This is PDF417!' }),
     ).toBeCloseTo(515 / 150);
     expect(
-      getBarcodeAspectRatio({ ...base, ...colors, type: 'gs1datamatrix', content: 'invalid' }),
-    ).toBeUndefined();
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: 'PDF417 rotated' }),
+    ).toBeCloseTo(515 / 135);
+    expect(getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: '' })).toBe(
+      undefined,
+    );
     expect(
       getBarcodeAspectRatio({ ...base, ...colors, type: 'code128', content: 'ABC-123' }),
     ).toBeUndefined();
+  });
+
+  test('bwip-js keeps square types square for short and long content', () => {
+    const inputs: [string, string][] = [
+      ['qrcode', 'A'],
+      ['qrcode', 'https://pdfme.com/'],
+      ['qrcode', 'x'.repeat(400)],
+      ['gs1datamatrix', '(01)12345678901231'],
+      ['gs1datamatrix', '(01)03453120000011(17)191125(10)ABCD1234'],
+    ];
+    for (const [type, input] of inputs) {
+      expect(isSquareBarcodeType(type), type).toBe(true);
+      const size = getSvgViewBoxSize(
+        createBarCodeSvg({ type: type as 'qrcode' | 'gs1datamatrix', input }),
+      );
+      expect(size?.width, `${type}:${input.length}`).toBe(size?.height);
+    }
+    expect(isSquareBarcodeType('pdf417')).toBe(false);
   });
 
   test('only locked plugins expose getAspectRatio, and their defaults already match it', () => {

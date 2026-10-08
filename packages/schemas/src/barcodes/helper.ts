@@ -230,6 +230,12 @@ const aspectRatioLockedTypes: readonly string[] = ASPECT_RATIO_LOCKED_BARCODE_TY
 export const isAspectRatioLockedBarcodeType = (type: string) =>
   aspectRatioLockedTypes.includes(type);
 
+// bwip-js always emits square QR and (with pdfme's default format) square DataMatrix
+// symbols, whatever the content. Only pdf417's ratio depends on the encoded data.
+const SQUARE_BARCODE_TYPES: readonly string[] = ['qrcode', 'gs1datamatrix'];
+
+export const isSquareBarcodeType = (type: string) => SQUARE_BARCODE_TYPES.includes(type);
+
 const SVG_VIEW_BOX_PATTERN = /viewBox="\s*(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s*"/;
 
 const positiveSize = (value: string | undefined) => {
@@ -365,17 +371,35 @@ export const getNaturalBarcodeSize = (schema: BarcodeSchema, input: string) =>
     }),
   );
 
-/** Natural width / height of a locked symbology for the schema's content; undefined otherwise. */
+const contentAspectRatioMemo = new Map<string, number | undefined>();
+const CONTENT_ASPECT_RATIO_MEMO_LIMIT = 200;
+
+/**
+ * Natural width / height of a locked symbology; undefined for 1D types. Square types
+ * return 1 even for empty content. The Designer calls this on every width/height/content
+ * commit, so content-dependent ratios are memoized.
+ */
 export const getBarcodeAspectRatio = (schema: BarcodeSchema): number | undefined => {
   if (!isAspectRatioLockedBarcodeType(schema.type)) return undefined;
+  if (isSquareBarcodeType(schema.type)) return 1;
+
   const input = schema.content ?? '';
   if (!validateBarcodeInput(schema.type, input)) return undefined;
+  const key = `${schema.type}:${input}`;
+  if (contentAspectRatioMemo.has(key)) return contentAspectRatioMemo.get(key);
+
+  let ratio: number | undefined;
   try {
     const size = getNaturalBarcodeSize(schema, input);
-    return size ? size.width / size.height : undefined;
+    ratio = size ? size.width / size.height : undefined;
   } catch {
-    return undefined;
+    ratio = undefined;
   }
+  if (contentAspectRatioMemo.size >= CONTENT_ASPECT_RATIO_MEMO_LIMIT) {
+    contentAspectRatioMemo.clear();
+  }
+  contentAspectRatioMemo.set(key, ratio);
+  return ratio;
 };
 
 export const createBarCode = async (arg: CreateBarCodeArg): Promise<Buffer> => {

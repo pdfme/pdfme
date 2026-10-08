@@ -1705,6 +1705,40 @@ test('QR codes keep a square box when resized without Shift', async () => {
   }
 });
 
+test('Moveable keeps the box ratio for plugins that define getAspectRatio', async () => {
+  // getAspectRatio returns undefined so changeSchemas does not snap; any kept ratio
+  // must come from Moveable's keepRatio during the drag.
+  const lockedText: Plugin = {
+    ...text,
+    propPanel: {
+      ...text.propPanel,
+      defaultSchema: { ...text.propPanel.defaultSchema, type: 'lockedText' },
+    },
+    getAspectRatio: () => undefined,
+  };
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [[{ ...textField('field1', 'hello'), type: 'lockedText', width: 45, height: 10 }]],
+  };
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(template, {
+    ...plugins,
+    lockedText,
+  });
+
+  try {
+    await selectBarcodeField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(45);
+      expect(field.width / field.height).toBeCloseTo(4.5, 1);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
 test('1D barcodes resize freely', async () => {
   vi.spyOn(console, 'error').mockImplementation(() => {});
   const { designer, domContainer, cleanup } = await mountPublicDesigner(
