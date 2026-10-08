@@ -204,6 +204,7 @@ export interface PropPanel<T extends Schema> {
  * @property {PropPanel} propPanel Object for defining the property panel.
  * @property {string} [icon] Icon SVG for the plugin.
  * @property {boolean} [uninterruptedEditMode] When editing in the UI, should the field avoid re-rendering while in edit mode?
+ * @property {function} [getAspectRatio] Intrinsic width / height ratio the field box must keep (e.g. square QR codes). When defined, the Designer derives the other side when width, height, or content changes, and locks canvas resizing to the current box ratio. Returning undefined skips the derivation, but canvas resizing stays locked because the method is defined.
  */
 export interface Plugin<T extends Schema = Schema> {
   pdf(arg: PDFRenderProps<T & Schema>): Promise<void> | void;
@@ -211,6 +212,7 @@ export interface Plugin<T extends Schema = Schema> {
   propPanel: PropPanel<T & Schema>;
   icon?: string;
   uninterruptedEditMode?: boolean;
+  getAspectRatio?(schema: T & Schema): number | undefined;
 }
 
 export type Plugins = { [key: string]: Plugin };

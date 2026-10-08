@@ -24,7 +24,13 @@ import { PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
-import { round, flatten, uuid, isRotatableSchema } from '../../../helper.js';
+import {
+  round,
+  flatten,
+  uuid,
+  isRotatableSchema,
+  isAspectRatioLockedPlugin,
+} from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
 import Selecto from './Selecto.js';
@@ -360,6 +366,16 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     });
   }, [activeElements, pageCursor, schemasList, pluginsRegistry]);
 
+  const keepRatio = useMemo(() => {
+    if (isPressShiftKey) return true;
+    const ids = activeElements.map((ae) => ae.id);
+    const selected = (schemasList[pageCursor] || []).filter((s) => ids.includes(s.id));
+    return (
+      selected.length > 0 &&
+      selected.every((s) => isAspectRatioLockedPlugin(pluginsRegistry.findByType(s.type)))
+    );
+  }, [isPressShiftKey, activeElements, pageCursor, schemasList, pluginsRegistry]);
+
   return (
     <div
       className={DESIGNER_CLASSNAME + 'canvas'}
@@ -469,7 +485,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
                   bounds={{ left: 0, top: 0, bottom: paperSize.height, right: paperSize.width }}
                   horizontalGuidelines={getGuideLines(horizontalGuides.current, index)}
                   verticalGuidelines={getGuideLines(verticalGuides.current, index)}
-                  keepRatio={isPressShiftKey}
+                  keepRatio={keepRatio}
                   rotatable={rotatable}
                   onDrag={onDrag}
                   onDragEnd={onDragEnd}

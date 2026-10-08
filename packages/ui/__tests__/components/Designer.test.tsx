@@ -27,7 +27,7 @@ import {
   mockClientSizeFromStyle,
   setupUIMock,
 } from '../assets/helper';
-import { text, image, multiVariableText, table } from '@pdfme/schemas';
+import { text, image, multiVariableText, table, barcodes } from '@pdfme/schemas';
 import { emitFormWatch, useForm } from 'form-render';
 import * as uiHelper from '../../src/helper';
 
@@ -1649,6 +1649,112 @@ test('selecting expand text on a non-blank PDF rewrites overflow without touchin
       expect(domContainer.querySelector('[title="renamedField1"]')).toBeTruthy();
     });
     expect(namesByPage(designer.getTemplate())).toEqual([['renamedField1']]);
+  } finally {
+    cleanup();
+  }
+});
+
+const barcodePlugins = { ...plugins, qrcode: barcodes.qrcode, code128: barcodes.code128 };
+
+const getBarcodeResizeTemplate = (type: 'qrcode' | 'code128'): Template => ({
+  basePdf: BLANK_A4_PDF,
+  schemas: [
+    [
+      {
+        name: 'field1',
+        type,
+        content: type === 'qrcode' ? 'https://pdfme.com/' : 'ABC-123',
+        position: { x: 10, y: 10 },
+        width: 30,
+        height: 30,
+        backgroundColor: '#ffffff',
+        barColor: '#000000',
+      },
+    ],
+  ],
+});
+
+const selectBarcodeField = async (domContainer: HTMLElement) => {
+  await waitFor(() => {
+    expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+  });
+  clickFieldInList(domContainer, 'field1');
+  await waitFor(() => {
+    expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+  });
+};
+
+test('QR codes keep a square box when resized without Shift', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(
+    getBarcodeResizeTemplate('qrcode'),
+    barcodePlugins,
+  );
+
+  try {
+    await selectBarcodeField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(30);
+      expect(field.width).toBe(field.height);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('Moveable keeps the box ratio for plugins that define getAspectRatio', async () => {
+  // getAspectRatio returns undefined so changeSchemas does not snap; any kept ratio
+  // must come from Moveable's keepRatio during the drag.
+  const lockedText: Plugin = {
+    ...text,
+    propPanel: {
+      ...text.propPanel,
+      defaultSchema: { ...text.propPanel.defaultSchema, type: 'lockedText' },
+    },
+    getAspectRatio: () => undefined,
+  };
+  const template: Template = {
+    basePdf: BLANK_A4_PDF,
+    schemas: [[{ ...textField('field1', 'hello'), type: 'lockedText', width: 45, height: 10 }]],
+  };
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(template, {
+    ...plugins,
+    lockedText,
+  });
+
+  try {
+    await selectBarcodeField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(45);
+      expect(field.width / field.height).toBeCloseTo(4.5, 1);
+    });
+  } finally {
+    cleanup();
+  }
+});
+
+test('1D barcodes resize freely', async () => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+  const { designer, domContainer, cleanup } = await mountPublicDesigner(
+    getBarcodeResizeTemplate('code128'),
+    barcodePlugins,
+  );
+
+  try {
+    await selectBarcodeField(domContainer);
+    await resizeSelectedField();
+
+    await waitFor(() => {
+      const field = designer.getTemplate().schemas[0][0];
+      expect(field.width).not.toBe(30);
+      expect(uiHelper.round(field.width / field.height, 2)).not.toBe(1);
+    });
   } finally {
     cleanup();
   }

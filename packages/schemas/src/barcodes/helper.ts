@@ -2,8 +2,12 @@ import { b64toUint8Array, isHexValid } from '@pdfme/common';
 import bwipjs, { RenderOptions } from 'bwip-js';
 import { Buffer } from 'buffer';
 import { splitHexAlpha } from '../utils.js';
-import { BARCODE_TYPES, DEFAULT_BARCODE_INCLUDETEXT } from './constants.js';
-import { BarcodeTypes } from './types.js';
+import {
+  ASPECT_RATIO_LOCKED_BARCODE_TYPES,
+  BARCODE_TYPES,
+  DEFAULT_BARCODE_INCLUDETEXT,
+} from './constants.js';
+import { BarcodeSchema, BarcodeTypes } from './types.js';
 
 // GTIN-13, GTIN-8, GTIN-12, GTIN-14
 const validateCheckDigit = (input: string, checkDigitPos: number) => {
@@ -221,11 +225,83 @@ const renderBarcodeToNodeBuffer = async (options: RenderOptions): Promise<Buffer
   return toBuffer(options);
 };
 
+const aspectRatioLockedTypes: readonly string[] = ASPECT_RATIO_LOCKED_BARCODE_TYPES;
+
+export const isAspectRatioLockedBarcodeType = (type: string) =>
+  aspectRatioLockedTypes.includes(type);
+
+// bwip-js always emits square QR and (with pdfme's default format) square DataMatrix
+// symbols, whatever the content. Only pdf417's ratio depends on the encoded data.
+const SQUARE_BARCODE_TYPES: readonly string[] = ['qrcode', 'gs1datamatrix'];
+
+export const isSquareBarcodeType = (type: string) => SQUARE_BARCODE_TYPES.includes(type);
+
+const SVG_VIEW_BOX_PATTERN = /viewBox="\s*(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s*"/;
+
+const positiveSize = (value: string | undefined) => {
+  const size = Number(value);
+  return Number.isFinite(size) && size > 0 ? size : undefined;
+};
+
+/** Root `viewBox` width/height, then `width`/`height` attributes. `undefined` when neither parses. */
+export const getSvgViewBoxSize = (svg: string): { width: number; height: number } | undefined => {
+  const viewBox = svg.match(SVG_VIEW_BOX_PATTERN);
+  if (viewBox) {
+    const width = positiveSize(viewBox[3]);
+    const height = positiveSize(viewBox[4]);
+    if (width !== undefined && height !== undefined) return { width, height };
+  }
+
+  const openTag = svg.match(/<svg\b[^>]*>/)?.[0];
+  if (!openTag) return undefined;
+  const width = positiveSize(openTag.match(/\bwidth="([^"]+)"/)?.[1]);
+  const height = positiveSize(openTag.match(/\bheight="([^"]+)"/)?.[1]);
+  if (width === undefined || height === undefined) return undefined;
+  return { width, height };
+};
+
+/** Centered contain rect for a natural size; the full box when the natural size is unknown. */
+export const getBarcodeFitLayout = ({
+  boxWidth,
+  boxHeight,
+  naturalWidth,
+  naturalHeight,
+}: {
+  boxWidth: number;
+  boxHeight: number;
+  naturalWidth?: number;
+  naturalHeight?: number;
+}): { width: number; height: number; offsetX: number; offsetY: number } => {
+  const stretch = { width: boxWidth, height: boxHeight, offsetX: 0, offsetY: 0 };
+  if (
+    naturalWidth === undefined ||
+    naturalHeight === undefined ||
+    naturalWidth <= 0 ||
+    naturalHeight <= 0
+  ) {
+    return stretch;
+  }
+
+  // Keep the limiting side exactly equal to the box so a box that already has the
+  // natural ratio yields the box itself (no floating-point drift in the PDF).
+  const ratio = naturalWidth / naturalHeight;
+  const widthLimited = boxWidth / boxHeight <= ratio;
+  const width = widthLimited ? boxWidth : boxHeight * ratio;
+  const height = widthLimited ? boxWidth / ratio : boxHeight;
+  return {
+    width,
+    height,
+    offsetX: (boxWidth - width) / 2,
+    offsetY: (boxHeight - height) / 2,
+  };
+};
+
 type CreateBarCodeArg = {
   type: BarcodeTypes;
   input: string;
-  width: number;
-  height: number;
+  /** Per-axis size targets in mm. Omit both to render the natural symbol. */
+  width?: number;
+  height?: number;
   backgroundColor?: string;
   barColor?: string;
   textColor?: string;
@@ -249,12 +325,12 @@ const createBwipJsRenderOptions = (arg: CreateBarCodeArg): RenderOptions => {
   const bwipjsArg: RenderOptions = {
     bcid,
     text: input,
-    width,
-    height,
     scale,
     includetext,
     textxalign: 'center',
   };
+  if (width !== undefined) bwipjsArg.width = width;
+  if (height !== undefined) bwipjsArg.height = height;
 
   if (backgroundColor) bwipjsArg.backgroundcolor = mapHexColorForBwipJsLib(backgroundColor);
   if (barColor) bwipjsArg.barcolor = mapHexColorForBwipJsLib(barColor);
@@ -281,6 +357,49 @@ export const createBarCodeSvg = (arg: CreateBarCodeArg): string => {
   }
 
   return svg;
+};
+
+/** Natural (unscaled) symbol size from bwip-js, in SVG user units. */
+export const getNaturalBarcodeSize = (schema: BarcodeSchema, input: string) =>
+  getSvgViewBoxSize(
+    createBarCodeSvg({
+      ...schema,
+      width: undefined,
+      height: undefined,
+      backgroundColor: undefined,
+      input,
+    }),
+  );
+
+const contentAspectRatioMemo = new Map<string, number | undefined>();
+const CONTENT_ASPECT_RATIO_MEMO_LIMIT = 200;
+
+/**
+ * Natural width / height of a locked symbology; undefined for 1D types. Square types
+ * return 1 even for empty content. The Designer calls this on every width/height/content
+ * commit, so content-dependent ratios are memoized.
+ */
+export const getBarcodeAspectRatio = (schema: BarcodeSchema): number | undefined => {
+  if (!isAspectRatioLockedBarcodeType(schema.type)) return undefined;
+  if (isSquareBarcodeType(schema.type)) return 1;
+
+  const input = schema.content ?? '';
+  if (!validateBarcodeInput(schema.type, input)) return undefined;
+  const key = `${schema.type}:${input}`;
+  if (contentAspectRatioMemo.has(key)) return contentAspectRatioMemo.get(key);
+
+  let ratio: number | undefined;
+  try {
+    const size = getNaturalBarcodeSize(schema, input);
+    ratio = size ? size.width / size.height : undefined;
+  } catch {
+    ratio = undefined;
+  }
+  if (contentAspectRatioMemo.size >= CONTENT_ASPECT_RATIO_MEMO_LIMIT) {
+    contentAspectRatioMemo.clear();
+  }
+  contentAspectRatioMemo.set(key, ratio);
+  return ratio;
 };
 
 export const createBarCode = async (arg: CreateBarCodeArg): Promise<Buffer> => {

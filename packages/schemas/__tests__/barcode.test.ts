@@ -1,5 +1,7 @@
 import jsQR, { QRCode } from 'jsqr';
 import { PNG } from 'pngjs';
+import barcodes from '../src/barcodes/index.js';
+import { ASPECT_RATIO_LOCKED_BARCODE_TYPES, BARCODE_TYPES } from '../src/barcodes/constants.js';
 import {
   validateBarcodeInput,
   createBarCode,
@@ -7,6 +9,11 @@ import {
   barCodeType2Bcid,
   mapHexColorForBwipJsLib,
   resolveBarcodeRenderRuntime,
+  getBarcodeAspectRatio,
+  getBarcodeFitLayout,
+  getNaturalBarcodeSize,
+  getSvgViewBoxSize,
+  isSquareBarcodeType,
 } from '../src/barcodes/helper.js';
 
 describe('validateBarcodeInput test', () => {
@@ -516,5 +523,160 @@ describe('mapHexColorForBwipJsLib text', () => {
   });
   test('it keeps hash-less colors untouched (legacy bwip-js RRGGBB/CCMMYYKK format)', () => {
     expect(mapHexColorForBwipJsLib('ff000080')).toEqual('ff000080');
+  });
+});
+
+describe('barcode aspect ratio', () => {
+  test('omitting width and height renders the natural symbol', () => {
+    const natural = createBarCodeSvg({ type: 'qrcode', input: 'https://pdfme.com/' });
+    expect(natural).toContain('viewBox="0 0 250 250"');
+    const stretched = createBarCodeSvg({
+      type: 'qrcode',
+      input: 'https://pdfme.com/',
+      width: 60,
+      height: 30,
+    });
+    expect(stretched).toContain('viewBox="0 0 850 425"');
+  });
+
+  test('getNaturalBarcodeSize ignores the schema box', () => {
+    const schema = {
+      name: '',
+      type: 'qrcode' as const,
+      position: { x: 0, y: 0 },
+      width: 60,
+      height: 30,
+      backgroundColor: '#ffffff',
+      barColor: '#000000',
+    };
+    expect(getNaturalBarcodeSize(schema, 'https://pdfme.com/')).toEqual({
+      width: 250,
+      height: 250,
+    });
+  });
+
+  test('natural QR png is square and still decodes', async () => {
+    const buffer = await createBarCode({
+      type: 'qrcode',
+      input: 'https://pdfme.com/',
+      backgroundColor: 'ffffff',
+    });
+    const png = PNG.sync.read(buffer);
+    expect(png.width).toBe(png.height);
+    const qr = jsQR(new Uint8ClampedArray(png.data), png.width, png.height) as QRCode;
+    expect(qr).not.toBeNull();
+    expect(Buffer.from(qr.binaryData).toString('utf8')).toEqual('https://pdfme.com/');
+  });
+
+  test('getBarcodeFitLayout letterboxes a natural size and falls back to the box', () => {
+    // A box at the natural ratio must come back unchanged (exact equality), which keeps
+    // its PDF output identical to the plain stretch path.
+    for (const box of [30, 15, 33.33, 47.1]) {
+      expect(
+        getBarcodeFitLayout({ boxWidth: box, boxHeight: box, naturalWidth: 1, naturalHeight: 1 }),
+      ).toEqual({ width: box, height: box, offsetX: 0, offsetY: 0 });
+    }
+
+    expect(
+      getBarcodeFitLayout({ boxWidth: 60, boxHeight: 30, naturalWidth: 250, naturalHeight: 250 }),
+    ).toEqual({ width: 30, height: 30, offsetX: 15, offsetY: 0 });
+
+    expect(
+      getBarcodeFitLayout({ boxWidth: 30, boxHeight: 60, naturalWidth: 250, naturalHeight: 250 }),
+    ).toEqual({ width: 30, height: 30, offsetX: 0, offsetY: 15 });
+
+    const wide = getBarcodeFitLayout({
+      boxWidth: 40,
+      boxHeight: 20,
+      naturalWidth: 1101,
+      naturalHeight: 104,
+    });
+    expect(wide.width).toBeCloseTo(40);
+    expect(wide.height).toBeCloseTo((104 * 40) / 1101);
+    expect(wide.offsetX).toBeCloseTo(0);
+    expect(wide.offsetY).toBeCloseTo((20 - wide.height) / 2);
+
+    expect(getBarcodeFitLayout({ boxWidth: 40, boxHeight: 20 })).toEqual({
+      width: 40,
+      height: 20,
+      offsetX: 0,
+      offsetY: 0,
+    });
+  });
+
+  test('getSvgViewBoxSize parses a viewBox and returns undefined when it is absent', () => {
+    expect(getSvgViewBoxSize('<svg viewBox="0 0 505 401"></svg>')).toEqual({
+      width: 505,
+      height: 401,
+    });
+    expect(getSvgViewBoxSize('<svg></svg>')).toBeUndefined();
+  });
+
+  test('getBarcodeAspectRatio: square types are 1 for any content, pdf417 follows content', () => {
+    const base = { position: { x: 0, y: 0 }, width: 40, height: 20, name: '' };
+    const colors = { backgroundColor: '#ffffff', barColor: '#000000' };
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'qrcode', content: 'https://pdfme.com/' }),
+    ).toBe(1);
+    expect(getBarcodeAspectRatio({ ...base, ...colors, type: 'qrcode', content: '' })).toBe(1);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'gs1datamatrix', content: 'invalid' }),
+    ).toBe(1);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: 'This is PDF417!' }),
+    ).toBeCloseTo(515 / 150);
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: 'PDF417 rotated' }),
+    ).toBeCloseTo(515 / 135);
+    expect(getBarcodeAspectRatio({ ...base, ...colors, type: 'pdf417', content: '' })).toBe(
+      undefined,
+    );
+    expect(
+      getBarcodeAspectRatio({ ...base, ...colors, type: 'code128', content: 'ABC-123' }),
+    ).toBeUndefined();
+  });
+
+  test('bwip-js keeps square types square for short and long content', () => {
+    const inputs: [string, string][] = [
+      ['qrcode', 'A'],
+      ['qrcode', 'https://pdfme.com/'],
+      ['qrcode', 'x'.repeat(400)],
+      ['gs1datamatrix', '(01)12345678901231'],
+      ['gs1datamatrix', '(01)03453120000011(17)191125(10)ABCD1234'],
+    ];
+    for (const [type, input] of inputs) {
+      expect(isSquareBarcodeType(type), type).toBe(true);
+      const size = getSvgViewBoxSize(
+        createBarCodeSvg({ type: type as 'qrcode' | 'gs1datamatrix', input }),
+      );
+      expect(size?.width, `${type}:${input.length}`).toBe(size?.height);
+    }
+    expect(isSquareBarcodeType('pdf417')).toBe(false);
+  });
+
+  test('only locked plugins expose getAspectRatio, and their defaults already match it', () => {
+    const locked = new Set<string>(ASPECT_RATIO_LOCKED_BARCODE_TYPES);
+    for (const type of BARCODE_TYPES) {
+      const plugin = barcodes[type];
+      if (!locked.has(type)) {
+        expect(plugin.getAspectRatio, type).toBeUndefined();
+        continue;
+      }
+      const { defaultSchema } = plugin.propPanel;
+      const ratio = plugin.getAspectRatio?.(defaultSchema);
+      expect(ratio, type).toBeDefined();
+      expect(defaultSchema.width / defaultSchema.height, type).toBeCloseTo(ratio!, 2);
+    }
+  });
+
+  test('no barcode exposes a fit option', () => {
+    const i18n = (key: string) => key;
+    for (const type of BARCODE_TYPES) {
+      const panel = barcodes[type].propPanel;
+      const schemaFn = panel.schema;
+      if (typeof schemaFn !== 'function') throw new Error(`${type} schema is not a function`);
+      expect(schemaFn({ i18n } as Parameters<typeof schemaFn>[0]), type).not.toHaveProperty('fit');
+      expect(panel.defaultSchema, type).not.toHaveProperty('fit');
+    }
   });
 });

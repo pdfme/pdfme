@@ -422,4 +422,112 @@ describe('barcode SVG PDF rendering', () => {
     expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
     await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-backgrounds-svg-1'));
   });
+
+  test('letterboxes 2D barcodes at their intrinsic ratio while 1D barcodes stretch', async () => {
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'qrWide',
+            type: 'qrcode',
+            content: '',
+            position: { x: 15, y: 15 },
+            width: 60,
+            height: 30,
+            backgroundColor: '#ff66cc',
+            barColor: '#000000',
+          },
+          {
+            name: 'qrTall',
+            type: 'qrcode',
+            content: '',
+            position: { x: 90, y: 15 },
+            width: 30,
+            height: 60,
+            backgroundColor: '#66ccff',
+            barColor: '#000000',
+          },
+          {
+            name: 'pdf417',
+            type: 'pdf417',
+            content: '',
+            position: { x: 135, y: 15 },
+            width: 55,
+            height: 30,
+            backgroundColor: '#ffe066',
+            barColor: '#000000',
+          },
+          {
+            name: 'gs1datamatrix',
+            type: 'gs1datamatrix',
+            content: '',
+            position: { x: 15, y: 90 },
+            width: 50,
+            height: 25,
+            backgroundColor: '#99e699',
+            barColor: '#000000',
+          },
+          {
+            name: 'qrRotated',
+            type: 'qrcode',
+            content: '',
+            position: { x: 120, y: 95 },
+            width: 50,
+            height: 28,
+            rotate: 20,
+            backgroundColor: '#cc99ff',
+            barColor: '#000000',
+          },
+          {
+            name: 'code128',
+            type: 'code128',
+            content: '',
+            position: { x: 15, y: 160 },
+            width: 80,
+            height: 20,
+            backgroundColor: '#dddddd',
+            barColor: '#000000',
+          },
+          {
+            name: 'japanpost',
+            type: 'japanpost',
+            content: '',
+            position: { x: 110, y: 160 },
+            width: 70,
+            height: 20,
+            backgroundColor: '#ff9933',
+            barColor: '#000000',
+          },
+        ],
+      ],
+    };
+
+    const pdf = await generate({
+      template,
+      inputs: [
+        {
+          qrWide: 'https://pdfme.com/ratio-wide',
+          qrTall: 'https://pdfme.com/ratio-tall',
+          pdf417: 'PDF417 ratio',
+          gs1datamatrix: '(01)12345678901231',
+          qrRotated: 'https://pdfme.com/ratio-rotated',
+          code128: 'ABC-123',
+          japanpost: '10000131-3-2-B503',
+        },
+      ],
+      plugins: {
+        qrcode: barcodes.qrcode,
+        pdf417: barcodes.pdf417,
+        gs1datamatrix: barcodes.gs1datamatrix,
+        code128: barcodes.code128,
+        japanpost: barcodes.japanpost,
+      },
+    });
+    const { pdfDoc, page } = await loadFirstPageContent(pdf);
+    const images = await pdfToImages(pdf);
+
+    expect(pageHasImageXObject(pdfDoc, page)).toBe(false);
+    await expect(images[0]).toMatchImage(getImageSnapshotOptions('barcode-aspect-ratio-1'));
+  });
 });
