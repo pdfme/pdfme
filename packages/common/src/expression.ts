@@ -4,6 +4,57 @@ import type { Schema, SchemaPageArray } from './types.js';
 
 const expressionCache = new Map<string, (context: Record<string, unknown>) => unknown>();
 
+const isJsonWhitespace = (ch: string | undefined): boolean =>
+  ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
+
+const isDigit = (ch: string | undefined): boolean => ch !== undefined && ch >= '0' && ch <= '9';
+
+// Whether value[start, end) is a JSON number: -?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?
+const isJsonNumber = (value: string, start: number, end: number): boolean => {
+  let i = start;
+  if (value[i] === '-') i++;
+  if (!isDigit(value[i])) return false;
+  if (value[i] === '0') i++;
+  else while (i < end && isDigit(value[i])) i++;
+  if (value[i] === '.') {
+    const digits = ++i;
+    while (i < end && isDigit(value[i])) i++;
+    if (i === digits) return false;
+  }
+  if (value[i] === 'e' || value[i] === 'E') {
+    i++;
+    if (value[i] === '+' || value[i] === '-') i++;
+    const digits = i;
+    while (i < end && isDigit(value[i])) i++;
+    if (i === digits) return false;
+  }
+  return i === end;
+};
+
+/**
+ * False only for strings JSON.parse would reject, so parseData can skip the throw. Index scans, not
+ * regexes: V8 keeps the subject of the last successful match (RegExp.input), which would pin a large
+ * value after the call.
+ */
+export const mayBeJson = (value: string): boolean => {
+  let start = 0;
+  let end = value.length;
+  while (start < end && isJsonWhitespace(value[start])) start++;
+  while (end > start && isJsonWhitespace(value[end - 1])) end--;
+  const first = value[start];
+  if (first === '{') {
+    // an object starts with a key or is empty: "{name}" (a placeholder) is not JSON
+    let i = start + 1;
+    while (i < end && isJsonWhitespace(value[i])) i++;
+    return value[i] === '"' || value[i] === '}';
+  }
+  if (first === '[' || first === '"') return true;
+  if (first === 't') return end - start === 4 && value.startsWith('true', start);
+  if (first === 'f') return end - start === 5 && value.startsWith('false', start);
+  if (first === 'n') return end - start === 4 && value.startsWith('null', start);
+  return isJsonNumber(value, start, end);
+};
+
 /**
  * Parse each string value in `data` as JSON, falling back to the original
  * string on failure. Previously memoized via a module-level `parseDataCache`
@@ -13,11 +64,15 @@ const expressionCache = new Map<string, (context: Record<string, unknown>) => un
  *   base64 (e.g. image schemas) or inputs containing base64 values. Every
  *   unique inputs state pinned its own multi-MB key for the app lifetime.
  * Parsing is O(fields) and cheap; removing the cache is strictly a win.
+ *
+ * It is called once per placeholder field, over every field, so most strings are not JSON and
+ * a thrown SyntaxError each made it the bulk of a render. Strings that cannot be JSON skip
+ * JSON.parse (see mayBeJson); the result is the same.
  */
 const parseData = (data: Record<string, unknown>): Record<string, unknown> => {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => {
-      if (typeof value === 'string') {
+      if (typeof value === 'string' && mayBeJson(value)) {
         try {
           const parsedValue = JSON.parse(value) as unknown;
           return [key, parsedValue];
