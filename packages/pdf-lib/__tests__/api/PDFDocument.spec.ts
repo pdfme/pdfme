@@ -9,6 +9,8 @@ import {
   PDFHexString,
   PDFName,
   PDFPage,
+  PDFRef,
+  PDFString,
   Duplex,
   NonFullScreenPageMode,
   PrintScaling,
@@ -29,6 +31,16 @@ const oldEncryptedPdfBytes1 = fs.readFileSync('assets/pdfs/encrypted_old.pdf');
 // const oldEncryptedPdfBytes2 = fs.readFileSync('pdf_specification.pdf');
 
 const newEncryptedPdfBytes = fs.readFileSync('assets/pdfs/encrypted_new.pdf');
+// AES-128, owner password only (opens with ''). The ciphertext of three of its four Info strings
+// contains bytes the writer had to escape (\r \f, \), \\); the fourth (CreationDate) has none.
+const escapedStringsEncryptedPdfBytes = fs.readFileSync(
+  'assets/pdfs/encrypted_aes128_escaped_strings.pdf',
+);
+// AES-128 like the file above (same O, U, P and ID, opens with ''), but with a cross-reference
+// stream instead of a table. Its Info title is "XRef stream (1) \ title".
+const xrefStreamEncryptedPdfBytes = fs.readFileSync(
+  'assets/pdfs/encrypted_aes128_xref_stream.pdf',
+);
 const invalidObjectsPdfBytes = fs.readFileSync(
   'assets/pdfs/with_invalid_objects.pdf',
 );
@@ -120,6 +132,60 @@ describe(`PDFDocument`, () => {
       expect(pdfDoc.isEncrypted).toBe(true);
     });
 
+    it(`decrypts literal strings whose ciphertext contains escape sequences`, async () => {
+      const pdfDoc = await PDFDocument.load(escapedStringsEncryptedPdfBytes, {
+        password: '',
+        updateMetadata: false,
+      });
+      expect(pdfDoc.getTitle()).toBe('AES-128 1');
+      const infoDict = pdfDoc.context.lookup(pdfDoc.context.trailerInfo.Info, PDFDict);
+      expect(infoDict.lookup(PDFName.of('Title'))).toBeInstanceOf(PDFString);
+      expect(pdfDoc.getCreator()).toBe('PDFKit');
+      expect(pdfDoc.getCreationDate()?.toISOString()).toBe('1970-01-01T00:00:00.000Z');
+
+      // the decrypted strings used to break saving with object streams (unreadable output)
+      const reloaded = await PDFDocument.load(await pdfDoc.save({ useObjectStreams: true }), {
+        updateMetadata: false,
+      });
+      expect(reloaded.getPageCount()).toBe(2);
+      expect(reloaded.getTitle()).toBe('AES-128 1');
+    });
+
+    it(`does not decrypt cross-reference streams`, async () => {
+      // Decrypting one turned it into an invalid object, and the trailer it carries (Info, ID)
+      // was lost: no title, and no ID after saving
+      const pdfDoc = await PDFDocument.load(xrefStreamEncryptedPdfBytes, {
+        password: '',
+        updateMetadata: false,
+      });
+      const id = '<7e0c8dc3b005c0a970b0686f510b8479>';
+      expect(pdfDoc.getTitle()).toBe('XRef stream (1) \\ title');
+      expect(String(pdfDoc.context.trailerInfo.ID)).toBe(`[ ${id} ${id} ]`);
+
+      const reloaded = await PDFDocument.load(await pdfDoc.save(), { updateMetadata: false });
+      expect(reloaded.getTitle()).toBe('XRef stream (1) \\ title');
+      expect(String(reloaded.context.trailerInfo.ID)).toBe(`[ ${id} ${id} ]`);
+    });
+
+    it(`does not decrypt the encryption dictionary`, async () => {
+      // Its strings (O, U...) are not encrypted: they must come out as they are in the file
+      const raw = await PDFDocument.load(escapedStringsEncryptedPdfBytes, {
+        ignoreEncryption: true,
+        updateMetadata: false,
+      });
+      const encryptRef = raw.context.trailerInfo.Encrypt as PDFRef;
+      const written = raw.context.lookup(encryptRef, PDFDict);
+
+      const pdfDoc = await PDFDocument.load(escapedStringsEncryptedPdfBytes, {
+        password: '',
+        updateMetadata: false,
+      });
+      const parsed = pdfDoc.context.lookup(encryptRef, PDFDict);
+      for (const key of ['O', 'U']) {
+        expect(String(parsed.get(PDFName.of(key)))).toBe(String(written.get(PDFName.of(key))));
+      }
+    });
+
     it(`does not throw an error for invalid PDFs when throwOnInvalidObject=false`, async () => {
       await expect(
         PDFDocument.load(invalidObjectsPdfBytes, {
@@ -176,6 +242,33 @@ describe(`PDFDocument`, () => {
 
       pdfDoc.setLanguage('');
       expect(String(pdfDoc.catalog.get(PDFName.of('Lang')))).toBe('()');
+    });
+
+    it(`escapes parens and backslashes in the language`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage();
+      const language = 'x-odd) (tag \\';
+      pdfDoc.setLanguage(language);
+
+      const reloaded = await PDFDocument.load(await pdfDoc.save());
+      expect(reloaded.catalog.lookup(PDFName.of('Lang'), PDFString).decodeText()).toBe(language);
+    });
+  });
+
+  describe(`attach() method`, () => {
+    it(`escapes parens and backslashes in the file name`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      pdfDoc.addPage();
+      const fileName = 'notes) draft \\.txt';
+      await pdfDoc.attach(new Uint8Array([104, 105]), fileName, { mimeType: 'text/plain' });
+
+      const reloaded = await PDFDocument.load(await pdfDoc.save());
+      const names = reloaded.catalog
+        .lookup(PDFName.of('Names'), PDFDict)
+        .lookup(PDFName.of('EmbeddedFiles'), PDFDict)
+        .lookup(PDFName.of('Names'), PDFArray);
+      const fileSpec = names.lookup(1, PDFDict);
+      expect(fileSpec.lookup(PDFName.of('F'), PDFString).decodeText()).toBe(fileName);
     });
   });
 
