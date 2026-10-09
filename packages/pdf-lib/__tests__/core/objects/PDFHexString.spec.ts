@@ -2,6 +2,12 @@ import { PDFHexString } from '../../../src/core';
 import { toCharCode, typedArrayFor } from '../../../src/utils';
 
 describe(`PDFHexString`, () => {
+  it(`can be constructed from bytes`, () => {
+    const bytes = Uint8Array.of(0x00, 0x0f, 0x10, 0xab, 0xff);
+    expect(String(PDFHexString.fromBytes(bytes))).toBe('<000F10ABFF>');
+    expect(PDFHexString.fromBytes(bytes).asBytes()).toEqual(bytes);
+  });
+
   it(`can be constructed from PDFHexString.of(...)`, () => {
     expect(PDFHexString.of('4E6F762073686D6F7A2')).toBeInstanceOf(PDFHexString);
     expect(PDFHexString.of('901FA3')).toBeInstanceOf(PDFHexString);

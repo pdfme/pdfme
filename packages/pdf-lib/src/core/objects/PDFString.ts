@@ -1,6 +1,7 @@
 import PDFObject from './PDFObject.js';
 import CharCodes from '../syntax/CharCodes.js';
 import {
+  charFromCode,
   copyStringIntoBuffer,
   padStart,
   utf16Decode,
@@ -14,8 +15,26 @@ import { InvalidPDFDateStringError } from '../errors.js';
 class PDFString extends PDFObject {
   // The PDF spec allows newlines and parens to appear directly within a literal
   // string. These character _may_ be escaped. But they do not _have_ to be. So
-  // for simplicity, we will not bother escaping them.
+  // for simplicity, we will not bother escaping them. `value` is the string's
+  // written form: for text that may contain unbalanced parens or backslashes,
+  // use `fromBytes`, which escapes them.
   static of = (value: string) => new PDFString(value);
+
+  // Unlike `of`, which takes a literal's written form as-is, this escapes the bytes that cannot
+  // appear raw in a literal string: parens and backslashes (which would unbalance or alter it) and
+  // CR (which readers turn into LF). Use it for arbitrary bytes or text, e.g. decrypted strings.
+  static fromBytes = (bytes: Uint8Array) => {
+    let value = '';
+    for (let idx = 0, len = bytes.length; idx < len; idx++) {
+      const byte = bytes[idx];
+      if (byte === CharCodes.LeftParen) value += '\\(';
+      else if (byte === CharCodes.RightParen) value += '\\)';
+      else if (byte === CharCodes.BackSlash) value += '\\\\';
+      else if (byte === CharCodes.CarriageReturn) value += '\\r';
+      else value += charFromCode(byte);
+    }
+    return new PDFString(value);
+  };
 
   static fromDate = (date: Date) => {
     const year = padStart(String(date.getUTCFullYear()), 4, '0');
@@ -54,15 +73,18 @@ class PDFString extends PDFObject {
         else pushByte(byte);
       } else {
         if (byte === CharCodes.Newline) pushByte();
-        else if (byte === CharCodes.CarriageReturn) pushByte();
-        else if (byte === CharCodes.n) pushByte(CharCodes.Newline);
+        else if (byte === CharCodes.CarriageReturn) {
+          // A backslash followed by CRLF is a single line continuation: skip the LF too
+          if (nextChar === '\n') idx++;
+          pushByte();
+        } else if (byte === CharCodes.n) pushByte(CharCodes.Newline);
         else if (byte === CharCodes.r) pushByte(CharCodes.CarriageReturn);
         else if (byte === CharCodes.t) pushByte(CharCodes.Tab);
         else if (byte === CharCodes.b) pushByte(CharCodes.Backspace);
         else if (byte === CharCodes.f) pushByte(CharCodes.FormFeed);
         else if (byte === CharCodes.LeftParen) pushByte(CharCodes.LeftParen);
         else if (byte === CharCodes.RightParen) pushByte(CharCodes.RightParen);
-        else if (byte === CharCodes.Backspace) pushByte(CharCodes.BackSlash);
+        else if (byte === CharCodes.BackSlash) pushByte(CharCodes.BackSlash);
         else if (byte >= CharCodes.Zero && byte <= CharCodes.Seven) {
           octal += char;
           if (octal.length === 3 || !(nextChar >= '0' && nextChar <= '7')) {
