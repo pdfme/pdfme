@@ -40,12 +40,15 @@ const pageErrors = [];
 browserWs.addEventListener('message', (event) => {
   const message = JSON.parse(event.data);
   if (message.id && pending.has(message.id)) {
-    const { resolve, reject } = pending.get(message.id);
+    const waiter = pending.get(message.id);
     pending.delete(message.id);
+    clearTimeout(waiter.timer);
     if (message.error) {
-      reject(new Error(`${message.error.message || 'CDP error'}: ${JSON.stringify(message.error)}`));
+      waiter.reject(
+        new Error(`${message.error.message || 'CDP error'}: ${JSON.stringify(message.error)}`),
+      );
     } else {
-      resolve(message.result);
+      waiter.resolve(message.result);
     }
     return;
   }
@@ -73,14 +76,25 @@ function send(method, params = {}, sessionId) {
   if (sessionId) payload.sessionId = sessionId;
   browserWs.send(JSON.stringify(payload));
   return new Promise((resolve, reject) => {
-    pending.set(id, { resolve, reject });
-    setTimeout(() => {
-      if (pending.has(id)) {
-        pending.delete(id);
-        reject(new Error(`CDP timeout: ${method}`));
-      }
+    const timer = setTimeout(() => {
+      if (!pending.has(id)) return;
+      pending.delete(id);
+      reject(new Error(`CDP timeout: ${method}`));
     }, 20000);
+    pending.set(id, { resolve, reject, timer });
   });
+}
+
+function designerReady(state) {
+  return Boolean(
+    state?.href?.startsWith(`${baseUrl}/designer`) &&
+      state.designerNav &&
+      state.openFormViewer &&
+      state.canvas &&
+      state.textPlugin &&
+      state.zoomOut &&
+      state.zoomText,
+  );
 }
 
 async function evaluate(sessionId, expression) {
@@ -132,21 +146,11 @@ let ready = null;
 const readyDeadline = Date.now() + 45000;
 while (Date.now() < readyDeadline) {
   ready = await evaluate(sessionId, readyExpression);
-  if (
-    ready?.href?.startsWith(`${baseUrl}/designer`) &&
-    ready.designerNav &&
-    ready.openFormViewer &&
-    ready.canvas &&
-    ready.textPlugin &&
-    ready.zoomOut &&
-    ready.zoomText
-  ) {
-    break;
-  }
+  if (designerReady(ready)) break;
   await sleep(250);
 }
 
-if (!ready?.canvas || !ready?.zoomText) {
+if (!designerReady(ready)) {
   throw new Error(`Designer was not ready: ${JSON.stringify(ready)}`);
 }
 

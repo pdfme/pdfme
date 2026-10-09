@@ -10,14 +10,9 @@ if [[ ! -f "$PIDFILE" ]]; then
   exit 1
 fi
 
-server_pid=$(cat "$PIDFILE")
-if [[ ! "$server_pid" =~ ^[0-9]+$ ]]; then
-  echo "Pid file does not contain a pid: ${PIDFILE}" >&2
-  exit 1
-fi
-
-if ! kill -0 "$server_pid" 2>/dev/null; then
-  echo "Recorded pid ${server_pid} is not running." >&2
+read_recorded "$PIDFILE" || true
+if ! recorded_is_live; then
+  echo "Recorded pid ${RECORDED_PID:-?} is not the process this run started." >&2
   exit 1
 fi
 
@@ -29,14 +24,14 @@ fi
 
 owned=""
 for listener in $listeners; do
-  if pid_is_in_tree "$server_pid" "$listener"; then
+  if pid_is_in_tree "$RECORDED_PID" "$listener"; then
     owned="${owned} ${listener}"
   fi
 done
 
 if [[ -z "$owned" ]]; then
-  echo "Port ${PORT} listeners (${listeners}) are not descendants of recorded pid ${server_pid}." >&2
+  echo "Port ${PORT} listeners (${listeners}) are not descendants of recorded pid ${RECORDED_PID}." >&2
   exit 1
 fi
 
-echo "ok pid=${server_pid} port=${PORT} listeners=${owned# } base=${BASE_URL}"
+echo "ok pid=${RECORDED_PID} port=${PORT} listeners=${owned# } base=${BASE_URL}"

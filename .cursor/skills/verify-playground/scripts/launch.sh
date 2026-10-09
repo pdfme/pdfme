@@ -22,9 +22,9 @@ fi
 mkdir -p "$STATE" "$EVIDENCE"
 
 if [[ -f "$PIDFILE" ]]; then
-  existing=$(cat "$PIDFILE" || true)
-  if [[ "$existing" =~ ^[0-9]+$ ]] && kill -0 "$existing" 2>/dev/null; then
-    echo "A verification server is already running as pid ${existing}. Run scripts/cleanup.sh before launching again." >&2
+  read_recorded "$PIDFILE" || true
+  if recorded_is_live; then
+    echo "A verification server is already running as pid ${RECORDED_PID}. Run scripts/cleanup.sh before launching again." >&2
     exit 1
   fi
   rm -f "$PIDFILE"
@@ -41,7 +41,16 @@ cd "$ROOT/playground"
 # nohup keeps the server alive after this script exits. $! is the npm pid, not a process-name match.
 nohup npm run dev -- --host 127.0.0.1 --port "$PORT" --strictPort >"$LOGFILE" 2>&1 &
 server_pid=$!
-echo "$server_pid" >"$PIDFILE"
+tries=0
+until write_recorded "$PIDFILE" "$server_pid"; do
+  tries=$((tries + 1))
+  if ((tries > 20)); then
+    echo "Started pid ${server_pid} but could not record its start time." >&2
+    kill -TERM "$server_pid" 2>/dev/null || true
+    exit 1
+  fi
+  sleep 0.1
+done
 echo "$BASE_URL" >"$BASE_URL_FILE"
 cd "$ROOT"
 

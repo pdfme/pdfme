@@ -11,6 +11,8 @@ There is no Playwright or Cypress project. `playground/e2e/index.test.ts` is Vit
 
 Two playgrounds cannot share a port. `vp dev` forwards `--port` to Vite (`vp dev --help` shows `vp dev --host localhost --port 5173`). The documented command leaves the port unset, so Vite uses 5173. A second server fails when that port is taken (`--strictPort`) or silently moves (`strictPort` defaults off). Verification always uses **5193** with `--strictPort`, and its own Chrome debugging port **9333**.
 
+`playground/e2e/index.test.ts` starts `npm run preview -- --host 127.0.0.1` and reads the URL Vite prints. It does not pass `--port` or `--strictPort`. Vite preview's default is 4173, which is the fallback `baseUrl` in that file. Port 5193 is neither the dev default nor the preview default, so this skill does not take the port the e2e harness expects.
+
 ## Launch
 
 Prerequisites, from the repo root. `packageManager` is `npm@11.12.1`. `npm` 10.9.7 fails `npm ci` with `Cannot read properties of null (reading 'edgesOut')`. `playground` is not an npm workspace and has its own lockfile.
@@ -65,7 +67,7 @@ Read-only check that the process this run started is still the process listening
 .cursor/skills/verify-playground/scripts/doctor.sh
 ```
 
-It exits 0 only when `tmp/verify-playground/server.pid` is alive and a listener on TCP 5193 is that pid or a descendant (`lsof`/`ss`, then `/proc/<pid>/status` `PPid`). It does not start, signal, or delete anything. Success looks like:
+It exits 0 only when `tmp/verify-playground/server.pid` names a live process whose `ps -o lstart=` matches the start time stored in that file, and a listener on TCP 5193 is that pid or a descendant (`lsof`, or `ss` when `lsof` is absent, then `ps -o ppid=`). It does not start, signal, or delete anything. Success looks like:
 
 ```text
 ok pid=<npm-pid> port=5193 listeners=<node-pid> base=http://127.0.0.1:5193
@@ -100,7 +102,7 @@ The helper drives that page:
 .cursor/skills/verify-playground/scripts/drive.sh
 ```
 
-It refuses to start unless doctor would pass, launches headless Chrome (`google-chrome` or Chromium) with `--remote-debugging-port=9333` and a user-data-dir under `tmp/verify-playground/chrome-profile`, then `scripts/cdp-drive.mjs` opens `http://127.0.0.1:5193/designer`. It waits until `#designer-nav`, `#open-form-viewer`, `.pdfme-designer-canvas`, `.pdfme-designer-plugin-text`, and `button.pdfme-ui-zoom-out` are present and `.pdfme-ui-zoom` shows a percent. It clicks Zoom out. Initial zoom in `@pdfme/ui` Designer is `1`, and the zoom step is `0.25`, so the label moves from `100%` to `75%`.
+It refuses to start unless doctor would pass, launches headless Chrome (`google-chrome` or Chromium) with `--remote-debugging-port=9333` and a user-data-dir under `tmp/verify-playground/chrome-profile`, then `scripts/cdp-drive.mjs` opens `http://127.0.0.1:5193/designer`. It waits until the address is `/designer` and all of these are present: `#designer-nav`, `#open-form-viewer`, `.pdfme-designer-canvas`, `.pdfme-designer-plugin-text`, `button.pdfme-ui-zoom-out`, and a percent inside `.pdfme-ui-zoom`. The same check fails the run when the wait ends. It clicks Zoom out. Initial zoom in `@pdfme/ui` Designer is `1`, and the zoom step is `0.25`, so the label moves from `100%` to `75%`.
 
 ## Evidence
 
@@ -118,7 +120,7 @@ It refuses to start unless doctor would pass, launches headless Chrome (`google-
 .cursor/skills/verify-playground/scripts/cleanup.sh
 ```
 
-This signals the pid in `tmp/verify-playground/server.pid` and, if a drive was interrupted, `chrome.pid`. It walks children via `ps --ppid` and then the recorded pid. It never uses `pkill`, `killall`, or a process name. It removes those two pid files and leaves `tmp/verify-playground/evidence/` on disk. If a drive fails, run cleanup before launching again so 5193 and 9333 are free.
+Each pid file stores `pid=` and `lstart=` (`LC_ALL=C ps -o lstart=`). Cleanup signals a process only when that pid is still alive and its start time still matches. A reused pid is left alone. It snapshots the process and its descendants with `pgrep -P` (or `ps -ax -o pid=,ppid=` when `pgrep` is missing) before sending `TERM`, then `KILL`s any of those same pids that are still alive. It never uses `pkill`, `killall`, a process name, or `/proc`. The scripts stay within bash 3.2 (`ps`, `pgrep`, `lsof`); they do not use `readlink -f`, GNU `timeout`, or `ps --ppid`. It removes the two pid files and leaves `tmp/verify-playground/evidence/` on disk. If a drive fails, run cleanup before launching again so 5193 and 9333 are free.
 
 ## Helpers
 

@@ -8,9 +8,9 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib.sh"
 "$(dirname "${BASH_SOURCE[0]}")/doctor.sh" >/dev/null
 
 if [[ -f "$CHROME_PIDFILE" ]]; then
-  chrome_existing=$(cat "$CHROME_PIDFILE" || true)
-  if [[ "$chrome_existing" =~ ^[0-9]+$ ]] && kill -0 "$chrome_existing" 2>/dev/null; then
-    echo "Chrome from a previous drive is still pid ${chrome_existing}. Run scripts/cleanup.sh first." >&2
+  read_recorded "$CHROME_PIDFILE" || true
+  if recorded_is_live; then
+    echo "Chrome from a previous drive is still pid ${RECORDED_PID}. Run scripts/cleanup.sh first." >&2
     exit 1
   fi
   rm -f "$CHROME_PIDFILE"
@@ -39,15 +39,7 @@ rm -rf "$profile"
 mkdir -p "$profile"
 
 stop_chrome() {
-  if [[ -f "$CHROME_PIDFILE" ]]; then
-    chrome_pid=$(cat "$CHROME_PIDFILE" || true)
-    if [[ "$chrome_pid" =~ ^[0-9]+$ ]]; then
-      kill_tree "$chrome_pid"
-      sleep 0.5
-      force_kill_tree "$chrome_pid"
-    fi
-    rm -f "$CHROME_PIDFILE"
-  fi
+  stop_recorded "$CHROME_PIDFILE" "chrome"
 }
 trap stop_chrome EXIT
 
@@ -62,7 +54,17 @@ nohup "$chrome_bin" \
   --user-data-dir="$profile" \
   --window-size=1366,768 \
   about:blank >"$CHROME_LOG" 2>&1 &
-echo $! >"$CHROME_PIDFILE"
+chrome_pid=$!
+tries=0
+until write_recorded "$CHROME_PIDFILE" "$chrome_pid"; do
+  tries=$((tries + 1))
+  if ((tries > 20)); then
+    echo "Started Chrome pid ${chrome_pid} but could not record its start time." >&2
+    kill -TERM "$chrome_pid" 2>/dev/null || true
+    exit 1
+  fi
+  sleep 0.1
+done
 
 deadline=$((SECONDS + 20))
 until curl -fsS "http://127.0.0.1:${CDP_PORT}/json/version" >/dev/null 2>&1; do
