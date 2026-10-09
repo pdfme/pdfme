@@ -15,6 +15,73 @@ import {
 } from '../../utils/index.js';
 
 /**
+ * How many leading bytes are compared to tell whether a cached font's bytes were overwritten in
+ * place. They cover the table directory, whose per-table checksums change with the font. This is
+ * a best-effort check, not a full comparison: bytes rewritten past this point with an unchanged
+ * directory would reuse the old parse.
+ */
+const FINGERPRINT_LENGTH = 1024;
+
+type ParsedFont = { byteOffset: number; byteLength: number; fingerprint: Uint8Array; font: Font };
+
+/** fontkit's Font keeps the glyphs it has created (with their code points) in `_glyphs`. */
+type GlyphCache = { _glyphs: Record<number, Glyph> };
+
+const parsedFonts = new WeakMap<Fontkit['create'], WeakMap<ArrayBufferLike, ParsedFont[]>>();
+
+const sameBytes = (a: Uint8Array, b: Uint8Array) =>
+  a.length === b.length && a.every((byte, idx) => byte === b[idx]);
+
+const hasGlyphCache = (font: Font): font is Font & GlyphCache =>
+  typeof (font as Partial<GlyphCache>)._glyphs === 'object';
+
+const createView = (font: Font) => {
+  const view = Object.create(font) as Font & GlyphCache;
+  view._glyphs = {};
+  return view;
+};
+
+/**
+ * Parses font bytes once per fontkit and byte range, and returns a new view of the parsed font on
+ * every call. Views share the directory and decoded tables (as fontkit's own `getVariation` does),
+ * but each has its own glyphs, layout engine and cmap processor: a glyph keeps the code points it
+ * was first created for, which go into the ToUnicode map, so sharing glyphs would let one
+ * document's text change another's, and keep every glyph ever created alive with the bytes.
+ * Bytes are looked up by their ArrayBuffer and range (embedFont wraps an ArrayBuffer in a new
+ * Uint8Array on every call), and reparsed if their leading bytes changed since.
+ *
+ * @internal Exported so that @pdfme/schemas measures text with the same parse that embedding
+ * uses; not meant to be called by applications.
+ */
+export const parseFont = (fontkit: Fontkit, fontData: Uint8Array): Font => {
+  let fontsByBuffer = parsedFonts.get(fontkit.create);
+  if (!fontsByBuffer) {
+    fontsByBuffer = new WeakMap();
+    parsedFonts.set(fontkit.create, fontsByBuffer);
+  }
+  let fonts = fontsByBuffer.get(fontData.buffer);
+  if (!fonts) {
+    fonts = [];
+    fontsByBuffer.set(fontData.buffer, fonts);
+  }
+
+  const { byteOffset, byteLength } = fontData;
+  const fingerprint = fontData.subarray(0, FINGERPRINT_LENGTH);
+  const idx = fonts.findIndex((f) => f.byteOffset === byteOffset && f.byteLength === byteLength);
+  if (idx !== -1 && sameBytes(fonts[idx].fingerprint, fingerprint)) {
+    return createView(fonts[idx].font);
+  }
+
+  const font = fontkit.create(fontData);
+  // Only fontkit's own fonts can be viewed; anything else is parsed per call.
+  if (!hasGlyphCache(font)) return font;
+  const parsed = { byteOffset, byteLength, fingerprint: fingerprint.slice(), font };
+  if (idx === -1) fonts.push(parsed);
+  else fonts[idx] = parsed;
+  return createView(font);
+};
+
+/**
  * A note of thanks to the developers of https://github.com/foliojs/pdfkit, as
  * this class borrows from:
  *   https://github.com/devongovett/pdfkit/blob/e71edab0dd4657b5a767804ba86c94c58d01fbca/lib/image/jpeg.coffee
@@ -26,7 +93,7 @@ class CustomFontEmbedder {
     customName?: string,
     fontFeatures?: TypeFeatures,
   ) {
-    const font = fontkit.create(fontData);
+    const font = parseFont(fontkit, fontData);
     return new CustomFontEmbedder(font, fontData, customName, fontFeatures);
   }
 

@@ -12,7 +12,7 @@ export { default as PDFTrailerDict } from './document/PDFTrailerDict.js';
 export { default as PDFCrossRefSection } from './document/PDFCrossRefSection.js';
 
 export { default as StandardFontEmbedder } from './embedders/StandardFontEmbedder.js';
-export { default as CustomFontEmbedder } from './embedders/CustomFontEmbedder.js';
+export { default as CustomFontEmbedder, parseFont } from './embedders/CustomFontEmbedder.js';
 export { default as CustomFontSubsetEmbedder } from './embedders/CustomFontSubsetEmbedder.js';
 export { default as FileEmbedder, AFRelationship } from './embedders/FileEmbedder.js';
 export { default as JpegEmbedder } from './embedders/JpegEmbedder.js';

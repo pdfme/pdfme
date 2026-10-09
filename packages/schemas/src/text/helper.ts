@@ -11,7 +11,7 @@ import {
   DEFAULT_FONT_NAME,
   isUrlSafeToFetch,
 } from '@pdfme/common';
-import { Buffer } from 'buffer';
+import { parseFont } from '@pdfme/pdf-lib';
 import type { DYNAMIC_FONT_SIZE_FIT, TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
 import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
@@ -218,6 +218,7 @@ const getFallbackFont = (font: Font) => {
 
 const getCacheKey = (fontName: string) => `getFontKitFont-${fontName}`;
 type FontKitFontCacheValue = fontkit.Font | Promise<fontkit.Font>;
+type PdfLibFontkit = Parameters<typeof parseFont>[0];
 
 export const fetchRemoteFontData = async (url: string): Promise<ArrayBuffer> => {
   if (!isUrlSafeToFetch(url)) {
@@ -263,14 +264,11 @@ export const getFontKitFont = async (
       }
     }
 
-    // Convert fontData to Buffer if it's not already a Buffer
-    let fontDataBuffer: Buffer;
-    if (fontData instanceof Buffer) {
-      fontDataBuffer = fontData;
-    } else {
-      fontDataBuffer = Buffer.from(fontData as ArrayBufferLike);
-    }
-    return fontkit.create(fontDataBuffer) as fontkit.Font;
+    // Parsed with pdf-lib's cache, which embedding the font reuses: bytes given as an ArrayBuffer
+    // or Uint8Array are parsed once across renders (strings are decoded, so parsed, per render).
+    // Byte data reaches this synchronously, so concurrent renders share the parse too.
+    const fontBytes = fontData instanceof Uint8Array ? fontData : new Uint8Array(fontData);
+    return parseFont(fontkit as unknown as PdfLibFontkit, fontBytes) as unknown as fontkit.Font;
   })();
   fontCache.set(cacheKey, fontKitFontPromise);
 
