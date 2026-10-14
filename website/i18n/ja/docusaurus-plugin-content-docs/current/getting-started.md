@@ -363,18 +363,3 @@ const viewer = new Viewer({ domContainer, template, inputs });
 
 pdfmeに貢献したい場合は、[開発ガイド](/docs/development-guide)ページをご確認ください。  
 あなたの貢献をお待ちしています！
-
-## クラウドサービスオプション
-
-pdfmeは強力なオープンソースライブラリですが、一部のユーザーはマネージドソリューションを好む場合があることを理解しています。セットアップやメンテナンスの必要なく、すぐに使える、スケーラブルなPDF生成サービスを探している方には、pdfme Cloudを提供しています。
-
-**[pdfme Cloudを試す - 手間のかからないPDF生成](https://app.pdfme.com?utm_source=website&utm_content=getting-started)**
-
-pdfme Cloudはオープンソースライブラリのすべての機能に加えて、以下を提供します：
-
-- インフラ管理なしでスケーラブルなPDF生成
-- ホスト型WYSIWYGテンプレートデザイナー
-- シンプルなAPI統合
-- 自動更新とメンテナンス
-
-\*pdfmeは今後もオープンソースであり続けます。クラウドサービスはマネージドソリューションを好む方向けのオプションサービスです。

@@ -179,8 +179,9 @@ const barcodeDefaults: { defaultSchema: BarcodeSchema }[] = [
       content: 'This is PDF417!',
       position,
       ...defaultColors,
+      // Natural ratio of the default content is 515:150.
       width: 40,
-      height: 16,
+      height: 11.65,
       rotate: 0,
       opacity: DEFAULT_OPACITY,
     },

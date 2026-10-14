@@ -106,6 +106,7 @@ function HelpModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
 
 export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
+  const [starBadgeFailed, setStarBadgeFailed] = useState(false);
   const location = useLocation();
 
   const navLinks = [
@@ -200,6 +201,32 @@ export default function Navigation() {
           </svg>
           Help
         </button>
+
+        <a
+          href="https://github.com/pdfme/pdfme"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={classNames(
+            'ml-auto flex shrink-0 items-center py-2',
+            starBadgeFailed
+              ? 'whitespace-nowrap text-sm font-medium text-gray-500 hover:text-gray-700'
+              : 'hover:opacity-80',
+          )}
+        >
+          {starBadgeFailed ? (
+            '★ Star on GitHub'
+          ) : (
+            <img
+              src="https://img.shields.io/github/stars/pdfme/pdfme?style=social"
+              alt="Star pdfme on GitHub"
+              height={20}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              onError={() => setStarBadgeFailed(true)}
+              className="h-5 w-auto"
+            />
+          )}
+        </a>
 
         <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
       </nav>

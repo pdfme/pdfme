@@ -35,4 +35,3 @@ pdfme is built with a focus on performance, minimal dependencies, and ease of us
 ## Optional
 - [Converter Package](https://www.npmjs.com/package/@pdfme/converter): PDF conversion utilities
 - [Common Package](https://www.npmjs.com/package/@pdfme/common): Shared utilities and types
-- [Cloud Service](https://app.pdfme.com): Commercial hosted solution

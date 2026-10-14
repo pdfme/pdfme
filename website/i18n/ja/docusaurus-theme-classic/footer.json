@@ -27,10 +27,6 @@
     "message": "テンプレート設計",
     "description": "The label of footer link with label=Template Design linking to the playground Designer"
   },
-  "link.item.label.Try pdfme Cloud": {
-    "message": "pdfme Cloudを試す",
-    "description": "The label of footer link with label=Try pdfme Cloud linking to https://app.pdfme.com?utm_source=website&utm_content=footer"
-  },
   "link.item.label.Github": {
     "message": "Github",
     "description": "The label of footer link with label=Github linking to https://github.com/pdfme/pdfme"

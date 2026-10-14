@@ -495,7 +495,7 @@ describe('Playground E2E Tests', () => {
     page.setDefaultNavigationTimeout(timeout);
 
     page.on('request', (req) => {
-      const ignoreDomains = ['https://media.ethicalads.io/'];
+      const ignoreDomains = ['https://media.ethicalads.io/', 'https://img.shields.io/'];
       if (ignoreDomains.some((d) => req.url().startsWith(d))) {
         req.abort();
       } else {

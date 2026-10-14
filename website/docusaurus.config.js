@@ -134,11 +134,6 @@ const config = {
           position: 'right',
         },
         {
-          href: 'https://app.pdfme.com?utm_source=website&utm_content=navbar',
-          label: 'Try pdfme Cloud',
-          position: 'right',
-        },
-        {
           href: 'https://app.pdfme.com/contact?utm_source=website&utm_content=navbar',
           label: 'Contact',
           position: 'right',
@@ -178,10 +173,6 @@ const config = {
               href: `${playgroundUrl}/designer`,
               target: '_blank',
             },
-            {
-              label: 'Try pdfme Cloud',
-              href: 'https://app.pdfme.com?utm_source=website&utm_content=footer',
-            }
           ],
         },
         {
