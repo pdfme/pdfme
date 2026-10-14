@@ -287,7 +287,7 @@ const Preview = ({
           schemasList={schemasList}
           pageSizes={pageSizes}
           backgrounds={backgrounds}
-          renderSchema={({ schema, index }) => {
+          renderSchema={({ schema, index, pageIndex }) => {
             const hasInputValue = Boolean(
               input && Object.prototype.hasOwnProperty.call(input, schema.name),
             );
@@ -300,7 +300,7 @@ const Preview = ({
                       variables: {
                         ...input,
                         totalPages: schemasList.length,
-                        currentPage: index + 1,
+                        currentPage: pageIndex + 1,
                       },
                       schemas: schemasList,
                     })

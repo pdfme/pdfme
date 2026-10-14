@@ -11,7 +11,8 @@ const Paper = (props: {
   pageSizes: Size[];
   backgrounds: string[];
   renderPaper: (arg: { index: number; paperSize: Size }) => ReactNode;
-  renderSchema: (arg: { index: number; schema: SchemaForUI }) => ReactNode;
+  /** index: the schema's position across all pages; pageIndex: the page it is on (0-based). */
+  renderSchema: (arg: { index: number; pageIndex: number; schema: SchemaForUI }) => ReactNode;
   hasRulers?: boolean;
 }) => {
   const {
@@ -103,6 +104,7 @@ const Paper = (props: {
                       paperIndex === 0
                         ? schemaIndex
                         : schemaIndex + schemasList[paperIndex - 1].length,
+                    pageIndex: paperIndex,
                   })}
                 </div>
               );
