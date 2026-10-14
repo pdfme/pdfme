@@ -54,9 +54,18 @@ export const getFallbackFontName = (font: Font) => {
   return fallbackFontName;
 };
 
-export const getDefaultFont = (): Font => ({
-  [DEFAULT_FONT_NAME]: { data: b64toUint8Array(DEFAULT_FONT_VALUE), fallback: true },
-});
+// Decoded once: the same bytes on every call let the font be parsed once, not on every render.
+let defaultFontData: ReturnType<typeof b64toUint8Array> | undefined;
+
+/**
+ * The built-in fallback font. Every call returns a new Font object around the same bytes, decoded
+ * once and kept for the life of the process: do not modify or transfer them (e.g. in a
+ * postMessage transfer list).
+ */
+export const getDefaultFont = (): Font => {
+  if (!defaultFontData) defaultFontData = b64toUint8Array(DEFAULT_FONT_VALUE);
+  return { [DEFAULT_FONT_NAME]: { data: defaultFontData, fallback: true } };
+};
 
 export const mm2pt = (mm: number): number => {
   return parseFloat(String(mm)) * MM_TO_PT_RATIO;
