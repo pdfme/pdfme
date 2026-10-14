@@ -2,6 +2,7 @@ import PDFString from '../objects/PDFString.js';
 import PDFHexString from '../objects/PDFHexString.js';
 import PDFContext from '../PDFContext.js';
 import PDFRef from '../objects/PDFRef.js';
+import { stringAsByteArray } from '../../utils/index.js';
 
 /**
  * From the PDF-A3 specification, section **3.1. Requirements - General**.
@@ -58,7 +59,7 @@ class FileEmbedder {
 
     const fileSpecDict = context.obj({
       Type: 'Filespec',
-      F: PDFString.of(this.fileName), // TODO: Assert that this is plain ASCII
+      F: PDFString.fromBytes(stringAsByteArray(this.fileName)), // TODO: Assert that this is plain ASCII
       UF: PDFHexString.fromText(this.fileName),
       EF: { F: embeddedFileStreamRef },
       Desc: description ? PDFHexString.fromText(description) : undefined,

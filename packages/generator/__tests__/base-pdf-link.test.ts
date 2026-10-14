@@ -5,6 +5,7 @@ import {
   PDFName,
   PDFString,
   rgb,
+  stringAsByteArray,
 } from '@pdfme/pdf-lib';
 import type { Template } from '@pdfme/common';
 import { text } from '@pdfme/schemas';
@@ -29,7 +30,7 @@ const addSourceUriLink = (arg: {
       A: {
         Type: PDFName.of('Action'),
         S: PDFName.of('URI'),
-        URI: PDFString.of(uri),
+        URI: PDFString.fromBytes(stringAsByteArray(uri)),
       },
     }),
   );
@@ -122,6 +123,20 @@ const getAnnotationUri = (annotation: PDFDict) =>
 const getAnnotationRect = (annotation: PDFDict) => annotation.lookup(PDFName.of('Rect'), PDFArray);
 
 describe('generate custom basePdf links', () => {
+  test('keeps a URI with an unbalanced paren intact', async () => {
+    const uri = 'https://pdfme.com/smile:-)';
+    const source = await PDFDocument.create();
+    source.addPage([200, 120]).drawText('smile', { x: 20, y: 70, size: 16 });
+    addSourceUriLink({ pdfDoc: source, pageIndex: 0, uri, rect: [20, 68, 70, 88] });
+    const template: Template = { basePdf: await source.save(), schemas: [[]] };
+
+    const pdf = await generate({ template, inputs: [{}], plugins: {} });
+    const links = await getUriLinkAnnotations(pdf);
+
+    expect(links).toHaveLength(1);
+    expect(getAnnotationUri(links[0])).toBe(uri);
+  });
+
   test('preserves URI link annotations from basePdf pages', async () => {
     const basePdf = await createBasePdfWithLink();
     const template: Template = {

@@ -24,6 +24,7 @@ import {
   PDFString,
   PDFHexString,
   EncryptedPDFError,
+  stringAsByteArray,
 } from '@pdfme/pdf-lib';
 import { TOOL_NAME } from './constants.js';
 import type { EmbedPdfBox, PdfBox } from './types.js';
@@ -212,7 +213,7 @@ const copyBasePdfUriLinkAnnotations = (arg: {
       A: {
         Type: PDFName.of('Action'),
         S: PDFName.of('URI'),
-        URI: PDFString.of(safeUri),
+        URI: PDFString.fromBytes(stringAsByteArray(safeUri)),
       },
     });
 

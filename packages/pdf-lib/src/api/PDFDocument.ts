@@ -61,6 +61,7 @@ import {
   isStandardFont,
   pluckIndices,
   range,
+  stringAsByteArray,
   toUint8Array,
 } from '../utils/index.js';
 import FileEmbedder, { AFRelationship } from '../core/embedders/FileEmbedder.js';
@@ -516,7 +517,7 @@ export default class PDFDocument {
   setLanguage(language: string): void {
     assertIs(language, 'language', ['string']);
     const key = PDFName.of('Lang');
-    this.catalog.set(key, PDFString.of(language));
+    this.catalog.set(key, PDFString.fromBytes(stringAsByteArray(language)));
   }
 
   /**

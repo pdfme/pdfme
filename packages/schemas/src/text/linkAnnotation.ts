@@ -1,6 +1,6 @@
 import { normalizeSafeLinkUri } from '@pdfme/common';
 import type { PDFDocument, PDFPage } from '@pdfme/pdf-lib';
-import { PDFName, PDFString } from '@pdfme/pdf-lib';
+import { PDFName, PDFString, stringAsByteArray } from '@pdfme/pdf-lib';
 
 export type LinkAnnotationRect = {
   x: number;
@@ -29,7 +29,7 @@ export const addUriLinkAnnotation = (arg: {
       A: {
         Type: PDFName.of('Action'),
         S: PDFName.of('URI'),
-        URI: PDFString.of(safeUri),
+        URI: PDFString.fromBytes(stringAsByteArray(safeUri)),
       },
     }),
   );
