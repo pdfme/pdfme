@@ -103,15 +103,7 @@ class PDFObjectParser extends BaseParser {
     this.bytes.assertNext(CharCodes.GreaterThan);
 
     if (this.cryptoFactory && ref) {
-      const transformer = this.cryptoFactory.createCipherTransform(
-        ref.objectNumber,
-        ref.generationNumber,
-      );
-      const arr = transformer.decryptBytes(PDFHexString.of(value).asBytes());
-      value = arr.reduce(
-        (str: string, byte: number) => str + byte.toString(16).padStart(2, '0'),
-        '',
-      );
+      return PDFHexString.fromBytes(this.decrypt(PDFHexString.of(value).asBytes(), ref));
     }
 
     return PDFHexString.of(value);
@@ -141,16 +133,18 @@ class PDFObjectParser extends BaseParser {
 
       // Once (if) the unescaped parenthesis balance out, return their contents
       if (nestingLvl === 0) {
-        let actualValue = value.substring(1, value.length - 1);
+        // Remove the outer parens so they aren't part of the contents
+        const actualValue = value.substring(1, value.length - 1);
 
         if (this.cryptoFactory && ref) {
-          const transformer = this.cryptoFactory.createCipherTransform(
-            ref.objectNumber,
-            ref.generationNumber,
-          );
-          actualValue = transformer.decryptString(actualValue);
+          // Decrypt the string's bytes, not its written form: the escape sequences (\( \) \\
+          // \ddd...) the writer put into the ciphertext must be resolved first. The plaintext can
+          // hold any byte, including unbalanced parens and backslashes, so it is escaped again
+          // (PDFString.fromBytes) rather than stored raw. Decrypting the written form garbled
+          // every string whose ciphertext happened to need an escape, and the unescaped plaintext
+          // broke saving with object streams.
+          return PDFString.fromBytes(this.decrypt(PDFString.of(actualValue).asBytes(), ref));
         }
-        // Remove the outer parens so they aren't part of the contents
         return PDFString.of(actualValue);
       }
     }
@@ -226,7 +220,7 @@ class PDFObjectParser extends BaseParser {
   protected parseDictOrStream(ref?: PDFRef): PDFDict | PDFStream {
     const startPos = this.bytes.position();
 
-    const dict = this.parseDict(ref);
+    let dict = this.parseDict(ref);
 
     this.skipWhitespaceAndComments();
 
@@ -259,14 +253,27 @@ class PDFObjectParser extends BaseParser {
     let contents = this.bytes.slice(start, end);
 
     if (this.cryptoFactory && ref) {
-      const transform = this.cryptoFactory.createCipherTransform(
-        ref.objectNumber,
-        ref.generationNumber,
-      );
-      contents = transform.decryptBytes(contents);
+      if (dict.get(PDFName.of('Type')) === PDFName.of('XRef')) {
+        // Cross-reference streams are never encrypted (PDF 32000 7.6.1): neither their contents
+        // nor the strings in their dictionary (e.g. /ID). Parse the dictionary again, as is.
+        const afterStream = this.bytes.offset();
+        this.bytes.moveTo(startPos.offset);
+        dict = this.parseDict();
+        this.bytes.moveTo(afterStream);
+      } else {
+        contents = this.decrypt(contents, ref);
+      }
     }
 
     return PDFRawStream.of(dict, contents);
+  }
+
+  private decrypt(bytes: Uint8Array, ref: PDFRef): Uint8Array {
+    const transform = this.cryptoFactory!.createCipherTransform(
+      ref.objectNumber,
+      ref.generationNumber,
+    );
+    return transform.decryptBytes(bytes);
   }
 
   protected findEndOfStreamFallback(startPos: Position) {

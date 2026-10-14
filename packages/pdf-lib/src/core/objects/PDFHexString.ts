@@ -2,6 +2,7 @@ import PDFObject from './PDFObject.js';
 import CharCodes from '../syntax/CharCodes.js';
 import {
   copyStringIntoBuffer,
+  toHexString,
   toHexStringOfMinLength,
   utf16Decode,
   utf16Encode,
@@ -13,6 +14,14 @@ import { InvalidPDFDateStringError } from '../errors.js';
 
 class PDFHexString extends PDFObject {
   static of = (value: string) => new PDFHexString(value);
+
+  static fromBytes = (bytes: Uint8Array) => {
+    let hex = '';
+    for (let idx = 0, len = bytes.length; idx < len; idx++) {
+      hex += toHexString(bytes[idx]);
+    }
+    return new PDFHexString(hex);
+  };
 
   static fromText = (value: string) => {
     const encoded = utf16Encode(value);

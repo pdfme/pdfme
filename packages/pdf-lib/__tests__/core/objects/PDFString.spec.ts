@@ -1,4 +1,4 @@
-import { PDFString } from '../../../src/core';
+import { PDFContext, PDFObjectParser, PDFString } from '../../../src/core';
 import { toCharCode, typedArrayFor } from '../../../src/utils';
 
 describe(`PDFString`, () => {
@@ -103,6 +103,25 @@ describe(`PDFString`, () => {
       ));
     });
 
+    it(`treats an escaped CRLF as a single line continuation`, () => {
+      const literal = 'a\\\r\nb\\\r\n';
+
+      expect(PDFString.of(literal).asBytes()).toEqual(
+        Uint8Array.of(toCharCode('a'), toCharCode('b')),
+      );
+    });
+
+    it(`ignores a backslash before a raw backspace and unescapes double backslashes`, () => {
+      const literal = 'a\\\bb\\\\c';
+
+      // prettier-ignore
+      expect(PDFString.of(literal).asBytes()).toEqual(Uint8Array.of(
+        toCharCode('a'), 0x08,
+        toCharCode('b'), toCharCode('\\'),
+        toCharCode('c'),
+      ));
+    });
+
     it(`can interpret invalid escapes`, () => {
       const literal = 'a\nb\rc\\xd\\;';
 
@@ -113,6 +132,28 @@ describe(`PDFString`, () => {
         toCharCode('c'), toCharCode('x'),
         toCharCode('d'), toCharCode(';'),
       ));
+    });
+  });
+
+  describe(`construction from bytes`, () => {
+    it(`escapes parens, backslashes and carriage returns`, () => {
+      const bytes = typedArrayFor('a(b)c\\d\re\nf');
+      expect(String(PDFString.fromBytes(bytes))).toBe('(a\\(b\\)c\\\\d\\re\nf)');
+    });
+
+    it(`round-trips every byte value`, () => {
+      const bytes = Uint8Array.from({ length: 256 }, (_, idx) => idx);
+      expect(PDFString.fromBytes(bytes).asBytes()).toEqual(bytes);
+    });
+
+    it(`round-trips through parsing`, () => {
+      const bytes = Uint8Array.from({ length: 256 }, (_, idx) => 255 - idx);
+      const parsed = PDFObjectParser.forBytes(
+        typedArrayFor(String(PDFString.fromBytes(bytes))),
+        PDFContext.create(),
+      ).parseObject();
+      expect(parsed).toBeInstanceOf(PDFString);
+      expect((parsed as PDFString).asBytes()).toEqual(bytes);
     });
   });
 

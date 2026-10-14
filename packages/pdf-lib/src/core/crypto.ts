@@ -1377,13 +1377,6 @@ class CipherTransform {
     );
   }
 
-  decryptString(s: string) {
-    const cipher = this.StringCipherConstructor();
-    let data = stringAsByteArray(s);
-    data = cipher.decryptBlock(data, true);
-    return arrayAsString(data);
-  }
-
   decryptBytes(d: Uint8Array) {
     const cipher = this.StringCipherConstructor();
     return cipher.decryptBlock(d, true);

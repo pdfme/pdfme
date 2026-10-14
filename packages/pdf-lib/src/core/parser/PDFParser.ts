@@ -32,10 +32,20 @@ class PDFParser extends PDFObjectParser {
     throwOnInvalidObject?: boolean,
     capNumbers?: boolean,
     cryptoFactory?: CipherTransformFactory,
-  ) => new PDFParser(pdfBytes, objectsPerTick, throwOnInvalidObject, capNumbers, cryptoFactory);
+    encryptRef?: PDFRef,
+  ) =>
+    new PDFParser(
+      pdfBytes,
+      objectsPerTick,
+      throwOnInvalidObject,
+      capNumbers,
+      cryptoFactory,
+      encryptRef,
+    );
 
   private readonly objectsPerTick: number;
   private readonly throwOnInvalidObject: boolean;
+  private readonly encryptRef?: PDFRef;
   private alreadyParsed = false;
   private parsedObjects = 0;
 
@@ -45,10 +55,12 @@ class PDFParser extends PDFObjectParser {
     throwOnInvalidObject = false,
     capNumbers = false,
     cryptoFactory?: CipherTransformFactory,
+    encryptRef?: PDFRef,
   ) {
     super(ByteStream.of(pdfBytes), PDFContext.create(), capNumbers, cryptoFactory);
     this.objectsPerTick = objectsPerTick;
     this.throwOnInvalidObject = throwOnInvalidObject;
+    this.encryptRef = encryptRef;
     this.context.isDecrypted = !!cryptoFactory?.encryptionKey;
   }
 
@@ -148,7 +160,9 @@ class PDFParser extends PDFObjectParser {
     const ref = this.parseIndirectObjectHeader();
 
     this.skipWhitespaceAndComments();
-    const object = this.parseObject(ref);
+    // The encryption dictionary's strings (O, U, OE, UE, Perms) are not encrypted (7.6.1), so it
+    // is parsed without a ref, which is what triggers decryption
+    const object = this.parseObject(ref === this.encryptRef ? undefined : ref);
 
     this.skipWhitespaceAndComments();
     // if (!this.matchKeyword(Keywords.endobj)) {

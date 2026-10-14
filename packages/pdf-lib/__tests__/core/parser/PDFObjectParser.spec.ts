@@ -18,6 +18,15 @@ import {
   typedArrayFor,
   numberToString,
 } from '../../../src/index';
+import ByteStream from '../../../src/core/parser/ByteStream';
+import type { CipherTransformFactory } from '../../../src/core/crypto';
+
+// Stand-in for a real cipher: "decrypts" by flipping the low bit of every byte
+const xorCryptoFactory = {
+  createCipherTransform: () => ({
+    decryptBytes: (bytes: Uint8Array) => bytes.map((byte) => byte ^ 0x01),
+  }),
+} as unknown as CipherTransformFactory;
 
 type ParseOptions = { capNumbers?: boolean };
 
@@ -725,6 +734,48 @@ describe(`PDFObjectParser`, () => {
       const object3 = parser.parseObject();
       expect(object3).toBeInstanceOf(PDFNumber);
       expect(object3.toString()).toBe('42');
+    });
+  });
+
+  describe(`when decrypting`, () => {
+    const parseEncrypted = (value: string | Uint8Array) =>
+      new PDFObjectParser(
+        ByteStream.of(typedArrayFor(value)),
+        PDFContext.create(),
+        false,
+        xorCryptoFactory,
+      ).parseObject(PDFRef.of(1));
+
+    it(`decrypts literal strings from their bytes and escapes the plaintext`, () => {
+      // The ciphertext bytes are ( ) \ 0x0C; flipping the low bit gives ) ( ] CR
+      const object = parseEncrypted('(\\(\\)\\\\\\014)');
+      expect(object).toBeInstanceOf(PDFString);
+      expect((object as PDFString).asBytes()).toEqual(typedArrayFor(')(]\r'));
+      expect(String(object)).toBe('(\\)\\(]\\r)');
+    });
+
+    it(`decrypts hex strings`, () => {
+      const object = parseEncrypted('<00FE41>');
+      expect(object).toBeInstanceOf(PDFHexString);
+      expect(String(object)).toBe('<01FF40>');
+    });
+
+    it(`decrypts the strings and contents of streams`, () => {
+      const object = parseEncrypted('<< /Length 3 /S (a) >>\nstream\nabc\nendstream');
+      expect(object).toBeInstanceOf(PDFRawStream);
+      const stream = object as PDFRawStream;
+      expect(String(stream.dict.get(PDFName.of('S')))).toBe('(`)');
+      expect(stream.contents).toEqual(typedArrayFor('`cb'));
+    });
+
+    it(`does not decrypt cross-reference streams`, () => {
+      const object = parseEncrypted(
+        '<< /Type /XRef /Length 3 /ID [(a) <0102>] >>\nstream\nabc\nendstream',
+      );
+      expect(object).toBeInstanceOf(PDFRawStream);
+      const stream = object as PDFRawStream;
+      expect(String(stream.dict.get(PDFName.of('ID')))).toBe('[ (a) <0102> ]');
+      expect(stream.contents).toEqual(typedArrayFor('abc'));
     });
   });
 });

@@ -6,6 +6,7 @@ import {
   PDFDict,
   PDFHeader,
   PDFInvalidObject,
+  PDFName,
   PDFPageLeaf,
   PDFParser,
   PDFRef,
@@ -13,6 +14,7 @@ import {
   ReparseError,
   typedArrayFor,
 } from '../../../src/index';
+import type { CipherTransformFactory } from '../../../src/core/crypto';
 
 describe(`PDFParser`, () => {
   const origConsoleWarn = console.warn;
@@ -46,6 +48,37 @@ describe(`PDFParser`, () => {
     `;
     const parser = PDFParser.forBytesWithOptions(typedArrayFor(input));
     await expect(parser.parseDocument()).rejects.toThrow();
+  });
+
+  it(`does not decrypt the encryption dictionary`, async () => {
+    // Stand-in for a real cipher: "decrypts" by flipping the low bit of every byte
+    const cryptoFactory = {
+      createCipherTransform: () => ({
+        decryptBytes: (bytes: Uint8Array) => bytes.map((byte) => byte ^ 0x01),
+      }),
+    } as unknown as CipherTransformFactory;
+    const input = `
+      %PDF-1.7
+      1 0 obj
+        (a)
+      endobj
+      2 0 obj
+        << /Filter /Standard /O (a) /U <61> >>
+      endobj
+    `;
+    const parser = PDFParser.forBytesWithOptions(
+      typedArrayFor(input),
+      undefined,
+      undefined,
+      undefined,
+      cryptoFactory,
+      PDFRef.of(2),
+    );
+    const context = await parser.parseDocument();
+    expect(String(context.lookup(PDFRef.of(1)))).toBe('(`)');
+    const encryptDict = context.lookup(PDFRef.of(2), PDFDict);
+    expect(String(encryptDict.get(PDFName.of('O')))).toBe('(a)');
+    expect(String(encryptDict.get(PDFName.of('U')))).toBe('<61>');
   });
 
   it(`does not throw an error when the 'endobj' keyword is missing`, async () => {
