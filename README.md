@@ -1,7 +1,7 @@
-# PDFME
+# pdfme
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/logo.svg" width="300"/>
+  <img src="website/static/img/demo.gif" width="800" alt="pdfme demo: designing a template in the Designer, viewing its JSON template, and generating a PDF from it" />
 </p>
 
 <h4 align="center">
@@ -31,10 +31,6 @@
 
 <p align="center">
   TypeScript-based PDF generator and React-based UI. Open source, developed by the community, and completely free to use under the MIT license!
-</p>
-
-<p align="center">
-  <img src="website/static/img/demo.gif" width="800" alt="pdfme demo: designing a template in the Designer, viewing its JSON template, and generating a PDF from it" />
 </p>
 
 ## Features
