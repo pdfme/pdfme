@@ -109,6 +109,44 @@ describe('generateForm', () => {
     expect(fontResources.has(PDFName.of(fontName!))).toBe(true);
   });
 
+  test('rejects AcroForm text fonts hosted at non-public URLs without fetching', async () => {
+    const template: Template = {
+      basePdf: BLANK_PDF,
+      schemas: [
+        [
+          {
+            name: 'patientName',
+            type: 'text',
+            content: '',
+            position: { x: 20, y: 25 },
+            width: 80,
+            height: 10,
+            fontName: 'Internal',
+          },
+        ],
+      ],
+    };
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    try {
+      await expect(
+        generateForm({
+          template,
+          options: {
+            font: {
+              ...getFont(),
+              Internal: { data: 'http://[::ffff:a9fe:a9fe]/font.ttf' },
+            },
+          },
+        }),
+      ).rejects.toThrow('[@pdfme/generator] Invalid or unsafe URL for font "Internal"');
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   test('renames duplicate fields during multi-input generation', async () => {
     const template: Template = {
       basePdf: BLANK_PDF,

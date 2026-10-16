@@ -142,6 +142,137 @@ export const getInputFromTemplate = (template: Template): { [key: string]: strin
   return [input];
 };
 
+const parseIpv4 = (host: string): number[] | null => {
+  const match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+  if (!match) return null;
+  const octets = match.slice(1).map(Number);
+  return octets.every((octet) => octet <= 255) ? octets : null;
+};
+
+const parseIpv6 = (host: string): number[] | null => {
+  let address = host.toLowerCase();
+
+  const lastColon = address.lastIndexOf(':');
+  const tail = address.slice(lastColon + 1);
+  if (tail.includes('.')) {
+    const octets = parseIpv4(tail);
+    if (!octets) return null;
+    const high = ((octets[0] << 8) | octets[1]).toString(16);
+    const low = ((octets[2] << 8) | octets[3]).toString(16);
+    address = `${address.slice(0, lastColon + 1)}${high}:${low}`;
+  }
+
+  const halves = address.split('::');
+  if (halves.length > 2) return null;
+  const toGroups = (part: string) => (part === '' ? [] : part.split(':'));
+  const head = toGroups(halves[0]);
+  let groups = head;
+  if (halves.length === 2) {
+    const rest = toGroups(halves[1]);
+    const missing = 8 - head.length - rest.length;
+    if (missing < 1) return null;
+    groups = [...head, ...Array<string>(missing).fill('0'), ...rest];
+  }
+
+  if (groups.length !== 8 || !groups.every((group) => /^[0-9a-f]{1,4}$/.test(group))) {
+    return null;
+  }
+  return groups.map((group) => parseInt(group, 16));
+};
+
+const ipv4ToInt = (octets: number[]) =>
+  ((octets[0] << 24) | (octets[1] << 16) | (octets[2] << 8) | octets[3]) >>> 0;
+
+const toIpv4Range = (cidr: string) => {
+  const [address, prefix] = cidr.split('/');
+  const prefixLength = Number(prefix);
+  const mask = prefixLength === 0 ? 0 : (~0 << (32 - prefixLength)) >>> 0;
+  return { base: (ipv4ToInt(parseIpv4(address)!) & mask) >>> 0, mask };
+};
+
+const toIpv6Range = (cidr: string) => {
+  const [address, prefix] = cidr.split('/');
+  return { base: parseIpv6(address)!, prefixLength: Number(prefix) };
+};
+
+const NON_PUBLIC_IPV4_RANGES = [
+  '0.0.0.0/8',
+  '10.0.0.0/8',
+  '100.64.0.0/10',
+  '127.0.0.0/8',
+  '169.254.0.0/16',
+  '172.16.0.0/12',
+  '192.0.0.0/24',
+  '192.0.2.0/24',
+  '192.88.99.0/24',
+  '192.168.0.0/16',
+  '198.18.0.0/15',
+  '198.51.100.0/24',
+  '203.0.113.0/24',
+  '224.0.0.0/4',
+  '240.0.0.0/4',
+].map(toIpv4Range);
+
+const NON_PUBLIC_IPV6_RANGES = [
+  // IPv4-compatible (deprecated), also covers :: and ::1
+  '::/96',
+  '100::/64',
+  // Teredo: the embedded IPv4 is obfuscated, so it cannot be re-checked
+  '2001::/32',
+  '2001:db8::/32',
+  // Local-use NAT64: the embedded IPv4 position depends on the operator's prefix length
+  '64:ff9b:1::/48',
+  'fc00::/7',
+  'fe80::/10',
+  'fec0::/10',
+  'ff00::/8',
+].map(toIpv6Range);
+
+const LOOPBACK_HOSTNAMES = new Set(['localhost', 'localhost.localdomain', 'ip6-localhost', 'ip6-loopback']);
+
+const IPV4_MAPPED_RANGE = toIpv6Range('::ffff:0:0/96');
+const NAT64_WELL_KNOWN_RANGE = toIpv6Range('64:ff9b::/96');
+const SIX_TO_FOUR_RANGE = toIpv6Range('2002::/16');
+
+const isPublicIpv4 = (octets: number[]) => {
+  const value = ipv4ToInt(octets);
+  return NON_PUBLIC_IPV4_RANGES.every(({ base, mask }) => (value & mask) >>> 0 !== base);
+};
+
+const isInIpv6Range = (
+  groups: number[],
+  { base, prefixLength }: { base: number[]; prefixLength: number },
+) => {
+  for (let i = 0; i < 8; i++) {
+    const bits = Math.min(16, Math.max(0, prefixLength - i * 16));
+    if (bits === 0) return true;
+    const mask = (0xffff << (16 - bits)) & 0xffff;
+    if ((groups[i] & mask) !== (base[i] & mask)) return false;
+  }
+  return true;
+};
+
+const ipv4FromGroups = (high: number, low: number) => [
+  high >> 8,
+  high & 0xff,
+  low >> 8,
+  low & 0xff,
+];
+
+const isPublicIpv6 = (groups: number[]) => {
+  if (isInIpv6Range(groups, IPV4_MAPPED_RANGE) || isInIpv6Range(groups, NAT64_WELL_KNOWN_RANGE)) {
+    return isPublicIpv4(ipv4FromGroups(groups[6], groups[7]));
+  }
+  if (isInIpv6Range(groups, SIX_TO_FOUR_RANGE)) {
+    return isPublicIpv4(ipv4FromGroups(groups[1], groups[2]));
+  }
+  return NON_PUBLIC_IPV6_RANGES.every((range) => !isInIpv6Range(groups, range));
+};
+
+/**
+ * Checks the URL's literal host only. DNS names that resolve to internal addresses and
+ * redirects are not covered; validate untrusted templates server-side if that matters.
+ */
 export const isUrlSafeToFetch = (urlString: string): boolean => {
   let parsed: URL;
   try {
@@ -156,42 +287,18 @@ export const isUrlSafeToFetch = (urlString: string): boolean => {
 
   const hostname = parsed.hostname.toLowerCase();
 
-  if (
-    hostname === 'localhost' ||
-    hostname === '0.0.0.0' ||
-    hostname === '[::1]' ||
-    hostname === '::1'
-  ) {
-    return false;
+  if (hostname.startsWith('[') && hostname.endsWith(']')) {
+    const groups = parseIpv6(hostname.slice(1, -1));
+    return groups !== null && isPublicIpv6(groups);
   }
 
-  // Block IPv6 private ranges (link-local, unique-local, IPv4-mapped)
-  const bare = hostname.replace(/^\[|\]$/g, '');
-  if (/^fe80:/i.test(bare)) return false;
-  if (/^f[cd]/i.test(bare)) return false;
-  const ipv4MappedMatch = bare.match(/^::ffff:(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/i);
-  if (ipv4MappedMatch) {
-    const a = Number(ipv4MappedMatch[1]);
-    const b = Number(ipv4MappedMatch[2]);
-    if (a === 0 || a === 10 || a === 127) return false;
-    if (a === 169 && b === 254) return false;
-    if (a === 172 && b >= 16 && b <= 31) return false;
-    if (a === 192 && b === 168) return false;
-  }
+  const host = hostname.replace(/\.+$/, '');
+  if (!host) return false;
 
-  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
-  if (ipv4Match) {
-    const a = Number(ipv4Match[1]);
-    const b = Number(ipv4Match[2]);
-    if (a === 0) return false;
-    if (a === 10) return false;
-    if (a === 127) return false;
-    if (a === 169 && b === 254) return false;
-    if (a === 172 && b >= 16 && b <= 31) return false;
-    if (a === 192 && b === 168) return false;
-  }
+  const ipv4 = parseIpv4(host);
+  if (ipv4) return isPublicIpv4(ipv4);
 
-  return true;
+  return !LOOPBACK_HOSTNAMES.has(host) && !host.endsWith('.localhost');
 };
 
 const SAFE_LINK_URI_PROTOCOLS = new Set(['http:', 'https:', 'mailto:']);

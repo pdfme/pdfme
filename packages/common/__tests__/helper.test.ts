@@ -9,6 +9,7 @@ import {
   checkFont,
   checkPlugins,
   isHexValid,
+  isUrlSafeToFetch,
   migrateTemplate,
 } from '../src/helper.js';
 import {
@@ -666,5 +667,183 @@ describe('getB64BasePdf', () => {
   test('Uint8Array', async () => {
     const result = await getB64BasePdf(new Uint8Array([10, 20, 30, 40, 50]));
     expect(typeof result).toBe('string');
+  });
+
+  describe('with window defined', () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    test.each([
+      'http://[::ffff:127.0.0.1]/a.pdf',
+      'http://[::ffff:a9fe:a9fe]/a.pdf',
+      'http://[::]/a.pdf',
+      'http://localhost./a.pdf',
+      'http://[64:ff9b::a9fe:a9fe]/a.pdf',
+      'http://100.64.0.1/a.pdf',
+    ])('rejects %s without fetching', async (url) => {
+      const fetchMock = vi.fn();
+      vi.stubGlobal('window', {});
+      vi.stubGlobal('fetch', fetchMock);
+
+      await expect(getB64BasePdf(url)).rejects.toThrow('Invalid or unsafe URL for basePdf');
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    test('fetches a public URL', async () => {
+      const fetchMock = vi.fn().mockRejectedValue(new Error('network stubbed'));
+      vi.stubGlobal('window', {});
+      vi.stubGlobal('fetch', fetchMock);
+
+      await expect(getB64BasePdf('https://example.com/a.pdf')).rejects.toThrow('network stubbed');
+      expect(fetchMock).toHaveBeenCalledWith('https://example.com/a.pdf');
+    });
+  });
+});
+
+describe('isUrlSafeToFetch', () => {
+  test.each([
+    // GHSA-2rg9-wxfw-wrr7 reproduction
+    'http://127.0.0.1/',
+    'http://169.254.169.254/',
+    'http://[::ffff:127.0.0.1]/',
+    'http://[::ffff:7f00:1]/',
+    'http://[::ffff:a9fe:a9fe]/',
+    'http://[::]/',
+    'http://localhost./',
+    // Hostnames
+    'http://localhost/',
+    'http://LOCALHOST/',
+    'http://localhost:3000/',
+    'http://localhost../',
+    'http://foo.localhost/',
+    'http://foo.localhost./',
+    'http://localhost.localdomain/',
+    'http://localhost.localdomain./',
+    'http://LOCALHOST.LOCALDOMAIN/',
+    'http://ip6-localhost/',
+    'http://ip6-localhost./',
+    'http://IP6-LOCALHOST/',
+    'http://ip6-loopback/',
+    'http://ip6-loopback./',
+    'http://IP6-Loopback:8080/',
+    // Non-public IPv4 ranges
+    'http://0.0.0.0/',
+    'http://0.1.2.3/',
+    'http://10.0.0.1/',
+    'http://10.255.255.255/',
+    'http://100.64.0.1/',
+    'http://100.127.255.255/',
+    'http://127.0.0.1:8080/',
+    'http://127.1.2.3/',
+    'http://127.0.0.1./',
+    'http://169.254.0.1/',
+    'http://172.16.0.1/',
+    'http://172.31.255.255/',
+    'http://192.0.0.1/',
+    'http://192.0.2.1/',
+    'http://192.88.99.1/',
+    'http://192.168.1.1/',
+    'http://198.18.0.1/',
+    'http://198.19.255.255/',
+    'http://198.51.100.1/',
+    'http://203.0.113.1/',
+    'http://224.0.0.1/',
+    'http://239.255.255.255/',
+    'http://240.0.0.1/',
+    'http://255.255.255.255/',
+    // Alternative IPv4 notations normalised by the URL parser
+    'http://2130706433/',
+    'http://0x7f000001/',
+    'http://0x7f.0.0.1/',
+    'http://0177.0.0.1/',
+    'http://127.1/',
+    'http://3232235777/',
+    'http://0xa9fea9fe/',
+    // Non-public IPv6 ranges
+    'http://[::1]/',
+    'http://[0:0:0:0:0:0:0:1]/',
+    'http://[0000:0000:0000:0000:0000:0000:0000:0000]/',
+    'http://[::7f00:1]/',
+    'http://[::127.0.0.1]/',
+    'http://[100::1]/',
+    'http://[2001:db8::1]/',
+    'http://[fc00::1]/',
+    'http://[fd12:3456:789a::1]/',
+    'http://[FD00::1]/',
+    'http://[fe80::1]/',
+    'http://[FE80::1]/',
+    'http://[febf::1]/',
+    'http://[fec0::1]/',
+    'http://[ff02::1]/',
+    // IPv4-mapped
+    'http://[::ffff:10.0.0.1]/',
+    'http://[::ffff:0:0]/',
+    'http://[::ffff:c0a8:101]/',
+    'http://[0:0:0:0:0:FFFF:7F00:1]/',
+    'http://[::FFFF:169.254.169.254]/',
+    // NAT64
+    'http://[64:ff9b::7f00:1]/',
+    'http://[64:ff9b::169.254.169.254]/',
+    'http://[64:ff9b::a00:1]/',
+    'http://[64:ff9b:1::1]/',
+    'http://[64:ff9b:1:ffff::8.8.8.8]/',
+    // 6to4
+    'http://[2002:7f00:1::]/',
+    'http://[2002:a9fe:a9fe::1]/',
+    'http://[2002:c0a8:101::1]/',
+    // Teredo
+    'http://[2001::1]/',
+    'http://[2001:0:4136:e378:8000:63bf:3fff:fdd2]/',
+    // Non-http schemes
+    'file:///etc/passwd',
+    'ftp://example.com/font.ttf',
+    'data:application/pdf;base64,AAAA',
+    'javascript:alert(1)',
+    'blob:https://example.com/uuid',
+    // Unparsable or empty host
+    '',
+    'not a url',
+    '/relative/path.pdf',
+    'http://',
+    'http://[::1/',
+    'http://[1:2:3:4:5:6:7:8:9]/',
+    'http://256.0.0.1/',
+    'http://./',
+    'http://../',
+  ])('rejects %s', (url) => {
+    expect(isUrlSafeToFetch(url)).toBe(false);
+  });
+
+  test.each([
+    'http://example.com/',
+    'https://example.com/a.pdf',
+    'https://fonts.gstatic.com/s/notosans/v1/font.ttf',
+    'https://EXAMPLE.com/',
+    'https://example.com./',
+    'https://example.com:8443/a.pdf',
+    'https://user:pass@example.com/',
+    'https://例え.jp/',
+    'https://localhost.example.com/',
+    'https://localdomain.example.com/',
+    'https://ip6-localhost.example.com/',
+    'http://8.8.8.8/',
+    'http://1.1.1.1:8080/',
+    'http://9.255.255.255/',
+    'http://11.0.0.1/',
+    'http://100.63.255.255/',
+    'http://100.128.0.1/',
+    'http://172.15.255.255/',
+    'http://172.32.0.1/',
+    'http://198.20.0.1/',
+    'http://223.255.255.255/',
+    'http://[2001:4860:4860::8888]/',
+    'http://[2606:4700:4700::1111]:8080/',
+    'http://[2001:4860:4860:0:0:0:0:8888]/',
+    'http://[::ffff:8.8.8.8]/',
+    'http://[64:ff9b::808:808]/',
+    'http://[2002:808:808::1]/',
+  ])('allows %s', (url) => {
+    expect(isUrlSafeToFetch(url)).toBe(true);
   });
 });

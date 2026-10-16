@@ -1,6 +1,7 @@
 import {
   getDefaultFont,
   getFallbackFontName,
+  isUrlSafeToFetch,
   type Font,
   type PDFRenderProps,
   type Plugin,
@@ -110,6 +111,12 @@ const fetchFontData = async (font: Font, fontName: string) => {
 
   if (typeof fontValue.data !== 'string' || !fontValue.data.startsWith('http')) {
     return fontValue.data;
+  }
+
+  if (!isUrlSafeToFetch(fontValue.data)) {
+    throw new Error(
+      `[@pdfme/generator] Invalid or unsafe URL for font "${fontName}". Only http: and https: URLs pointing to public hosts are allowed.`,
+    );
   }
 
   const res = await fetch(fontValue.data);
