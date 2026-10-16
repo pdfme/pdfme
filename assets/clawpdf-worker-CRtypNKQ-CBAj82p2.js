@@ -18682,6 +18682,89 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 	var pt2mm = (pt) => {
 		return pt * PT_TO_MM_RATIO;
 	};
+	var parseIpv4 = (host) => {
+		const match = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+		if (!match) return null;
+		const octets = match.slice(1).map(Number);
+		return octets.every((octet) => octet <= 255) ? octets : null;
+	};
+	var parseIpv6 = (host) => {
+		let address = host.toLowerCase();
+		const lastColon = address.lastIndexOf(":");
+		const tail = address.slice(lastColon + 1);
+		if (tail.includes(".")) {
+			const octets = parseIpv4(tail);
+			if (!octets) return null;
+			const high = (octets[0] << 8 | octets[1]).toString(16);
+			const low = (octets[2] << 8 | octets[3]).toString(16);
+			address = `${address.slice(0, lastColon + 1)}${high}:${low}`;
+		}
+		const halves = address.split("::");
+		if (halves.length > 2) return null;
+		const toGroups = (part) => part === "" ? [] : part.split(":");
+		const head = toGroups(halves[0]);
+		let groups = head;
+		if (halves.length === 2) {
+			const rest = toGroups(halves[1]);
+			const missing = 8 - head.length - rest.length;
+			if (missing < 1) return null;
+			groups = [
+				...head,
+				...Array(missing).fill("0"),
+				...rest
+			];
+		}
+		if (groups.length !== 8 || !groups.every((group) => /^[0-9a-f]{1,4}$/.test(group))) return null;
+		return groups.map((group) => parseInt(group, 16));
+	};
+	var ipv4ToInt = (octets) => (octets[0] << 24 | octets[1] << 16 | octets[2] << 8 | octets[3]) >>> 0;
+	var toIpv4Range = (cidr) => {
+		const [address, prefix] = cidr.split("/");
+		const prefixLength = Number(prefix);
+		const mask = prefixLength === 0 ? 0 : -1 << 32 - prefixLength >>> 0;
+		return {
+			base: (ipv4ToInt(parseIpv4(address)) & mask) >>> 0,
+			mask
+		};
+	};
+	var toIpv6Range = (cidr) => {
+		const [address, prefix] = cidr.split("/");
+		return {
+			base: parseIpv6(address),
+			prefixLength: Number(prefix)
+		};
+	};
+	[
+		"0.0.0.0/8",
+		"10.0.0.0/8",
+		"100.64.0.0/10",
+		"127.0.0.0/8",
+		"169.254.0.0/16",
+		"172.16.0.0/12",
+		"192.0.0.0/24",
+		"192.0.2.0/24",
+		"192.88.99.0/24",
+		"192.168.0.0/16",
+		"198.18.0.0/15",
+		"198.51.100.0/24",
+		"203.0.113.0/24",
+		"224.0.0.0/4",
+		"240.0.0.0/4"
+	].map(toIpv4Range);
+	[
+		"::/96",
+		"100::/64",
+		"2001::/32",
+		"2001:db8::/32",
+		"64:ff9b:1::/48",
+		"fc00::/7",
+		"fe80::/10",
+		"fec0::/10",
+		"ff00::/8"
+	].map(toIpv6Range);
+	toIpv6Range("::ffff:0:0/96");
+	toIpv6Range("64:ff9b::/96");
+	toIpv6Range("2002::/16");
 	Object.hasOwnProperty;
 	//#endregion
 	//#region src/pdf2size.ts
@@ -18746,4 +18829,4 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
 	//#endregion
 })();
 
-//# sourceMappingURL=clawpdf-worker-D_kpMSvl.js.map
+//# sourceMappingURL=clawpdf-worker-CRtypNKQ.js.map
