@@ -605,4 +605,72 @@ describe('Playground E2E Tests', () => {
 
     await generateAndComparePDF(page, browser, 'final-form');
   });
+
+  it('should keep the header and menus usable on a mobile viewport', async () => {
+    if (!browser) throw new Error('Browser not initialized');
+
+    const mobilePage = await browser.newPage();
+    try {
+      await mobilePage.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+      await mobilePage.goto(`${baseUrl}/designer?template=invoice`, {
+        waitUntil: 'networkidle2',
+        timeout,
+      });
+      await waitForDesignerReady(mobilePage, 'INVOICE');
+
+      const layout = await mobilePage.evaluate(() => {
+        const header = document.querySelector('header')!.getBoundingClientRect();
+        const canvas = document.querySelector('.pdfme-designer-canvas')!.getBoundingClientRect();
+        const headerHit = document.elementFromPoint(header.width / 2, header.height / 2);
+        return {
+          scrollWidth: document.documentElement.scrollWidth,
+          scrollHeight: document.documentElement.scrollHeight,
+          headerBottom: header.bottom,
+          canvasTop: canvas.top,
+          headerOnTop: document.querySelector('header')!.contains(headerHit),
+          desktopTabsVisible: document.querySelector('#designer-nav')!.checkVisibility(),
+          actionsInHeader: !!document.querySelector('header #page-actions-button'),
+        };
+      });
+      expect(layout.scrollWidth).toBe(390);
+      expect(layout.scrollHeight).toBe(844);
+      expect(layout.canvasTop).toBeGreaterThanOrEqual(layout.headerBottom);
+      expect(layout.headerOnTop).toBe(true);
+      expect(layout.desktopTabsVisible).toBe(false);
+      expect(layout.actionsInHeader).toBe(true);
+
+      await mobilePage.click('#site-menu-button');
+      const menu = await mobilePage.evaluate(() => {
+        const button = document.querySelector('#site-menu-button')!;
+        const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+        const formViewerLink = [...(panel?.querySelectorAll('a') ?? [])].find(
+          (link) => link.textContent?.trim() === 'Form/Viewer',
+        );
+        return {
+          expanded: button.getAttribute('aria-expanded'),
+          focusInPanel: !!panel?.contains(document.activeElement),
+          hasFormViewerLink: !!formViewerLink?.checkVisibility(),
+          current: panel?.querySelector('[aria-current="page"]')?.textContent?.trim(),
+        };
+      });
+      expect(menu).toEqual({
+        expanded: 'true',
+        focusInPanel: true,
+        hasFormViewerLink: true,
+        current: 'Designer',
+      });
+
+      await mobilePage.keyboard.press('Escape');
+      const afterEscape = await mobilePage.evaluate(() => {
+        const button = document.querySelector('#site-menu-button')!;
+        return {
+          expanded: button.getAttribute('aria-expanded'),
+          focusOnButton: document.activeElement === button,
+        };
+      });
+      expect(afterEscape).toEqual({ expanded: 'false', focusOnButton: true });
+    } finally {
+      await mobilePage.close();
+    }
+  });
 });
