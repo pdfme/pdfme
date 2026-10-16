@@ -452,6 +452,18 @@ async function generateAndComparePDF(page: Page, browser: Browser, labelPrefix: 
   }
 }
 
+async function blockThirdPartyRequests(page: Page) {
+  const ignoreDomains = ['https://media.ethicalads.io/', 'https://img.shields.io/'];
+  await page.setRequestInterception(true);
+  page.on('request', (req) => {
+    if (ignoreDomains.some((d) => req.url().startsWith(d))) {
+      req.abort();
+    } else {
+      req.continue();
+    }
+  });
+}
+
 describe('Playground E2E Tests', () => {
   let browser: Browser | undefined;
   let page: Page | undefined;
@@ -490,18 +502,9 @@ describe('Playground E2E Tests', () => {
         document.head.appendChild(style);
       });
     });
-    await page.setRequestInterception(true);
+    await blockThirdPartyRequests(page);
     await page.setViewport(viewport);
     page.setDefaultNavigationTimeout(timeout);
-
-    page.on('request', (req) => {
-      const ignoreDomains = ['https://media.ethicalads.io/', 'https://img.shields.io/'];
-      if (ignoreDomains.some((d) => req.url().startsWith(d))) {
-        req.abort();
-      } else {
-        req.continue();
-      }
-    });
   });
 
   afterAll(async () => {
@@ -611,6 +614,7 @@ describe('Playground E2E Tests', () => {
 
     const mobilePage = await browser.newPage();
     try {
+      await blockThirdPartyRequests(mobilePage);
       await mobilePage.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
       await mobilePage.goto(`${baseUrl}/designer?template=invoice`, {
         waitUntil: 'networkidle2',
@@ -669,6 +673,31 @@ describe('Playground E2E Tests', () => {
         };
       });
       expect(afterEscape).toEqual({ expanded: 'false', focusOnButton: true });
+
+      await mobilePage.click('#site-menu-button');
+      await mobilePage.evaluate(() => {
+        const button = document.querySelector('#site-menu-button')!;
+        const panel = document.getElementById(button.getAttribute('aria-controls') ?? '');
+        const link = [...(panel?.querySelectorAll('a') ?? [])].find(
+          (a) => a.textContent?.trim() === 'Form/Viewer',
+        );
+        (link as HTMLAnchorElement).click();
+      });
+      await mobilePage.waitForFunction(() => location.pathname === '/form-viewer', { timeout });
+      await waitForFormReady(mobilePage);
+      const afterNavigation = await mobilePage.evaluate(() => {
+        const button = document.querySelector('#site-menu-button')!;
+        return {
+          expanded: button.getAttribute('aria-expanded'),
+          focusOnButton: document.activeElement === button,
+          headerHeight: document.querySelector('header')!.getBoundingClientRect().height,
+        };
+      });
+      expect(afterNavigation).toEqual({
+        expanded: 'false',
+        focusOnButton: true,
+        headerHeight: layout.headerBottom,
+      });
     } finally {
       await mobilePage.close();
     }
