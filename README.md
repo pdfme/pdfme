@@ -34,7 +34,7 @@
 </p>
 
 <p align="center">
-  <img src="website/static/img/demo.gif" width="800" alt="pdfme demo: designing a template in the Designer, viewing its JSON template, and generating a PDF from it" />
+  <img src="https://raw.githubusercontent.com/pdfme/pdfme/main/website/static/img/demo.gif" width="800" alt="pdfme demo: designing a template in the Designer, viewing its JSON template, and generating a PDF from it" />
 </p>
 
 ## Features
