@@ -1179,13 +1179,17 @@ function DesignerApp() {
           key="file-workspace-status"
           aria-atomic="true"
           aria-live="polite"
-          className="flex items-center border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900"
+          className="flex shrink-0 items-center border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900"
           role="status"
         >
           <span className="min-w-0 flex-1 truncate">{fileWorkspaceStatusMessage}</span>
         </div>
       )}
-      <div key="designer-container" ref={designerRef} className="min-h-0 flex-1 w-full" />
+      <div
+        key="designer-container"
+        ref={designerRef}
+        className="min-h-0 flex-1 w-full"
+      />
       {pendingPreviewNavigation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div

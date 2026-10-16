@@ -361,18 +361,18 @@ function FormAndViewerApp() {
   ];
 
   return (
-    <>
+    <main className="flex min-h-0 flex-1 flex-col">
       <NavBar items={navItems} />
       {fileWorkspaceEntry && fileWorkspaceStatus && (
-        <div className="border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
+        <div className="shrink-0 border-b border-yellow-200 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
           {fileWorkspaceStatus === 'invalid' &&
             `${fileWorkspaceEntry.path} is currently invalid on disk. The viewer is keeping the last valid template.`}
           {fileWorkspaceStatus === 'deleted' &&
             `${fileWorkspaceEntry.path} was deleted on disk. The viewer is keeping the last loaded template.`}
         </div>
       )}
-      <div ref={uiRef} className="flex-1 w-full" />
-    </>
+      <div ref={uiRef} className="min-h-0 flex-1 w-full" />
+    </main>
   );
 }
 

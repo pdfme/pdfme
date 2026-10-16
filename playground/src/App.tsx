@@ -14,7 +14,7 @@ const Md2Pdf = lazy(() => import('./routes/Md2Pdf'));
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="flex h-screen flex-col overflow-hidden supports-[height:100dvh]:h-dvh">
       <Header />
       <Suspense fallback={<main className="min-h-0 flex-1 bg-gray-100" />}>
         <Routes>

@@ -462,7 +462,7 @@ export default function JsxPlayground() {
   return (
     <main
       ref={pageRootRef}
-      className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-gray-100 lg:overflow-hidden"
+      className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain bg-gray-100 lg:overflow-hidden"
     >
       <div className="flex flex-col gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
