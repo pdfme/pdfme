@@ -12,6 +12,7 @@ import {
   PopoverPanel,
 } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
+import { useHeaderSlot } from './headerSlotContext';
 
 const externalIcon = (
   <svg
@@ -187,6 +188,7 @@ export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [starBadgeFailed, setStarBadgeFailed] = useState(false);
   const location = useLocation();
+  const { setActionsSlot, closePageActionsRef } = useHeaderSlot();
   const onStarBadgeError = () => setStarBadgeFailed(true);
 
   const currentPage = navLinks.find(
@@ -282,11 +284,13 @@ export default function Navigation() {
       <div className="flex items-center justify-between gap-2 px-4 py-1.5 lg:hidden">
         {homeLink}
         <div className="flex items-center gap-2">
+          <div ref={setActionsSlot} className="flex items-center" />
           <Popover key={location.pathname}>
             {({ open, close }) => (
               <>
                 <PopoverButton
                   id="site-menu-button"
+                  onClick={() => closePageActionsRef.current?.()}
                   aria-label={`${open ? 'Close' : 'Open'} navigation menu (current page: ${
                     currentPage?.label ?? 'none'
                   })`}
@@ -365,4 +369,3 @@ export default function Navigation() {
     </header>
   );
 }
-
