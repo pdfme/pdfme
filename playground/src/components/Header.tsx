@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { PDFME_VERSION } from '@pdfme/common';
 import {
@@ -10,9 +10,10 @@ import {
   PopoverBackdrop,
   PopoverButton,
   PopoverPanel,
+  useClose,
 } from '@headlessui/react';
 import { Menu, X } from 'lucide-react';
-import { useHeaderSlot } from './headerSlotContext';
+import { BELOW_HEADER_HEIGHT, BELOW_HEADER_MAX_HEIGHT, useHeaderSlot } from './headerSlotContext';
 
 const externalIcon = (
   <svg
@@ -184,11 +185,25 @@ function StarBadge({ failed, onError }: { failed: boolean; onError: () => void }
   );
 }
 
+function CloseOnNavigation({ open }: { open: boolean }) {
+  const close = useClose();
+  const { pathname } = useLocation();
+  const previousPathname = useRef(pathname);
+
+  useEffect(() => {
+    if (previousPathname.current === pathname) return;
+    previousPathname.current = pathname;
+    if (open) close();
+  }, [pathname, open, close]);
+
+  return null;
+}
+
 export default function Navigation() {
   const [helpModalOpen, setHelpModalOpen] = useState(false);
   const [starBadgeFailed, setStarBadgeFailed] = useState(false);
   const location = useLocation();
-  const { setActionsSlot, closePageActionsRef } = useHeaderSlot();
+  const { setActionsSlot, setPanelSlot, closePageActionsRef } = useHeaderSlot();
   const onStarBadgeError = () => setStarBadgeFailed(true);
 
   const currentPage = navLinks.find(
@@ -217,7 +232,9 @@ export default function Navigation() {
       className="flex items-center gap-2 py-2 pr-2 text-sm font-semibold text-gray-900 hover:text-green-700"
     >
       <span className="size-2 rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.16)]" />
-      pdfme playground
+      <span className="whitespace-nowrap">
+        pdfme<span className="max-sm:hidden"> playground</span>
+      </span>
     </NavLink>
   );
 
@@ -285,28 +302,29 @@ export default function Navigation() {
         {homeLink}
         <div className="flex items-center gap-2">
           <div ref={setActionsSlot} className="flex items-center" />
-          <Popover key={location.pathname}>
+          <Popover>
             {({ open, close }) => (
               <>
+                <CloseOnNavigation open={open} />
                 <PopoverButton
                   id="site-menu-button"
                   onClick={() => closePageActionsRef.current?.()}
-                  aria-label={`${open ? 'Close' : 'Open'} navigation menu (current page: ${
-                    currentPage?.label ?? 'none'
-                  })`}
+                  aria-label="Navigation menu"
                   className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
                 >
-                  {currentPage && <span className="max-w-32 truncate">{currentPage.label}</span>}
+                  Menu
                   {open ? (
                     <X className="size-5" aria-hidden="true" />
                   ) : (
                     <Menu className="size-5" aria-hidden="true" />
                   )}
                 </PopoverButton>
-                <PopoverBackdrop className="absolute inset-x-0 top-full h-dvh bg-black/20" />
+                <PopoverBackdrop
+                  className={`absolute inset-x-0 top-full bg-black/20 ${BELOW_HEADER_HEIGHT}`}
+                />
                 <PopoverPanel
                   focus
-                  className="absolute inset-x-0 top-full max-h-[calc(100dvh-4rem)] overflow-y-auto border-b border-gray-200 bg-white shadow-lg"
+                  className={`absolute inset-x-0 top-full overflow-y-auto border-y border-gray-200 bg-white shadow-lg ${BELOW_HEADER_MAX_HEIGHT}`}
                 >
                   <nav aria-label="Primary" className="px-2 py-2">
                     <ul role="list" className="space-y-1">
@@ -364,6 +382,8 @@ export default function Navigation() {
           </Popover>
         </div>
       </div>
+
+      <div ref={setPanelSlot} />
 
       <HelpModal isOpen={helpModalOpen} onClose={() => setHelpModalOpen(false)} />
     </header>
