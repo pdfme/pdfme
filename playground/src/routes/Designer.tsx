@@ -1188,7 +1188,7 @@ function DesignerApp() {
       <div
         key="designer-container"
         ref={designerRef}
-        className="min-h-0 flex-1 w-full"
+        className="relative isolate min-h-0 flex-1 w-full"
       />
       {pendingPreviewNavigation && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

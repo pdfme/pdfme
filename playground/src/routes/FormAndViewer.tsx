@@ -371,7 +371,7 @@ function FormAndViewerApp() {
             `${fileWorkspaceEntry.path} was deleted on disk. The viewer is keeping the last loaded template.`}
         </div>
       )}
-      <div ref={uiRef} className="min-h-0 flex-1 w-full" />
+      <div ref={uiRef} className="relative isolate min-h-0 flex-1 w-full" />
     </main>
   );
 }

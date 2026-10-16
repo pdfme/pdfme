@@ -12,7 +12,7 @@ type NavBarProps = {
 
 export function NavBar({ items }: NavBarProps) {
   return (
-    <Disclosure as="nav" className="border-b bg-white">
+    <Disclosure as="nav" className="relative shrink-0 border-b bg-white">
       {({ open }) => (
         <>
           <div className="mx-auto px-2">

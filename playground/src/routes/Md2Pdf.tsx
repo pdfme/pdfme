@@ -338,7 +338,7 @@ export default function Md2Pdf() {
           </div>
           <div
             ref={viewerRootRef}
-            className="h-[38rem] flex-none lg:h-auto lg:min-h-0 lg:flex-1"
+            className="relative isolate h-[38rem] flex-none lg:h-auto lg:min-h-0 lg:flex-1"
           />
         </section>
       </div>
