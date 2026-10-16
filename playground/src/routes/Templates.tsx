@@ -1271,7 +1271,7 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
   };
 
   return (
-    <div className="bg-white">
+    <main className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain bg-white">
       <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12 lg:max-w-7xl lg:px-8">
         {showWorkspace && (
           <div className="mb-10 rounded-lg border border-green-200 bg-green-50 p-5">
@@ -1702,7 +1702,7 @@ function TemplatesApp({ view = 'templates' }: TemplatesAppProps) {
           onSave={onSaveMountedMetadata}
         />
       )}
-    </div>
+    </main>
   );
 }
 

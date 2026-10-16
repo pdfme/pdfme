@@ -88,6 +88,8 @@ Header tabs in `playground/src/components/Header.tsx`:
 | `/jsx` | `#jsx-nav` | JSX |
 | `/md2pdf` | `#md2pdf-nav` | md2pdf |
 
+These tab ids exist only in the desktop header row, which is visible at 1024px and wider (Tailwind `lg`). Below that, `#site-menu-button` opens a menu with the same links by name, and on Designer and Form/Viewer `#page-actions-button` in the header opens that page's toolbar.
+
 Designer (`/designer`), English UI (`lang: 'en'` in `playground/src/routes/Designer.tsx`):
 
 - `#open-form-viewer` opens Form/Viewer. Unsaved workspace edits open the dialog `#preview-navigation-title` ("Save before opening Form/Viewer?") with `#open-form-viewer-without-saving` and `#save-and-open-form-viewer`.
