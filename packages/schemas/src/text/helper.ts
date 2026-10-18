@@ -14,7 +14,13 @@ import {
 import { parseFont } from '@pdfme/pdf-lib';
 import type { DYNAMIC_FONT_SIZE_FIT, TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
-import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
+import {
+  countGraphemes,
+  splitParagraphs,
+  toLegacySplitLines,
+  wrapText,
+  type WrapLine,
+} from './wrap.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -167,8 +173,12 @@ export const fitDynamicFontSize = ({
   return dynamicFontSize;
 };
 
+// Spacing goes between graphemes: the Viewer draws one span per grapheme and
+// justify divides by the grapheme count. `length` would count a surrogate
+// pair such as 𠮷 or 👍 as two characters.
 const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
-  return (textContent.length - 1) * textCharacterSpacing;
+  if (textCharacterSpacing === 0) return 0;
+  return Math.max(countGraphemes(textContent) - 1, 0) * textCharacterSpacing;
 };
 
 const TEXT_WIDTH_CACHE_LIMIT = 5000;
