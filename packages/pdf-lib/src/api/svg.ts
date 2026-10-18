@@ -37,6 +37,8 @@ type InheritedAttributes = {
   strokeWidth?: number;
   strokeOpacity?: number;
   strokeLineCap?: LineCapStyle;
+  strokeDashArray?: number[];
+  strokeDashOffset?: number;
   fillRule?: FillRule;
   strokeLineJoin?: LineJoinStyle;
   fontFamily?: string;
@@ -280,6 +282,8 @@ const runnersToPage = (
       color: element.svgAttributes.stroke,
       opacity: element.svgAttributes.strokeOpacity,
       lineCap: element.svgAttributes.strokeLineCap,
+      dashArray: element.svgAttributes.strokeDashArray,
+      dashPhase: element.svgAttributes.strokeDashOffset,
       matrix: element.svgAttributes.matrix,
       clipSpaces: element.svgAttributes.clipSpaces,
     });
@@ -294,6 +298,8 @@ const runnersToPage = (
       borderWidth: element.svgAttributes.strokeWidth,
       borderOpacity: element.svgAttributes.strokeOpacity,
       borderLineCap: element.svgAttributes.strokeLineCap,
+      borderDashArray: element.svgAttributes.strokeDashArray,
+      borderDashPhase: element.svgAttributes.strokeDashOffset,
       color: element.svgAttributes.fill,
       opacity: element.svgAttributes.fillOpacity,
       fillRule: element.svgAttributes.fillRule,
@@ -335,6 +341,8 @@ const runnersToPage = (
       borderWidth: element.svgAttributes.strokeWidth,
       borderOpacity: element.svgAttributes.strokeOpacity,
       borderLineCap: element.svgAttributes.strokeLineCap,
+      borderDashArray: element.svgAttributes.strokeDashArray,
+      borderDashPhase: element.svgAttributes.strokeDashOffset,
       color: element.svgAttributes.fill,
       opacity: element.svgAttributes.fillOpacity,
       matrix: element.svgAttributes.matrix,
@@ -351,6 +359,8 @@ const runnersToPage = (
       borderWidth: element.svgAttributes.strokeWidth,
       borderOpacity: element.svgAttributes.strokeOpacity,
       borderLineCap: element.svgAttributes.strokeLineCap,
+      borderDashArray: element.svgAttributes.strokeDashArray,
+      borderDashPhase: element.svgAttributes.strokeDashOffset,
       color: element.svgAttributes.fill,
       opacity: element.svgAttributes.fillOpacity,
       matrix: element.svgAttributes.matrix,
@@ -416,6 +426,35 @@ const splitFontFamilies = (fontFamily: string): string[] => {
 
 const normalizeFontFamily = (fontFamily: string): string => {
   return splitFontFamilies(fontFamily)[0] || fontFamily.trim();
+};
+
+/**
+ * Parses `stroke-dasharray`. Returns `undefined` when the value is missing or
+ * invalid so that the inherited pattern applies, and an empty array for a
+ * solid stroke.
+ */
+const parseDashArray = (value: string | undefined, reference: number): number[] | undefined => {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (trimmed === 'none') return [];
+  const dashes = trimmed
+    .split(/\s*,\s*|\s+/)
+    .filter((dash) => dash.length > 0)
+    .map((dash) => parseFloatValue(dash, reference));
+  if (dashes.length === 0) return undefined;
+  if (dashes.some((dash) => dash === undefined || dash < 0)) return undefined;
+  const lengths = dashes as number[];
+  // A zero-length pattern renders as a solid stroke.
+  if (lengths.every((dash) => dash === 0)) return [];
+  // An odd number of values is repeated to yield an even number of values.
+  return lengths.length % 2 === 1 ? [...lengths, ...lengths] : lengths;
+};
+
+/** Wraps an SVG dash offset into the PDF dash phase range [0, pattern length). */
+const normalizeDashOffset = (offset: number | undefined, dashArray: number[] | undefined) => {
+  if (offset === undefined || !dashArray || dashArray.length === 0) return 0;
+  const patternLength = dashArray.reduce((sum, dash) => sum + dash, 0);
+  return ((offset % patternLength) + patternLength) % patternLength;
 };
 
 const parseColor = (
@@ -493,6 +532,8 @@ const parseAttributes = (
   const strokeLineJoinRaw = styleOrAttribute(attributes, style, 'stroke-linejoin');
   const fillRuleRaw = styleOrAttribute(attributes, style, 'fill-rule');
   const strokeWidthRaw = styleOrAttribute(attributes, style, 'stroke-width');
+  const strokeDashArrayRaw = styleOrAttribute(attributes, style, 'stroke-dasharray');
+  const strokeDashOffsetRaw = styleOrAttribute(attributes, style, 'stroke-dashoffset');
   const fontFamilyRaw = styleOrAttribute(attributes, style, 'font-family');
   const fontStyleRaw = styleOrAttribute(attributes, style, 'font-style');
   const fontWeightRaw = styleOrAttribute(attributes, style, 'font-weight');
@@ -510,6 +551,10 @@ const parseAttributes = (
   const cy = parseFloatValue(attributes.cy, inherited.height);
   const rx = parseFloatValue(attributes.rx || attributes.r, inherited.width);
   const ry = parseFloatValue(attributes.ry || attributes.r, inherited.height);
+  // Percentages in dash lengths refer to the normalized diagonal of the viewport.
+  const dashReference = Math.sqrt(
+    (inherited.viewBox.width ** 2 + inherited.viewBox.height ** 2) / 2,
+  );
 
   const newInherited: InheritedAttributes = {
     fontFamily: fontFamilyRaw || inherited.fontFamily,
@@ -527,6 +572,9 @@ const parseAttributes = (
       inherited.strokeOpacity,
     strokeLineCap: StrokeLineCapMap[strokeLineCapRaw] || inherited.strokeLineCap,
     strokeLineJoin: StrokeLineJoinMap[strokeLineJoinRaw] || inherited.strokeLineJoin,
+    strokeDashArray: parseDashArray(strokeDashArrayRaw, dashReference) ?? inherited.strokeDashArray,
+    strokeDashOffset:
+      parseFloatValue(strokeDashOffsetRaw, dashReference) ?? inherited.strokeDashOffset,
     width: width || inherited.width,
     height: height || inherited.height,
     rotation: inherited.rotation,
@@ -765,6 +813,10 @@ const parseHTMLNode = (
     const svgAttributes = {
       ...attributes.inherited,
       ...attributes.svgAttributes,
+      strokeDashOffset: normalizeDashOffset(
+        attributes.inherited.strokeDashOffset,
+        attributes.inherited.strokeDashArray,
+      ),
       matrix: attributes.matrix,
       clipSpaces,
     };
