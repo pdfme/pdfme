@@ -14,13 +14,7 @@ import {
 import { parseFont } from '@pdfme/pdf-lib';
 import type { DYNAMIC_FONT_SIZE_FIT, TextSchema, FontWidthCalcValues } from './types.js';
 import { getBoxContentArea } from '../box.js';
-import {
-  countGraphemes,
-  splitParagraphs,
-  toLegacySplitLines,
-  wrapText,
-  type WrapLine,
-} from './wrap.js';
+import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -173,13 +167,12 @@ export const fitDynamicFontSize = ({
   return dynamicFontSize;
 };
 
-// Spacing goes between graphemes: the Viewer draws one span per grapheme and
-// justify divides by the grapheme count. `length` would count a surrogate
-// pair such as 𠮷 or 👍 as two characters.
-const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
-  if (textCharacterSpacing === 0) return 0;
-  return Math.max(countGraphemes(textContent) - 1, 0) * textCharacterSpacing;
-};
+// PDF applies character spacing (Tc) after every glyph drawn, so spacing goes
+// between the glyphs of the same layout used for the width. `length` would count
+// a surrogate pair such as 𠮷 as two characters, and graphemes would miss a
+// combining mark that the font draws as a glyph of its own.
+const calculateCharacterSpacing = (glyphCount: number, textCharacterSpacing: number) =>
+  Math.max(glyphCount - 1, 0) * textCharacterSpacing;
 
 const TEXT_WIDTH_CACHE_LIMIT = 5000;
 const textWidthCache = new WeakMap<FontKitFont, Map<string, number>>();
@@ -211,7 +204,7 @@ export const widthOfTextAtSize = (
   const standardWidth =
     glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
     (fontSize / 1000);
-  const width = standardWidth + calculateCharacterSpacing(text, characterSpacing);
+  const width = standardWidth + calculateCharacterSpacing(glyphs.length, characterSpacing);
 
   if (cache.size >= TEXT_WIDTH_CACHE_LIMIT) {
     cache.clear();
