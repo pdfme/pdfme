@@ -28,6 +28,9 @@ type Box = Position & Size;
 
 type SVGStyle = Record<string, string>;
 
+/** A dash length as written in SVG, resolved against the viewport where it is used. */
+type DashLength = { value: number; percent: boolean };
+
 type InheritedAttributes = {
   width: number;
   height: number;
@@ -37,8 +40,9 @@ type InheritedAttributes = {
   strokeWidth?: number;
   strokeOpacity?: number;
   strokeLineCap?: LineCapStyle;
-  strokeDashArray?: number[];
-  strokeDashOffset?: number;
+  // Unresolved stroke-dasharray / stroke-dashoffset, see resolveDashPattern.
+  dashArray?: DashLength[];
+  dashOffset?: DashLength;
   fillRule?: FillRule;
   strokeLineJoin?: LineJoinStyle;
   fontFamily?: string;
@@ -81,6 +85,8 @@ type SVGAttributes = {
   textAnchor?: string;
   preserveAspectRatio?: string;
   strokeWidth?: number;
+  strokeDashArray?: number[];
+  strokeDashOffset?: number;
   dominantBaseline?: string;
   points?: string;
 };
@@ -428,33 +434,67 @@ const normalizeFontFamily = (fontFamily: string): string => {
   return splitFontFamilies(fontFamily)[0] || fontFamily.trim();
 };
 
+const DASH_LENGTH_REGEX = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?(px|%)?$/i;
+
+/** Parses one dash length. The whole token must be a finite number, optionally in px or %. */
+const parseDashLength = (token: string): DashLength | undefined => {
+  const match = DASH_LENGTH_REGEX.exec(token);
+  if (!match) return undefined;
+  const value = parseFloat(token);
+  if (!Number.isFinite(value)) return undefined;
+  return { value, percent: match[1] === '%' };
+};
+
 /**
  * Parses `stroke-dasharray`. Returns `undefined` when the value is missing or
  * invalid so that the inherited pattern applies, and an empty array for a
  * solid stroke.
  */
-const parseDashArray = (value: string | undefined, reference: number): number[] | undefined => {
+const parseDashArray = (value: string | undefined): DashLength[] | undefined => {
   if (!value) return undefined;
   const trimmed = value.trim();
   if (trimmed === 'none') return [];
   const dashes = trimmed
     .split(/\s*,\s*|\s+/)
     .filter((dash) => dash.length > 0)
-    .map((dash) => parseFloatValue(dash, reference));
+    .map(parseDashLength);
   if (dashes.length === 0) return undefined;
-  if (dashes.some((dash) => dash === undefined || dash < 0)) return undefined;
-  const lengths = dashes as number[];
+  if (dashes.some((dash) => dash === undefined || dash.value < 0)) return undefined;
+  const lengths = dashes as DashLength[];
   // A zero-length pattern renders as a solid stroke.
-  if (lengths.every((dash) => dash === 0)) return [];
+  if (lengths.every((dash) => dash.value === 0)) return [];
   // An odd number of values is repeated to yield an even number of values.
   return lengths.length % 2 === 1 ? [...lengths, ...lengths] : lengths;
 };
 
-/** Wraps an SVG dash offset into the PDF dash phase range [0, pattern length). */
-const normalizeDashOffset = (offset: number | undefined, dashArray: number[] | undefined) => {
-  if (offset === undefined || !dashArray || dashArray.length === 0) return 0;
-  const patternLength = dashArray.reduce((sum, dash) => sum + dash, 0);
-  return ((offset % patternLength) + patternLength) % patternLength;
+/** Parses `stroke-dashoffset`. Returns `undefined` when the value is missing or invalid. */
+const parseDashOffset = (value: string | undefined): DashLength | undefined =>
+  value ? parseDashLength(value.trim()) : undefined;
+
+/**
+ * Resolves the dash pattern of a stroked element. Percentages refer to the
+ * normalized diagonal of the element's nearest viewport, and the offset is
+ * wrapped into the PDF dash phase range [0, pattern length).
+ */
+const resolveDashPattern = (
+  dashArray: DashLength[] | undefined,
+  dashOffset: DashLength | undefined,
+  viewBox: Box,
+): { strokeDashArray?: number[]; strokeDashOffset: number } => {
+  if (!dashArray) return { strokeDashArray: undefined, strokeDashOffset: 0 };
+  const reference = Math.sqrt((viewBox.width ** 2 + viewBox.height ** 2) / 2);
+  const resolve = (length: DashLength) =>
+    length.percent ? (length.value * reference) / 100 : length.value;
+  const lengths = dashArray.map(resolve);
+  const patternLength = lengths.reduce((sum, dash) => sum + dash, 0);
+  if (patternLength <= 0 || !Number.isFinite(patternLength)) {
+    return { strokeDashArray: [], strokeDashOffset: 0 };
+  }
+  const offset = dashOffset ? resolve(dashOffset) : 0;
+  return {
+    strokeDashArray: lengths,
+    strokeDashOffset: ((offset % patternLength) + patternLength) % patternLength,
+  };
 };
 
 const parseColor = (
@@ -551,10 +591,6 @@ const parseAttributes = (
   const cy = parseFloatValue(attributes.cy, inherited.height);
   const rx = parseFloatValue(attributes.rx || attributes.r, inherited.width);
   const ry = parseFloatValue(attributes.ry || attributes.r, inherited.height);
-  // Percentages in dash lengths refer to the normalized diagonal of the viewport.
-  const dashReference = Math.sqrt(
-    (inherited.viewBox.width ** 2 + inherited.viewBox.height ** 2) / 2,
-  );
 
   const newInherited: InheritedAttributes = {
     fontFamily: fontFamilyRaw || inherited.fontFamily,
@@ -572,9 +608,9 @@ const parseAttributes = (
       inherited.strokeOpacity,
     strokeLineCap: StrokeLineCapMap[strokeLineCapRaw] || inherited.strokeLineCap,
     strokeLineJoin: StrokeLineJoinMap[strokeLineJoinRaw] || inherited.strokeLineJoin,
-    strokeDashArray: parseDashArray(strokeDashArrayRaw, dashReference) ?? inherited.strokeDashArray,
-    strokeDashOffset:
-      parseFloatValue(strokeDashOffsetRaw, dashReference) ?? inherited.strokeDashOffset,
+    // Dash lengths stay unresolved here: percentages refer to the viewport where they are used.
+    dashArray: parseDashArray(strokeDashArrayRaw) ?? inherited.dashArray,
+    dashOffset: parseDashOffset(strokeDashOffsetRaw) ?? inherited.dashOffset,
     width: width || inherited.width,
     height: height || inherited.height,
     rotation: inherited.rotation,
@@ -813,9 +849,10 @@ const parseHTMLNode = (
     const svgAttributes = {
       ...attributes.inherited,
       ...attributes.svgAttributes,
-      strokeDashOffset: normalizeDashOffset(
-        attributes.inherited.strokeDashOffset,
-        attributes.inherited.strokeDashArray,
+      ...resolveDashPattern(
+        attributes.inherited.dashArray,
+        attributes.inherited.dashOffset,
+        attributes.inherited.viewBox,
       ),
       matrix: attributes.matrix,
       clipSpaces,
