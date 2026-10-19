@@ -36,7 +36,6 @@ const hotkeys = function (
   return hotkeysJs(keys, callback);
 } as HotkeysFunction;
 
-// Add properties to the hotkeys function
 hotkeys.unbind = function (keys: string) {
   // Do nothing if hotkeysJs doesn't have unbind
   const hotkeysFn = hotkeysJs as unknown as { unbind?: (keys: string) => void };
