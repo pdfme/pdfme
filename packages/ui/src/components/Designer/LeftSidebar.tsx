@@ -65,6 +65,7 @@ const LeftSidebar = ({
 }) => {
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
+  const options = useContext(OptionsContext);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
@@ -90,7 +91,7 @@ const LeftSidebar = ({
         position: 'absolute',
         zIndex: 1,
         height,
-        width: LEFT_SIDEBAR_WIDTH,
+        width: options.leftSidebarWidth ?? LEFT_SIDEBAR_WIDTH,
         background: token.colorBgLayout,
         textAlign: 'center',
         overflow: isDragging ? 'visible' : 'auto',

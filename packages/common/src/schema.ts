@@ -292,6 +292,8 @@ export const UIOptions = CommonOptions.extend({
   requiredByDefault: z.boolean().optional(),
   maxZoom: z.number().optional(),
   sidebarOpen: z.boolean().optional(),
+  leftSidebarWidth: z.number().positive().finite().optional(),
+  rightSidebarWidth: z.number().positive().finite().optional(),
   zoomLevel: z.number().optional(),
 });
 

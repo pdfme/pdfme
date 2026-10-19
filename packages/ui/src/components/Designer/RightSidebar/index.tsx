@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { theme, Button } from 'antd';
 import type { SidebarProps } from '../../../types.js';
 import { RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
+import { OptionsContext } from '../../../contexts.js';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import ListView from './ListView/index.js';
 import DetailView from './DetailView/index.js';
 
 const Sidebar = (props: SidebarProps) => {
   const { sidebarOpen, setSidebarOpen, activeElements, schemas } = props;
+  const options = useContext(OptionsContext);
+  const rightSidebarWidth = options.rightSidebarWidth ?? RIGHT_SIDEBAR_WIDTH;
 
   const { token } = theme.useToken();
   const getActiveSchemas = () =>
@@ -27,7 +30,7 @@ const Sidebar = (props: SidebarProps) => {
         right: 0,
         zIndex: 1,
         height: '100%',
-        width: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
+        width: sidebarOpen ? rightSidebarWidth : 0,
       }}
     >
       <Button
@@ -47,7 +50,7 @@ const Sidebar = (props: SidebarProps) => {
       />
       <div
         style={{
-          width: RIGHT_SIDEBAR_WIDTH,
+          width: rightSidebarWidth,
           height: '100%',
           display: sidebarOpen ? 'flex' : 'none',
           top: 0,
