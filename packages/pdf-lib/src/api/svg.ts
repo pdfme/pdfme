@@ -434,7 +434,7 @@ const normalizeFontFamily = (fontFamily: string): string => {
   return splitFontFamilies(fontFamily)[0] || fontFamily.trim();
 };
 
-const DASH_LENGTH_REGEX = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?(px|%)?$/i;
+const DASH_LENGTH_REGEX = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?(px|%)?$/i;
 
 /** Parses one dash length. The whole token must be a finite number, optionally in px or %. */
 const parseDashLength = (token: string): DashLength | undefined => {
@@ -453,7 +453,7 @@ const parseDashLength = (token: string): DashLength | undefined => {
 const parseDashArray = (value: string | undefined): DashLength[] | undefined => {
   if (!value) return undefined;
   const trimmed = value.trim();
-  if (trimmed === 'none') return [];
+  if (trimmed.toLowerCase() === 'none') return [];
   const dashes = trimmed
     .split(/\s*,\s*|\s+/)
     .filter((dash) => dash.length > 0)

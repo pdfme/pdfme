@@ -282,4 +282,42 @@ describe('PDFPage.drawSvg', () => {
     expect(content.match(/\[3 3\] 1 d/g) ?? []).toHaveLength(3);
     expect(content).not.toContain('NaN');
   });
+
+  it('rejects long invalid dash tokens quickly', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+    const token = `${'1'.repeat(100_000)}x`;
+
+    const start = Date.now();
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3" stroke-dashoffset="1">
+          <path d="M0 0L10 0" fill="none" stroke-dasharray="${token}"/>
+          <path d="M0 5L10 5" fill="none" stroke-dashoffset="${token}"/>
+        </g>
+      </svg>`,
+    );
+    const elapsed = Date.now() - start;
+
+    const content = getPageContent(page);
+
+    // The invalid tokens are ignored, so the inherited pattern and offset apply.
+    expect(content.match(/\[3 3\] 1 d/g) ?? []).toHaveLength(2);
+    expect(elapsed).toBeLessThan(1000);
+  });
+
+  it('accepts none in any case', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3">
+          <path d="M0 0L10 0" fill="none" stroke-dasharray="NONE"/>
+        </g>
+      </svg>`,
+    );
+
+    expect(getPageContent(page)).not.toContain('[3 3]');
+  });
 });
