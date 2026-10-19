@@ -6,21 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PDFme is an open-source TypeScript-based PDF generation and manipulation library for web and Node.js applications. It provides a complete solution for creating, designing, and manipulating PDFs with a focus on performance, minimal dependencies, and ease of use.
 
-## Claude Code Integration
-
-### Triggering Claude Code
-- Use `@claude` in GitHub issues, PR comments, or reviews to trigger Claude Code assistance
-- Claude Code is configured via `.github/workflows/claude.yml` with appropriate permissions
-- Best practices:
-  - Be specific about the problem or task
-  - Include relevant error messages or logs
-  - Mention specific files or components when applicable
-
-### GitHub Workflow Integration
-- Claude Code automatically runs on issue comments, PR reviews, and new issues containing `@claude`
-- Has read access to repository contents, pull requests, and issues
-- Can assist with code analysis, debugging, and implementation suggestions
-
 ## Environment Requirements
 
 ### Node.js and Package Manager
@@ -401,7 +386,6 @@ npm run test -w packages/ui -- -u
 - All PRs automatically run tests via GitHub Actions
 - Ensure local tests pass before pushing
 - Monitor CI status and address failures promptly
-- Use Claude Code integration for assistance with CI issues
 
 ### Key Files to Understand
 
