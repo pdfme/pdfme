@@ -14,7 +14,7 @@ import { TEXT_OVERFLOW_EXPAND, TEXT_OVERFLOW_VISIBLE } from '@pdfme/schemas/text
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
-import { debounce, isRotatableSchema } from '../../../../helper.js';
+import { debounce, getRotatedBoxInset, isRotatableSchema } from '../../../../helper.js';
 import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
@@ -190,6 +190,14 @@ const DetailView = (props: DetailViewProps) => {
     ? basePdf.padding
     : [0, 0, 0, 0];
 
+  // Position describes the un-rotated box, so the allowed range shifts by how far the
+  // rotated box sticks out (or is inset) relative to it. 0 for unrotated fields.
+  const { x: activeInsetX, y: activeInsetY } = getRotatedBoxInset({
+    width: activeSchema.width,
+    height: activeSchema.height,
+    rotate: activeSchema.rotate ?? 0,
+  });
+
   // Cross-field validation: only checks when both fields are individually valid
   const validatePosition = (_: unknown, value: number, fieldName: string): boolean => {
     const formValues = form.getValues() as Record<string, unknown>;
@@ -199,18 +207,46 @@ const DetailView = (props: DetailViewProps) => {
 
     if (!position || width === undefined || height === undefined) return true;
 
+    // Use the candidate width/height so resizing a rotated field re-checks its rotated extent.
+    const { x: insetX, y: insetY } = getRotatedBoxInset({
+      width: fieldName === 'width' ? value : width,
+      height: fieldName === 'height' ? value : height,
+      rotate: (formValues.rotate as number | undefined) ?? 0,
+    });
+    // Positions are stored with 2 decimals, so allow that much rounding slack.
+    const eps = 0.01;
+
     if (fieldName === 'x') {
-      if (value < paddingLeft || value > pageSize.width - paddingRight) return true;
-      if (width > 0 && value + width > pageSize.width - paddingRight) return false;
+      if (
+        value < paddingLeft + insetX - eps ||
+        value > pageSize.width - paddingRight - insetX + eps
+      )
+        return true;
+      if (width > 0 && value + width + insetX > pageSize.width - paddingRight + eps) return false;
     } else if (fieldName === 'y') {
-      if (value < paddingTop || value > pageSize.height - paddingBottom) return true;
-      if (height > 0 && value + height > pageSize.height - paddingBottom) return false;
+      if (
+        value < paddingTop + insetY - eps ||
+        value > pageSize.height - paddingBottom - insetY + eps
+      )
+        return true;
+      if (height > 0 && value + height + insetY > pageSize.height - paddingBottom + eps)
+        return false;
     } else if (fieldName === 'width') {
-      if (position.x < paddingLeft || position.x > pageSize.width - paddingRight) return true;
-      if (value > 0 && position.x + value > pageSize.width - paddingRight) return false;
+      if (
+        position.x < paddingLeft + insetX - eps ||
+        position.x > pageSize.width - paddingRight - insetX + eps
+      )
+        return true;
+      if (value > 0 && position.x + value + insetX > pageSize.width - paddingRight + eps)
+        return false;
     } else if (fieldName === 'height') {
-      if (position.y < paddingTop || position.y > pageSize.height - paddingBottom) return true;
-      if (value > 0 && position.y + value > pageSize.height - paddingBottom) return false;
+      if (
+        position.y < paddingTop + insetY - eps ||
+        position.y > pageSize.height - paddingBottom - insetY + eps
+      )
+        return true;
+      if (value > 0 && position.y + value + insetY > pageSize.height - paddingBottom + eps)
+        return false;
     }
 
     return true;
@@ -375,8 +411,8 @@ const DetailView = (props: DetailViewProps) => {
             widget: 'inputNumber',
             required: true,
             span: 8,
-            min: paddingLeft,
-            max: pageSize.width - paddingRight,
+            min: paddingLeft + activeInsetX,
+            max: pageSize.width - paddingRight - activeInsetX,
             rules: [
               {
                 validator: (_: unknown, value: number) => validatePosition(_, value, 'x'),
@@ -390,8 +426,8 @@ const DetailView = (props: DetailViewProps) => {
             widget: 'inputNumber',
             required: true,
             span: 8,
-            min: paddingTop,
-            max: pageSize.height - paddingBottom,
+            min: paddingTop + activeInsetY,
+            max: pageSize.height - paddingBottom - activeInsetY,
             rules: [
               {
                 validator: (_: unknown, value: number) => validatePosition(_, value, 'y'),

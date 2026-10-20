@@ -29,6 +29,8 @@ import {
   getStickyScrollPageIndex,
   isRotatableSchema,
   isAspectRatioLockedPlugin,
+  getRotatedBoxInset,
+  moveCommandToChangeSchemasArg,
 } from '../src/helper';
 import {
   text,
@@ -1328,5 +1330,130 @@ describe('hotkeys-js version floor (#1465)', () => {
     const patch = Number(match![3]);
     const atLeast404 = major > 4 || (major === 4 && (minor > 0 || patch >= 4));
     expect(atLeast404).toBe(true);
+  });
+});
+
+describe('getRotatedBoxInset', () => {
+  test('is zero when the field is not rotated', () => {
+    expect(getRotatedBoxInset({ width: 100, height: 20, rotate: 0 })).toEqual({ x: 0, y: 0 });
+  });
+
+  test('swaps the extents at 90 degrees (wide, short field becomes narrow and tall)', () => {
+    expect(getRotatedBoxInset({ width: 100, height: 20, rotate: 90 })).toEqual({ x: -40, y: 40 });
+  });
+
+  test('is symmetric for 180/270 degrees and negative angles', () => {
+    expect(getRotatedBoxInset({ width: 100, height: 20, rotate: 180 })).toEqual({ x: 0, y: 0 });
+    expect(getRotatedBoxInset({ width: 100, height: 20, rotate: 270 })).toEqual({ x: -40, y: 40 });
+    expect(getRotatedBoxInset({ width: 100, height: 20, rotate: -90 })).toEqual({ x: -40, y: 40 });
+  });
+
+  test('grows the box at 45 degrees', () => {
+    const { x, y } = getRotatedBoxInset({ width: 100, height: 20, rotate: 45 });
+    expect(x).toBeCloseTo(-7.5736, 3);
+    expect(y).toBeCloseTo(32.4264, 3);
+  });
+});
+
+describe('moveCommandToChangeSchemasArg with rotated schemas', () => {
+  const pageSize = { width: 210, height: 297 };
+  const make = (over: Partial<SchemaForUI>): SchemaForUI =>
+    ({ ...getSchema(), id: 's1', width: 100, height: 20, ...over }) as SchemaForUI;
+  const run = (command: 'up' | 'down' | 'left' | 'right', schema: SchemaForUI) =>
+    moveCommandToChangeSchemasArg({ command, activeSchemas: [schema], isShift: false, pageSize })[0]
+      .value;
+
+  test('unrotated fields keep the previous clamping', () => {
+    const s = make({ position: { x: 0, y: 0 } });
+    expect(run('left', s)).toBe(0);
+    expect(run('up', s)).toBe(0);
+    expect(run('right', make({ position: { x: 110, y: 0 } }))).toBe(110);
+    expect(run('right', make({ position: { x: 109.5, y: 0 } }))).toBe(110);
+  });
+
+  test('a 90deg rotated field can reach the left and top page edges', () => {
+    // visual box: 20 wide x 100 tall, centred on the un-rotated box
+    const s = make({ rotate: 90, position: { x: -39, y: 41 } });
+    expect(run('left', s)).toBe(-40);
+    expect(run('up', make({ rotate: 90, position: { x: 0, y: 41 } }))).toBe(40);
+  });
+
+  test('a 90deg rotated field can reach the right and bottom page edges', () => {
+    // un-rotated x max = 210 - 100 - (-40) = 150, y max = 297 - 20 - 40 = 237
+    expect(run('right', make({ rotate: 90, position: { x: 149.5, y: 0 } }))).toBe(150);
+    expect(run('down', make({ rotate: 90, position: { x: 0, y: 236.5 } }))).toBe(237);
+  });
+
+  test('a 90deg rotated field cannot be pushed past the edge', () => {
+    expect(run('left', make({ rotate: 90, position: { x: -40, y: 40 } }))).toBe(-40);
+    expect(run('up', make({ rotate: 90, position: { x: 0, y: 40 } }))).toBe(40);
+  });
+});
+
+describe('changeSchemas with rotated schemas', () => {
+  const pageSize = { width: 210, height: 297 };
+  const basePdf = { width: 210, height: 297, padding: [0, 0, 0, 0] };
+  const pluginsRegistry = pluginRegistry;
+
+  test('keeps rotated field edge positions when committed through changeSchemas', () => {
+    const schema = {
+      ...getSchema(),
+      id: 's1',
+      width: 100,
+      height: 20,
+      rotate: 90,
+      position: { x: 0, y: 50 },
+    } as SchemaForUI;
+
+    const commit = (objs: { key: string; value: unknown; schemaId: string }[]) => {
+      let result: SchemaForUI[] = [];
+      changeSchemas({
+        schemas: [schema],
+        objs,
+        commitSchemas: (s) => {
+          result = s;
+        },
+        basePdf,
+        pluginsRegistry,
+        pageSize,
+      });
+      return result[0].position;
+    };
+
+    expect(commit([{ key: 'position.x', value: -40, schemaId: 's1' }])).toEqual({ x: -40, y: 50 });
+    expect(commit([{ key: 'position.x', value: 150, schemaId: 's1' }])).toEqual({ x: 150, y: 50 });
+    expect(commit([{ key: 'position.y', value: 40, schemaId: 's1' }])).toEqual({ x: 0, y: 40 });
+    expect(commit([{ key: 'position.y', value: 237, schemaId: 's1' }])).toEqual({ x: 0, y: 237 });
+  });
+
+  test('clamps rotated field positions that exceed rotated limits in changeSchemas', () => {
+    const schema = {
+      ...getSchema(),
+      id: 's1',
+      width: 100,
+      height: 20,
+      rotate: 90,
+      position: { x: 0, y: 50 },
+    } as SchemaForUI;
+
+    const commit = (objs: { key: string; value: unknown; schemaId: string }[]) => {
+      let result: SchemaForUI[] = [];
+      changeSchemas({
+        schemas: [schema],
+        objs,
+        commitSchemas: (s) => {
+          result = s;
+        },
+        basePdf,
+        pluginsRegistry,
+        pageSize,
+      });
+      return result[0].position;
+    };
+
+    expect(commit([{ key: 'position.x', value: -50, schemaId: 's1' }])).toEqual({ x: -40, y: 50 });
+    expect(commit([{ key: 'position.x', value: 160, schemaId: 's1' }])).toEqual({ x: 150, y: 50 });
+    expect(commit([{ key: 'position.y', value: 30, schemaId: 's1' }])).toEqual({ x: 0, y: 40 });
+    expect(commit([{ key: 'position.y', value: 250, schemaId: 's1' }])).toEqual({ x: 0, y: 237 });
   });
 });

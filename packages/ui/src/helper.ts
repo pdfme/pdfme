@@ -123,6 +123,35 @@ export const flatten = <T>(arr: T[][]): T[] => ([] as T[]).concat(...arr);
 export const isRotatableSchema = (defaultSchema?: Record<string, unknown>): boolean =>
   typeof defaultSchema?.rotate !== 'undefined';
 
+/**
+ * How far the rotated (visual) bounding box of a field sticks out past its
+ * un-rotated box, per axis, in the same unit as the inputs (mm in the Designer).
+ *
+ * CSS `rotate()` pivots on the box centre, so both boxes share a centre. A positive
+ * value means the rotated box is larger than the un-rotated one on that axis; a
+ * negative value means it is smaller (e.g. a wide, short field rotated by 90deg).
+ * `position.x/y` always describe the un-rotated box, so a bounds check on the visual
+ * edge has to shift the allowed range for `position` by this inset.
+ */
+export const getRotatedBoxInset = ({
+  width,
+  height,
+  rotate,
+}: {
+  width: number;
+  height: number;
+  rotate: number;
+}): { x: number; y: number } => {
+  const rad = (rotate * Math.PI) / 180;
+  const cos = Math.abs(Math.cos(rad));
+  const sin = Math.abs(Math.sin(rad));
+
+  return {
+    x: round((width * cos + height * sin - width) / 2, 4),
+    y: round((width * sin + height * cos - height) / 2, 4),
+  };
+};
+
 /** Plugins with an intrinsic aspect ratio keep their box ratio on canvas resize without Shift. */
 export const isAspectRatioLockedPlugin = (plugin?: Plugin): boolean =>
   typeof plugin?.getAspectRatio === 'function';
@@ -468,19 +497,23 @@ export const moveCommandToChangeSchemasArg = (props: {
         break;
     }
 
-    return value > 0 ? value : 0;
+    return value;
   };
 
   return activeSchemas.map((as) => {
-    let value = getValue(as);
+    const value = getValue(as);
     const { width, height } = as;
-    if (key === 'x') {
-      value = value > pageSize.width - width ? round(pageSize.width - width, 2) : value;
-    } else {
-      value = value > pageSize.height - height ? round(pageSize.height - height, 2) : value;
-    }
+    // position.x/y describe the un-rotated box, so keep the *rotated* box inside the page.
+    const inset = getRotatedBoxInset({ width, height, rotate: as.rotate ?? 0 });
+    const insetOnAxis = key === 'x' ? inset.x : inset.y;
+    const min = round(insetOnAxis, 2);
+    const max = round(
+      (key === 'x' ? pageSize.width - width : pageSize.height - height) - insetOnAxis,
+      2,
+    );
+    const clamped = value > max ? max : value < min ? min : value;
 
-    return { key: `position.${key}`, value, schemaId: as.id };
+    return { key: `position.${key}`, value: clamped, schemaId: as.id };
   });
 };
 
@@ -661,10 +694,15 @@ const handlePositionSizeChange = (
   const { width: pw, height: ph } = pageSize;
   const calcBounds = (v: unknown, min: number, max: number) =>
     Math.min(Math.max(Number(v), min), max);
+  const inset = getRotatedBoxInset({
+    width: schema.width,
+    height: schema.height,
+    rotate: schema.rotate ?? 0,
+  });
   if (key === 'position.x') {
-    schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
+    schema.position.x = calcBounds(value, pl + inset.x, pw - schema.width - pr - inset.x);
   } else if (key === 'position.y') {
-    schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
+    schema.position.y = calcBounds(value, pt + inset.y, ph - schema.height - pb - inset.y);
   } else if (key === 'width') {
     schema.width = calcBounds(value, 0, pw - schema.position.x - pr);
   } else if (key === 'height') {

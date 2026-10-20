@@ -30,6 +30,7 @@ import {
   uuid,
   isRotatableSchema,
   isAspectRatioLockedPlugin,
+  getRotatedBoxInset,
 } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
@@ -47,6 +48,11 @@ const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
+const getRotate = (target: HTMLElement | SVGElement) => {
+  const match = /rotate\(([^)]+?)deg\)/.exec(target.style.transform);
+  const rotate = match ? Number(match[1]) : 0;
+  return Number.isFinite(rotate) ? rotate : 0;
+};
 
 const DeleteButton = ({
   activeElements: aes,
@@ -200,6 +206,12 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const targetHeight = fmt(_height);
     const actualTop = top / ZOOM;
     const actualLeft = left / ZOOM;
+    // top/left describe the un-rotated box; shift the limits so the rotated box can reach the page edge.
+    const { x: insetX, y: insetY } = getRotatedBoxInset({
+      width: targetWidth,
+      height: targetHeight,
+      rotate: getRotate(target),
+    });
     const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
     let topPadding = 0;
     let rightPadding = 0;
@@ -214,16 +226,18 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       leftPadding = l * ZOOM;
     }
 
-    if (actualTop + targetHeight > pageHeight - bottomPadding) {
-      target.style.top = `${(pageHeight - targetHeight - bottomPadding) * ZOOM}px`;
+    if (actualTop + targetHeight + insetY > pageHeight - bottomPadding) {
+      target.style.top = `${(pageHeight - targetHeight - insetY - bottomPadding) * ZOOM}px`;
     } else {
-      target.style.top = `${top < topPadding ? topPadding : top}px`;
+      const minTop = topPadding + insetY * ZOOM;
+      target.style.top = `${top < minTop ? minTop : top}px`;
     }
 
-    if (actualLeft + targetWidth > pageWidth - rightPadding) {
-      target.style.left = `${(pageWidth - targetWidth - rightPadding) * ZOOM}px`;
+    if (actualLeft + targetWidth + insetX > pageWidth - rightPadding) {
+      target.style.left = `${(pageWidth - targetWidth - insetX - rightPadding) * ZOOM}px`;
     } else {
-      target.style.left = `${left < leftPadding ? leftPadding : left}px`;
+      const minLeft = leftPadding + insetX * ZOOM;
+      target.style.left = `${left < minLeft ? minLeft : left}px`;
     }
   };
 
