@@ -738,11 +738,9 @@ test('Preview(as Form) renders staticSchema multiVariableText without throwing',
   expect(getSelectableElement(container, 'pageMvt')).toBeInTheDocument();
 });
 
-const renderReadOnlyMvtPreview = (onChangeInput?: (arg: {
-  index: number;
-  value: string;
-  name: string;
-}) => void) =>
+const renderReadOnlyMvtPreview = (
+  onChangeInput?: (arg: { index: number; value: string; name: string }) => void,
+) =>
   render(
     <I18nContext.Provider value={i18n}>
       <FontContext.Provider value={getDefaultFont()}>
@@ -912,4 +910,42 @@ test('Preview resolves {currentPage} in read-only fields to the page number', as
   await waitFor(() => {
     expect(getSelectableElement(container, 'pageLabel')).toHaveTextContent('2/2');
   });
+});
+
+test('Preview leaves a template without dynamic layout schemas as is, like the generator', async () => {
+  setupUIMock();
+  const template: Template = {
+    basePdf: { width: 100, height: 100, padding: [20, 10, 20, 10] },
+    schemas: [
+      [
+        {
+          name: 'inPadding',
+          type: 'text',
+          content: '',
+          position: { x: 10, y: 5 },
+          width: 60,
+          height: 10,
+          fontSize: 10,
+        },
+      ],
+    ],
+  };
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={plugins}>
+          <Preview
+            template={template}
+            inputs={[{ inPadding: 'text' }]}
+            size={{ width: 1200, height: 1200 }}
+          />
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+
+  await waitFor(() => {
+    expect(container.querySelectorAll('[data-pdfme-render-ready="true"]').length).toBe(1);
+  });
+  expect(getTop(container.querySelector('[title="inPadding"]'))).toBeCloseTo(5 * ZOOM);
 });

@@ -729,6 +729,72 @@ describe('getDynamicTemplate', () => {
   });
 });
 
+describe('getDynamicTemplate with rotated schemas (#1683)', () => {
+  const field = (name: string, over: Partial<Schema>): Schema => ({
+    name,
+    type: 'static',
+    content: name,
+    position: { x: 10, y: 0 },
+    width: 10,
+    height: 10,
+    ...over,
+  });
+
+  const layout = (schemas: Schema[], heights: Record<string, number[]>) =>
+    getDynamicTemplate({
+      template: { schemas: [schemas], basePdf: { width: 100, height: 100, padding: [0, 0, 0, 0] } },
+      input: {},
+      options: {},
+      _cache: new Map(),
+      getDynamicHeights: async (_value: string, { schema }: { schema: Schema }) =>
+        heights[schema.name] ?? [schema.height],
+    });
+
+  const find = (template: Template, page: number, name: string) =>
+    template.schemas[page].find((s) => s.name === name)!;
+
+  // 20x60 at 90deg is drawn 60 wide and 20 tall; at y = 50 its visible box spans y 70..90.
+  const rotated = (y: number) =>
+    field('r', { width: 20, height: 60, rotate: 90, position: { x: 50, y } });
+
+  test('pushes a rotated field by its visible box and keeps it on the page', async () => {
+    const result = await layout([field('grow', {}), rotated(50)], { grow: [10, 10] });
+
+    expect(result.schemas.length).toBe(1);
+    expect(find(result, 0, 'r')).toMatchObject({ position: { x: 50, y: 60 }, height: 60 });
+  });
+
+  test('moves a rotated field to the next page whole when its visible box no longer fits', async () => {
+    const result = await layout([field('grow', {}), rotated(50)], { grow: [10, 10, 10] });
+
+    expect(result.schemas.length).toBe(2);
+    // Visible top at 0 on the new page: y = 0 + (50 - 70).
+    expect(find(result, 1, 'r')).toMatchObject({ position: { x: 50, y: -20 }, height: 60 });
+  });
+
+  test('keeps a rotated field whose visible box starts at the page top', async () => {
+    const result = await layout([rotated(-20), field('grow', { position: { x: 10, y: 30 } })], {
+      grow: [10, 10],
+    });
+
+    expect(find(result, 0, 'r').position).toEqual({ x: 50, y: -20 });
+    expect(find(result, 0, 'grow')).toMatchObject({ position: { y: 30 }, height: 20 });
+  });
+
+  test('grows a rotated dynamic field as one block without splitting it', async () => {
+    // 30x10 at 90deg at y = 60 is drawn 10 wide and 30 tall over y 50..80.
+    const dynamic = field('d', { width: 30, height: 10, rotate: 90, position: { x: 10, y: 60 } });
+    const below = field('below', { position: { x: 50, y: 85 } });
+    const result = await layout([dynamic, below], { d: [10, 10, 10, 10] });
+
+    expect(result.schemas.length).toBe(1);
+    expect(result.schemas[0].filter((s) => s.name === 'd')).toHaveLength(1);
+    // Height 40 keeps the visible box at y 50..80: y + (40 - 30) / 2 = 50.
+    expect(find(result, 0, 'd')).toMatchObject({ position: { y: 45 }, height: 40 });
+    expect(find(result, 0, 'below').position.y).toBe(85);
+  });
+});
+
 describe('getSchemaValue / getReadOnlyTableValue (#1299)', () => {
   const designerDefault = JSON.stringify([
     ['Alice', 'New York', 'Alice is a freelance web designer and developer'],

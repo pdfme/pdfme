@@ -20,7 +20,7 @@ import {
   registerInternalLinkAnchor,
   resetInternalLinkAnnotations,
 } from '@pdfme/common';
-import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
+import { getDynamicLayoutForSchema, hasDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
 import {
   insertPage,
   preprocessing,
@@ -28,18 +28,6 @@ import {
   getEmbedPdfPages,
   validateRequiredFields,
 } from './helper.js';
-
-const hasDynamicLayoutSchema = (schemas: Schema[][]) => {
-  for (let i = 0; i < schemas.length; i += 1) {
-    const schemaPage = schemas[i];
-    for (let j = 0; j < schemaPage.length; j += 1) {
-      if (isDynamicLayoutSchema(schemaPage[j])) {
-        return true;
-      }
-    }
-  }
-  return false;
-};
 
 const getAdjustedSchema = (
   schema: Schema,
