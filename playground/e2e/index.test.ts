@@ -609,6 +609,69 @@ describe('Playground E2E Tests', () => {
     await generateAndComparePDF(page, browser, 'final-form');
   });
 
+  it('should render the Designer property panel with the Designer theme', async () => {
+    if (!page) throw new Error('Browser/Page not initialized');
+
+    await loadRouteWithStorage(page, '/designer', { template: buildModifiedTemplate() });
+    await waitForDesignerReady(page, 'Type Something...');
+
+    const fieldName = modifiedTemplateFieldNames.text;
+    await page.evaluate((name) => {
+      const label = [...document.querySelectorAll('span')].find(
+        (el) => el.textContent?.trim() === name,
+      );
+      if (!label) throw new Error(`Field "${name}" not found in the field list`);
+      label.click();
+    }, fieldName);
+
+    const checkedCheckbox = '.fr-form .ant-checkbox-checked';
+    await page.waitForSelector(checkedCheckbox, { timeout });
+    const checkboxColor = await page.$eval(
+      checkedCheckbox,
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+
+    // The playground Designer sets theme.token.colorPrimary to #25c2a0.
+    expect(checkboxColor).toBe('rgb(37, 194, 160)');
+
+    const panelStyles = await page.evaluate(() => {
+      const form = document.querySelector('.fr-form');
+      if (!form) throw new Error('Property panel form not found');
+      const style = (el: Element | null | undefined, pseudo?: string) => {
+        if (!el) throw new Error('Property panel element not found');
+        return getComputedStyle(el, pseudo);
+      };
+      const headerTitle = [...form.querySelectorAll('*')].find(
+        (el) => el.childElementCount === 0 && el.textContent?.trim() === 'Border Width',
+      );
+      let headerLine = headerTitle?.parentElement;
+      while (headerLine && parseFloat(style(headerLine).borderBottomWidth) === 0) {
+        headerLine = headerLine.parentElement;
+      }
+      const emptyInput = [...form.querySelectorAll<HTMLInputElement>('input[placeholder]')].find(
+        (input) => !input.value,
+      );
+      return {
+        inputBorder: style(form.querySelector('.ant-input-number')).borderTopColor,
+        placeholder: style(emptyInput, '::placeholder').color,
+        headerTitleColor: style(headerTitle).color,
+        headerTitleIsThemed: !!headerTitle?.closest('.ant-typography'),
+        formLabelColor: style(form.querySelector('.ant-form-item-label > label')).color,
+        headerLine: style(headerLine).borderBottomColor,
+        dividerLine: style(document.querySelector('.ant-divider')).borderTopColor,
+      };
+    });
+
+    // Light theme tokens resolved by @pdfme/ui (packages/ui/src/theme.ts).
+    expect(panelStyles.inputBorder).toBe('rgb(142, 142, 142)');
+    expect(panelStyles.placeholder).toBe('rgba(0, 0, 0, 0.65)');
+    // Section headers ("Border Width") use the theme text color and the
+    // panel divider line instead of form-render's hardcoded CSS.
+    expect(panelStyles.headerLine).toBe(panelStyles.dividerLine);
+    expect(panelStyles.headerTitleIsThemed).toBe(true);
+    expect(panelStyles.headerTitleColor).toBe(panelStyles.formLabelColor);
+  });
+
   it('should keep the header and menus usable on a mobile viewport', async () => {
     if (!browser) throw new Error('Browser not initialized');
 

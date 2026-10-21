@@ -22,6 +22,8 @@ import WidgetRenderer from './WidgetRenderer.js';
 import ButtonGroupWidget from './ButtonGroupWidget.js';
 import ColorWidget from './ColorWidget.js';
 import type { ColorWidgetProps } from './ColorWidget.js';
+import LineTitleWidget from './LineTitleWidget.js';
+import type { LineTitleWidgetProps } from './LineTitleWidget.js';
 import { expandSameTypeBulkUpdateChanges } from './schemaChangeHelpers.js';
 import { InternalNamePath, ValidateErrorEntity } from 'rc-field-form/es/interface.js';
 import { SidebarBody, SidebarFrame, SidebarHeader, SIDEBAR_H_PADDING_PX } from '../layout.js';
@@ -121,6 +123,8 @@ const DetailView = (props: DetailViewProps) => {
       ),
       // Override form-render's built-in `color` widget
       color: (p) => <ColorWidget {...(p as unknown as ColorWidgetProps)} />,
+      // Override form-render's built-in `lineTitle` widget (section headers)
+      lineTitle: (p) => <LineTitleWidget {...(p as unknown as LineTitleWidgetProps)} />,
     };
     for (const plugin of pluginsRegistry.values()) {
       const pluginWidgets = (plugin.propPanel.widgets ?? {}) as Record<
