@@ -59,7 +59,11 @@ type TemplateEditorProps = Omit<DesignerProps, 'domContainer'> & {
   onUpdateTemplatePageApplied?: (page: number) => void;
   onPageCursorChange: (newPageCursor: number, totalPages: number) => void;
   updateTemplatePage?: number;
+  /** Applied once per new reference, overriding the user's sidebar toggle. */
+  sidebarOpenRequest?: SidebarOpenRequest;
 };
+
+export type SidebarOpenRequest = { open: boolean };
 
 type PendingScrollPage = {
   page: number;
@@ -135,6 +139,7 @@ const TemplateEditor = ({
   onRegisterSchemaSelectionHandler,
   onUpdateTemplatePageApplied,
   updateTemplatePage,
+  sidebarOpenRequest,
 }: TemplateEditorProps) => {
   const past = useRef<DesignerHistoryEntry[]>([]);
   const future = useRef<DesignerHistoryEntry[]>([]);
@@ -170,6 +175,11 @@ const TemplateEditor = ({
   const [sidebarOpen, setSidebarOpen] = useState(
     options.sidebarOpen ?? canvasWidth - rightSidebarWidth >= MIN_CANVAS_WIDTH,
   );
+  const [appliedSidebarOpenRequest, setAppliedSidebarOpenRequest] = useState(sidebarOpenRequest);
+  if (sidebarOpenRequest !== appliedSidebarOpenRequest) {
+    setAppliedSidebarOpenRequest(sidebarOpenRequest);
+    if (sidebarOpenRequest) setSidebarOpen(sidebarOpenRequest.open);
+  }
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
   // Page backgrounds and sizes follow the edited document, not the loaded
@@ -317,12 +327,6 @@ const TemplateEditor = ({
       setZoomLevel(options.zoomLevel);
     }
   }, [options.zoomLevel, setZoomLevel]);
-
-  useEffect(() => {
-    if (typeof options.sidebarOpen === 'boolean') {
-      setSidebarOpen(options.sidebarOpen);
-    }
-  }, [options.sidebarOpen]);
 
   const armScrollSuppression = (fallbackMs?: number) => {
     const token = ++scrollSuppressTokenRef.current;

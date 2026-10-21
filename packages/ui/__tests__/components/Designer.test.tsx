@@ -2143,3 +2143,116 @@ describe('re-rendering keeps the editing session (#1691)', () => {
     }
   });
 });
+
+describe('options.sidebarOpen', () => {
+  const getSidebar = (domContainer: HTMLElement) =>
+    domContainer.querySelector(`.${DESIGNER_CLASSNAME}right-sidebar`) as HTMLDivElement;
+  const toggleSidebar = (domContainer: HTMLElement) =>
+    fireEvent.click(domContainer.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+  const OPEN = `${RIGHT_SIDEBAR_WIDTH}px`;
+  const CLOSED = '0px';
+
+  test('reopens a sidebar the user closed when the same value is set again', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(
+      getOnePageBlankTemplate(),
+      plugins,
+      (created) => created.updateOptions({ sidebarOpen: true }),
+    );
+
+    try {
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(OPEN));
+      toggleSidebar(domContainer);
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(CLOSED));
+
+      await act(async () => {
+        designer.updateOptions({ sidebarOpen: true });
+      });
+      expect(getSidebar(domContainer).style.width).toBe(OPEN);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('closes a sidebar the user opened when the same value is set again', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(
+      getOnePageBlankTemplate(),
+      plugins,
+      (created) => created.updateOptions({ sidebarOpen: false }),
+    );
+
+    try {
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(CLOSED));
+      toggleSidebar(domContainer);
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(OPEN));
+
+      await act(async () => {
+        designer.updateOptions({ sidebarOpen: false });
+      });
+      expect(getSidebar(domContainer).style.width).toBe(CLOSED);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('re-renders and unrelated option updates keep the user toggle', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(
+      getOnePageBlankTemplate(),
+      plugins,
+      (created) => created.updateOptions({ sidebarOpen: true }),
+    );
+
+    try {
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(OPEN));
+      toggleSidebar(domContainer);
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(CLOSED));
+
+      await act(async () => {
+        designer.updateOptions({});
+      });
+      await act(async () => {
+        designer.updateOptions({ requiredByDefault: true });
+      });
+      await act(async () => {
+        designer.updateTemplate(getOnePageBlankTemplate());
+      });
+      expect(designer.getOptions().sidebarOpen).toBe(true);
+      expect(getSidebar(domContainer).style.width).toBe(CLOSED);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('an onChangeSelection callback can reopen the sidebar for each new selection (#1691)', async () => {
+    const template: Template = {
+      basePdf: BLANK_A4_PDF,
+      schemas: [[textField('field1'), { ...textField('field2'), position: { x: 20, y: 60 } }]],
+    };
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(
+      template,
+      plugins,
+      (created) =>
+        created.onChangeSelection(({ schemas }) => {
+          created.updateOptions({ sidebarOpen: schemas.length > 0 });
+        }),
+    );
+
+    try {
+      await waitFor(() => expect(domContainer.querySelector('[title="field2"]')).toBeTruthy());
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(OPEN));
+
+      toggleSidebar(domContainer);
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(CLOSED));
+
+      await act(async () => {
+        designer.selectSchemas('field2');
+      });
+      await waitFor(() => expect(getSidebar(domContainer).style.width).toBe(OPEN));
+      expect(designer.getSelectedSchemas().map(({ name }) => name)).toEqual(['field2']);
+    } finally {
+      cleanup();
+    }
+  });
+});
