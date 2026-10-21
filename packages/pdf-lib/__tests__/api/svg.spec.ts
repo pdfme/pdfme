@@ -155,4 +155,169 @@ describe('PDFPage.drawSvg', () => {
       }),
     );
   });
+
+  it('applies stroke-dasharray and stroke-dashoffset to stroked shapes', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="40" height="40">
+        <line x1="0" y1="0" x2="10" y2="0" stroke="#000" stroke-dasharray="4 2" stroke-dashoffset="1"/>
+        <path d="M0 5L10 5" stroke="#000" fill="none" stroke-dasharray="4,2" stroke-dashoffset="1"/>
+        <rect width="10" height="10" stroke="#000" style="stroke-dasharray: 4, 2; stroke-dashoffset: 1"/>
+        <circle cx="20" cy="20" r="5" stroke="#000" stroke-dasharray="4 2" stroke-dashoffset="1"/>
+        <polygon points="0,0 10,0 10,10" stroke="#000" stroke-dasharray="4 2" stroke-dashoffset="1"/>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    expect(content.match(/\[4 2\] 1 d/g) ?? []).toHaveLength(5);
+    expect(content).not.toContain('[] 0 d');
+  });
+
+  it('inherits dash patterns from groups and lets children reset them', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3" stroke-dashoffset="-1">
+          <path d="M0 0L10 0" fill="none"/>
+          <path d="M0 5L10 5" fill="none" stroke-dasharray="none"/>
+          <path d="M0 10L10 10" fill="none" stroke-dasharray="10%"/>
+        </g>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    // An odd-length list is repeated, and a negative offset is wrapped into the pattern.
+    expect(content).toContain('[3 3] 5 d');
+    expect(content).toContain('[] 0 d');
+    // Percentages refer to the normalized diagonal of the 20x20 viewport.
+    expect(content).toContain('[2 2] 3 d');
+  });
+
+  it('draws solid strokes for zero-length or invalid dash arrays', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <path d="M0 0L10 0" stroke="#000" fill="none" stroke-dasharray="0 0"/>
+        <path d="M0 5L10 5" stroke="#000" fill="none" stroke-dasharray="4 -2"/>
+        <path d="M0 10L10 10" stroke="#000" fill="none" stroke-dasharray="4 abc"/>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    expect(content.match(/\[\] 0 d/g) ?? []).toHaveLength(3);
+  });
+
+  it('resolves dash percentages against the nearest viewport of the stroked element', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([200, 200]);
+
+    await page.drawSvg(
+      `<svg width="100" height="100">
+        <path d="M0 0L10 0" stroke="#000" fill="none" stroke-dasharray="10%" stroke-dashoffset="5%"/>
+        <svg width="20" height="20" viewBox="0 0 20 20" stroke-dasharray="10%" stroke-dashoffset="5%">
+          <path d="M0 5L10 5" stroke="#000" fill="none"/>
+        </svg>
+        <g stroke-dasharray="20%" stroke-dashoffset="15%">
+          <svg width="20" height="20" viewBox="0 0 20 20">
+            <path d="M0 10L10 10" stroke="#000" fill="none"/>
+          </svg>
+        </g>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    expect(content).toContain('[10 10] 5 d');
+    // Inherited percentages are resolved against the nested 20x20 viewport.
+    expect(content).toContain('[2 2] 1 d');
+    expect(content).toContain('[4 4] 3 d');
+  });
+
+  it('ignores dash declarations with trailing garbage after a number', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3" stroke-dashoffset="1">
+          <path d="M0 0L10 0" fill="none" stroke-dasharray="4 2abc"/>
+          <path d="M0 5L10 5" fill="none" stroke-dashoffset="2abc"/>
+          <path d="M0 10L10 10" fill="none" stroke-dasharray="4px, 2" stroke-dashoffset="1px"/>
+        </g>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    // Invalid declarations are ignored, so the inherited pattern and offset apply.
+    expect(content.match(/\[3 3\] 1 d/g) ?? []).toHaveLength(2);
+    expect(content).toContain('[4 2] 1 d');
+  });
+
+  it('ignores non-finite dash lengths and offsets', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3" stroke-dashoffset="1">
+          <line x1="0" y1="0" x2="10" y2="0" stroke-dashoffset="Infinity"/>
+          <path d="M0 5L10 5" fill="none" stroke-dasharray="4 1e999"/>
+          <path d="M0 10L10 10" fill="none" stroke-dasharray="4 Infinity"/>
+        </g>
+      </svg>`,
+    );
+
+    const content = getPageContent(page);
+
+    expect(content.match(/\[3 3\] 1 d/g) ?? []).toHaveLength(3);
+    expect(content).not.toContain('NaN');
+  });
+
+  it('rejects long invalid dash tokens quickly', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+    const token = `${'1'.repeat(100_000)}x`;
+
+    const start = Date.now();
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3" stroke-dashoffset="1">
+          <path d="M0 0L10 0" fill="none" stroke-dasharray="${token}"/>
+          <path d="M0 5L10 5" fill="none" stroke-dashoffset="${token}"/>
+        </g>
+      </svg>`,
+    );
+    const elapsed = Date.now() - start;
+
+    const content = getPageContent(page);
+
+    // The invalid tokens are ignored, so the inherited pattern and offset apply.
+    expect(content.match(/\[3 3\] 1 d/g) ?? []).toHaveLength(2);
+    expect(elapsed).toBeLessThan(1000);
+  });
+
+  it('accepts none in any case', async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([100, 100]);
+
+    await page.drawSvg(
+      `<svg width="20" height="20">
+        <g stroke="#000" stroke-dasharray="3">
+          <path d="M0 0L10 0" fill="none" stroke-dasharray="NONE"/>
+        </g>
+      </svg>`,
+    );
+
+    expect(getPageContent(page)).not.toContain('[3 3]');
+  });
 });
