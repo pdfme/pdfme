@@ -6,6 +6,7 @@ import {
   pt2mm,
   pt2px,
   checkGenerateProps,
+  checkUIOptions,
   checkFont,
   checkPlugins,
   isHexValid,
@@ -54,6 +55,20 @@ const getTemplate = (): Template => ({
       },
     ],
   ],
+});
+
+describe('sidebar width options', () => {
+  it('accepts omitted widths and positive custom widths', () => {
+    expect(() => checkUIOptions({})).not.toThrow();
+    expect(() =>
+      checkUIOptions({ leftSidebarWidth: 100, rightSidebarWidth: 450 }),
+    ).not.toThrow();
+  });
+
+  it.each([0, -1, NaN, Infinity, -Infinity])('rejects invalid width %s', (width) => {
+    expect(() => checkUIOptions({ leftSidebarWidth: width })).toThrow();
+    expect(() => checkUIOptions({ rightSidebarWidth: width })).toThrow();
+  });
 });
 
 describe('mm2pt test', () => {

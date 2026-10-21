@@ -89,6 +89,8 @@ const designer = new Designer({
   options: {
     zoomLevel: 1.5,
     sidebarOpen: false,  // (Designer only)
+    leftSidebarWidth: 100,  // (Designer only) default: 45px
+    rightSidebarWidth: 450,  // (Designer only) default: 400px
   }
 });
 
@@ -98,3 +100,7 @@ designer.updateOptions({
   sidebarOpen: true
 });
 ```
+
+`leftSidebarWidth` and `rightSidebarWidth` (Designer only) set the widths of the left plugin sidebar and the right property panel sidebar in pixels. They accept positive numbers and default to 45px and 400px respectively.
+
+Note: very small widths clip the plugin buttons and the property panel.

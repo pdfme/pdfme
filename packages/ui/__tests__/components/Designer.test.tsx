@@ -453,6 +453,59 @@ test('Designer keeps sidebar toggle interactive when options.sidebarOpen is only
   });
 });
 
+test.each([
+  { viewportWidth: 1200, leftWidth: 100, rightWidth: 450, initiallyOpen: true },
+  { viewportWidth: 600, leftWidth: 100, rightWidth: 450, initiallyOpen: false },
+  { viewportWidth: 320, leftWidth: 400, rightWidth: 450, initiallyOpen: false },
+])('Designer respects custom sidebar widths at $viewportWidth px', async ({
+  viewportWidth,
+  leftWidth,
+  rightWidth,
+  initiallyOpen,
+}) => {
+  setupUIMock();
+  const { container } = render(
+    <I18nContext.Provider value={i18n}>
+      <FontContext.Provider value={getDefaultFont()}>
+        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+          <OptionsContext.Provider
+            value={{ leftSidebarWidth: leftWidth, rightSidebarWidth: rightWidth }}
+          >
+            <Designer
+              template={getSampleTemplate()}
+              onSaveTemplate={vi.fn()}
+              onChangeTemplate={vi.fn()}
+              size={{ width: viewportWidth, height: 1200 }}
+              onPageCursorChange={vi.fn()}
+            />
+          </OptionsContext.Provider>
+        </PluginsRegistry.Provider>
+      </FontContext.Provider>
+    </I18nContext.Provider>,
+  );
+  const leftSidebar = container.querySelector(`.${DESIGNER_CLASSNAME}left-sidebar`) as HTMLElement;
+  const rightSidebar = container.querySelector(`.${DESIGNER_CLASSNAME}right-sidebar`) as HTMLElement;
+  const canvas = container.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLElement;
+  const canvasContainer = canvas.parentElement!;
+
+  expect(leftSidebar.style.width).toBe(`${leftWidth}px`);
+  expect(canvasContainer.style.marginLeft).toBe(`${leftWidth}px`);
+  expect(canvasContainer.style.width).toBe(`${Math.max(viewportWidth - leftWidth, 0)}px`);
+
+  const expectLayout = (open: boolean) => {
+    expect(rightSidebar.style.width).toBe(`${open ? rightWidth : 0}px`);
+    expect(canvas.style.marginRight).toBe(`${open ? rightWidth : 0}px`);
+    expect(canvas.style.width).toBe(
+      `${Math.max(viewportWidth - leftWidth - (open ? rightWidth : 0), 0)}px`,
+    );
+  };
+  await waitFor(() => expectLayout(initiallyOpen));
+  fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+  await waitFor(() => expectLayout(!initiallyOpen));
+  fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+  await waitFor(() => expectLayout(initiallyOpen));
+});
+
 test('Designer renders staticSchema multiVariableText without throwing', async () => {
   setupUIMock();
   mockStableUuids();

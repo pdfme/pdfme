@@ -20,7 +20,7 @@ import {
   isBlankPdf,
   resolveReadOnlyContent,
 } from '@pdfme/common';
-import { PluginsRegistry } from '../../../contexts.js';
+import { OptionsContext, PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
 import { RULER_HEIGHT, RIGHT_SIDEBAR_WIDTH, DESIGNER_CLASSNAME } from '../../../constants.js';
 import { usePrevious } from '../../../hooks.js';
@@ -142,6 +142,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   } = props;
   const { token } = theme.useToken();
   const pluginsRegistry = useContext(PluginsRegistry);
+  const options = useContext(OptionsContext);
   const verticalGuides = useRef<GuidesInterface[]>([]);
   const horizontalGuides = useRef<GuidesInterface[]>([]);
   const moveable = useRef<MoveableComponent>(null);
@@ -382,7 +383,7 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
       style={{
         position: 'relative',
         overflow: 'auto',
-        marginRight: sidebarOpen ? RIGHT_SIDEBAR_WIDTH : 0,
+        marginRight: sidebarOpen ? (options.rightSidebarWidth ?? RIGHT_SIDEBAR_WIDTH) : 0,
         ...size,
       }}
       ref={ref}

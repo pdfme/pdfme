@@ -150,7 +150,9 @@ const TemplateEditor = ({
   const options = useContext(OptionsContext);
   const maxZoom = useMaxZoom();
 
-  const canvasWidth = size.width - LEFT_SIDEBAR_WIDTH;
+  const leftSidebarWidth = options.leftSidebarWidth ?? LEFT_SIDEBAR_WIDTH;
+  const rightSidebarWidth = options.rightSidebarWidth ?? RIGHT_SIDEBAR_WIDTH;
+  const canvasWidth = Math.max(size.width - leftSidebarWidth, 0);
 
   const [hoveringSchemaId, setHoveringSchemaId] = useState<string | null>(null);
   const [activeElements, setActiveElements] = useState<HTMLElement[]>([]);
@@ -164,7 +166,7 @@ const TemplateEditor = ({
   // Close the sidebar by default on narrow viewports (e.g. smartphones) where
   // it would not leave any usable canvas width.
   const [sidebarOpen, setSidebarOpen] = useState(
-    options.sidebarOpen ?? canvasWidth - RIGHT_SIDEBAR_WIDTH >= MIN_CANVAS_WIDTH,
+    options.sidebarOpen ?? canvasWidth - rightSidebarWidth >= MIN_CANVAS_WIDTH,
   );
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
@@ -174,10 +176,10 @@ const TemplateEditor = ({
       // Never let the width go negative; on narrow viewports the open sidebar
       // can be wider than the screen, which previously produced a negative
       // base scale and left the Designer stuck on the loading spinner.
-      width: Math.max(sidebarOpen ? canvasWidth - RIGHT_SIDEBAR_WIDTH : canvasWidth, 0),
+      width: Math.max(sidebarOpen ? canvasWidth - rightSidebarWidth : canvasWidth, 0),
       height: size.height,
     }),
-    [canvasWidth, sidebarOpen, size.height],
+    [canvasWidth, rightSidebarWidth, sidebarOpen, size.height],
   );
 
   const { backgrounds, pageSizes, baseScale, error, refresh } = useUIPreProcessor({
@@ -736,7 +738,7 @@ const TemplateEditor = ({
           style={{
             position: 'absolute',
             width: canvasWidth,
-            marginLeft: LEFT_SIDEBAR_WIDTH,
+            marginLeft: leftSidebarWidth,
           }}
         >
           <CtlBar
