@@ -134,14 +134,6 @@ const designerSnapshotOptions: MatchImageOptions = {
   allowedPixelRatio: 0.06,
 };
 
-// Scoped to the property panel so theme token changes (control borders,
-// placeholders, section headers) are not lost in the full-page tolerance:
-// a border color change is ~0.16% of the full Designer but ~2% of the panel.
-const propertyPanelSnapshotOptions: MatchImageOptions = {
-  ...snapshotOptions,
-  allowedPixelRatio: 0.005,
-};
-
 const replayPdfSnapshotOptions: MatchImageOptions = {
   ...snapshotOptions,
   allowedPixelRatio: 0.05,
@@ -620,9 +612,6 @@ describe('Playground E2E Tests', () => {
   it('should render the Designer property panel with the Designer theme', async () => {
     if (!page) throw new Error('Browser/Page not initialized');
 
-    // Tall enough to show the whole text property panel without scrolling.
-    await page.setViewport({ ...viewport, height: 1400 });
-    onTestFinished(() => page?.setViewport(viewport));
     await loadRouteWithStorage(page, '/designer', { template: buildModifiedTemplate() });
     await waitForDesignerReady(page, 'Type Something...');
 
@@ -645,12 +634,42 @@ describe('Playground E2E Tests', () => {
     // The playground Designer sets theme.token.colorPrimary to #25c2a0.
     expect(checkboxColor).toBe('rgb(37, 194, 160)');
 
-    const rightSidebar = await page.$('.pdfme-designer-right-sidebar');
-    if (!rightSidebar) throw new Error('Designer right sidebar not found');
-    await expect(Buffer.from(await rightSidebar.screenshot({ type: 'png' }))).toMatchImage({
-      ...propertyPanelSnapshotOptions,
-      name: 'designer-property-panel',
+    const panelStyles = await page.evaluate(() => {
+      const form = document.querySelector('.fr-form');
+      if (!form) throw new Error('Property panel form not found');
+      const style = (el: Element | null | undefined, pseudo?: string) => {
+        if (!el) throw new Error('Property panel element not found');
+        return getComputedStyle(el, pseudo);
+      };
+      const headerTitle = [...form.querySelectorAll('*')].find(
+        (el) => el.childElementCount === 0 && el.textContent?.trim() === 'Border Width',
+      );
+      let headerLine = headerTitle?.parentElement;
+      while (headerLine && parseFloat(style(headerLine).borderBottomWidth) === 0) {
+        headerLine = headerLine.parentElement;
+      }
+      const emptyInput = [...form.querySelectorAll<HTMLInputElement>('input[placeholder]')].find(
+        (input) => !input.value,
+      );
+      return {
+        inputBorder: style(form.querySelector('.ant-input-number')).borderTopColor,
+        placeholder: style(emptyInput, '::placeholder').color,
+        headerTitleColor: style(headerTitle).color,
+        headerTitleIsThemed: !!headerTitle?.closest('.ant-typography'),
+        formLabelColor: style(form.querySelector('.ant-form-item-label > label')).color,
+        headerLine: style(headerLine).borderBottomColor,
+        dividerLine: style(document.querySelector('.ant-divider')).borderTopColor,
+      };
     });
+
+    // Light theme tokens resolved by @pdfme/ui (packages/ui/src/theme.ts).
+    expect(panelStyles.inputBorder).toBe('rgb(142, 142, 142)');
+    expect(panelStyles.placeholder).toBe('rgba(0, 0, 0, 0.65)');
+    // Section headers ("Border Width") use the theme text color and the
+    // panel divider line instead of form-render's hardcoded CSS.
+    expect(panelStyles.headerLine).toBe(panelStyles.dividerLine);
+    expect(panelStyles.headerTitleIsThemed).toBe(true);
+    expect(panelStyles.headerTitleColor).toBe(panelStyles.formLabelColor);
   });
 
   it('should keep the header and menus usable on a mobile viewport', async () => {
