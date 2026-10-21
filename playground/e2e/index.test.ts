@@ -609,6 +609,32 @@ describe('Playground E2E Tests', () => {
     await generateAndComparePDF(page, browser, 'final-form');
   });
 
+  it('should render the Designer property panel with the Designer theme', async () => {
+    if (!page) throw new Error('Browser/Page not initialized');
+
+    await loadRouteWithStorage(page, '/designer', { template: buildModifiedTemplate() });
+    await waitForDesignerReady(page, 'Type Something...');
+
+    const fieldName = modifiedTemplateFieldNames.text;
+    await page.evaluate((name) => {
+      const label = [...document.querySelectorAll('span')].find(
+        (el) => el.textContent?.trim() === name,
+      );
+      if (!label) throw new Error(`Field "${name}" not found in the field list`);
+      label.click();
+    }, fieldName);
+
+    const checkedCheckbox = '.fr-form .ant-checkbox-checked';
+    await page.waitForSelector(checkedCheckbox, { timeout });
+    const checkboxColor = await page.$eval(
+      checkedCheckbox,
+      (el) => getComputedStyle(el).backgroundColor,
+    );
+
+    // The playground Designer sets theme.token.colorPrimary to #25c2a0.
+    expect(checkboxColor).toBe('rgb(37, 194, 160)');
+  });
+
   it('should keep the header and menus usable on a mobile viewport', async () => {
     if (!browser) throw new Error('Browser not initialized');
 
