@@ -225,7 +225,9 @@ const DetailView = (props: DetailViewProps) => {
       },
       width: fieldName === 'width' ? value : width,
       height: fieldName === 'height' ? value : height,
-      rotate: Number(formValues.rotate ?? 0),
+      // A rotate edit is always committed and changeSchemas translates the field back
+      // inside, so validate against the committed rotation, not the one being typed.
+      rotate: Number(activeSchema.rotate ?? 0),
     };
     const { position: p, width: w, height: h, rotate } = candidate;
     if (![p.x, p.y, w, h, rotate].every((v) => Number.isFinite(v))) return true;
