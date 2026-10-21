@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { BLANK_PDF, type PropPanelWidgetProps, type SchemaForUI } from '@pdfme/common';
 import AlignWidget from '../../src/components/Designer/RightSidebar/DetailView/AlignWidget';
 import { DESIGNER_CLASSNAME } from '../../src/constants';
@@ -18,6 +18,20 @@ beforeAll(() => {
       removeListener: vi.fn(),
     })),
   });
+});
+
+// antd Button schedules state updates on timers after a click. Flush them while the
+// component is still mounted so none fire after jsdom is torn down.
+beforeEach(() => {
+  vi.useFakeTimers();
+});
+
+afterEach(() => {
+  act(() => {
+    vi.runOnlyPendingTimers();
+  });
+  cleanup();
+  vi.useRealTimers();
 });
 
 const schema = (id: string, x: number, rotate = 0): SchemaForUI => ({
@@ -55,7 +69,10 @@ const renderAlign = (schemas: SchemaForUI[]) => {
 
   const { container } = render(<AlignWidget {...props} />);
   const click = (id: string) =>
-    fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}align-${id}`)!);
+    act(() => {
+      fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}align-${id}`)!);
+      vi.runOnlyPendingTimers();
+    });
   return { click, changeSchemas };
 };
 
