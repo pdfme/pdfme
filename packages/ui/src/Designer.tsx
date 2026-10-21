@@ -34,10 +34,17 @@ class Designer extends BaseUIClass {
   private selection: DesignerSelection = EMPTY_DESIGNER_SELECTION;
   private selectSchemasHandler: DesignerSelectSchemas | null = null;
   private updateTemplatePage?: number;
+  /**
+   * Template the editor loads. A new reference makes the editor discard its
+   * document, selection and schema ids, so it changes only when the host
+   * supplies a template; edits made in the editor update `this.template` only.
+   */
+  private editorTemplate: Template;
 
   constructor(props: DesignerProps) {
     super(props);
     checkDesignerProps(props);
+    this.editorTemplate = this.template;
   }
 
   public saveTemplate() {
@@ -51,6 +58,7 @@ class Designer extends BaseUIClass {
     checkTemplate(template);
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.template = cloneDeep(template);
+    this.editorTemplate = this.template;
     this.updateTemplatePage = options.page;
     if (this.onChangeTemplateCallback) {
       this.onChangeTemplateCallback(template);
@@ -155,7 +163,7 @@ class Designer extends BaseUIClass {
         options={this.getOptions()}
       >
         <DesignerComponent
-          template={this.template}
+          template={this.editorTemplate}
           onSaveTemplate={this.handleSaveTemplate}
           onChangeTemplate={this.handleChangeTemplate}
           onPageCursorChange={this.handlePageCursorChange}
