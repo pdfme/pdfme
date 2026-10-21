@@ -16,34 +16,52 @@ const isExternal = (id: string) =>
   builtinModuleSet.has(id) ||
   externalDependencies.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
 
-const ANTD_IMPORT = /^antd(?:\/|$)/;
-const ANTD_PACKAGE_ROOT = /^(.*[\\/]node_modules[\\/]antd)(?:[\\/]|$)/;
-
 /**
- * form-render peers on antd 4/5, so npm installs a second antd next to ours.
- * A second copy has its own ConfigProvider context and silently drops
- * `options.theme` in the property panel (#1690). Fail the build instead.
+ * Packages that must be bundled exactly once. Each copy of antd (or of the
+ * cssinjs runtime it styles with) has its own context, so a second copy pulled
+ * in by form-render (which peers on antd 4/5) silently drops `options.theme`
+ * in the property panel (#1690). Fail the build instead.
  */
+const SINGLE_COPY_PACKAGES = ['antd', '@ant-design/cssinjs'];
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 const singleAntdCopy = (): Plugin => {
-  const packageRoots = new Set<string>();
+  const packages = SINGLE_COPY_PACKAGES.map((name) => {
+    const path = escapeRegExp(name).replace('/', '[\\\\/]');
+    return {
+      name,
+      importPattern: new RegExp(`^${escapeRegExp(name)}(?:/|$)`),
+      rootPattern: new RegExp(`^(.*[\\\\/]node_modules[\\\\/]${path})(?:[\\\\/]|$)`),
+      roots: new Set<string>(),
+    };
+  });
   return {
     name: 'pdfme:single-antd-copy',
     enforce: 'pre',
     buildStart() {
-      packageRoots.clear();
+      packages.forEach(({ roots }) => roots.clear());
     },
     async resolveId(source, importer, options) {
-      if (!ANTD_IMPORT.test(source)) return null;
+      const target = packages.find(({ importPattern }) => importPattern.test(source));
+      if (!target) return null;
       const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
-      const packageRoot = resolved ? ANTD_PACKAGE_ROOT.exec(resolved.id)?.[1] : undefined;
-      if (packageRoot) packageRoots.add(packageRoot);
+      const packageRoot = resolved ? target.rootPattern.exec(resolved.id)?.[1] : undefined;
+      if (packageRoot) target.roots.add(packageRoot);
       return resolved;
     },
     buildEnd(error) {
-      if (error || packageRoots.size <= 1) return;
+      if (error) return;
+      const duplicated = packages.filter(({ roots }) => roots.size > 1);
+      if (duplicated.length === 0) return;
       this.error(
-        `Expected exactly one antd copy in the @pdfme/ui bundle, found ${packageRoots.size}:\n` +
-          [...packageRoots].map((root) => `  - ${root}`).join('\n'),
+        duplicated
+          .map(
+            ({ name, roots }) =>
+              `Expected exactly one ${name} copy in the @pdfme/ui bundle, found ${roots.size}:\n` +
+              [...roots].map((root) => `  - ${root}`).join('\n'),
+          )
+          .join('\n'),
       );
     },
   };
