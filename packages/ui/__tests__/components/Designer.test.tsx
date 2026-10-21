@@ -1850,3 +1850,93 @@ test('1D barcodes resize freely', async () => {
     cleanup();
   }
 });
+
+describe('onChangeSelection (#1691)', () => {
+  const flushRender = () =>
+    act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+  test('does not notify on mount or on re-renders that keep the selection', async () => {
+    const { designer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    const selections: number[] = [];
+    designer.onChangeSelection(({ schemas }) => selections.push(schemas.length));
+
+    try {
+      await flushRender();
+      for (let i = 0; i < 3; i++) {
+        await act(async () => {
+          designer.updateOptions({});
+        });
+      }
+      expect(selections).toEqual([]);
+
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await waitFor(() => expect(selections).toEqual([1]));
+
+      for (let i = 0; i < 3; i++) {
+        await act(async () => {
+          designer.updateOptions({});
+        });
+      }
+      expect(selections).toEqual([1]);
+      expect(designer.getSelectedSchemas().map(({ name }) => name)).toEqual(['field1']);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('notifies again when the selected schema changes', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    const fontSizes: Array<number | undefined> = [];
+    designer.onChangeSelection(({ schemas }) => {
+      fontSizes.push((schemas[0]?.schema as { fontSize?: number } | undefined)?.fontSize);
+    });
+
+    try {
+      await selectField1(domContainer);
+      const notificationsAfterSelect = fontSizes.length;
+      expect(notificationsAfterSelect).toBe(1);
+
+      emitFormWatch({ fontSize: 20 });
+      await waitFor(() => expect(fontSizes.at(-1)).toBe(20));
+      expect(fontSizes).toHaveLength(notificationsAfterSelect + 1);
+
+      await act(async () => {
+        designer.selectSchemas([]);
+      });
+      await waitFor(() => expect(fontSizes.at(-1)).toBeUndefined());
+      expect(designer.getSelectedSchemas()).toEqual([]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('a callback that calls updateOptions does not loop', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { designer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    let calls = 0;
+    designer.onChangeSelection(({ schemas }) => {
+      calls++;
+      // Bound the loop so a regression fails instead of hanging the worker.
+      if (calls > 20) return;
+      designer.updateOptions({ sidebarOpen: schemas.length > 0 });
+    });
+
+    try {
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await flushRender();
+      expect(calls).toBe(1);
+      expect(designer.getSelectedSchemas()).toHaveLength(1);
+      expect(
+        errorSpy.mock.calls.some((args) => String(args[0]).includes('Maximum update depth')),
+      ).toBe(false);
+    } finally {
+      cleanup();
+    }
+  });
+});
