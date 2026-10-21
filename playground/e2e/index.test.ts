@@ -134,6 +134,14 @@ const designerSnapshotOptions: MatchImageOptions = {
   allowedPixelRatio: 0.06,
 };
 
+// Scoped to the property panel so theme token changes (control borders,
+// placeholders, section headers) are not lost in the full-page tolerance:
+// a border color change is ~0.16% of the full Designer but ~2% of the panel.
+const propertyPanelSnapshotOptions: MatchImageOptions = {
+  ...snapshotOptions,
+  allowedPixelRatio: 0.005,
+};
+
 const replayPdfSnapshotOptions: MatchImageOptions = {
   ...snapshotOptions,
   allowedPixelRatio: 0.05,
@@ -612,6 +620,9 @@ describe('Playground E2E Tests', () => {
   it('should render the Designer property panel with the Designer theme', async () => {
     if (!page) throw new Error('Browser/Page not initialized');
 
+    // Tall enough to show the whole text property panel without scrolling.
+    await page.setViewport({ ...viewport, height: 1400 });
+    onTestFinished(() => page?.setViewport(viewport));
     await loadRouteWithStorage(page, '/designer', { template: buildModifiedTemplate() });
     await waitForDesignerReady(page, 'Type Something...');
 
@@ -633,6 +644,13 @@ describe('Playground E2E Tests', () => {
 
     // The playground Designer sets theme.token.colorPrimary to #25c2a0.
     expect(checkboxColor).toBe('rgb(37, 194, 160)');
+
+    const rightSidebar = await page.$('.pdfme-designer-right-sidebar');
+    if (!rightSidebar) throw new Error('Designer right sidebar not found');
+    await expect(Buffer.from(await rightSidebar.screenshot({ type: 'png' }))).toMatchImage({
+      ...propertyPanelSnapshotOptions,
+      name: 'designer-property-panel',
+    });
   });
 
   it('should keep the header and menus usable on a mobile viewport', async () => {
