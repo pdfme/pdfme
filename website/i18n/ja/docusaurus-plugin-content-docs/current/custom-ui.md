@@ -89,6 +89,8 @@ const designer = new Designer({
   options: {
     zoomLevel: 1.5,
     sidebarOpen: false,  // （Designerのみ）
+    leftSidebarWidth: 100,  // （Designerのみ）デフォルト: 45px
+    rightSidebarWidth: 450,  // （Designerのみ）デフォルト: 400px
   }
 });
 
@@ -98,3 +100,7 @@ designer.updateOptions({
   sidebarOpen: true
 });
 ```
+
+`leftSidebarWidth` と `rightSidebarWidth`（Designerのみ）では、左側のプラグインサイドバーと右側のプロパティパネルサイドバーの幅をピクセル単位で指定できます。正の数値を指定でき、デフォルトはそれぞれ45pxと400pxです。
+
+注意: 幅を極端に小さくすると、プラグインボタンやプロパティパネルが見切れてしまいます。
