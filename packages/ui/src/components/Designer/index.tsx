@@ -18,6 +18,7 @@ import {
   Size,
   isBlankPdf,
   px2mm,
+  clampPositionIntoPage,
 } from '@pdfme/common';
 import { DndContext, type DragEndEvent } from '@dnd-kit/core';
 import RightSidebar from './RightSidebar/index.js';
@@ -34,6 +35,7 @@ import {
   getPagesScrollTopByIndex,
   changeSchemas as _changeSchemas,
   useMaxZoom,
+  getPageArea,
 } from '../../helper.js';
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents, useZoom } from '../../hooks.js';
 import {
@@ -600,10 +602,8 @@ const TemplateEditor = ({
   );
 
   const addSchema = (defaultSchema: Schema) => {
-    const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(template.basePdf)
-      ? template.basePdf.padding
-      : [0, 0, 0, 0];
-    const pageSize = pageSizes[pageCursor];
+    const [paddingTop] = isBlankPdf(template.basePdf) ? template.basePdf.padding : [0];
+    const page = getPageArea(template.basePdf, pageSizes[pageCursor]);
 
     const newSchemaName = (prefix: string) => {
       let index = schemasList.reduce((acc, page) => acc + page.length, 1);
@@ -614,25 +614,11 @@ const TemplateEditor = ({
       }
       return newName;
     };
-    const ensureMiddleValue = (min: number, value: number, max: number) =>
-      Math.min(Math.max(min, value), max);
-
     const s = {
       id: uuid(),
       ...defaultSchema,
       name: newSchemaName(i18n('field')),
-      position: {
-        x: ensureMiddleValue(
-          paddingLeft,
-          defaultSchema.position.x,
-          pageSize.width - paddingRight - defaultSchema.width,
-        ),
-        y: ensureMiddleValue(
-          paddingTop,
-          defaultSchema.position.y,
-          pageSize.height - paddingBottom - defaultSchema.height,
-        ),
-      },
+      position: { ...defaultSchema.position },
       required: defaultSchema.readOnly
         ? false
         : options.requiredByDefault || defaultSchema.required || false,
@@ -641,8 +627,9 @@ const TemplateEditor = ({
     if (defaultSchema.position.y === 0) {
       const paper = paperRefs.current[pageCursor];
       const rectTop = paper ? paper.getBoundingClientRect().top : 0;
-      s.position.y = rectTop > 0 ? paddingTop : pageSizes[pageCursor].height / 2;
+      s.position.y = rectTop > 0 ? paddingTop : page.height / 2;
     }
+    s.position = clampPositionIntoPage(s, page);
 
     commitSchemas(schemasList[pageCursor].concat(s));
     setTimeout(() => onEdit([document.getElementById(s.id)]));
