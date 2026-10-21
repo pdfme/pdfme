@@ -26,6 +26,9 @@ const isExpandableTextSchema = (schema: Schema) =>
 export const isDynamicLayoutSchema = (schema: Schema) =>
   schema.type === 'table' || schema.type === 'list' || isExpandableTextSchema(schema);
 
+export const hasDynamicLayoutSchema = (schemas: Schema[][]) =>
+  schemas.some((page) => page.some(isDynamicLayoutSchema));
+
 export const getDynamicLayoutForSchema = (
   value: string,
   args: DynamicLayoutArgs,

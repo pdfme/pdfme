@@ -9,6 +9,7 @@ import {
 } from './types.js';
 import { cloneDeep, isBlankPdf } from './helper.js';
 import { replacePlaceholders } from './expression.js';
+import { getRotatedBoundingBox } from './geometry.js';
 
 /** Floating point tolerance for comparisons */
 const EPSILON = 0.01;
@@ -29,12 +30,19 @@ interface ModifyTemplateForDynamicTableArg {
   ) => Promise<DynamicLayoutCallbackResult>;
 }
 
+/**
+ * `baseY` and `height` are the visible (rotated) box in page-content coordinates,
+ * so a rotated field breaks and pushes by what is actually drawn.
+ */
 interface LayoutItem {
   schema: Schema;
   baseY: number;
   height: number;
   dynamicLayout: DynamicLayoutResult;
 }
+
+// A half turn keeps the box on the same axes, so it lays out and splits like an unrotated one.
+const isRotated = (schema: Schema) => (Number(schema.rotate) || 0) % 180 !== 0;
 
 /** Calculate the content height of a page (drawable area excluding padding) */
 const getContentHeight = (basePdf: BlankPdf): number =>
@@ -94,13 +102,14 @@ function normalizePageSchemas(
   const orderMap = new Map<string, number>();
 
   pageSchemas.forEach((schema, index) => {
-    // Guard against negative Y position when schema.y < paddingTop
+    const visible = getRotatedBoundingBox(schema);
+    // Guard against negative Y position when the visible top is above paddingTop
     // Prevents "Cannot read properties of undefined (reading 'push')" error
-    const localY = Math.max(0, schema.position.y - paddingTop);
+    const localY = Math.max(0, visible.y - paddingTop);
     items.push({
       schema: cloneDeep(schema),
       baseY: localY,
-      height: schema.height,
+      height: visible.height,
       dynamicLayout: { heights: [schema.height] }, // Will be updated later
     });
     orderMap.set(schema.name, index);
@@ -118,6 +127,56 @@ function normalizePageSchemas(
 }
 
 /**
+ * Place a rotated schema as one block. Its units run along the rotated axis, so
+ * slicing them at a horizontal page break would not match what is drawn; the
+ * whole visible box moves to the next page instead when it fits there.
+ * @returns The final global Y coordinate (bottom of the visible box) after placement
+ */
+function placeRotatedOnPage(
+  schema: Schema,
+  dynamicLayout: DynamicLayoutResult,
+  startGlobalY: number,
+  contentHeight: number,
+  paddingTop: number,
+  pages: Schema[][],
+): number {
+  const height = dynamicLayout.heights.reduce((sum, h) => sum + h, 0);
+  const visible = getRotatedBoundingBox({ ...schema, height });
+  let pageIndex = Math.max(0, Math.floor(startGlobalY / contentHeight));
+  let yInPage = Math.max(0, startGlobalY % contentHeight);
+
+  // A box taller than a page cannot fit on the next one either, so it stays where it is.
+  const fitsOnFreshPage = visible.height <= contentHeight + EPSILON;
+  if (fitsOnFreshPage && visible.height > contentHeight - yInPage + EPSILON) {
+    pageIndex++;
+    yInPage = 0;
+  }
+  while (pages.length <= pageIndex) pages.push([]);
+
+  const patch =
+    dynamicLayout.patchSplitSchema?.({
+      schema,
+      start: 0,
+      end: dynamicLayout.heights.length,
+      isSplit: false,
+      chunkHeight: height,
+    }) ?? {};
+  pages[pageIndex].push({
+    ...schema,
+    ...patch,
+    height,
+    position: { ...schema.position, y: yInPage + paddingTop + schema.position.y - visible.y },
+  });
+
+  yInPage += visible.height;
+  if (yInPage >= contentHeight - EPSILON) {
+    pageIndex++;
+    yInPage = 0;
+  }
+  return pageIndex * contentHeight + yInPage;
+}
+
+/**
  * Place height units on pages, splitting across pages as needed.
  * @returns The final global Y coordinate after placement
  */
@@ -129,6 +188,17 @@ function placeUnitsOnPages(
   paddingTop: number,
   pages: Schema[][],
 ): number {
+  if (isRotated(schema)) {
+    return placeRotatedOnPage(
+      schema,
+      dynamicLayout,
+      startGlobalY,
+      contentHeight,
+      paddingTop,
+      pages,
+    );
+  }
+
   const dynamicHeights = dynamicLayout.heights;
   let currentUnitIndex = 0;
   let currentPageIndex = Math.max(0, Math.floor(startGlobalY / contentHeight));

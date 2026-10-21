@@ -9,7 +9,11 @@ import {
   isBlankPdf,
   resolveReadOnlyContent,
 } from '@pdfme/common';
-import { getDynamicLayoutForSchema, isDynamicLayoutSchema } from '@pdfme/schemas/dynamicLayout';
+import {
+  getDynamicLayoutForSchema,
+  hasDynamicLayoutSchema,
+  isDynamicLayoutSchema,
+} from '@pdfme/schemas/dynamicLayout';
 import { getTextLineRange, mergeTextLineRangeValue } from '@pdfme/schemas/texts';
 import UnitPager from './UnitPager.js';
 import Root from './Root.js';
@@ -122,13 +126,17 @@ const Preview = ({
     const currentInput = inputOverride ?? latestInputRef.current;
     const options = { font: latestFontRef.current };
     const currentRefresh = latestRefreshRef.current;
-    getDynamicTemplate({
-      template,
-      input: currentInput,
-      options,
-      _cache,
-      getDynamicHeights: getDynamicLayoutForSchema,
-    })
+    // Match the generator: without a dynamic layout schema the template is used as is.
+    const dynamicTemplatePromise = hasDynamicLayoutSchema(template.schemas)
+      ? getDynamicTemplate({
+          template,
+          input: currentInput,
+          options,
+          _cache,
+          getDynamicHeights: getDynamicLayoutForSchema,
+        })
+      : Promise.resolve(template);
+    dynamicTemplatePromise
       .then(async (dynamicTemplate) => {
         const sl = await template2SchemasList(dynamicTemplate);
         if (!isMountedRef.current || requestId !== initRequestIdRef.current) {

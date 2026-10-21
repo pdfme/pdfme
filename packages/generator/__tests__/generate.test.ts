@@ -502,6 +502,57 @@ describe('generate integrate test', () => {
       expect(bodySchemas[1].__isSplit).toBe(true);
       expect(bodySchemas[1].position.y).toBe(10);
     });
+
+    test('splits a 180deg expanded text taller than a page like an unrotated one (#1683)', async () => {
+      const render = async (rotate: number) => {
+        const renderedSchemas: Schema[] = [];
+        const textProbePlugin: Plugin = {
+          pdf: ({ schema }) => {
+            renderedSchemas.push({ ...schema, position: { ...schema.position } });
+          },
+          ui: () => {},
+          propPanel: { schema: {}, defaultSchema: { ...textObject(0, 0), type: 'text' } },
+        };
+        const pdf = await generate({
+          template: {
+            basePdf: { width: 100, height: 100, padding: [10, 10, 10, 10] },
+            schemas: [
+              [
+                {
+                  ...textObject(10, 70, 'body'),
+                  width: 20,
+                  height: 5,
+                  rotate,
+                  overflow: 'expand',
+                  fontSize: 13,
+                  lineHeight: 1,
+                  characterSpacing: 0,
+                },
+              ],
+            ],
+          },
+          inputs: [{ body: 'long text '.repeat(60) }],
+          options: { font: getFont() },
+          plugins: { text: textProbePlugin },
+        });
+        const pageCount = (await PDFDocument.load(pdf)).getPageCount();
+        return { pageCount, body: renderedSchemas.filter((schema) => schema.name === 'body') };
+      };
+
+      const unrotated = await render(0);
+      const halfTurn = await render(180);
+
+      expect(halfTurn.body.length).toBeGreaterThan(2);
+      expect(halfTurn.body).toEqual(unrotated.body.map((schema) => ({ ...schema, rotate: 180 })));
+      // One chunk per page: no empty page.
+      expect(halfTurn.pageCount).toBe(halfTurn.body.length);
+      // Every chunk stays inside the 10mm padding, and the line ranges are contiguous.
+      halfTurn.body.forEach((schema, i) => {
+        expect(schema.position.y).toBeGreaterThanOrEqual(10);
+        expect(schema.position.y + schema.height).toBeLessThanOrEqual(90.01);
+        if (i > 0) expect(schema.__splitRange?.start).toBe(halfTurn.body[i - 1].__splitRange?.end);
+      });
+    });
   });
 
   describe('use fontColor template', () => {
