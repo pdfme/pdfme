@@ -60,6 +60,35 @@ const isDarkBackground = (color: unknown) => {
   return rgb ? contrastRatio(WHITE, rgb) > contrastRatio(BLACK, rgb) : false;
 };
 
+const toHex = ({ r, g, b }: Rgb) =>
+  '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+
+/** WCAG 2.x non-text contrast (1.4.11) for component boundaries. */
+const MIN_BOUNDARY_CONTRAST = 3;
+
+const minContrast = (color: Rgb, surfaces: Rgb[]) =>
+  Math.min(...surfaces.map((surface) => contrastRatio(color, surface)));
+
+/**
+ * The lightest mix of `text` over `background` that still reaches
+ * MIN_BOUNDARY_CONTRAST against every surface a control sits on.
+ */
+const boundaryColor = (text: Rgb, background: Rgb, surfaces: Rgb[]) => {
+  const mix = (alpha: number): Rgb => ({
+    r: Math.round(text.r * alpha + background.r * (1 - alpha)),
+    g: Math.round(text.g * alpha + background.g * (1 - alpha)),
+    b: Math.round(text.b * alpha + background.b * (1 - alpha)),
+  });
+  let low = 0;
+  let high = 1;
+  for (let i = 0; i < 20; i++) {
+    const alpha = (low + high) / 2;
+    if (minContrast(mix(alpha), surfaces) >= MIN_BOUNDARY_CONTRAST) high = alpha;
+    else low = alpha;
+  }
+  return toHex(mix(high));
+};
+
 /**
  * Completes a merged theme so derived colors stay readable:
  * - antd's default algorithm derives borders and fills by darkening
@@ -67,6 +96,9 @@ const isDarkBackground = (color: unknown) => {
  *   dark algorithm when the host sets a dark background without an algorithm.
  * - antd's placeholder color (`colorTextQuaternary`) is below the WCAG AA text
  *   contrast in both algorithms; use the secondary text color instead.
+ * - antd's control border (`colorBorder`) is below the WCAG AA non-text
+ *   contrast in both algorithms; darken/lighten it just enough to reach 3:1
+ *   against the control fill and the sidebar background.
  * Values the host sets explicitly are kept.
  */
 export const resolveTheme = (theme: ThemeConfig): ThemeConfig => {
@@ -79,6 +111,17 @@ export const resolveTheme = (theme: ThemeConfig): ThemeConfig => {
   const token = { ...resolved.token };
   if (!token.colorTextPlaceholder) {
     token.colorTextPlaceholder = derived.colorTextSecondary;
+  }
+  // Controls are filled with colorBgContainer and placed on colorBgLayout (sidebar).
+  const background = parseColor(derived.colorBgContainer);
+  const layout = parseColor(derived.colorBgLayout);
+  const border = parseColor(derived.colorBorder);
+  const text = parseColor(derived.colorText);
+  if (!token.colorBorder && background && layout && border && text) {
+    const surfaces = [background, layout];
+    if (minContrast(border, surfaces) < MIN_BOUNDARY_CONTRAST) {
+      token.colorBorder = boundaryColor(text, background, surfaces);
+    }
   }
   resolved.token = token;
   return resolved;

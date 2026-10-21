@@ -32,12 +32,14 @@ describe('resolveTheme', () => {
     ['default theme', defaultTheme],
     ['dark colorBgBase', darkTheme],
     ['dark algorithm', { algorithm: antdTheme.darkAlgorithm }],
-  ])('keeps placeholders at WCAG AA contrast (%s)', (_, input) => {
+  ])('keeps placeholders and control borders at WCAG AA contrast (%s)', (_, input) => {
     const token = antdTheme.getDesignToken(resolveTheme(input));
 
     expect(contrast(token.colorTextPlaceholder, token.colorBgContainer)).toBeGreaterThanOrEqual(
       4.5,
     );
+    expect(contrast(token.colorBorder, token.colorBgContainer)).toBeGreaterThanOrEqual(3);
+    expect(contrast(token.colorBorder, token.colorBgLayout)).toBeGreaterThanOrEqual(3);
   });
 
   it('uses the dark algorithm for a dark colorBgBase without an algorithm', () => {
@@ -48,11 +50,14 @@ describe('resolveTheme', () => {
   it('keeps values set by the host', () => {
     const resolved = resolveTheme({
       algorithm: antdTheme.defaultAlgorithm,
-      token: { ...darkTheme.token, colorTextPlaceholder: '#222222' },
+      token: { ...darkTheme.token, colorBorder: '#111111', colorTextPlaceholder: '#222222' },
     });
 
     expect(resolved.algorithm).toBe(antdTheme.defaultAlgorithm);
-    expect(resolved.token).toMatchObject({ colorTextPlaceholder: '#222222' });
+    expect(resolved.token).toMatchObject({
+      colorBorder: '#111111',
+      colorTextPlaceholder: '#222222',
+    });
   });
 
   it('does not mutate the input theme', () => {
