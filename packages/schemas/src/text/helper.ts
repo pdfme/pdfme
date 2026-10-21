@@ -167,12 +167,20 @@ export const fitDynamicFontSize = ({
   return dynamicFontSize;
 };
 
-// PDF applies character spacing (Tc) after every glyph drawn, so spacing goes
-// between the glyphs of the same layout used for the width. `length` would count
-// a surrogate pair such as 𠮷 as two characters, and graphemes would miss a
-// combining mark that the font draws as a glyph of its own.
-const calculateCharacterSpacing = (glyphCount: number, textCharacterSpacing: number) =>
-  Math.max(glyphCount - 1, 0) * textCharacterSpacing;
+// Browsers do not form optional ligatures in letter-spaced text (CSS Text 3,
+// "Tracking"), and the Viewer draws one span per grapheme, so a ligature never
+// takes up a single spacing gap in the UI. Text drawn with non-zero spacing is
+// shaped without them for the width and in the PDF alike.
+const LETTER_SPACED_FONT_FEATURES = { liga: false, clig: false, dlig: false, hlig: false };
+
+export const getFontFeatures = (characterSpacing: number) =>
+  characterSpacing === 0 ? undefined : LETTER_SPACED_FONT_FEATURES;
+
+// Without optional ligatures the PDF draws one glyph per code point (Tc follows
+// each glyph, combining marks included), and the UI never puts more than one
+// gap in a code point. `length` would count a surrogate pair such as 𠮷 twice.
+const calculateCharacterSpacing = (text: string, textCharacterSpacing: number) =>
+  Math.max(Array.from(text).length - 1, 0) * textCharacterSpacing;
 
 const TEXT_WIDTH_CACHE_LIMIT = 5000;
 const textWidthCache = new WeakMap<FontKitFont, Map<string, number>>();
@@ -199,12 +207,12 @@ export const widthOfTextAtSize = (
     return cachedWidth;
   }
 
-  const { glyphs } = fontKitFont.layout(text);
+  const { glyphs } = fontKitFont.layout(text, getFontFeatures(characterSpacing));
   const scale = 1000 / fontKitFont.unitsPerEm;
   const standardWidth =
     glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
     (fontSize / 1000);
-  const width = standardWidth + calculateCharacterSpacing(glyphs.length, characterSpacing);
+  const width = standardWidth + calculateCharacterSpacing(text, characterSpacing);
 
   if (cache.size >= TEXT_WIDTH_CACHE_LIMIT) {
     cache.clear();

@@ -245,8 +245,14 @@ describe('shared wrap engine (#1115)', () => {
 
 describe('widthOfTextAtSize character spacing', () => {
   const font = createMockFont();
+  const loadFont = (file: string) =>
+    fontkit.create(
+      fs.readFileSync(path.join(__dirname, '../../common/__tests__/assets/fonts', file)),
+    ) as FontKitFont;
+  const notoSans = loadFont('NotoSans-Regular.ttf');
+  const notoSerif = loadFont('NotoSerif-Regular.ttf');
 
-  it('counts spacing between glyphs, not UTF-16 code units', () => {
+  it('counts spacing between code points, not UTF-16 code units', () => {
     expect(widthOfTextAtSize('吉田', font, 10, 2)).toBe(12);
     expect(widthOfTextAtSize('𠮷田', font, 10, 2)).toBe(12);
     expect(widthOfTextAtSize('👍👍', font, 10, 2)).toBe(12);
@@ -256,18 +262,34 @@ describe('widthOfTextAtSize character spacing', () => {
     expect(widthOfTextAtSize('', font, 10, 2)).toBe(0);
   });
 
-  it('adds spacing between every glyph the font draws, as PDF Tc does', () => {
-    const notoSans = fontkit.create(
-      fs.readFileSync(
-        path.join(__dirname, '../../common/__tests__/assets/fonts/NotoSans-Regular.ttf'),
-      ),
-    ) as FontKitFont;
+  it('adds spacing after each combining mark, as PDF Tc does after its glyph', () => {
     // Two graphemes, each drawn as a base glyph plus a combining acute (acutecomb).
     const text = 'e\u0301e\u0301';
     expect(notoSans.layout(text).glyphs).toHaveLength(4);
 
     const unspaced = widthOfTextAtSize(text, notoSans, 10, 0);
     expect(widthOfTextAtSize(text, notoSans, 10, 2)).toBeCloseTo(unspaced + 3 * 2);
+  });
+
+  it('adds spacing between every character of a ligature', () => {
+    // NotoSans shapes "office" as o, ffi, c, e, with the same advances as six glyphs.
+    expect(notoSans.layout('office').glyphs).toHaveLength(4);
+
+    const unspaced = widthOfTextAtSize('office', notoSans, 10, 0);
+    expect(widthOfTextAtSize('office', notoSans, 10, 2)).toBeCloseTo(unspaced + 5 * 2);
+    expect(widthOfTextAtSize('office', notoSans, 10, -0.5)).toBeCloseTo(unspaced - 5 * 0.5);
+  });
+
+  it('measures letter-spaced text with the advances of its unligated glyphs', () => {
+    // NotoSerif's ffi is narrower than f + f + i.
+    const advance = (glyphs: { advanceWidth: number }[]) =>
+      glyphs.reduce((total, glyph) => total + (glyph.advanceWidth * 10) / notoSerif.unitsPerEm, 0);
+    const ligated = advance(notoSerif.layout('office').glyphs);
+    const unligated = advance(notoSerif.layout('office', { liga: false }).glyphs);
+    expect(unligated).toBeGreaterThan(ligated);
+
+    expect(widthOfTextAtSize('office', notoSerif, 10, 0)).toBeCloseTo(ligated);
+    expect(widthOfTextAtSize('office', notoSerif, 10, 2)).toBeCloseTo(unligated + 5 * 2);
   });
 });
 
