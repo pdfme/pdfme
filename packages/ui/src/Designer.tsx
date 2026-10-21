@@ -5,11 +5,13 @@ import {
   DesignerProps,
   checkDesignerProps,
   checkTemplate,
+  checkUIOptions,
   PDFME_VERSION,
+  UIOptions,
 } from '@pdfme/common';
 import { BaseUIClass } from './class.js';
 import { DESTROYED_ERR_MSG } from './constants.js';
-import DesignerComponent from './components/Designer/index.js';
+import DesignerComponent, { type SidebarOpenRequest } from './components/Designer/index.js';
 import AppContextProvider from './components/AppContextProvider.js';
 import {
   EMPTY_DESIGNER_SELECTION,
@@ -40,11 +42,22 @@ class Designer extends BaseUIClass {
    * supplies a template; edits made in the editor update `this.template` only.
    */
   private editorTemplate: Template;
+  private sidebarOpenRequest?: SidebarOpenRequest;
 
   constructor(props: DesignerProps) {
     super(props);
     checkDesignerProps(props);
     this.editorTemplate = this.template;
+  }
+
+  public updateOptions(options: UIOptions) {
+    checkUIOptions(options);
+    // The user can toggle the sidebar after the option was set, so every call
+    // is a new request even when the value equals the stored option.
+    if (typeof options.sidebarOpen === 'boolean') {
+      this.sidebarOpenRequest = { open: options.sidebarOpen };
+    }
+    super.updateOptions(options);
   }
 
   public saveTemplate() {
@@ -171,6 +184,7 @@ class Designer extends BaseUIClass {
           onRegisterSchemaSelectionHandler={this.handleRegisterSchemaSelectionHandler}
           onUpdateTemplatePageApplied={this.handleUpdateTemplatePageApplied}
           updateTemplatePage={this.updateTemplatePage}
+          sidebarOpenRequest={this.sidebarOpenRequest}
           size={this.size}
         />
       </AppContextProvider>,
