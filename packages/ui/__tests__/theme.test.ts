@@ -3,23 +3,40 @@ import { theme as antdTheme } from 'antd';
 import type { ThemeConfig } from 'antd';
 import { defaultTheme, resolveTheme } from '../src/theme';
 
-const rgb = (color: string) => {
-  const hex = /^#([0-9a-f]{6})/i.exec(color)?.[1];
-  if (hex) return [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+type Rgba = [number, number, number, number];
+
+const rgba = (color: string): Rgba => {
+  const hex = /^#([0-9a-f]{6})([0-9a-f]{2})?$/i.exec(color);
+  if (hex) {
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16));
+    return [r, g, b, hex[2] ? parseInt(hex[2], 16) / 255 : 1];
+  }
   const match = /rgba?\(([^)]+)\)/.exec(color);
   if (!match) throw new Error(`Unsupported color: ${color}`);
-  return match[1].split(',').slice(0, 3).map(Number);
+  const [r, g, b, a = 1] = match[1].split(',').map(Number);
+  return [r, g, b, a];
 };
 
-const contrast = (a: string, b: string) => {
-  const luminance = (color: string) => {
-    const [r, g, bl] = rgb(color).map((c) => {
+/** Paints `color` over `background` (itself painted over white), as the browser does. */
+const paint = (color: string, background = '#ffffff'): Rgba => {
+  const [r, g, b, a] = rgba(color);
+  const bg = rgba(background);
+  const base: Rgba = bg[3] < 1 ? paint(background) : bg;
+  return [0, 1, 2].map((i) => [r, g, b][i] * a + base[i] * (1 - a)).concat(1) as Rgba;
+};
+
+/** WCAG contrast of `foreground` painted on `background`. */
+const contrast = (foreground: string, background: string) => {
+  const luminance = ([r, g, b]: Rgba) => {
+    const [lr, lg, lb] = [r, g, b].map((c) => {
       const s = c / 255;
       return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
     });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+    return 0.2126 * lr + 0.7152 * lg + 0.0722 * lb;
   };
-  const [lighter, darker] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  const bg = paint(background);
+  const fg = paint(foreground, background);
+  const [lighter, darker] = [luminance(fg), luminance(bg)].sort((x, y) => y - x);
   return (lighter + 0.05) / (darker + 0.05);
 };
 

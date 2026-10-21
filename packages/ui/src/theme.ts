@@ -21,8 +21,9 @@ export const defaultTheme: ThemeConfig = {
 };
 
 type Rgb = { r: number; g: number; b: number };
+type Rgba = Rgb & { a: number };
 
-const parseColor = (color: unknown): Rgb | null => {
+const parseColor = (color: unknown): Rgba | null => {
   if (typeof color !== 'string') return null;
   const value = color.trim();
   const hex = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(value)?.[1];
@@ -32,11 +33,21 @@ const parseColor = (color: unknown): Rgb | null => {
       r: parseInt(full.slice(0, 2), 16),
       g: parseInt(full.slice(2, 4), 16),
       b: parseInt(full.slice(4, 6), 16),
+      a: full.length === 8 ? parseInt(full.slice(6, 8), 16) / 255 : 1,
     };
   }
-  const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(value);
-  return rgb ? { r: Number(rgb[1]), g: Number(rgb[2]), b: Number(rgb[3]) } : null;
+  const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:[\s,/]+([\d.]+%?))?/i.exec(value);
+  if (!rgb) return null;
+  const alpha = rgb[4] ? parseFloat(rgb[4]) / (rgb[4].endsWith('%') ? 100 : 1) : 1;
+  return { r: Number(rgb[1]), g: Number(rgb[2]), b: Number(rgb[3]), a: alpha };
 };
+
+/** Composites a possibly translucent color over an opaque one, as the browser paints it. */
+const over = ({ r, g, b, a }: Rgba, background: Rgb): Rgb => ({
+  r: r * a + background.r * (1 - a),
+  g: g * a + background.g * (1 - a),
+  b: b * a + background.b * (1 - a),
+});
 
 const relativeLuminance = ({ r, g, b }: Rgb) => {
   const channel = (c: number) => {
@@ -66,18 +77,19 @@ const toHex = ({ r, g, b }: Rgb) =>
 /** WCAG 2.x non-text contrast (1.4.11) for component boundaries. */
 const MIN_BOUNDARY_CONTRAST = 3;
 
-const minContrast = (color: Rgb, surfaces: Rgb[]) =>
-  Math.min(...surfaces.map((surface) => contrastRatio(color, surface)));
+const minContrast = (color: Rgba, surfaces: Rgb[]) =>
+  Math.min(...surfaces.map((surface) => contrastRatio(over(color, surface), surface)));
 
 /**
  * The lightest mix of `text` over `background` that still reaches
  * MIN_BOUNDARY_CONTRAST against every surface a control sits on.
  */
 const boundaryColor = (text: Rgb, background: Rgb, surfaces: Rgb[]) => {
-  const mix = (alpha: number): Rgb => ({
+  const mix = (alpha: number): Rgba => ({
     r: Math.round(text.r * alpha + background.r * (1 - alpha)),
     g: Math.round(text.g * alpha + background.g * (1 - alpha)),
     b: Math.round(text.b * alpha + background.b * (1 - alpha)),
+    a: 1,
   });
   let low = 0;
   let high = 1;
@@ -113,14 +125,17 @@ export const resolveTheme = (theme: ThemeConfig): ThemeConfig => {
     token.colorTextPlaceholder = derived.colorTextSecondary;
   }
   // Controls are filled with colorBgContainer and placed on colorBgLayout (sidebar).
-  const background = parseColor(derived.colorBgContainer);
-  const layout = parseColor(derived.colorBgLayout);
+  const base = parseColor(derived.colorBgBase);
+  const layoutColor = parseColor(derived.colorBgLayout);
+  const containerColor = parseColor(derived.colorBgContainer);
   const border = parseColor(derived.colorBorder);
   const text = parseColor(derived.colorText);
-  if (!token.colorBorder && background && layout && border && text) {
+  if (!token.colorBorder && base && layoutColor && containerColor && border && text) {
+    const layout = over(layoutColor, over(base, WHITE));
+    const background = over(containerColor, layout);
     const surfaces = [background, layout];
     if (minContrast(border, surfaces) < MIN_BOUNDARY_CONTRAST) {
-      token.colorBorder = boundaryColor(text, background, surfaces);
+      token.colorBorder = boundaryColor(over(text, background), background, surfaces);
     }
   }
   resolved.token = token;
