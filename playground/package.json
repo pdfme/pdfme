@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@puppeteer/replay": "^4.0.2",
-    "@sentry/vite-plugin": "^5.4.0",
+    "@sentry/vite-plugin": "^11.8.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
