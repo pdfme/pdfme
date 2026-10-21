@@ -928,7 +928,11 @@ const addSchemaFromSidebar = (container: HTMLElement, type: string) => {
   fireEvent.pointerUp(document, { ...pointer, clientX: 180, clientY: 180 });
 };
 
-const mountPublicDesigner = async (template: Template, designerPlugins: Plugins = plugins) => {
+const mountPublicDesigner = async (
+  template: Template,
+  designerPlugins: Plugins = plugins,
+  onCreate?: (designer: PublicDesigner) => void,
+) => {
   const originalResizeObserver = globalThis.ResizeObserver;
   globalThis.ResizeObserver = class {
     observe() {}
@@ -947,6 +951,8 @@ const mountPublicDesigner = async (template: Template, designerPlugins: Plugins 
     template,
     plugins: designerPlugins,
   });
+  // The first render is only committed inside the next act(), so this runs before mount.
+  onCreate?.(designer);
   await act(async () => {
     designer.updateTemplate(template);
   });
@@ -1849,4 +1855,153 @@ test('1D barcodes resize freely', async () => {
   } finally {
     cleanup();
   }
+});
+
+describe('onChangeSelection (#1691)', () => {
+  const flushRender = () =>
+    act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+  test('does not notify on mount or on re-renders that keep the selection', async () => {
+    const selections: number[] = [];
+    const { designer, cleanup } = await mountPublicDesigner(
+      getResizeFieldTemplate(),
+      plugins,
+      (created) => created.onChangeSelection(({ schemas }) => selections.push(schemas.length)),
+    );
+
+    try {
+      await flushRender();
+      expect(selections).toEqual([]);
+
+      for (let i = 0; i < 3; i++) {
+        await act(async () => {
+          designer.updateOptions({});
+        });
+      }
+      expect(selections).toEqual([]);
+
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await waitFor(() => expect(selections).toEqual([1]));
+
+      for (let i = 0; i < 3; i++) {
+        await act(async () => {
+          designer.updateOptions({});
+        });
+      }
+      expect(selections).toEqual([1]);
+      expect(designer.getSelectedSchemas().map(({ name }) => name)).toEqual(['field1']);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('notifies once when the page changes without a selection', async () => {
+    const selections: Array<{ pageIndex: number; count: number }> = [];
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(
+      getTwoPageTemplate(),
+      plugins,
+      (created) =>
+        created.onChangeSelection(({ pageIndex, schemas }) =>
+          selections.push({ pageIndex, count: schemas.length }),
+        ),
+    );
+
+    try {
+      await waitFor(() => expect(domContainer).toHaveTextContent('1/2'));
+      expect(selections).toEqual([]);
+
+      fireEvent.click(domContainer.querySelector('.pdfme-ui-page-next')!);
+      await waitFor(() => expect(designer.getPageCursor()).toBe(1));
+      await flushRender();
+      expect(selections).toEqual([{ pageIndex: 1, count: 0 }]);
+
+      await act(async () => {
+        designer.updateOptions({});
+      });
+      expect(selections).toEqual([{ pageIndex: 1, count: 0 }]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('notifies again when the selected schema changes', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    const fontSizes: Array<number | undefined> = [];
+    designer.onChangeSelection(({ schemas }) => {
+      fontSizes.push((schemas[0]?.schema as { fontSize?: number } | undefined)?.fontSize);
+    });
+
+    try {
+      await selectField1(domContainer);
+      const notificationsAfterSelect = fontSizes.length;
+      expect(notificationsAfterSelect).toBe(1);
+
+      emitFormWatch({ fontSize: 20 });
+      await waitFor(() => expect(fontSizes.at(-1)).toBe(20));
+      expect(fontSizes).toHaveLength(notificationsAfterSelect + 1);
+
+      await act(async () => {
+        designer.selectSchemas([]);
+      });
+      await waitFor(() => expect(fontSizes.at(-1)).toBeUndefined());
+      expect(designer.getSelectedSchemas()).toEqual([]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('notifies when undo changes the selected schema', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    const fontSizes: Array<number | undefined> = [];
+    designer.onChangeSelection(({ schemas }) => {
+      fontSizes.push((schemas[0]?.schema as { fontSize?: number } | undefined)?.fontSize);
+    });
+
+    try {
+      await selectField1(domContainer);
+      const originalFontSize = fontSizes.at(-1);
+      expect(originalFontSize).not.toBe(20);
+
+      emitFormWatch({ fontSize: 20 });
+      await waitFor(() => expect(fontSizes.at(-1)).toBe(20));
+      const notificationsAfterEdit = fontSizes.length;
+
+      pressShortcut('z');
+      await waitFor(() => expect(fontSizes.at(-1)).toBe(originalFontSize));
+      expect(fontSizes).toHaveLength(notificationsAfterEdit + 1);
+      expect(designer.getSelectedSchemas().map(({ name }) => name)).toEqual(['field1']);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('a callback that calls updateOptions does not loop', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { designer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+    let calls = 0;
+    designer.onChangeSelection(({ schemas }) => {
+      calls++;
+      // Bound the loop so a regression fails instead of hanging the worker.
+      if (calls > 20) return;
+      designer.updateOptions({ sidebarOpen: schemas.length > 0 });
+    });
+
+    try {
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await flushRender();
+      expect(calls).toBe(1);
+      expect(designer.getSelectedSchemas()).toHaveLength(1);
+      expect(
+        errorSpy.mock.calls.some((args) => String(args[0]).includes('Maximum update depth')),
+      ).toBe(false);
+    } finally {
+      cleanup();
+    }
+  });
 });

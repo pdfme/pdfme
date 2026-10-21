@@ -4,6 +4,7 @@ import React, {
   useContext,
   useCallback,
   useEffect,
+  useEffectEvent,
   useLayoutEffect,
   useMemo,
 } from 'react';
@@ -38,6 +39,7 @@ import {
 import { useUIPreProcessor, useScrollPageCursor, useInitEvents, useZoom } from '../../hooks.js';
 import {
   createDesignerSelection,
+  EMPTY_DESIGNER_SELECTION,
   getDesignerSelectionPageIndex,
   getSelectedSchemaIds,
   normalizeDesignerSchemaSelectionTargets,
@@ -260,15 +262,25 @@ const TemplateEditor = ({
     return () => onRegisterSchemaSelectionHandler?.(null);
   }, [onRegisterSchemaSelectionHandler, selectSchemas]);
 
+  const notifySelectionChange = useEffectEvent((selection: DesignerSelection) => {
+    onChangeSelection?.(selection);
+  });
+  const lastSelectionKeyRef = useRef(JSON.stringify(EMPTY_DESIGNER_SELECTION));
+
+  // Notify only when the selection payload changes. Re-renders recreate
+  // `schemasList` and callbacks, and hosts may call updateOptions from the
+  // callback, so emitting on reference changes would loop.
   useEffect(() => {
-    onChangeSelection?.(
-      createDesignerSelection({
-        activeSchemaIds: activeElements.map((element) => element.id),
-        pageIndex: pageCursor,
-        schemasList,
-      }),
-    );
-  }, [activeElements, onChangeSelection, pageCursor, schemasList]);
+    const selection = createDesignerSelection({
+      activeSchemaIds: activeElements.map((element) => element.id),
+      pageIndex: pageCursor,
+      schemasList,
+    });
+    const selectionKey = JSON.stringify(selection);
+    if (selectionKey === lastSelectionKeyRef.current) return;
+    lastSelectionKeyRef.current = selectionKey;
+    notifySelectionChange(selection);
+  }, [activeElements, pageCursor, schemasList]);
 
   const onEditEnd = () => {
     setActiveElements([]);

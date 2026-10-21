@@ -100,6 +100,51 @@ class Designer extends BaseUIClass {
     return this.template.schemas.length;
   }
 
+  private readonly handleSaveTemplate = (template: Template) => {
+    this.template = template;
+    this.template.pdfmeVersion = PDFME_VERSION;
+    if (this.onSaveTemplateCallback) {
+      this.onSaveTemplateCallback(template);
+    }
+  };
+
+  private readonly handleChangeTemplate = (template: Template) => {
+    this.template = template;
+    this.template.pdfmeVersion = PDFME_VERSION;
+    if (this.onChangeTemplateCallback) {
+      this.onChangeTemplateCallback(template);
+    }
+  };
+
+  private readonly handlePageCursorChange = (newPageCursor: number, totalPages: number) => {
+    this.pageCursor = newPageCursor;
+    if (this.onPageChangeCallback) {
+      this.onPageChangeCallback({
+        currentPage: newPageCursor,
+        totalPages: totalPages,
+      });
+    }
+  };
+
+  private readonly handleChangeSelection = (selection: DesignerSelection) => {
+    this.selection = cloneDeep(selection);
+    if (this.onChangeSelectionCallback) {
+      this.onChangeSelectionCallback(cloneDeep(selection));
+    }
+  };
+
+  private readonly handleRegisterSchemaSelectionHandler = (
+    handler: DesignerSelectSchemas | null,
+  ) => {
+    this.selectSchemasHandler = handler;
+  };
+
+  private readonly handleUpdateTemplatePageApplied = (page: number) => {
+    if (Object.is(this.updateTemplatePage, page)) {
+      this.updateTemplatePage = undefined;
+    }
+  };
+
   protected render() {
     if (!this.domContainer) throw Error(DESTROYED_ERR_MSG);
     this.mount(
@@ -111,43 +156,12 @@ class Designer extends BaseUIClass {
       >
         <DesignerComponent
           template={this.template}
-          onSaveTemplate={(template) => {
-            this.template = template;
-            this.template.pdfmeVersion = PDFME_VERSION;
-            if (this.onSaveTemplateCallback) {
-              this.onSaveTemplateCallback(template);
-            }
-          }}
-          onChangeTemplate={(template) => {
-            this.template = template;
-            this.template.pdfmeVersion = PDFME_VERSION;
-            if (this.onChangeTemplateCallback) {
-              this.onChangeTemplateCallback(template);
-            }
-          }}
-          onPageCursorChange={(newPageCursor: number, totalPages: number) => {
-            this.pageCursor = newPageCursor;
-            if (this.onPageChangeCallback) {
-              this.onPageChangeCallback({
-                currentPage: newPageCursor,
-                totalPages: totalPages,
-              });
-            }
-          }}
-          onChangeSelection={(selection) => {
-            this.selection = cloneDeep(selection);
-            if (this.onChangeSelectionCallback) {
-              this.onChangeSelectionCallback(cloneDeep(selection));
-            }
-          }}
-          onRegisterSchemaSelectionHandler={(handler) => {
-            this.selectSchemasHandler = handler;
-          }}
-          onUpdateTemplatePageApplied={(page) => {
-            if (Object.is(this.updateTemplatePage, page)) {
-              this.updateTemplatePage = undefined;
-            }
-          }}
+          onSaveTemplate={this.handleSaveTemplate}
+          onChangeTemplate={this.handleChangeTemplate}
+          onPageCursorChange={this.handlePageCursorChange}
+          onChangeSelection={this.handleChangeSelection}
+          onRegisterSchemaSelectionHandler={this.handleRegisterSchemaSelectionHandler}
+          onUpdateTemplatePageApplied={this.handleUpdateTemplatePageApplied}
           updateTemplatePage={this.updateTemplatePage}
           size={this.size}
         />
