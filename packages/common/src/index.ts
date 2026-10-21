@@ -87,6 +87,17 @@ import { getDynamicTemplate, getReadOnlyTableValue, getSchemaValue } from './dyn
 import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './splitRange.js';
 import { replacePlaceholders, resolveReadOnlyContent } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
+import {
+  GEOMETRY_EPSILON,
+  clampToRange,
+  getRotatedBoundingBox,
+  getPositionRange,
+  clampPositionIntoPage,
+  getSizeRange,
+  fitIntoPage,
+  isWithinPage,
+} from './geometry.js';
+import type { GeometryBox, PageArea } from './geometry.js';
 
 export {
   PDFME_VERSION,
@@ -138,6 +149,14 @@ export {
   resolvePageSize,
   createDynamicLayoutSplitRange,
   getDynamicLayoutSplitRange,
+  GEOMETRY_EPSILON,
+  clampToRange,
+  getRotatedBoundingBox,
+  getPositionRange,
+  clampPositionIntoPage,
+  getSizeRange,
+  fitIntoPage,
+  isWithinPage,
 };
 
 export type {
@@ -183,4 +202,6 @@ export type {
   PageSize,
   PageSizePreset,
   PdfBytes,
+  GeometryBox,
+  PageArea,
 };
