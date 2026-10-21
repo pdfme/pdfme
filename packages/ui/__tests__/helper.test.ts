@@ -29,6 +29,8 @@ import {
   getStickyScrollPageIndex,
   isRotatableSchema,
   isAspectRatioLockedPlugin,
+  initShortCuts,
+  destroyShortCuts,
 } from '../src/helper';
 import {
   text,
@@ -1328,5 +1330,43 @@ describe('hotkeys-js version floor (#1465)', () => {
     const patch = Number(match![3]);
     const atLeast404 = major > 4 || (major === 4 && (minor > 0 || patch >= 4));
     expect(atLeast404).toBe(true);
+  });
+});
+
+describe('initShortCuts arrow keys (#1684)', () => {
+  const noop = () => undefined;
+  const pressArrowDown = (shiftKey: boolean) =>
+    document.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', keyCode: 40, shiftKey }),
+    );
+
+  type Move = Parameters<typeof initShortCuts>[0]['move'];
+  let move: ReturnType<typeof vi.fn<Move>>;
+
+  beforeEach(() => {
+    move = vi.fn<Move>();
+    initShortCuts({
+      move,
+      remove: noop,
+      esc: noop,
+      copy: noop,
+      paste: noop,
+      redo: noop,
+      undo: noop,
+      save: noop,
+      selectAll: noop,
+    });
+  });
+
+  afterEach(() => destroyShortCuts());
+
+  test('an arrow key moves without the fine-nudge flag', () => {
+    pressArrowDown(false);
+    expect(move).toHaveBeenCalledWith('down', false);
+  });
+
+  test('Shift + arrow key moves with the fine-nudge flag', () => {
+    pressArrowDown(true);
+    expect(move).toHaveBeenCalledWith('down', true);
   });
 });

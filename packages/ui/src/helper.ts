@@ -25,7 +25,6 @@ import { OptionsContext } from './contexts.js';
 // Define a type for the hotkeys function with additional properties
 type HotkeysFunction = {
   (keys: string, callback: (e: KeyboardEvent, handler: { shortcut: string }) => void): unknown;
-  shift: boolean;
   unbind: (keys: string) => void;
 };
 
@@ -37,8 +36,6 @@ const hotkeys = function (
   return hotkeysJs(keys, callback);
 } as HotkeysFunction;
 
-// Add properties to the hotkeys function
-hotkeys.shift = false;
 hotkeys.unbind = function (keys: string) {
   // Do nothing if hotkeysJs doesn't have unbind
   const hotkeysFn = hotkeysJs as unknown as { unbind?: (keys: string) => void };
@@ -196,22 +193,22 @@ export const initShortCuts = (arg: {
       case up:
       case shiftUp:
         e.preventDefault();
-        arg.move('up', hotkeys.shift);
+        arg.move('up', e.shiftKey);
         break;
       case down:
       case shiftDown:
         e.preventDefault();
-        arg.move('down', hotkeys.shift);
+        arg.move('down', e.shiftKey);
         break;
       case left:
       case shiftLeft:
         e.preventDefault();
-        arg.move('left', hotkeys.shift);
+        arg.move('left', e.shiftKey);
         break;
       case right:
       case shiftRight:
         e.preventDefault();
-        arg.move('right', hotkeys.shift);
+        arg.move('right', e.shiftKey);
         break;
       case rmWin:
       case rmMac:
