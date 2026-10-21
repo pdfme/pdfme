@@ -172,6 +172,9 @@ const TemplateEditor = ({
   );
   const [canvasHeight, setCanvasHeight] = useState(0);
   const [prevTemplate, setPrevTemplate] = useState<Template | null>(null);
+  // Page backgrounds and sizes follow the edited document, not the loaded
+  // `template`, which keeps its page count until the host loads another one.
+  const [pageSource, setPageSource] = useState(template);
 
   const sizeExcSidebars = useMemo(
     () => ({
@@ -184,8 +187,8 @@ const TemplateEditor = ({
     [canvasWidth, rightSidebarWidth, sidebarOpen, size.height],
   );
 
-  const { backgrounds, pageSizes, baseScale, error, refresh } = useUIPreProcessor({
-    template,
+  const { backgrounds, pageSizes, baseScale, error } = useUIPreProcessor({
+    template: pageSource,
     size: sizeExcSidebars,
     zoomLevel: 1,
     maxZoom,
@@ -447,7 +450,7 @@ const TemplateEditor = ({
         onPageCursorChange(clampedCursor, next.length);
       }
       if (pageCountChanged) {
-        void refresh(newTemplate);
+        setPageSource(newTemplate);
       }
 
       if (cursorChanged) {
@@ -464,7 +467,7 @@ const TemplateEditor = ({
         }
       }
     },
-    [displayScale, onChangeTemplate, onPageCursorChange, pageSizes, refresh, template.basePdf],
+    [displayScale, onChangeTemplate, onPageCursorChange, pageSizes, template.basePdf],
   );
 
   const commitSchemas = useCallback(
@@ -705,6 +708,7 @@ const TemplateEditor = ({
 
   if (prevTemplate !== template) {
     setPrevTemplate(template);
+    setPageSource(template);
     void updateTemplate(template, updateTemplatePage);
   }
 

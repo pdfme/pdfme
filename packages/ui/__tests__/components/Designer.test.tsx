@@ -2005,3 +2005,141 @@ describe('onChangeSelection (#1691)', () => {
     }
   });
 });
+
+describe('re-rendering keeps the editing session (#1691)', () => {
+  const flushRender = () =>
+    act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+  const getSyncHeightTemplate = (): Template => ({
+    basePdf: BLANK_A4_PDF,
+    schemas: [
+      [
+        { ...textField('field1', 'hello'), width: 45, height: 10 },
+        { ...syncHeightPlugin.propPanel.defaultSchema, position: { x: 10, y: 60 } },
+      ],
+    ],
+  });
+
+  const mountAfterHeightSync = async (onCreate?: (designer: PublicDesigner) => void) => {
+    const mounted = await mountPublicDesigner(getSyncHeightTemplate(), syncHeightPlugins, onCreate);
+    await waitFor(() => {
+      expect(heightOfType(mounted.designer.getTemplate(), 'syncHeight')).toBe(SYNCED_HEIGHT);
+      expect(mounted.domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    });
+    return mounted;
+  };
+
+  test('updateOptions after a renderer height sync keeps the selection and schema ids', async () => {
+    const { designer, domContainer, cleanup } = await mountAfterHeightSync();
+
+    try {
+      const field1Id = domContainer.querySelector('[title="field1"]')!.id;
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await waitFor(() => expect(designer.getSelectedSchemas()).toHaveLength(1));
+      expect(designer.getSelectedSchemas()[0].schemaId).toBe(field1Id);
+
+      await act(async () => {
+        designer.updateOptions({});
+      });
+      await flushRender();
+
+      expect(designer.getSelectedSchemas().map(({ name, schemaId }) => [name, schemaId])).toEqual([
+        ['field1', field1Id],
+      ]);
+      expect(domContainer.querySelector('[title="field1"]')!.id).toBe(field1Id);
+      expect(domContainer.querySelectorAll(`.${DESIGNER_CLASSNAME}delete-button`)).toHaveLength(1);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('the first click survives a callback that calls updateOptions', async () => {
+    const selections: string[][] = [];
+    const { designer, domContainer, cleanup } = await mountAfterHeightSync((created) =>
+      created.onChangeSelection(({ schemas }) => {
+        selections.push(schemas.map(({ name }) => name));
+        created.updateOptions({ sidebarOpen: schemas.length > 0 });
+      }),
+    );
+
+    try {
+      clickFieldInList(domContainer, 'field1');
+      await waitFor(() => expect(selections).toEqual([['field1']]));
+      await flushRender();
+
+      expect(selections).toEqual([['field1']]);
+      expect(designer.getSelectedSchemas().map(({ name }) => name)).toEqual(['field1']);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('updateOptions after an edit keeps schema ids and undo history', async () => {
+    const { designer, domContainer, cleanup } = await mountPublicDesigner(getResizeFieldTemplate());
+
+    try {
+      await selectField1(domContainer);
+      const field1Id = designer.getSelectedSchemas()[0].schemaId;
+
+      emitFormWatch({ fontSize: 20 });
+      await waitFor(() => expect(designer.getTemplate().schemas[0][0].fontSize).toBe(20));
+
+      await act(async () => {
+        designer.updateOptions({ zoomLevel: 1 });
+      });
+      await flushRender();
+      expect(designer.getSelectedSchemas().map(({ schemaId }) => schemaId)).toEqual([field1Id]);
+
+      pressShortcut('z');
+      await waitFor(() => expect(designer.getTemplate().schemas[0][0].fontSize).toBe(13));
+      expect(designer.getSelectedSchemas().map(({ schemaId }) => schemaId)).toEqual([field1Id]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('updateTemplate still replaces the document and clears the selection', async () => {
+    const { designer, cleanup } = await mountAfterHeightSync();
+
+    try {
+      await act(async () => {
+        designer.selectSchemas('field1');
+      });
+      await waitFor(() => expect(designer.getSelectedSchemas()).toHaveLength(1));
+
+      await act(async () => {
+        designer.updateTemplate(getOnePageBlankTemplate());
+      });
+      await flushRender();
+
+      expect(designer.getSelectedSchemas()).toEqual([]);
+      expect(namesByPage(designer.getTemplate())).toEqual([['field1']]);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test('a page added in the editor stays rendered when the canvas size changes', async () => {
+    const { domContainer, cleanup } = await mountPublicDesigner(getOnePageBlankTemplate());
+
+    try {
+      await waitFor(() => {
+        expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+      });
+      await clickControl(domContainer, '.pdfme-ui-context-menu', 'Add Page After');
+      await waitFor(() => expect(domContainer).toHaveTextContent('2/2'));
+
+      fireEvent.click(domContainer.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+      await flushRender();
+
+      expect(domContainer).toHaveTextContent('2/2');
+      expect(domContainer.querySelector('[title="field1"]')).toBeTruthy();
+    } finally {
+      cleanup();
+    }
+  });
+});
