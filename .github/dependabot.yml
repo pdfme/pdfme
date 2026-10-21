@@ -14,6 +14,10 @@ updates:
     labels:
       - "dependencies"
       - "npm"
+    ignore:
+      # Bundled into @pdfme/ui against antd 6 outside its antd 4/5 peer range
+      # (#1690). Bump manually after checking the Designer property panel.
+      - dependency-name: "form-render"
     groups:
       minor-and-patch:
         patterns:
