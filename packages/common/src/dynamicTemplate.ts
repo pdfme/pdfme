@@ -41,7 +41,8 @@ interface LayoutItem {
   dynamicLayout: DynamicLayoutResult;
 }
 
-const isRotated = (schema: Schema) => (Number(schema.rotate) || 0) % 360 !== 0;
+// A half turn keeps the box on the same axes, so it lays out and splits like an unrotated one.
+const isRotated = (schema: Schema) => (Number(schema.rotate) || 0) % 180 !== 0;
 
 /** Calculate the content height of a page (drawable area excluding padding) */
 const getContentHeight = (basePdf: BlankPdf): number =>
@@ -128,7 +129,7 @@ function normalizePageSchemas(
 /**
  * Place a rotated schema as one block. Its units run along the rotated axis, so
  * slicing them at a horizontal page break would not match what is drawn; the
- * whole visible box moves to the next page instead.
+ * whole visible box moves to the next page instead when it fits there.
  * @returns The final global Y coordinate (bottom of the visible box) after placement
  */
 function placeRotatedOnPage(
@@ -144,8 +145,9 @@ function placeRotatedOnPage(
   let pageIndex = Math.max(0, Math.floor(startGlobalY / contentHeight));
   let yInPage = Math.max(0, startGlobalY % contentHeight);
 
-  // An oversized box stays where it is when already at a page top.
-  if (visible.height > contentHeight - yInPage + EPSILON && yInPage > EPSILON) {
+  // A box taller than a page cannot fit on the next one either, so it stays where it is.
+  const fitsOnFreshPage = visible.height <= contentHeight + EPSILON;
+  if (fitsOnFreshPage && visible.height > contentHeight - yInPage + EPSILON) {
     pageIndex++;
     yInPage = 0;
   }

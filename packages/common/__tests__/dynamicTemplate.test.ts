@@ -781,6 +781,29 @@ describe('getDynamicTemplate with rotated schemas (#1683)', () => {
     expect(find(result, 0, 'grow')).toMatchObject({ position: { y: 30 }, height: 20 });
   });
 
+  test('splits a 180deg table taller than one page like an unrotated one', async () => {
+    const table = (rotate: number) =>
+      field('table', { type: 'table', rotate, width: 80, height: 20, position: { x: 10, y: 10 } });
+    const heights = { table: [20, 30, 30, 30, 30, 30] };
+    const unrotated = await layout([table(0)], heights);
+    const halfTurn = await layout([table(180)], heights);
+
+    expect(halfTurn.schemas.length).toBeGreaterThan(1);
+    expect(halfTurn.schemas.every((page) => page.length > 0)).toBe(true);
+    expect(halfTurn.schemas).toEqual(
+      unrotated.schemas.map((page) => page.map((s) => ({ ...s, rotate: 180 }))),
+    );
+  });
+
+  test('keeps a rotated box taller than the page where it is instead of leaving a blank page', async () => {
+    // 150x10 at 90deg is drawn 150 tall; at y = 90 its visible box starts at y = 20.
+    const tall = field('tall', { width: 150, height: 10, rotate: 90, position: { x: 50, y: 90 } });
+    const result = await layout([field('grow', {}), tall], { grow: [10, 10] });
+
+    expect(result.schemas.length).toBe(1);
+    expect(find(result, 0, 'tall').position).toEqual({ x: 50, y: 100 });
+  });
+
   test('grows a rotated dynamic field as one block without splitting it', async () => {
     // 30x10 at 90deg at y = 60 is drawn 10 wide and 30 tall over y 50..80.
     const dynamic = field('d', { width: 30, height: 10, rotate: 90, position: { x: 10, y: 60 } });
