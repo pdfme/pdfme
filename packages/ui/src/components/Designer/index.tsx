@@ -491,6 +491,7 @@ const TemplateEditor = ({
         basePdf: template.basePdf,
         pluginsRegistry,
         pageSize,
+        layoutSync: true,
         commitSchemas: (newSchemas) => {
           const currentSchemas = schemasListRef.current;
           if (schemasEqual(currentSchemas[currentPage], newSchemas)) return;

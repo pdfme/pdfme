@@ -276,16 +276,19 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
     const left = fmt4Num(s.left) + (movesLeft ? fmt4Num(s.width) - width : 0);
     const top = fmt4Num(s.top) + (movesTop ? fmt4Num(s.height) - height : 0);
 
-    const fitted = fitIntoPage(
-      {
-        position: { x: left / ZOOM, y: top / ZOOM },
-        width: width / ZOOM,
-        height: height / ZOOM,
-        rotate: current.rotate,
-      },
-      getPageArea(basePdf, pageSizes[pageCursor]),
-      { positionSize: { width: current.width, height: current.height } },
+    const next = {
+      position: { x: left / ZOOM, y: top / ZOOM },
+      width: width / ZOOM,
+      height: height / ZOOM,
+      rotate: current.rotate,
+    };
+    const editedSizeKeys = (['width', 'height'] as const).filter(
+      (key) => Math.abs(next[key] - current[key]) > 1e-6,
     );
+    const fitted = fitIntoPage(next, getPageArea(basePdf, pageSizes[pageCursor]), {
+      editedSizeKeys,
+      shrink: true,
+    });
     Object.assign(s, {
       top: `${fitted.position.y * ZOOM}px`,
       left: `${fitted.position.x * ZOOM}px`,

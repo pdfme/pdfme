@@ -680,9 +680,10 @@ describe('changeSchemas test', () => {
         name: 'a',
         type: 'text',
         content: 'a',
-        position: { x: 100, y: 187 },
+        // Each edited size is capped at the edited position inside the 10mm padding.
+        position: { x: 100, y: 197 },
         width: 100,
-        height: 100,
+        height: 90,
       },
       {
         id: schemaB.id,
@@ -1514,5 +1515,115 @@ describe('rotated fields at the page edge (#1683)', () => {
     const [[r, u]] = await template2SchemasList(template);
     expect(r.position).toEqual({ x: 150, y: 237 });
     expect(u.position).toEqual({ x: 110, y: 277 });
+  });
+
+  test('template2SchemasList leaves negative positions alone and pulls back far-edge overflow', async () => {
+    const field = (name: string, over: Partial<SchemaForUI>) => ({
+      ...getSchema(),
+      name,
+      width: 100,
+      height: 20,
+      ...over,
+    });
+    const template: Template = {
+      basePdf,
+      schemas: [
+        [
+          field('bleed', { position: { x: -5, y: -3 } }),
+          field('rotatedBleed', { rotate: 90, position: { x: -60, y: 20 } }),
+          field('rotatedOver', { rotate: 90, position: { x: 160, y: 250 } }),
+        ],
+      ],
+    };
+    const [[bleed, rotatedBleed, rotatedOver]] = await template2SchemasList(template);
+    expect(bleed.position).toEqual({ x: -5, y: -3 });
+    expect(rotatedBleed.position).toEqual({ x: -60, y: 20 });
+    expect(rotatedOver.position).toEqual({ x: 150, y: 237 });
+  });
+
+  test('a 90deg field at an edge can shrink', () => {
+    // Visible left edge on x = 0. Shrinking width moves the centre left, so the field translates.
+    expect(
+      commit([{ key: 'width', value: 80 }], rotated({ position: { x: -40, y: 50 } })),
+    ).toMatchObject({ position: { x: -30, y: 50 }, width: 80, height: 20 });
+  });
+
+  test('a 45deg field at an edge can shrink', () => {
+    // At 45deg a 100x20 field is drawn ~84.85 wide, so x = -7.57 touches the left edge.
+    const result = commit(
+      [{ key: 'width', value: 60 }],
+      rotated({ rotate: 45, position: { x: -7.57, y: 50 } }),
+    );
+    expect(result.width).toBe(60);
+    expect(result.height).toBe(20);
+    expect(result.position.x).toBeGreaterThan(-7.57);
+  });
+
+  test('shrinking one side of a rotated field never collapses the other side', () => {
+    // 20x100 at 90deg is drawn 100 wide and 20 tall; y = -40 puts it on the top edge.
+    const schema = rotated({ width: 20, height: 100, position: { x: 40, y: -40 } });
+    expect(commit([{ key: 'height', value: 60 }], schema)).toMatchObject({
+      position: { x: 40, y: -20 },
+      width: 20,
+      height: 60,
+    });
+  });
+
+  test('shrinking from the left handle at an edge keeps the field in place in either commit order', () => {
+    const atRight = rotated({ rotate: 0, position: { x: 110, y: 0 } });
+    const position = { key: 'position.x', value: 130 };
+    const width = { key: 'width', value: 80 };
+    expect(commit([position, width], atRight)).toMatchObject({ position: { x: 130 }, width: 80 });
+    expect(commit([width, position], atRight)).toMatchObject({ position: { x: 130 }, width: 80 });
+
+    const rotatedAtRight = rotated({ position: { x: 150, y: 50 } });
+    const canvasResize = [
+      { key: 'position.x', value: 160 },
+      { key: 'position.y', value: 50 },
+      { key: 'width', value: 80 },
+      { key: 'height', value: 20 },
+    ];
+    expect(commit(canvasResize, rotatedAtRight)).toMatchObject({
+      position: { x: 160, y: 50 },
+      width: 80,
+      height: 20,
+    });
+    expect(commit([...canvasResize].reverse(), rotatedAtRight)).toMatchObject({
+      position: { x: 160, y: 50 },
+      width: 80,
+      height: 20,
+    });
+  });
+
+  test('a rotation change only translates the field', () => {
+    // 300 wide does not fit the 297 tall page at 90deg; the field keeps its size
+    // and takes the near end of the swapped interval.
+    const schema = rotated({ rotate: 0, width: 300, position: { x: 0, y: 0 } });
+    expect(commit([{ key: 'rotate', value: 90 }], schema)).toMatchObject({
+      rotate: 90,
+      width: 300,
+      height: 20,
+      position: { y: 137 },
+    });
+  });
+
+  test('layout sync only caps the height and never moves the field', () => {
+    const padded: BasePdf = { ...pageSize, padding: [10, 10, 10, 10] };
+    const schema = rotated({ rotate: 0, position: { x: 5, y: 3 } });
+    const commitSchemas = vi.fn();
+    const sync = (height: number) => {
+      changeSchemas({
+        objs: [{ key: 'height', value: height, schemaId: schema.id }],
+        schemas: [schema],
+        basePdf: padded,
+        pluginsRegistry,
+        pageSize,
+        commitSchemas,
+        layoutSync: true,
+      });
+      return (commitSchemas.mock.calls.at(-1)![0] as SchemaForUI[])[0];
+    };
+    expect(sync(40)).toMatchObject({ position: { x: 5, y: 3 }, width: 100, height: 40 });
+    expect(sync(400)).toMatchObject({ position: { x: 5, y: 3 }, height: 284 });
   });
 });

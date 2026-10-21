@@ -26,6 +26,8 @@ export type PageArea = {
 };
 
 /**
+ * @internal Exported so that @pdfme/ui uses the same tolerance. Not part of the public API.
+ *
  * Tolerance in mm. The Designer stores geometry rounded to 2 decimals, so a value
  * this close to a limit counts as on it and is never moved.
  */
@@ -56,7 +58,11 @@ const toRange = (a: number, b: number): Range => {
   return min <= max ? { min, max } : { min: max, max: min };
 };
 
-/** Clamp into a range, leaving values within GEOMETRY_EPSILON of it untouched. */
+/**
+ * @internal Exported for @pdfme/ui. Not part of the public API.
+ *
+ * Clamp into a range, leaving values within GEOMETRY_EPSILON of it untouched.
+ */
 export const clampToRange = (value: number, { min, max }: Range): number => {
   if (value < min - GEOMETRY_EPSILON) return min;
   if (value > max + GEOMETRY_EPSILON) return max;
@@ -105,10 +111,25 @@ export const clampPositionIntoPage = (
   };
 };
 
+/** Whether the visible box lies inside the page area, within GEOMETRY_EPSILON. */
+export const isWithinPage = (box: GeometryBox, page: PageArea): boolean => {
+  const { left, top, right, bottom } = getLimits(page);
+  const visible = getRotatedBoundingBox(box);
+  return (
+    visible.x >= left - GEOMETRY_EPSILON &&
+    visible.y >= top - GEOMETRY_EPSILON &&
+    visible.x + visible.width <= right + GEOMETRY_EPSILON &&
+    visible.y + visible.height <= bottom + GEOMETRY_EPSILON
+  );
+};
+
 /**
- * Allowed `width` or `height` with the position and the other side held fixed.
- * Each visible edge is affine in the size, so two samples give its slope and
- * every page edge turns into a lower or upper bound.
+ * @internal Exported for @pdfme/ui. Not part of the public API.
+ *
+ * Largest `width` or `height` with the position and the other side held fixed;
+ * `min` is always 0, so a size is never raised. Each visible edge is affine in the
+ * size, so two samples give its slope. Only edges that move outward as the size
+ * grows limit it, and an edge that is already out at size 0 is left to translation.
  */
 export const getSizeRange = (box: GeometryBox, page: PageArea, key: 'width' | 'height'): Range => {
   const { left, top, right, bottom } = getLimits(page);
@@ -121,53 +142,63 @@ export const getSizeRange = (box: GeometryBox, page: PageArea, key: 'width' | 'h
     { start: at0.y + at0.height, end: at1.y + at1.height, limit: bottom, lower: false },
   ];
 
-  let min = 0;
   let max = Infinity;
   for (const { start, end, limit, lower } of edges) {
     const slope = end - start;
-    if (Math.abs(slope) < 1e-9) continue;
+    // A lower edge limits growth only when it moves down (left/up); an upper edge when it moves up.
+    if (lower ? slope >= -1e-9 : slope <= 1e-9) continue;
     const bound = (limit - start) / slope;
-    // A lower edge must stay >= limit and an upper edge <= limit; a negative slope flips it.
-    if (lower === slope > 0) min = Math.max(min, bound);
-    else max = Math.min(max, bound);
+    if (bound >= 0) max = Math.min(max, bound);
   }
-  return toRange(min, max);
+  return { min: 0, max: roundGeometry(max) };
 };
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 /**
- * Fit a box into the page area: translate first, then shrink.
+ * @internal Exported for @pdfme/ui. Not part of the public API.
  *
- * The position is clamped at `positionSize` (default: the box's own size). Pass
- * the size from before an edit so a resize that overflows shrinks back instead of
- * pushing the box away. The size is then clamped with that position held, and a
- * final translation covers boxes that cannot fit at their clamped position.
+ * Fit an edited box into the page area. A box already inside is returned as is.
+ * Otherwise:
+ * 1. each size in `editedSizeKeys` is capped at its held-position maximum;
+ * 2. the box is translated inside at its new size;
+ * 3. with `shrink`, a visible box still larger than the area is scaled down to fit.
+ * Without `shrink` (a move or a rotation), an oversized box keeps the swapped
+ * position interval from `getPositionRange`. The result is rounded to 2 decimals.
  */
 export const fitIntoPage = (
   box: GeometryBox,
   page: PageArea,
-  options: { positionSize?: { width: number; height: number } } = {},
+  options: { editedSizeKeys?: ('width' | 'height')[]; shrink?: boolean } = {},
 ): { position: { x: number; y: number }; width: number; height: number } => {
-  let position = clampPositionIntoPage({ ...box, ...options.positionSize }, page);
-  const width = Math.max(
-    0,
-    clampToRange(box.width, getSizeRange({ ...box, position }, page, 'width')),
-  );
-  const height = Math.max(
-    0,
-    clampToRange(box.height, getSizeRange({ ...box, position, width }, page, 'height')),
-  );
-  position = clampPositionIntoPage({ ...box, position, width, height }, page);
-  return { position, width, height };
-};
+  if (isWithinPage(box, page)) {
+    return { position: { ...box.position }, width: box.width, height: box.height };
+  }
 
-/** Whether the visible box lies inside the page area, within GEOMETRY_EPSILON. */
-export const isWithinPage = (box: GeometryBox, page: PageArea): boolean => {
-  const { left, top, right, bottom } = getLimits(page);
-  const visible = getRotatedBoundingBox(box);
-  return (
-    visible.x >= left - GEOMETRY_EPSILON &&
-    visible.y >= top - GEOMETRY_EPSILON &&
-    visible.x + visible.width <= right + GEOMETRY_EPSILON &&
-    visible.y + visible.height <= bottom + GEOMETRY_EPSILON
-  );
+  const size = { width: box.width, height: box.height };
+  for (const key of options.editedSizeKeys ?? []) {
+    size[key] = clampToRange(size[key], getSizeRange({ ...box, ...size }, page, key));
+  }
+  let position = clampPositionIntoPage({ ...box, ...size }, page);
+
+  if (options.shrink) {
+    const { left, top, right, bottom } = getLimits(page);
+    const visible = getRotatedBoundingBox({ ...box, ...size, position });
+    const scale = Math.min(
+      1,
+      visible.width > 0 ? Math.max(0, right - left) / visible.width : 1,
+      visible.height > 0 ? Math.max(0, bottom - top) / visible.height : 1,
+    );
+    if (scale < 1) {
+      size.width *= scale;
+      size.height *= scale;
+      position = clampPositionIntoPage({ ...box, ...size, position }, page);
+    }
+  }
+
+  return {
+    position: { x: round2(position.x), y: round2(position.y) },
+    width: round2(size.width),
+    height: round2(size.height),
+  };
 };

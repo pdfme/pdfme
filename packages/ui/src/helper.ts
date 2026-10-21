@@ -16,7 +16,9 @@ import {
   clampPositionIntoPage,
   clampToRange,
   fitIntoPage,
+  getRotatedBoundingBox,
   getSizeRange,
+  GEOMETRY_EPSILON,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import {
@@ -326,6 +328,26 @@ const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
   return template.schemas as SchemaForUI[][];
 };
 
+/**
+ * Move a field whose visible (rotated) box overflows the right or bottom page edge
+ * back in, without pushing its visible box past the left or top edge. Negative
+ * positions are left alone: Form and Viewer load through here, and intentional
+ * bleed has to keep matching the generator.
+ */
+const pullBackFromFarEdges = (schema: SchemaForUI, page: Size) => {
+  const visible = getRotatedBoundingBox(schema);
+  const { x, y } = schema.position;
+  const fix = (pos: number, visibleStart: number, visibleSize: number, pageSize: number) => {
+    const overflow = visibleStart + visibleSize - pageSize;
+    if (overflow <= GEOMETRY_EPSILON) return pos;
+    return Math.max(pos - overflow, Math.min(pos, pos - visibleStart));
+  };
+  return {
+    x: fix(x, visible.x, visible.width, page.width),
+    y: fix(y, visible.y, visible.height, page.height),
+  };
+};
+
 export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const { basePdf, schemas } = template;
@@ -347,7 +369,7 @@ export const template2SchemasList = async (_template: Template) => {
 
   return alignSchemasListToPageCount(schemasForUI, pageSizes.length).map((schema, i) => {
     Object.values(schema).forEach((value) => {
-      value.position = clampPositionIntoPage(value, pageSizes[i]);
+      value.position = pullBackFromFarEdges(value, pageSizes[i]);
     });
 
     return schema;
@@ -666,31 +688,39 @@ const toFiniteBox = (schema: SchemaForUI) => {
 };
 
 /**
- * Keep the visible (rotated) box inside the page area. An edited size is held at
- * the position it had before the edit, so an overflowing resize shrinks rather
- * than pushing the field away; a move or rotation translates the field instead.
+ * Keep the visible (rotated) box inside the page area. Only sizes the user edited
+ * are capped where they stand; everything else translates. Moves and rotations
+ * never shrink a field.
  */
 const fitSchemaIntoPage = (
   schema: SchemaForUI,
-  prevSchema: SchemaForUI | undefined,
+  original: SchemaForUI | undefined,
   changedKeys: Set<string>,
   page: PageArea,
 ) => {
   const box = toFiniteBox(schema);
   if (!box) return;
 
-  const sizeEdited =
-    (changedKeys.has('width') || changedKeys.has('height')) && !changedKeys.has('type');
-  const prevBox = sizeEdited && prevSchema ? toFiniteBox(prevSchema) : undefined;
-  const positionSize = prevBox ? { width: prevBox.width, height: prevBox.height } : undefined;
-  const { position, width, height } = fitIntoPage(box, page, { positionSize });
+  const typeChanged = changedKeys.has('type');
+  // A canvas resize commits both sides; only a side whose value moved counts as edited.
+  const editedSizeKeys = typeChanged
+    ? []
+    : (['width', 'height'] as const).filter(
+        (key) => changedKeys.has(key) && Number(original?.[key]) !== box[key],
+      );
+  const { position, width, height } = fitIntoPage(box, page, {
+    editedSizeKeys,
+    shrink: typeChanged || editedSizeKeys.length > 0,
+  });
   schema.position = position;
   schema.width = width;
   schema.height = height;
 };
 
 const clampSize = (schema: SchemaForUI, key: 'width' | 'height', value: number, page: PageArea) => {
-  schema[key] = Math.max(0, clampToRange(value, getSizeRange(schema, page, key)));
+  const box = toFiniteBox({ ...schema, [key]: value });
+  if (!box) return;
+  schema[key] = clampToRange(value, getSizeRange(box, page, key));
 };
 
 const handleTypeChange = (
@@ -772,8 +802,10 @@ export const changeSchemas = (args: {
   pluginsRegistry: PluginRegistry;
   pageSize: { width: number; height: number };
   commitSchemas: (newSchemas: SchemaForUI[]) => void;
+  /** Renderer layout sync (table/list height): only cap the height, never move the field. */
+  layoutSync?: boolean;
 }) => {
-  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas } = args;
+  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas, layoutSync } = args;
   const changedKeysById = new Map<string, Set<string>>();
   const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
     const tgt = acc.find((s) => s.id === schemaId);
@@ -796,9 +828,11 @@ export const changeSchemas = (args: {
   for (const schema of newSchemas) {
     const changedKeys = changedKeysById.get(schema.id);
     if (!changedKeys) continue;
-    if ([...changedKeys].some((key) => GEOMETRY_KEYS.has(key))) {
-      const prevSchema = schemas.find((s) => s.id === schema.id);
-      fitSchemaIntoPage(schema, prevSchema, changedKeys, page);
+    if (layoutSync) {
+      if (changedKeys.has('height')) clampSize(schema, 'height', Number(schema.height), page);
+    } else if ([...changedKeys].some((key) => GEOMETRY_KEYS.has(key))) {
+      const original = schemas.find((s) => s.id === schema.id);
+      fitSchemaIntoPage(schema, original, changedKeys, page);
     }
     applyAspectRatio(schema, changedKeys, pluginsRegistry, basePdf, pageSize);
   }

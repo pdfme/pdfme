@@ -88,14 +88,14 @@ import { createDynamicLayoutSplitRange, getDynamicLayoutSplitRange } from './spl
 import { replacePlaceholders, resolveReadOnlyContent } from './expression.js';
 import { pluginRegistry } from './pluginRegistry.js';
 import {
-  GEOMETRY_EPSILON,
-  clampToRange,
   getRotatedBoundingBox,
   getPositionRange,
   clampPositionIntoPage,
+  isWithinPage,
+  GEOMETRY_EPSILON,
+  clampToRange,
   getSizeRange,
   fitIntoPage,
-  isWithinPage,
 } from './geometry.js';
 import type { GeometryBox, PageArea } from './geometry.js';
 
@@ -149,14 +149,15 @@ export {
   resolvePageSize,
   createDynamicLayoutSplitRange,
   getDynamicLayoutSplitRange,
-  GEOMETRY_EPSILON,
-  clampToRange,
   getRotatedBoundingBox,
   getPositionRange,
   clampPositionIntoPage,
+  isWithinPage,
+  // @internal: Designer bounds policy shared with @pdfme/ui, not part of the public API.
+  GEOMETRY_EPSILON,
+  clampToRange,
   getSizeRange,
   fitIntoPage,
-  isWithinPage,
 };
 
 export type {

@@ -9,7 +9,13 @@ import type {
   PropPanelSchema,
   Schema,
 } from '@pdfme/common';
-import { getPositionRange, isBlankPdf, isWithinPage } from '@pdfme/common';
+import {
+  GEOMETRY_EPSILON,
+  getPositionRange,
+  getSizeRange,
+  isBlankPdf,
+  isWithinPage,
+} from '@pdfme/common';
 import { TEXT_OVERFLOW_EXPAND, TEXT_OVERFLOW_VISIBLE } from '@pdfme/schemas/texts';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
@@ -185,23 +191,20 @@ const DetailView = (props: DetailViewProps) => {
   const validateUniqueSchemaName = (_: unknown, value: string): boolean =>
     uniqueSchemaName.current(value);
 
-  // Calculate padding values once
-  const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(basePdf)
-    ? basePdf.padding
-    : [0, 0, 0, 0];
-
   const pageArea = getPageArea(basePdf, pageSize);
-  // Widen outward to the 2 decimals the Designer stores, so a field dragged onto a
-  // rotated edge never reads as out of range.
+  // Widen by the same tolerance clampToRange allows, snapped to the 2 decimals the
+  // Designer stores, so a value on a rotated edge never reads as out of range.
   const toInputRange = ({ min, max }: { min: number; max: number }) => ({
-    min: Math.floor(min * 100) / 100,
-    max: Math.ceil(max * 100) / 100,
+    min: Math.ceil((min - GEOMETRY_EPSILON) * 100) / 100,
+    max: Math.floor((max + GEOMETRY_EPSILON) * 100) / 100,
   });
   const exactPositionRange = getPositionRange(activeSchema, pageArea);
   const positionRange = {
     x: toInputRange(exactPositionRange.x),
     y: toInputRange(exactPositionRange.y),
   };
+  const maxWidth = toInputRange(getSizeRange(activeSchema, pageArea, 'width')).max;
+  const maxHeight = toInputRange(getSizeRange(activeSchema, pageArea, 'height')).max;
 
   // Cross-field validation on the visible (rotated) box. An x/y value outside its own
   // min/max is left to that rule so the field does not show two errors.
@@ -338,10 +341,6 @@ const DetailView = (props: DetailViewProps) => {
         return result;
       })()
     : emptySchema;
-
-  // Calculate max values considering padding
-  const maxWidth = pageSize.width - paddingLeft - paddingRight;
-  const maxHeight = pageSize.height - paddingTop - paddingBottom;
 
   // Create a type-safe schema object
   const propPanelSchema: PropPanelSchema = {
