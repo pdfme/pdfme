@@ -40,6 +40,7 @@ import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
 import { propPanel as textPropPanel } from '../src/text/propPanel.js';
 import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
 import { pdfRender } from '../src/text/pdfRender.js';
+import { transformTextCase } from '../src/text/textTransform.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 import type { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
@@ -142,6 +143,68 @@ describe('text pdfRender', () => {
     });
 
     expect(drawRectangle).not.toHaveBeenCalled();
+  });
+
+  it('applies the configured text case to PDF output without changing the input value', async () => {
+    const drawText = vi.fn<(...args: unknown[]) => void>();
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      textTransform: 'uppercase',
+    } as TextSchema;
+    const fontKitFont = createMockFont(500);
+    const cache = new Map<string | number, unknown>([['getFontKitFont-Base', fontKitFont]]);
+    const value = 'Hello world';
+
+    await pdfRender({
+      value,
+      schema,
+      pdfDoc: { embedFont: async () => ({}) } as never,
+      pdfLib: { setCharacterSpacing: () => ({}) } as never,
+      page: {
+        getHeight: () => mm2pt(297),
+        drawText,
+        drawRectangle: () => undefined,
+        pushOperators: () => undefined,
+      } as never,
+      options: { font: { Base: { data: new Uint8Array(), fallback: true } } },
+      basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] },
+      _cache: cache,
+    });
+
+    expect(drawText).toHaveBeenCalledWith('HELLO WORLD', expect.any(Object));
+    expect(value).toBe('Hello world');
+  });
+});
+
+describe('text case property', () => {
+  it('offers none, uppercase, and lowercase in the format toolbar', () => {
+    const schema = getTextPropPanelSchema();
+    expect(schema.textTransform).toBeUndefined();
+    const formatter = schema.formatter as PropPanelSchema & {
+      buttons: Array<{ key: string; type: string; values?: string[] }>;
+    };
+    const textTransform = formatter.buttons.find((button) => button.key === 'textTransform');
+
+    expect(textTransform).toMatchObject({
+      type: 'cycle',
+      values: ['none', 'uppercase', 'lowercase'],
+    });
+  });
+
+  it('does not show the text case toolbar control for other schema types', () => {
+    const schema = getTextPropPanelSchema({ activeSchema: { type: 'multiVariableText' } });
+    const formatter = schema.formatter as PropPanelSchema & {
+      buttons: Array<{ key: string }>;
+    };
+
+    expect(formatter.buttons.some((button) => button.key === 'textTransform')).toBe(false);
+  });
+
+  it('transforms case only when configured', () => {
+    expect(transformTextCase('Hello PDFme')).toBe('Hello PDFme');
+    expect(transformTextCase('Hello PDFme', 'uppercase')).toBe('HELLO PDFME');
+    expect(transformTextCase('Hello PDFme', 'lowercase')).toBe('hello pdfme');
   });
 });
 
@@ -326,10 +389,7 @@ describe('text prop panel', () => {
       basePdf: { width: 210, height: 297, padding: [10, 10, 10, 10] },
     });
 
-    expect(getOverflowOptionValues(schema)).toEqual([
-      TEXT_OVERFLOW_VISIBLE,
-      TEXT_OVERFLOW_EXPAND,
-    ]);
+    expect(getOverflowOptionValues(schema)).toEqual([TEXT_OVERFLOW_VISIBLE, TEXT_OVERFLOW_EXPAND]);
   });
 
   it('hides overflow expand for custom basePdf', () => {
@@ -346,10 +406,7 @@ describe('text prop panel', () => {
       activeSchema: { type: 'select' },
     });
 
-    expect(getOverflowOptionValues(schema)).toEqual([
-      TEXT_OVERFLOW_VISIBLE,
-      TEXT_OVERFLOW_EXPAND,
-    ]);
+    expect(getOverflowOptionValues(schema)).toEqual([TEXT_OVERFLOW_VISIBLE, TEXT_OVERFLOW_EXPAND]);
   });
 
   it('keeps dynamic font size controls enabled when custom basePdf has stale overflow expand', () => {
@@ -1061,7 +1118,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'vertical' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 18;
-    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value, startingFontSize });
 
     expect(result).toBe(19.25);
   });
@@ -1071,7 +1128,7 @@ describe('calculateDynamicFontSize with Default font', () => {
     textSchema.dynamicFontSize = { min: 10, max: 30, fit: 'horizontal' };
     const value = 'test with a length string\n and a new line';
     const startingFontSize = 36;
-    const result = calculateDynamicFontSize({textSchema, fontKitFont, value, startingFontSize});
+    const result = calculateDynamicFontSize({ textSchema, fontKitFont, value, startingFontSize });
 
     expect(result).toBe(11.25);
   });
@@ -1091,7 +1148,6 @@ describe('calculateDynamicFontSize with Custom font', () => {
   beforeAll(async () => {
     fontKitFont = await getFontKitFont('SauceHanSansJP', getSampleFont(), new Map());
   });
-
 
   it('should return smaller font size when dynamicFontSizeSetting is provided with horizontal fit', async () => {
     const textSchema = getTextSchema();
@@ -1142,7 +1198,7 @@ describe('calculateDynamicFontSize with Custom font', () => {
 describe('getFontDescentInPt test', () => {
   test('it gets a descent size relative to the font size', () => {
     expect(getFontDescentInPt({ descent: -400, unitsPerEm: 1000 } as FontKitFont, 12)).toBe(
-      -4.800000000000001
+      -4.800000000000001,
     );
     expect(getFontDescentInPt({ descent: 54, unitsPerEm: 1000 } as FontKitFont, 20)).toBe(1.08);
     expect(getFontDescentInPt({ descent: -512, unitsPerEm: 2048 } as FontKitFont, 54)).toBe(-13.5);

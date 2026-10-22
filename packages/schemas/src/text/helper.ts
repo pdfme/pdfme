@@ -12,9 +12,15 @@ import {
   isUrlSafeToFetch,
 } from '@pdfme/common';
 import { parseFont } from '@pdfme/pdf-lib';
-import type { DYNAMIC_FONT_SIZE_FIT, TextSchema, FontWidthCalcValues } from './types.js';
+import type {
+  DYNAMIC_FONT_SIZE_FIT,
+  TEXT_TRANSFORM,
+  TextSchema,
+  FontWidthCalcValues,
+} from './types.js';
 import { getBoxContentArea } from '../box.js';
 import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
+import { transformTextCase } from './textTransform.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -393,8 +399,9 @@ export const calculateDynamicFontSize = ({
   if (!dynamicFontSizeSetting) return fontSize;
   if (dynamicFontSizeSetting.max < dynamicFontSizeSetting.min) return fontSize;
 
+  const displayValue = transformTextCase(value, textSchema.textTransform);
   const characterSpacing = schemaCharacterSpacing ?? DEFAULT_CHARACTER_SPACING;
-  const paragraphs = splitParagraphs(value);
+  const paragraphs = splitParagraphs(displayValue);
   const dynamicFontFit = dynamicFontSizeSetting.fit ?? DEFAULT_DYNAMIC_FIT;
 
   return fitDynamicFontSize({
@@ -407,7 +414,7 @@ export const calculateDynamicFontSize = ({
       let totalHeightInMm = 0;
       const boxWidthInPt = mm2pt(boxWidth);
       const lines = wrapText(
-        value,
+        displayValue,
         (text) =>
           text.length === 0 ? 0 : widthOfTextAtSize(text, fontKitFont, size, characterSpacing),
         boxWidthInPt,
@@ -449,11 +456,18 @@ export const wrapTextToSize = (arg: {
   boxWidthInPt: number;
   fontSize: number;
   fontKitFont: fontkit.Font;
+  textTransform?: TEXT_TRANSFORM;
 }): WrapLine[] => {
-  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt } = arg;
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt, textTransform } = arg;
   return wrapText(
     value,
-    (text) => measureTextWidth(text, fontKitFont, fontSize, characterSpacing),
+    (text) =>
+      measureTextWidth(
+        transformTextCase(text, textTransform),
+        fontKitFont,
+        fontSize,
+        characterSpacing,
+      ),
     boxWidthInPt,
   );
 };
@@ -469,6 +483,7 @@ export const splitTextToSize = (arg: {
   boxWidthInPt: number;
   fontSize: number;
   fontKitFont: fontkit.Font;
+  textTransform?: TEXT_TRANSFORM;
 }) => toLegacySplitLines(wrapTextToSize(arg));
 export const isFirefox = () => navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 //

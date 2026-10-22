@@ -16,6 +16,7 @@ import {
   type RichTextLine,
 } from './richText.js';
 import type { TextSchema } from './types.js';
+import { transformRichTextRuns } from './textTransform.js';
 import { getTextLineRange } from '../splitRange.js';
 import {
   getBoxContentArea,
@@ -76,7 +77,7 @@ export const measureTextLines = async ({
   const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
 
   if (isInlineMarkdownTextSchema(schema)) {
-    const richTextRuns = parseInlineMarkdown(value);
+    const richTextRuns = transformRichTextRuns(parseInlineMarkdown(value), schema.textTransform);
     const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
     const resolvedFontSize =
       schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
@@ -113,6 +114,7 @@ export const measureTextLines = async ({
     fontSize: resolvedFontSize,
     fontKitFont,
     boxWidthInPt,
+    textTransform: schema.textTransform,
   });
 
   return {
@@ -139,7 +141,7 @@ export const mergeTextLineRangeValue = async ({
 
   const { lines } = await measureTextLines({
     value,
-    schema,
+    schema: { ...schema, textTransform: 'none' },
     font,
     _cache,
     ignoreDynamicFontSize: true,

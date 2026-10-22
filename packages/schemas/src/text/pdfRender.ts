@@ -42,6 +42,7 @@ import {
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 import { embedAndGetFont } from '../pdfFont.js';
+import { transformTextCase } from './textTransform.js';
 
 const getFontProp = ({
   value,
@@ -118,7 +119,10 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     font,
     _cache as Map<string, FontKitFont>,
   );
-  const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
+  const displayValue = transformTextCase(
+    enableInlineMarkdown ? stripInlineMarkdown(value) : value,
+    schema.textTransform,
+  );
   const dynamicRichTextFontSize =
     enableInlineMarkdown && shouldUseDynamicFontSize(schema, basePdf)
       ? await calculateDynamicRichTextFontSize({ value, schema, font, _cache })
@@ -183,7 +187,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const lines = applyTextLineRange(
     wrapTextToSize({
-      value,
+      value: displayValue,
       characterSpacing,
       fontSize,
       fontKitFont,

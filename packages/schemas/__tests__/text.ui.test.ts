@@ -102,6 +102,61 @@ describe('text inline markdown UI rendering', () => {
     expect(link.style.textDecoration).toContain('underline');
   });
 
+  it('transforms displayed inline markdown while preserving link destinations', async () => {
+    const rootElement = document.createElement('div');
+    const schema = { ...getTextSchema(), textTransform: 'uppercase' };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Visit [pdfme](https://pdfme.com).',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const link = rootElement.querySelector('a') as HTMLAnchorElement;
+    expect(rootElement.textContent).toBe('VISIT PDFME.');
+    expect(link.textContent).toBe('PDFME');
+    expect(link.href).toBe('https://pdfme.com/');
+  });
+
+  it('shows transformed editable text without changing its source value', async () => {
+    const rootElement = document.createElement('div');
+    const schema = { ...getTextSchema(), readOnly: false, textTransform: 'uppercase' };
+    const onChange = vi.fn<(change: { key: string; value: string }) => void>();
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Hello',
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.innerText).toBe('Hello');
+    expect(textBlock.style.textTransform).toBe('uppercase');
+    textBlock.dispatchEvent(new FocusEvent('blur'));
+    expect(onChange).toHaveBeenCalledWith({ key: 'content', value: 'Hello' });
+  });
+
   it('renders internal inline markdown links as same-document anchors', async () => {
     const rootElement = document.createElement('div');
     const schema = getTextSchema();

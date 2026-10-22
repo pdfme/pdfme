@@ -47,6 +47,7 @@ import {
 import { isEditable } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
+import { transformRichTextRuns, transformTextCase } from './textTransform.js';
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -117,7 +118,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     _cache as Map<string, import('fontkit').Font>,
   );
   const enableDynamicFontSize = shouldUseDynamicFontSize(schema, basePdf);
-  const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
+  const displayValue = transformTextCase(
+    enableInlineMarkdown ? stripInlineMarkdown(value) : value,
+    schema.textTransform,
+  );
   const dynamicRichTextFontSize =
     enableInlineMarkdown && enableDynamicFontSize
       ? await calculateDynamicRichTextFontSize({
@@ -132,7 +136,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       ? calculateDynamicFontSize({
           textSchema: schema,
           fontKitFont,
-          value: usePlaceholder ? (placeholder as string) : displayValue,
+          value: transformTextCase(
+            usePlaceholder ? (placeholder as string) : displayValue,
+            schema.textTransform,
+          ),
         })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE);
   const useComputedWrapLines = !editable;
@@ -171,7 +178,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       textBlock,
       lines: applyTextLineRange(
         wrapTextToSize({
-          value,
+          value: displayValue,
           characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
           fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
           fontKitFont,
@@ -266,7 +273,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
   const runs = await resolveRichTextRuns({
-    runs: parseInlineMarkdown(value),
+    runs: transformRichTextRuns(parseInlineMarkdown(value), schema.textTransform),
     schema,
     font,
     _cache,
@@ -466,6 +473,7 @@ const getRangedPlainTextValue = (arg: {
       fontSize,
       fontKitFont,
       boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+      textTransform: schema.textTransform,
     }),
     lineRange,
   );
@@ -572,6 +580,9 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
+    ...(editable && schema.textTransform && schema.textTransform !== 'none'
+      ? { textTransform: schema.textTransform }
+      : {}),
     // Browsers include the final letter-spacing in editable text wrapping, unlike PDF rendering.
     ...(editable && characterSpacing > 0 ? { width: `calc(100% + ${characterSpacing}pt)` } : {}),
     ...(isTopAligned ? { height: '100%' } : {}),
