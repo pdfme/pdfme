@@ -1,6 +1,11 @@
 import type { Font as FontKitFont } from 'fontkit';
 import { mm2pt, type Font } from '@pdfme/common';
-import { calculateDynamicFontSize, splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
+import {
+  calculateDynamicFontSize,
+  splitTextToSize,
+  wrapTextToSize,
+  wrapTextToSizeWithSourceRanges,
+} from '../src/text/helper.js';
 import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
 import { CJ, getRawLineBreakClass, IS, QU, SA } from '../src/text/lineBreak.js';
 import {
@@ -196,6 +201,46 @@ describe('shared wrap engine (#1115)', () => {
     };
     const structured = wrapTextToSize(args);
     expect(splitTextToSize(args)).toEqual(toLegacySplitLines(structured));
+  });
+
+  it('wraps the complete transformed text and maps lines to source offsets', () => {
+    const args = {
+      value: 'ßßß',
+      characterSpacing: 0,
+      boxWidthInPt: 15,
+      fontSize: 10,
+      fontKitFont: createMockFont(),
+      textTransform: 'uppercase' as const,
+    };
+
+    const lines = wrapTextToSize(args);
+    const sourceLines = wrapTextToSizeWithSourceRanges(args);
+
+    expect(lineTexts(lines)).toEqual(['SS', 'SS', 'SS']);
+    expect(sourceLines.map(({ sourceStart, sourceEnd }) => [sourceStart, sourceEnd])).toEqual([
+      [0, 1],
+      [1, 2],
+      [2, 3],
+    ]);
+  });
+
+  it('keeps case-expanded characters together when wrapping at expansion boundaries', () => {
+    const args = {
+      value: 'ßßß',
+      characterSpacing: 0,
+      boxWidthInPt: 5,
+      fontSize: 10,
+      fontKitFont: createMockFont(),
+      textTransform: 'uppercase' as const,
+    };
+    const sourceLines = wrapTextToSizeWithSourceRanges(args);
+
+    expect(lineTexts(sourceLines)).toEqual(['SS', 'SS', 'SS']);
+    expect(sourceLines.map(({ sourceStart, sourceEnd }) => [sourceStart, sourceEnd])).toEqual([
+      [0, 1],
+      [1, 2],
+      [2, 3],
+    ]);
   });
 
   it('uses the SA word-segmenter dictionary for Thai when ICU can split words', () => {

@@ -5,7 +5,7 @@ import {
   calculateDynamicFontSize,
   getFontKitFont,
   getLineBoxHeightPt,
-  splitTextToSize,
+  wrapTextToSizeWithSourceRanges,
 } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import {
@@ -108,7 +108,7 @@ export const measureTextLines = async ({
     schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : fontSize;
-  const lines = splitTextToSize({
+  const lines = wrapTextToSizeWithSourceRanges({
     value,
     characterSpacing,
     fontSize: resolvedFontSize,
@@ -118,8 +118,13 @@ export const measureTextLines = async ({
   });
 
   return {
-    lines,
-    lineHeights: measurePlainTextLineHeights(lines, fontKitFont, resolvedFontSize, lineHeight),
+    lines: lines.map((line) => value.slice(line.sourceStart, line.sourceEnd)),
+    lineHeights: measurePlainTextLineHeights(
+      lines.map((line) => line.text),
+      fontKitFont,
+      resolvedFontSize,
+      lineHeight,
+    ),
   };
 };
 
@@ -141,7 +146,7 @@ export const mergeTextLineRangeValue = async ({
 
   const { lines } = await measureTextLines({
     value,
-    schema: { ...schema, textTransform: 'none' },
+    schema,
     font,
     _cache,
     ignoreDynamicFontSize: true,

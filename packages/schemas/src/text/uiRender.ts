@@ -30,8 +30,8 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
-  splitTextToSize,
   wrapTextToSize,
+  wrapTextToSizeWithSourceRanges,
   widthOfTextAtSize,
 } from './helper.js';
 import { getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
@@ -48,6 +48,22 @@ import { isEditable } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
 import { transformRichTextRuns, transformTextCase } from './textTransform.js';
+
+export const readEditableText = (element: HTMLDivElement) => {
+  const textTransform = element.style.textTransform;
+  element.style.textTransform = 'none';
+  let text: string;
+  try {
+    text = element.innerText;
+  } finally {
+    element.style.textTransform = textTransform;
+  }
+  if (text.endsWith('\n')) {
+    // contenteditable adds the final newline when reading with innerText
+    text = text.slice(0, -1);
+  }
+  return text;
+};
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -103,14 +119,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     enableInlineMarkdown || isReadOnlySplitInlineMarkdownFormChunk;
   const editable = isEditable(mode, schema) && !isReadOnlySplitInlineMarkdownFormChunk;
   const usePlaceholder = editable && placeholder && !value;
-  const getText = (element: HTMLDivElement) => {
-    let text = element.innerText;
-    if (text.endsWith('\n')) {
-      // contenteditable adds additional newline char retrieved with innerText
-      text = text.slice(0, -1);
-    }
-    return text;
-  };
+  const getText = readEditableText;
   const font = options?.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(
     schema.fontName,
@@ -178,11 +187,12 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       textBlock,
       lines: applyTextLineRange(
         wrapTextToSize({
-          value: displayValue,
+          value,
           characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
           fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
           fontKitFont,
           boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+          textTransform: schema.textTransform,
         }),
         getTextLineRange(schema),
       ),
@@ -467,7 +477,7 @@ const getRangedPlainTextValue = (arg: {
   if (!lineRange) return value;
 
   const lines = applyTextLineRange(
-    splitTextToSize({
+    wrapTextToSizeWithSourceRanges({
       value,
       characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
       fontSize,
@@ -477,7 +487,7 @@ const getRangedPlainTextValue = (arg: {
     }),
     lineRange,
   );
-  return plainTextLinesToValue(lines);
+  return plainTextLinesToValue(lines.map((line) => value.slice(line.sourceStart, line.sourceEnd)));
 };
 
 export const buildStyledTextContainer = (

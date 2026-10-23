@@ -20,7 +20,7 @@ import type {
 } from './types.js';
 import { getBoxContentArea } from '../box.js';
 import { splitParagraphs, toLegacySplitLines, wrapText, type WrapLine } from './wrap.js';
-import { transformTextCase } from './textTransform.js';
+import { transformTextCase, transformTextCaseWithSourceOffsets } from './textTransform.js';
 import {
   DEFAULT_FONT_SIZE,
   DEFAULT_CHARACTER_SPACING,
@@ -450,6 +450,53 @@ const measureTextWidth = (
   characterSpacing: number,
 ) => (text.length === 0 ? 0 : widthOfTextAtSize(text, fontKitFont, fontSize, characterSpacing));
 
+export type WrappedTextLineWithSourceRange = WrapLine & {
+  sourceStart: number;
+  sourceEnd: number;
+};
+
+export const wrapTextToSizeWithSourceRanges = (arg: {
+  value: string;
+  characterSpacing: number;
+  boxWidthInPt: number;
+  fontSize: number;
+  fontKitFont: fontkit.Font;
+  textTransform?: TEXT_TRANSFORM;
+}): WrappedTextLineWithSourceRange[] => {
+  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt, textTransform } = arg;
+  const { text, sourceOffsets, protectedBoundaries } = transformTextCaseWithSourceOffsets(
+    value,
+    textTransform,
+  );
+  const displayLines = wrapText(
+    text,
+    (line) => measureTextWidth(line, fontKitFont, fontSize, characterSpacing),
+    boxWidthInPt,
+    { protectedBoundaries },
+  );
+  let displayOffset = 0;
+
+  return displayLines.map((line) => {
+    const displayStart = line.text ? text.indexOf(line.text, displayOffset) : displayOffset;
+    if (displayStart < 0) {
+      throw new Error('[@pdfme/schemas] Failed to map a wrapped text line to its source value.');
+    }
+    const displayEnd = displayStart + line.text.length;
+    displayOffset = displayEnd;
+    const sourceStart = sourceOffsets[displayStart];
+    const sourceEnd = sourceOffsets[displayEnd];
+    if (sourceStart === undefined || sourceEnd === undefined) {
+      throw new Error('[@pdfme/schemas] Failed to map a wrapped text line to its source value.');
+    }
+
+    return {
+      ...line,
+      sourceStart,
+      sourceEnd,
+    };
+  });
+};
+
 export const wrapTextToSize = (arg: {
   value: string;
   characterSpacing: number;
@@ -457,20 +504,8 @@ export const wrapTextToSize = (arg: {
   fontSize: number;
   fontKitFont: fontkit.Font;
   textTransform?: TEXT_TRANSFORM;
-}): WrapLine[] => {
-  const { value, characterSpacing, fontSize, fontKitFont, boxWidthInPt, textTransform } = arg;
-  return wrapText(
-    value,
-    (text) =>
-      measureTextWidth(
-        transformTextCase(text, textTransform),
-        fontKitFont,
-        fontSize,
-        characterSpacing,
-      ),
-    boxWidthInPt,
-  );
-};
+}): WrapLine[] =>
+  wrapTextToSizeWithSourceRanges(arg).map(({ text, hardBreak }) => ({ text, hardBreak }));
 
 /**
  * Facade over the shared wrap engine. Converts structured `{ text, hardBreak }`

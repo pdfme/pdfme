@@ -3,7 +3,7 @@
 import type { Font as FontKitFont } from 'fontkit';
 import type { Font } from '@pdfme/common';
 import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
-import { uiRender } from '../src/text/uiRender.js';
+import { readEditableText, uiRender } from '../src/text/uiRender.js';
 import type { TextSchema } from '../src/text/types.js';
 
 const createMockFont = (hasGlyphForCodePoint: (codePoint: number) => boolean) =>
@@ -41,6 +41,15 @@ const getTextSchema = (): TextSchema => ({
 });
 
 describe('text inline markdown UI rendering', () => {
+  it('reads editable source text with case formatting temporarily disabled', () => {
+    const textBlock = document.createElement('div');
+    textBlock.style.textTransform = 'uppercase';
+    textBlock.innerText = 'Hello\nworld';
+
+    expect(readEditableText(textBlock)).toBe('Hello\nworld');
+    expect(textBlock.style.textTransform).toBe('uppercase');
+  });
+
   it('checks unsupported characters against each resolved variant font', async () => {
     const starCodePoint = '★'.codePointAt(0) ?? 0;
     const rootElement = document.createElement('div');

@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, vi } from 'vitest';
 import type { Font as FontKitFont } from 'fontkit';
-import { Font, getDefaultFont, mm2pt } from '@pdfme/common';
+import { Font, getDefaultFont, mm2pt, pt2mm } from '@pdfme/common';
 import type { BasePdf, PropPanelSchema, PropPanelWidgetProps } from '@pdfme/common';
 import {
   calculateDynamicFontSize,
@@ -35,12 +35,12 @@ import {
   TEXT_OVERFLOW_VISIBLE,
 } from '../src/text/constants.js';
 import { getDynamicLayoutForText } from '../src/text/dynamicTemplate.js';
-import { mergeTextLineRangeValue } from '../src/text/measure.js';
+import { measureTextLines, mergeTextLineRangeValue } from '../src/text/measure.js';
 import { shouldUseDynamicFontSize } from '../src/text/overflow.js';
 import { propPanel as textPropPanel } from '../src/text/propPanel.js';
 import { getDynamicLayoutForMultiVariableText } from '../src/multiVariableText/dynamicTemplate.js';
 import { pdfRender } from '../src/text/pdfRender.js';
-import { transformTextCase } from '../src/text/textTransform.js';
+import { transformRichTextRuns, transformTextCase } from '../src/text/textTransform.js';
 
 import { FontWidthCalcValues, TextSchema } from '../src/text/types.js';
 import type { MultiVariableTextSchema } from '../src/multiVariableText/types.js';
@@ -205,6 +205,27 @@ describe('text case property', () => {
     expect(transformTextCase('Hello PDFme')).toBe('Hello PDFme');
     expect(transformTextCase('Hello PDFme', 'uppercase')).toBe('HELLO PDFME');
     expect(transformTextCase('Hello PDFme', 'lowercase')).toBe('hello pdfme');
+  });
+
+  it('applies lowercase with context across inline markdown runs', () => {
+    expect(transformRichTextRuns(parseInlineMarkdown('Ο**Σ**'), 'lowercase')).toEqual([
+      { text: 'ο' },
+      { text: 'ς', bold: true },
+    ]);
+  });
+
+  it('lowercases many alternating inline markdown runs without changing their styles', () => {
+    const value = 'a**B**'.repeat(500);
+    const sourceRuns = parseInlineMarkdown(value);
+    const transformedRuns = transformRichTextRuns(sourceRuns, 'lowercase');
+
+    expect(transformedRuns.map((run) => run.text).join('')).toBe(
+      sourceRuns
+        .map((run) => run.text)
+        .join('')
+        .toLowerCase(),
+    );
+    expect(transformedRuns.map((run) => run.bold)).toEqual(sourceRuns.map((run) => run.bold));
   });
 });
 
@@ -615,6 +636,90 @@ describe('text dynamic layout', () => {
 
     expect(result).toContain('edited one\nedited two\nedited three\nedited four');
     expect(result).not.toBe('edited one\nedited two\nedited three\nedited four');
+  });
+
+  it('keeps case-transformed split ranges aligned with unmodified source text', async () => {
+    const fontKitFont = {
+      unitsPerEm: 1000,
+      ascent: 800,
+      descent: -200,
+      bbox: { maxY: 800, minY: -200 },
+      layout: (text: string) => ({
+        glyphs: Array.from(text, (character) => ({
+          advanceWidth: character === character.toUpperCase() ? 800 : 300,
+        })),
+      }),
+      hasGlyphForCodePoint: () => true,
+    } as unknown as FontKitFont;
+    const font: Font = { Base: { data: new Uint8Array(), fallback: true } };
+    const cache = new Map<string | number, unknown>([['getFontKitFont-Base', fontKitFont]]);
+    const value = 'one two three four five six';
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      fontSize: 10,
+      width: pt2mm(25),
+      height: 30,
+      overflow: 'expand',
+      textTransform: 'uppercase',
+    } as TextSchema;
+    const sourceLines = await measureTextLines({ value, schema, font, _cache: cache });
+    const result = await mergeTextLineRangeValue({
+      value,
+      replacement: 'edited',
+      schema: { ...schema, __splitRange: { unit: 'textLine', start: 1, end: 2 } },
+      font,
+      _cache: cache,
+    });
+
+    expect(sourceLines.lines.length).toBeGreaterThan(2);
+    expect(result).toBe(
+      [...sourceLines.lines.slice(0, 1), 'edited', ...sourceLines.lines.slice(2)].join('\n'),
+    );
+  });
+
+  it('merges a split edit when a case expansion is narrower than the box', async () => {
+    const fontKitFont = createMockFont(500);
+    const font: Font = { Base: { data: new Uint8Array(), fallback: true } };
+    const cache = new Map<string | number, unknown>([['getFontKitFont-Base', fontKitFont]]);
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      fontSize: 10,
+      characterSpacing: 0,
+      width: pt2mm(5),
+      overflow: 'expand',
+      textTransform: 'uppercase',
+      __splitRange: { unit: 'textLine', start: 1, end: 2 },
+    } as TextSchema;
+
+    const result = await mergeTextLineRangeValue({
+      value: 'ßßß',
+      replacement: 'edited',
+      schema,
+      font,
+      _cache: cache,
+    });
+
+    expect(result).toBe('ß\nedited\nß');
+  });
+
+  it('measures expanded case text using the same wrapped lines as rendering', async () => {
+    const fontKitFont = createMockFont(500);
+    const font: Font = { Base: { data: new Uint8Array(), fallback: true } };
+    const cache = new Map<string | number, unknown>([['getFontKitFont-Base', fontKitFont]]);
+    const schema = {
+      ...getTextSchema(),
+      fontName: 'Base',
+      fontSize: 10,
+      characterSpacing: 0,
+      width: pt2mm(16),
+      textTransform: 'uppercase',
+    } as TextSchema;
+    const result = await measureTextLines({ value: 'ßßß', schema, font, _cache: cache });
+
+    expect(result.lineHeights).toHaveLength(3);
+    expect(result.lines).toEqual(['ß', 'ß', 'ß']);
   });
 
   it('does not use dynamic font size while text overflow is expand', () => {

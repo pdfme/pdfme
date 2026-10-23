@@ -187,11 +187,12 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
 
   const lines = applyTextLineRange(
     wrapTextToSize({
-      value: displayValue,
+      value,
       characterSpacing,
       fontSize,
       fontKitFont,
       boxWidthInPt: contentWidth,
+      textTransform: schema.textTransform,
     }),
     getTextLineRange(schema),
   );
