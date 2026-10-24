@@ -2,7 +2,10 @@ import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, vi } from 'vitest';
+import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
+import * as pdfLib from '@pdfme/pdf-lib';
+import { PDFDocument } from '@pdfme/pdf-lib';
 import { Font, getDefaultFont, mm2pt } from '@pdfme/common';
 import type { BasePdf, PropPanelSchema, PropPanelWidgetProps } from '@pdfme/common';
 import {
@@ -142,6 +145,61 @@ describe('text pdfRender', () => {
     });
 
     expect(drawRectangle).not.toHaveBeenCalled();
+  });
+
+  describe('with a ligature font', () => {
+    const notoSansData = readFileSync(
+      path.join(__dirname, '../../common/__tests__/assets/fonts/NotoSans-Regular.ttf'),
+    );
+
+    const renderOffice = async (characterSpacing: number) => {
+      const pdfDoc = await PDFDocument.create();
+      // @ts-expect-error registerFontkit method is not in type definitions but exists at runtime
+      pdfDoc.registerFontkit(fontkit);
+      const page = pdfDoc.addPage([mm2pt(210), mm2pt(297)]);
+      const drawText = vi.spyOn(page, 'drawText');
+      const schema: TextSchema = {
+        ...getTextSchema(),
+        fontName: 'NotoSans',
+        alignment: 'right',
+        characterSpacing,
+      };
+
+      await pdfRender({
+        value: 'office',
+        schema,
+        pdfDoc,
+        pdfLib,
+        page,
+        options: { font: { NotoSans: { fallback: true, data: notoSansData } } },
+        basePdf: { width: 210, height: 297, padding: [0, 0, 0, 0] },
+        _cache: new Map(),
+      });
+
+      expect(drawText).toHaveBeenCalledTimes(1);
+      const [text, drawOptions] = drawText.mock.calls[0];
+      const pdfFont = drawOptions?.font;
+      if (!pdfFont || drawOptions.x === undefined) throw new Error('drawText options missing');
+      const glyphCount = (pdfFont.encodeText(text).toString().length - 2) / 4;
+      // Tc follows every glyph drawn, so the last glyph's ink ends one Tc before the pen.
+      const rightEdge =
+        drawOptions.x +
+        pdfFont.widthOfTextAtSize(text, schema.fontSize!) +
+        (glyphCount - 1) * characterSpacing;
+      return { glyphCount, rightEdge, boxRightEdge: mm2pt(schema.width) };
+    };
+
+    it('keeps ligatures when characterSpacing is 0', async () => {
+      const { glyphCount, rightEdge, boxRightEdge } = await renderOffice(0);
+      expect(glyphCount).toBe(4);
+      expect(rightEdge).toBeCloseTo(boxRightEdge);
+    });
+
+    it('draws one glyph per character when letter-spaced, ending at the box edge', async () => {
+      const { glyphCount, rightEdge, boxRightEdge } = await renderOffice(2);
+      expect(glyphCount).toBe(6);
+      expect(rightEdge).toBeCloseTo(boxRightEdge);
+    });
   });
 });
 
