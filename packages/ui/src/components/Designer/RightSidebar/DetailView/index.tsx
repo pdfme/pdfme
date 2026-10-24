@@ -9,12 +9,18 @@ import type {
   PropPanelSchema,
   Schema,
 } from '@pdfme/common';
-import { isBlankPdf } from '@pdfme/common';
+import {
+  GEOMETRY_EPSILON,
+  getPositionRange,
+  getSizeRange,
+  isBlankPdf,
+  isWithinPage,
+} from '@pdfme/common';
 import { TEXT_OVERFLOW_EXPAND, TEXT_OVERFLOW_VISIBLE } from '@pdfme/schemas/texts';
 import type { SidebarProps } from '../../../../types.js';
 import { Menu } from 'lucide-react';
 import { I18nContext, PluginsRegistry, OptionsContext } from '../../../../contexts.js';
-import { debounce, isRotatableSchema } from '../../../../helper.js';
+import { debounce, getPageArea, isRotatableSchema } from '../../../../helper.js';
 import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import { theme, Typography, Button, Divider } from 'antd';
 import AlignWidget from './AlignWidget.js';
@@ -189,12 +195,23 @@ const DetailView = (props: DetailViewProps) => {
   const validateUniqueSchemaName = (_: unknown, value: string): boolean =>
     uniqueSchemaName.current(value);
 
-  // Calculate padding values once
-  const [paddingTop, paddingRight, paddingBottom, paddingLeft] = isBlankPdf(basePdf)
-    ? basePdf.padding
-    : [0, 0, 0, 0];
+  const pageArea = getPageArea(basePdf, pageSize);
+  // Widen by the same tolerance clampToRange allows, snapped to the 2 decimals the
+  // Designer stores, so a value on a rotated edge never reads as out of range.
+  const toInputRange = ({ min, max }: { min: number; max: number }) => ({
+    min: Math.ceil((min - GEOMETRY_EPSILON) * 100) / 100,
+    max: Math.floor((max + GEOMETRY_EPSILON) * 100) / 100,
+  });
+  const exactPositionRange = getPositionRange(activeSchema, pageArea);
+  const positionRange = {
+    x: toInputRange(exactPositionRange.x),
+    y: toInputRange(exactPositionRange.y),
+  };
+  const maxWidth = toInputRange(getSizeRange(activeSchema, pageArea, 'width')).max;
+  const maxHeight = toInputRange(getSizeRange(activeSchema, pageArea, 'height')).max;
 
-  // Cross-field validation: only checks when both fields are individually valid
+  // Cross-field validation on the visible (rotated) box. An x/y value outside its own
+  // min/max is left to that rule so the field does not show two errors.
   const validatePosition = (_: unknown, value: number, fieldName: string): boolean => {
     const formValues = form.getValues() as Record<string, unknown>;
     const position = formValues.position as { x: number; y: number } | undefined;
@@ -203,21 +220,25 @@ const DetailView = (props: DetailViewProps) => {
 
     if (!position || width === undefined || height === undefined) return true;
 
-    if (fieldName === 'x') {
-      if (value < paddingLeft || value > pageSize.width - paddingRight) return true;
-      if (width > 0 && value + width > pageSize.width - paddingRight) return false;
-    } else if (fieldName === 'y') {
-      if (value < paddingTop || value > pageSize.height - paddingBottom) return true;
-      if (height > 0 && value + height > pageSize.height - paddingBottom) return false;
-    } else if (fieldName === 'width') {
-      if (position.x < paddingLeft || position.x > pageSize.width - paddingRight) return true;
-      if (value > 0 && position.x + value > pageSize.width - paddingRight) return false;
-    } else if (fieldName === 'height') {
-      if (position.y < paddingTop || position.y > pageSize.height - paddingBottom) return true;
-      if (value > 0 && position.y + value > pageSize.height - paddingBottom) return false;
+    if (fieldName === 'x' || fieldName === 'y') {
+      const { min, max } = positionRange[fieldName];
+      if (value < min || value > max) return true;
     }
 
-    return true;
+    const candidate = {
+      position: {
+        x: fieldName === 'x' ? value : position.x,
+        y: fieldName === 'y' ? value : position.y,
+      },
+      width: fieldName === 'width' ? value : width,
+      height: fieldName === 'height' ? value : height,
+      // A rotate edit is always committed and changeSchemas translates the field back
+      // inside, so validate against the committed rotation, not the one being typed.
+      rotate: Number(activeSchema.rotate ?? 0),
+    };
+    const { position: p, width: w, height: h, rotate } = candidate;
+    if (![p.x, p.y, w, h, rotate].every((v) => Number.isFinite(v))) return true;
+    return isWithinPage(candidate, pageArea);
   };
 
   // Use explicit type for debounce function that matches the expected signature
@@ -325,10 +346,6 @@ const DetailView = (props: DetailViewProps) => {
       })()
     : emptySchema;
 
-  // Calculate max values considering padding
-  const maxWidth = pageSize.width - paddingLeft - paddingRight;
-  const maxHeight = pageSize.height - paddingTop - paddingBottom;
-
   // Create a type-safe schema object
   const propPanelSchema: PropPanelSchema = {
     type: 'object',
@@ -379,8 +396,8 @@ const DetailView = (props: DetailViewProps) => {
             widget: 'inputNumber',
             required: true,
             span: 8,
-            min: paddingLeft,
-            max: pageSize.width - paddingRight,
+            min: positionRange.x.min,
+            max: positionRange.x.max,
             rules: [
               {
                 validator: (_: unknown, value: number) => validatePosition(_, value, 'x'),
@@ -394,8 +411,8 @@ const DetailView = (props: DetailViewProps) => {
             widget: 'inputNumber',
             required: true,
             span: 8,
-            min: paddingTop,
-            max: pageSize.height - paddingBottom,
+            min: positionRange.y.min,
+            max: positionRange.y.max,
             rules: [
               {
                 validator: (_: unknown, value: number) => validatePosition(_, value, 'y'),

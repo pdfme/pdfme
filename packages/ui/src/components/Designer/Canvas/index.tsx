@@ -17,8 +17,9 @@ import {
   Size,
   ChangeSchemas,
   BasePdf,
-  isBlankPdf,
   resolveReadOnlyContent,
+  clampPositionIntoPage,
+  fitIntoPage,
 } from '@pdfme/common';
 import { OptionsContext, PluginsRegistry } from '../../../contexts.js';
 import { X } from 'lucide-react';
@@ -30,6 +31,7 @@ import {
   uuid,
   isRotatableSchema,
   isAspectRatioLockedPlugin,
+  getPageArea,
 } from '../../../helper.js';
 import Paper from '../../Paper.js';
 import Renderer from '../../Renderer.js';
@@ -40,13 +42,21 @@ import Mask from './Mask.js';
 import Padding from './Padding.js';
 import StaticSchema from '../../StaticSchema.js';
 
-const mm2px = (mm: number) => mm * 3.7795275591;
-
 const DELETE_BTN_ID = uuid();
 const fmt4Num = (prop: string) => Number(prop.replace('px', ''));
 const fmt = (prop: string) => round(fmt4Num(prop) / ZOOM, 2);
 const isTopLeftResize = (d: string) => d === '-1,-1' || d === '-1,0' || d === '0,-1';
 const normalizeRotate = (angle: number) => ((angle % 360) + 360) % 360;
+const parseRotate = (transform: string) => {
+  const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
+  return Number.isFinite(rotate) ? rotate : 0;
+};
+const px2box = (style: CSSStyleDeclaration) => ({
+  position: { x: fmt4Num(style.left) / ZOOM, y: fmt4Num(style.top) / ZOOM },
+  width: fmt4Num(style.width) / ZOOM,
+  height: fmt4Num(style.height) / ZOOM,
+  rotate: parseRotate(style.transform),
+});
 
 const DeleteButton = ({
   activeElements: aes,
@@ -196,36 +206,10 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   }, [renderScale]);
 
   const onDrag = ({ target, top, left }: OnDrag) => {
-    const { width: _width, height: _height } = target.style;
-    const targetWidth = fmt(_width);
-    const targetHeight = fmt(_height);
-    const actualTop = top / ZOOM;
-    const actualLeft = left / ZOOM;
-    const { width: pageWidth, height: pageHeight } = pageSizes[pageCursor];
-    let topPadding = 0;
-    let rightPadding = 0;
-    let bottomPadding = 0;
-    let leftPadding = 0;
-
-    if (isBlankPdf(basePdf)) {
-      const [t, r, b, l] = basePdf.padding;
-      topPadding = t * ZOOM;
-      rightPadding = r;
-      bottomPadding = b;
-      leftPadding = l * ZOOM;
-    }
-
-    if (actualTop + targetHeight > pageHeight - bottomPadding) {
-      target.style.top = `${(pageHeight - targetHeight - bottomPadding) * ZOOM}px`;
-    } else {
-      target.style.top = `${top < topPadding ? topPadding : top}px`;
-    }
-
-    if (actualLeft + targetWidth > pageWidth - rightPadding) {
-      target.style.left = `${(pageWidth - targetWidth - rightPadding) * ZOOM}px`;
-    } else {
-      target.style.left = `${left < leftPadding ? leftPadding : left}px`;
-    }
+    const box = { ...px2box(target.style), position: { x: left / ZOOM, y: top / ZOOM } };
+    const { x, y } = clampPositionIntoPage(box, getPageArea(basePdf, pageSizes[pageCursor]));
+    target.style.top = `${y * ZOOM}px`;
+    target.style.left = `${x * ZOOM}px`;
   };
 
   const onDragEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
@@ -249,16 +233,13 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
   };
 
   const onRotateEnd = ({ target }: { target: HTMLElement | SVGElement }) => {
-    const { transform } = target.style;
-    const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
-    const normalizedRotate = normalizeRotate(rotate);
+    const normalizedRotate = normalizeRotate(parseRotate(target.style.transform));
     changeSchemas([{ key: 'rotate', value: normalizedRotate, schemaId: target.id }]);
   };
 
   const onRotateEnds = ({ targets }: { targets: (HTMLElement | SVGElement)[] }) => {
     const arg = targets.map(({ style: { transform }, id }) => {
-      const rotate = Number(transform.replace('rotate(', '').replace('deg)', ''));
-      const normalizedRotate = normalizeRotate(rotate);
+      const normalizedRotate = normalizeRotate(parseRotate(transform));
       return [{ key: 'rotate', value: normalizedRotate, schemaId: id }];
     });
     changeSchemas(flatten(arg));
@@ -287,53 +268,33 @@ const Canvas = (props: Props, ref: Ref<HTMLDivElement>) => {
 
   const onResize = ({ target, width, height, direction }: OnResize) => {
     if (!target) return;
-    let topPadding = 0;
-    let rightPadding = 0;
-    let bottomPadding = 0;
-    let leftPadding = 0;
-
-    if (isBlankPdf(basePdf)) {
-      const [t, r, b, l] = basePdf.padding;
-      topPadding = t * ZOOM;
-      rightPadding = mm2px(r);
-      bottomPadding = mm2px(b);
-      leftPadding = l * ZOOM;
-    }
-
-    const pageWidth = mm2px(pageSizes[pageCursor].width);
-    const pageHeight = mm2px(pageSizes[pageCursor].height);
-
-    const obj: { top?: string; left?: string; width: string; height: string } = {
-      width: `${width}px`,
-      height: `${height}px`,
-    };
-
     const s = target.style;
-    let newLeft = fmt4Num(s.left) + (fmt4Num(s.width) - width);
-    let newTop = fmt4Num(s.top) + (fmt4Num(s.height) - height);
-    if (newLeft < leftPadding) {
-      newLeft = leftPadding;
-    }
-    if (newTop < topPadding) {
-      newTop = topPadding;
-    }
-    if (newLeft + width > pageWidth - rightPadding) {
-      obj.width = `${pageWidth - rightPadding - newLeft}px`;
-    }
-    if (newTop + height > pageHeight - bottomPadding) {
-      obj.height = `${pageHeight - bottomPadding - newTop}px`;
-    }
-
+    const current = px2box(s);
     const d = direction.toString();
-    if (isTopLeftResize(d)) {
-      obj.top = `${newTop}px`;
-      obj.left = `${newLeft}px`;
-    } else if (d === '1,-1') {
-      obj.top = `${newTop}px`;
-    } else if (d === '-1,1') {
-      obj.left = `${newLeft}px`;
-    }
-    Object.assign(s, obj);
+    const movesLeft = isTopLeftResize(d) || d === '-1,1';
+    const movesTop = isTopLeftResize(d) || d === '1,-1';
+    const left = fmt4Num(s.left) + (movesLeft ? fmt4Num(s.width) - width : 0);
+    const top = fmt4Num(s.top) + (movesTop ? fmt4Num(s.height) - height : 0);
+
+    const next = {
+      position: { x: left / ZOOM, y: top / ZOOM },
+      width: width / ZOOM,
+      height: height / ZOOM,
+      rotate: current.rotate,
+    };
+    const editedSizeKeys = (['width', 'height'] as const).filter(
+      (key) => Math.abs(next[key] - current[key]) > 1e-6,
+    );
+    const fitted = fitIntoPage(next, getPageArea(basePdf, pageSizes[pageCursor]), {
+      editedSizeKeys,
+      shrink: true,
+    });
+    Object.assign(s, {
+      top: `${fitted.position.y * ZOOM}px`,
+      left: `${fitted.position.x * ZOOM}px`,
+      width: `${fitted.width * ZOOM}px`,
+      height: `${fitted.height * ZOOM}px`,
+    });
   };
 
   const getGuideLines = (guides: GuidesInterface[], index: number) =>
