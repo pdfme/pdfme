@@ -167,9 +167,12 @@ export const fitDynamicFontSize = ({
   return dynamicFontSize;
 };
 
-const calculateCharacterSpacing = (textContent: string, textCharacterSpacing: number) => {
-  return (textContent.length - 1) * textCharacterSpacing;
-};
+// PDF applies character spacing (Tc) after every glyph drawn, so spacing goes
+// between the glyphs of the same layout used for the width. `length` would count
+// a surrogate pair such as 𠮷 as two characters, and graphemes would miss a
+// combining mark that the font draws as a glyph of its own.
+const calculateCharacterSpacing = (glyphCount: number, textCharacterSpacing: number) =>
+  Math.max(glyphCount - 1, 0) * textCharacterSpacing;
 
 const TEXT_WIDTH_CACHE_LIMIT = 5000;
 const textWidthCache = new WeakMap<FontKitFont, Map<string, number>>();
@@ -201,7 +204,7 @@ export const widthOfTextAtSize = (
   const standardWidth =
     glyphs.reduce((totalWidth, glyph) => totalWidth + glyph.advanceWidth * scale, 0) *
     (fontSize / 1000);
-  const width = standardWidth + calculateCharacterSpacing(text, characterSpacing);
+  const width = standardWidth + calculateCharacterSpacing(glyphs.length, characterSpacing);
 
   if (cache.size >= TEXT_WIDTH_CACHE_LIMIT) {
     cache.clear();

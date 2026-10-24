@@ -1,6 +1,14 @@
+import fs from 'fs';
+import path from 'path';
+import * as fontkit from 'fontkit';
 import type { Font as FontKitFont } from 'fontkit';
 import { mm2pt, type Font } from '@pdfme/common';
-import { calculateDynamicFontSize, splitTextToSize, wrapTextToSize } from '../src/text/helper.js';
+import {
+  calculateDynamicFontSize,
+  splitTextToSize,
+  widthOfTextAtSize,
+  wrapTextToSize,
+} from '../src/text/helper.js';
 import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
 import { CJ, getRawLineBreakClass, IS, QU, SA } from '../src/text/lineBreak.js';
 import {
@@ -225,6 +233,41 @@ describe('shared wrap engine (#1115)', () => {
     expect(lineTexts(lines).some((text) => text.includes('\u0301') && !text.includes('é'))).toBe(
       false,
     );
+  });
+
+  it('adds character spacing once per surrogate-pair character', () => {
+    // Four 5pt glyphs with 2pt between them are 26pt wide. Counting UTF-16
+    // units saw 7 gaps (34pt) and pushed the last 𠮷 onto a second line.
+    const lines = wrap('𠮷𠮷𠮷𠮷', 26, 10, 2);
+    expect(lineTexts(lines)).toEqual(['𠮷𠮷𠮷𠮷']);
+  });
+});
+
+describe('widthOfTextAtSize character spacing', () => {
+  const font = createMockFont();
+
+  it('counts spacing between glyphs, not UTF-16 code units', () => {
+    expect(widthOfTextAtSize('吉田', font, 10, 2)).toBe(12);
+    expect(widthOfTextAtSize('𠮷田', font, 10, 2)).toBe(12);
+    expect(widthOfTextAtSize('👍👍', font, 10, 2)).toBe(12);
+  });
+
+  it('does not return a negative width for empty text', () => {
+    expect(widthOfTextAtSize('', font, 10, 2)).toBe(0);
+  });
+
+  it('adds spacing between every glyph the font draws, as PDF Tc does', () => {
+    const notoSans = fontkit.create(
+      fs.readFileSync(
+        path.join(__dirname, '../../common/__tests__/assets/fonts/NotoSans-Regular.ttf'),
+      ),
+    ) as FontKitFont;
+    // Two graphemes, each drawn as a base glyph plus a combining acute (acutecomb).
+    const text = 'e\u0301e\u0301';
+    expect(notoSans.layout(text).glyphs).toHaveLength(4);
+
+    const unspaced = widthOfTextAtSize(text, notoSans, 10, 0);
+    expect(widthOfTextAtSize(text, notoSans, 10, 2)).toBeCloseTo(unspaced + 3 * 2);
   });
 });
 
