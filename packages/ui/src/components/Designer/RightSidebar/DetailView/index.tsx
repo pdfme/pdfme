@@ -118,7 +118,6 @@ const DetailView = (props: DetailViewProps) => {
           {...p}
           {...props}
           changeSchemas={changeSchemasWithSameTypeSelection}
-          options={options}
         />
       ),
       // Override form-render's built-in `color` widget

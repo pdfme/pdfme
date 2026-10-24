@@ -33,6 +33,7 @@ import { DEFAULT_OPACITY, HEX_COLOR_PATTERN } from '../constants.js';
 import { getExtraFormatterSchema } from './extraFormatter.js';
 import { canUseTextOverflowExpand, isTextOverflowExpand } from './overflow.js';
 import { createBoxDimension, getBoxDimensionPropPanelSchema } from '../box.js';
+import { DEFAULT_TEXT_TRANSFORM } from './textTransform.js';
 
 const UseDynamicFontSize = (props: PropPanelWidgetProps) => {
   const { rootElement, changeSchemas, activeSchema, i18n, basePdf } = props;
@@ -143,7 +144,7 @@ export const propPanel: PropPanel<TextSchema> = {
         span: 6,
         props: { min: 0 },
       },
-      formatter: getExtraFormatterSchema(i18n),
+      formatter: getExtraFormatterSchema(i18n, activeTextSchema.type === 'text'),
       lineHeight: {
         title: i18n('schemas.text.lineHeight'),
         type: 'number',
@@ -316,6 +317,7 @@ export const propPanel: PropPanel<TextSchema> = {
     verticalAlignment: DEFAULT_VERTICAL_ALIGNMENT,
     fontSize: DEFAULT_FONT_SIZE,
     textFormat: DEFAULT_TEXT_FORMAT,
+    textTransform: DEFAULT_TEXT_TRANSFORM,
     overflow: DEFAULT_TEXT_OVERFLOW,
     fontVariantFallback: DEFAULT_FONT_VARIANT_FALLBACK,
     lineHeight: DEFAULT_LINE_HEIGHT,

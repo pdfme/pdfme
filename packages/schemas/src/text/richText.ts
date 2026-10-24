@@ -25,6 +25,7 @@ import {
 } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import type { RichTextRun, TextSchema } from './types.js';
+import { transformRichTextRuns } from './textTransform.js';
 import { getBoxContentArea } from '../box.js';
 import { countGraphemes, layoutStyledRuns } from './wrap.js';
 
@@ -278,7 +279,7 @@ export const calculateDynamicRichTextFontSize = async (arg: {
   const fontSize = startingFontSize || schemaFontSize || DEFAULT_FONT_SIZE;
   if (!dynamicFontSizeSetting) return fontSize;
 
-  const richTextRuns = parseInlineMarkdown(value);
+  const richTextRuns = transformRichTextRuns(parseInlineMarkdown(value), schema.textTransform);
   const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
   const fallbackFont =
     resolvedRuns[0]?.fontKitFont ??

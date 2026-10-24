@@ -5,7 +5,7 @@ import {
   calculateDynamicFontSize,
   getFontKitFont,
   getLineBoxHeightPt,
-  splitTextToSize,
+  wrapTextToSizeWithSourceRanges,
 } from './helper.js';
 import { parseInlineMarkdown } from './inlineMarkdown.js';
 import {
@@ -16,6 +16,7 @@ import {
   type RichTextLine,
 } from './richText.js';
 import type { TextSchema } from './types.js';
+import { transformRichTextRuns } from './textTransform.js';
 import { getTextLineRange } from '../splitRange.js';
 import {
   getBoxContentArea,
@@ -76,7 +77,7 @@ export const measureTextLines = async ({
   const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
 
   if (isInlineMarkdownTextSchema(schema)) {
-    const richTextRuns = parseInlineMarkdown(value);
+    const richTextRuns = transformRichTextRuns(parseInlineMarkdown(value), schema.textTransform);
     const resolvedRuns = await resolveRichTextRuns({ runs: richTextRuns, schema, font, _cache });
     const resolvedFontSize =
       schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
@@ -107,17 +108,23 @@ export const measureTextLines = async ({
     schema.dynamicFontSize && schema.height > 0 && !ignoreDynamicFontSize
       ? calculateDynamicFontSize({ textSchema: schema, fontKitFont, value })
       : fontSize;
-  const lines = splitTextToSize({
+  const lines = wrapTextToSizeWithSourceRanges({
     value,
     characterSpacing,
     fontSize: resolvedFontSize,
     fontKitFont,
     boxWidthInPt,
+    textTransform: schema.textTransform,
   });
 
   return {
-    lines,
-    lineHeights: measurePlainTextLineHeights(lines, fontKitFont, resolvedFontSize, lineHeight),
+    lines: lines.map((line) => value.slice(line.sourceStart, line.sourceEnd)),
+    lineHeights: measurePlainTextLineHeights(
+      lines.map((line) => line.text),
+      fontKitFont,
+      resolvedFontSize,
+      lineHeight,
+    ),
   };
 };
 
