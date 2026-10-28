@@ -104,3 +104,28 @@ designer.updateOptions({
 `leftSidebarWidth` and `rightSidebarWidth` (Designer only) set the widths of the left plugin sidebar and the right property panel sidebar in pixels. They accept positive numbers and default to 45px and 400px respectively.
 
 Note: very small widths clip the plugin buttons and the property panel.
+
+### Guides
+
+`guides` (Designer only) configures the guides dragged out of the rulers. All fields are optional, and without them guides behave as before: positions are rounded to the millimeter, snap nowhere and are not labeled.
+
+```ts
+new Designer({
+  domContainer,
+  template,
+  options: {
+    lang: 'fr',
+    guides: {
+      precision: 1, // decimals kept for the position of a guide, 0 to 2 (default: 0)
+      snapToPageCenter: true, // magnet at the middle of the page (default: false)
+      showPosition: true, // show the position while dragging and on the guides (default: false)
+    },
+  },
+});
+```
+
+- `precision`: number of decimals of the position of a guide, in mm. One pixel of the ruler is about 0.26 mm, so a higher precision alone only lets you place a guide more finely, not exactly at a given value.
+- `snapToPageCenter`: guides snap to the middle of the page, computed for each page (for A4, 105 mm horizontally and 148.5 mm vertically). A page with an odd size has a half-millimeter middle: set `precision` to at least `1`, otherwise the position is rounded (149 mm instead of 148.5 mm). Elements being moved then snap to this guide as they do to any other.
+- `showPosition`: shows the position in mm next to the guide being dragged and next to the guides already placed. The number is formatted with `options.lang` (`148,5 mm` with `fr`, `148.5 mm` with `en`).
+
+Guides already placed keep their position. `updateOptions` replaces the whole `guides` object.
