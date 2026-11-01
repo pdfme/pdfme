@@ -30,6 +30,20 @@ describe(`PNG`, () => {
     expect(pngImage.alphaChannel).toEqual(new Uint8Array([128]));
   });
 
+  it(`can load images from a Uint8Array view with a non-zero byteOffset`, () => {
+    const backing = new Uint8Array(singlePixelPng.length + 16);
+    backing.set(singlePixelPng, 16);
+    const view = backing.subarray(16);
+    expect(view.byteOffset).toBe(16);
+
+    const pngImage = PNG.load(view);
+
+    expect(pngImage.width).toBe(1);
+    expect(pngImage.height).toBe(1);
+    expect(pngImage.rgbChannel).toEqual(new Uint8Array([255, 120, 80]));
+    expect(pngImage.alphaChannel).toEqual(new Uint8Array([128]));
+  });
+
   it(`resolves nested default exports from @pdf-lib/upng`, async () => {
     vi.doMock('@pdf-lib/upng', () => ({
       default: {

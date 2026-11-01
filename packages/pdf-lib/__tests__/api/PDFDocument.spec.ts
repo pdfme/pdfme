@@ -584,6 +584,49 @@ describe(`PDFDocument`, () => {
 
       await expect(noErrorFunc()).resolves.not.toThrow();
     });
+
+    it(`accepts a Uint8Array view with a non-zero byteOffset (#1702)`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      const pngBytes = Uint8Array.from(
+        Buffer.from(examplePngImage.split(',')[1], 'base64'),
+      );
+
+      const backing = new Uint8Array(pngBytes.length + 16);
+      backing.set(pngBytes, 16);
+      const view = backing.subarray(16);
+      expect(view.byteOffset).toBe(16);
+
+      const image = await pdfDoc.embedPng(view);
+      expect(image.width).toBe(64);
+      expect(image.height).toBe(64);
+    });
+
+    it(`accepts a pooled Node Buffer (#1702)`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      // Small Buffers are carved out of Node's shared pool, so a bare
+      // `.buffer` would include unrelated bytes before the PNG signature.
+      const pooled = Buffer.from(examplePngImage.split(',')[1], 'base64');
+
+      const image = await pdfDoc.embedPng(pooled);
+      expect(image.width).toBe(64);
+      expect(image.height).toBe(64);
+    });
+  });
+
+  describe(`embedJpg() method`, () => {
+    it(`accepts a Uint8Array view with a non-zero byteOffset (#1702)`, async () => {
+      const pdfDoc = await PDFDocument.create();
+      const jpgBytes = fs.readFileSync('assets/images/cat_riding_unicorn.jpg');
+
+      const backing = new Uint8Array(jpgBytes.length + 16);
+      backing.set(jpgBytes, 16);
+      const view = backing.subarray(16);
+      expect(view.byteOffset).toBe(16);
+
+      const image = await pdfDoc.embedJpg(view);
+      expect(image.width).toBe(1920);
+      expect(image.height).toBe(1080);
+    });
   });
 
   describe(`save() method`, () => {
