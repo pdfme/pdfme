@@ -12,6 +12,13 @@ import {
   isBlankPdf,
   Plugin,
   PluginRegistry,
+  PageArea,
+  clampPositionIntoPage,
+  clampToRange,
+  fitIntoPage,
+  getRotatedBoundingBox,
+  getSizeRange,
+  GEOMETRY_EPSILON,
 } from '@pdfme/common';
 import { pdf2size } from '@pdfme/converter';
 import {
@@ -321,6 +328,26 @@ const convertSchemasForUI = (template: Template): SchemaForUI[][] => {
   return template.schemas as SchemaForUI[][];
 };
 
+/**
+ * Move a field whose visible (rotated) box overflows the right or bottom page edge
+ * back in, without pushing its visible box past the left or top edge. Negative
+ * positions are left alone: Form and Viewer load through here, and intentional
+ * bleed has to keep matching the generator.
+ */
+const pullBackFromFarEdges = (schema: SchemaForUI, page: Size) => {
+  const visible = getRotatedBoundingBox(schema);
+  const { x, y } = schema.position;
+  const fix = (pos: number, visibleStart: number, visibleSize: number, pageSize: number) => {
+    const overflow = visibleStart + visibleSize - pageSize;
+    if (overflow <= GEOMETRY_EPSILON) return pos;
+    return Math.max(pos - overflow, Math.min(pos, pos - visibleStart));
+  };
+  return {
+    x: fix(x, visible.x, visible.width, page.width),
+    y: fix(y, visible.y, visible.height, page.height),
+  };
+};
+
 export const template2SchemasList = async (_template: Template) => {
   const template = cloneDeep(_template);
   const { basePdf, schemas } = template;
@@ -342,15 +369,7 @@ export const template2SchemasList = async (_template: Template) => {
 
   return alignSchemasListToPageCount(schemasForUI, pageSizes.length).map((schema, i) => {
     Object.values(schema).forEach((value) => {
-      const { width, height } = pageSizes[i];
-      const xEdge = value.position.x + value.width;
-      const yEdge = value.position.y + value.height;
-      if (xEdge > width) {
-        value.position.x = Math.max(0, width - value.width);
-      }
-      if (yEdge > height) {
-        value.position.y = Math.max(0, height - value.height);
-      }
+      value.position = pullBackFromFarEdges(value, pageSizes[i]);
     });
 
     return schema;
@@ -465,17 +484,12 @@ export const moveCommandToChangeSchemasArg = (props: {
         break;
     }
 
-    return value > 0 ? value : 0;
+    return value;
   };
 
   return activeSchemas.map((as) => {
-    let value = getValue(as);
-    const { width, height } = as;
-    if (key === 'x') {
-      value = value > pageSize.width - width ? round(pageSize.width - width, 2) : value;
-    } else {
-      value = value > pageSize.height - height ? round(pageSize.height - height, 2) : value;
-    }
+    const position = { ...as.position, [key]: getValue(as) };
+    const value = round(clampPositionIntoPage({ ...as, position }, pageSize)[key], 2);
 
     return { key: `position.${key}`, value, schemaId: as.id };
   });
@@ -646,27 +660,67 @@ export const restoreZoomAnchor = ({
   }
 };
 
-const handlePositionSizeChange = (
+export const getPageArea = (basePdf: BasePdf, pageSize: Size): PageArea => ({
+  width: pageSize.width,
+  height: pageSize.height,
+  padding: isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0],
+});
+
+const GEOMETRY_KEYS = new Set([
+  'position',
+  'position.x',
+  'position.y',
+  'width',
+  'height',
+  'rotate',
+  'type',
+]);
+
+const toFiniteBox = (schema: SchemaForUI) => {
+  const box = {
+    position: { x: Number(schema.position?.x), y: Number(schema.position?.y) },
+    width: Number(schema.width),
+    height: Number(schema.height),
+    rotate: Number(schema.rotate ?? 0),
+  };
+  const values = [box.position.x, box.position.y, box.width, box.height, box.rotate];
+  return values.every((v) => Number.isFinite(v)) ? box : undefined;
+};
+
+/**
+ * Keep the visible (rotated) box inside the page area. Only sizes the user edited
+ * are capped where they stand; everything else translates. Moves and rotations
+ * never shrink a field.
+ */
+const fitSchemaIntoPage = (
   schema: SchemaForUI,
-  key: string,
-  value: unknown,
-  basePdf: BasePdf,
-  pageSize: Size,
+  original: SchemaForUI | undefined,
+  changedKeys: Set<string>,
+  page: PageArea,
 ) => {
-  const padding = isBlankPdf(basePdf) ? basePdf.padding : [0, 0, 0, 0];
-  const [pt, pr, pb, pl] = padding;
-  const { width: pw, height: ph } = pageSize;
-  const calcBounds = (v: unknown, min: number, max: number) =>
-    Math.min(Math.max(Number(v), min), max);
-  if (key === 'position.x') {
-    schema.position.x = calcBounds(value, pl, pw - schema.width - pr);
-  } else if (key === 'position.y') {
-    schema.position.y = calcBounds(value, pt, ph - schema.height - pb);
-  } else if (key === 'width') {
-    schema.width = calcBounds(value, 0, pw - schema.position.x - pr);
-  } else if (key === 'height') {
-    schema.height = calcBounds(value, 0, ph - schema.position.y - pb);
-  }
+  const box = toFiniteBox(schema);
+  if (!box) return;
+
+  const typeChanged = changedKeys.has('type');
+  // A canvas resize commits both sides; only a side whose value moved counts as edited.
+  const editedSizeKeys = typeChanged
+    ? []
+    : (['width', 'height'] as const).filter(
+        (key) => changedKeys.has(key) && Number(original?.[key]) !== box[key],
+      );
+  const { position, width, height } = fitIntoPage(box, page, {
+    editedSizeKeys,
+    shrink: typeChanged || editedSizeKeys.length > 0,
+  });
+  schema.position = position;
+  schema.width = width;
+  schema.height = height;
+};
+
+const clampSize = (schema: SchemaForUI, key: 'width' | 'height', value: number, page: PageArea) => {
+  const box = toFiniteBox({ ...schema, [key]: value });
+  if (!box) return;
+  schema[key] = clampToRange(value, getSizeRange(box, page, key));
 };
 
 const handleTypeChange = (
@@ -731,12 +785,13 @@ const applyAspectRatio = (
   const deriveFrom = (key: 'width' | 'height') =>
     round(key === 'width' ? schema.width / ratio : schema.height * ratio, 2);
 
+  const page = getPageArea(basePdf, pageSize);
   const target = deriveFrom(edited);
-  handlePositionSizeChange(schema, derived, target, basePdf, pageSize);
+  clampSize(schema, derived, target, page);
   // Re-derive the edited side only when bounds clamped the derived one; otherwise
   // rounding would alter the value the user just typed.
   if (schema[derived] !== target) {
-    handlePositionSizeChange(schema, edited, deriveFrom(derived), basePdf, pageSize);
+    clampSize(schema, edited, deriveFrom(derived), page);
   }
 };
 
@@ -747,8 +802,10 @@ export const changeSchemas = (args: {
   pluginsRegistry: PluginRegistry;
   pageSize: { width: number; height: number };
   commitSchemas: (newSchemas: SchemaForUI[]) => void;
+  /** Renderer layout sync (table/list height): only cap the height, never move the field. */
+  layoutSync?: boolean;
 }) => {
-  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas } = args;
+  const { objs, schemas, basePdf, pluginsRegistry, pageSize, commitSchemas, layoutSync } = args;
   const changedKeysById = new Map<string, Set<string>>();
   const newSchemas = objs.reduce((acc, { key, value, schemaId }) => {
     const tgt = acc.find((s) => s.id === schemaId);
@@ -758,8 +815,6 @@ export const changeSchemas = (args: {
 
     if (key === 'type') {
       handleTypeChange(tgt, key, value, pluginsRegistry);
-    } else if (['position.x', 'position.y', 'width', 'height'].includes(key)) {
-      handlePositionSizeChange(tgt, key, value, basePdf, pageSize);
     }
 
     const changedKeys = changedKeysById.get(schemaId) ?? new Set<string>();
@@ -769,9 +824,17 @@ export const changeSchemas = (args: {
     return acc;
   }, cloneDeep(schemas));
 
+  const page = getPageArea(basePdf, pageSize);
   for (const schema of newSchemas) {
     const changedKeys = changedKeysById.get(schema.id);
-    if (changedKeys) applyAspectRatio(schema, changedKeys, pluginsRegistry, basePdf, pageSize);
+    if (!changedKeys) continue;
+    if (layoutSync) {
+      if (changedKeys.has('height')) clampSize(schema, 'height', Number(schema.height), page);
+    } else if ([...changedKeys].some((key) => GEOMETRY_KEYS.has(key))) {
+      const original = schemas.find((s) => s.id === schema.id);
+      fitSchemaIntoPage(schema, original, changedKeys, page);
+    }
+    applyAspectRatio(schema, changedKeys, pluginsRegistry, basePdf, pageSize);
   }
   commitSchemas(newSchemas);
 };

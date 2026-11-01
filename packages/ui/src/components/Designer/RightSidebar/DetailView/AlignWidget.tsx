@@ -1,6 +1,7 @@
 import { Space, Button, Form } from 'antd';
 import React from 'react';
-import type { PropPanelWidgetProps } from '@pdfme/common';
+import type { PropPanelWidgetProps, SchemaForUI } from '@pdfme/common';
+import { getRotatedBoundingBox } from '@pdfme/common';
 import { DESIGNER_CLASSNAME } from '../../../../constants.js';
 import {
   AlignStartVertical,
@@ -14,58 +15,33 @@ import {
 } from 'lucide-react';
 import { round } from '../../../../helper.js';
 
+// Align and distribute by the visible (rotated) box; `offset` maps its edge back to `position`.
+const getExtent = (schema: SchemaForUI, axis: 'x' | 'y') => {
+  const box = getRotatedBoundingBox(schema);
+  const start = axis === 'x' ? box.x : box.y;
+  const size = axis === 'x' ? box.width : box.height;
+  return { start, size, end: start + size, offset: schema.position[axis] - start };
+};
+
 const AlignWidget = (props: PropPanelWidgetProps) => {
   const { activeElements, changeSchemas, schemas, pageSize, schema } = props;
-  const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+  const getActiveSchemas = () => {
     const ids = activeElements.map((ae) => ae.id);
-    const ass = schemas.filter((s) => ids.includes(s.id));
+    return schemas.filter((s) => ids.includes(s.id));
+  };
 
-    const isVertical = ['left', 'center', 'right'].includes(type);
-    const tgtPos = isVertical ? 'x' : 'y';
-    const tgtSize = isVertical ? 'width' : 'height';
+  const align = (type: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') => {
+    const ass = getActiveSchemas();
+    const axis = ['left', 'center', 'right'].includes(type) ? 'x' : 'y';
+    const extents = ass.map((as) => getExtent(as, axis));
     const isSingle = ass.length === 1;
-    // Access pageSize property safely with proper type assertion
-    const root =
-      pageSize && typeof pageSize === 'object'
-        ? tgtSize === 'width'
-          ? (pageSize as unknown as { width: number }).width
-          : (pageSize as unknown as { height: number }).height
-        : 0;
+    const page = pageSize as { width: number; height: number } | undefined;
+    const root = axis === 'x' ? (page?.width ?? 0) : (page?.height ?? 0);
 
-    // Access position properties safely with proper type assertion
-    const min = isSingle
-      ? 0
-      : Math.min(
-          ...ass.map((as) => {
-            // Safely access position property with proper type assertion
-            const position =
-              as.position && typeof as.position === 'object'
-                ? (as.position as unknown as { x: number; y: number })
-                : { x: 0, y: 0 };
-            return tgtPos === 'x' ? position.x : position.y;
-          }),
-        );
-    const max = isSingle
-      ? root
-      : Math.max(
-          ...ass.map((as) => {
-            // Safely access position and size properties with proper type assertion
-            const position =
-              as.position && typeof as.position === 'object'
-                ? (as.position as unknown as { x: number; y: number })
-                : { x: 0, y: 0 };
-            const posValue = tgtPos === 'x' ? position.x : position.y;
-
-            // Safely access width/height with proper type assertion
-            const asWithSize = as as unknown as { width?: number; height?: number };
-            const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
-
-            return posValue + sizeValue;
-          }),
-        );
+    const min = isSingle ? 0 : Math.min(...extents.map((e) => e.start));
+    const max = isSingle ? root : Math.max(...extents.map((e) => e.end));
 
     let basePos = min;
-    // Define adjust function with consistent parameter usage
     let adjust: (size: number) => number = () => 0;
 
     if (['center', 'middle'].includes(type)) {
@@ -77,87 +53,31 @@ const AlignWidget = (props: PropPanelWidgetProps) => {
     }
 
     changeSchemas(
-      ass.map((as) => {
-        // Safely access size property with proper type assertion
-        const asWithSize = as as unknown as { width?: number; height?: number; id: string };
-        const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
-
-        return {
-          key: `position.${tgtPos}`,
-          value: round(basePos - adjust(sizeValue), 2),
-          schemaId: asWithSize.id,
-        };
-      }),
+      ass.map((as, i) => ({
+        key: `position.${axis}`,
+        value: round(basePos - adjust(extents[i].size) + extents[i].offset, 2),
+        schemaId: as.id,
+      })),
     );
   };
 
   const distribute = (type: 'vertical' | 'horizontal') => {
-    const ids = activeElements.map((ae) => ae.id);
-    const ass = schemas.filter((s) => ids.includes(s.id));
-
-    const isVertical = type === 'vertical';
-    const tgtPos = isVertical ? 'y' : 'x';
-    const tgtSize = isVertical ? 'height' : 'width';
-
-    // Safely access position property with proper type assertion
-    const min = Math.min(
-      ...ass.map((as) => {
-        const position =
-          as.position && typeof as.position === 'object'
-            ? (as.position as unknown as { x: number; y: number })
-            : { x: 0, y: 0 };
-        return tgtPos === 'x' ? position.x : position.y;
-      }),
-    );
-
-    // Safely access position and size properties with proper type assertion
-    const max = Math.max(
-      ...ass.map((as) => {
-        const position =
-          as.position && typeof as.position === 'object'
-            ? (as.position as unknown as { x: number; y: number })
-            : { x: 0, y: 0 };
-        const posValue = tgtPos === 'x' ? position.x : position.y;
-
-        // Safely access width/height with proper type assertion
-        const asWithSize = as as unknown as { width?: number; height?: number };
-        const sizeValue = tgtSize === 'width' ? asWithSize.width || 0 : asWithSize.height || 0;
-
-        return posValue + sizeValue;
-      }),
-    );
-
+    const ass = getActiveSchemas();
     if (ass.length < 3) return;
 
-    const boxPos = min;
-    const boxSize = max - min;
-    // Safely access size property with proper type assertion
-    const sum = ass.reduce((acc, cur) => {
-      const curWithSize = cur as unknown as { width?: number; height?: number };
-      const sizeValue = tgtSize === 'width' ? curWithSize.width || 0 : curWithSize.height || 0;
-      return acc + sizeValue;
-    }, 0);
-    const remain = boxSize - sum;
-    const unit = remain / (ass.length - 1);
+    const axis = type === 'vertical' ? 'y' : 'x';
+    const extents = ass.map((as) => getExtent(as, axis));
+    const min = Math.min(...extents.map((e) => e.start));
+    const max = Math.max(...extents.map((e) => e.end));
+    const sum = extents.reduce((acc, e) => acc + e.size, 0);
+    const unit = (max - min - sum) / (ass.length - 1);
 
     let prev = 0;
     changeSchemas(
       ass.map((as, index) => {
-        // Safely access size property of previous element with proper type assertion
-        const prevSize =
-          index === 0
-            ? 0
-            : (() => {
-                const prevAs = ass[index - 1] as unknown as { width?: number; height?: number };
-                return tgtSize === 'width' ? prevAs.width || 0 : prevAs.height || 0;
-              })();
-
-        prev += index === 0 ? 0 : prevSize + unit;
-        const value = round(boxPos + prev, 2);
-
-        // Safely access id with proper type assertion
-        const asWithId = as as unknown as { id: string };
-        return { key: `position.${tgtPos}`, value, schemaId: asWithId.id };
+        prev += index === 0 ? 0 : extents[index - 1].size + unit;
+        const value = round(min + prev + extents[index].offset, 2);
+        return { key: `position.${axis}`, value, schemaId: as.id };
       }),
     );
   };
