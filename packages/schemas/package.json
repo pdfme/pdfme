@@ -91,7 +91,7 @@
     "dompurify": "^3.4.17",
     "fontkit": "^2.0.2",
     "jpeg-js": "^0.4.4",
-    "lucide": "^1.59.0",
+    "lucide": "^1.64.0",
     "signature_pad": "^5.1.4"
   },
   "devDependencies": {
