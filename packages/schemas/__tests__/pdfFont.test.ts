@@ -11,6 +11,24 @@ const createPdfDoc = async () => {
 };
 
 describe('embedAndGetFont', () => {
+  test('embeds one font for unspaced text and one for letter-spaced text', async () => {
+    const pdfDoc = await createPdfDoc();
+    const font = getDefaultFont();
+    const fontName = Object.keys(font)[0];
+    const _cache = new Map<string | number, unknown>();
+    const embed = (characterSpacing?: number) =>
+      embedAndGetFont({ pdfDoc, font, fontName, _cache, characterSpacing });
+
+    const unspaced = await embed();
+    expect(await embed(0)).toBe(unspaced);
+    const letterSpaced = await embed(2);
+    expect(letterSpaced).not.toBe(unspaced);
+    expect(await embed(-0.5)).toBe(letterSpaced);
+
+    expect(unspaced.encodeText('fi').toString()).toHaveLength(2 + 4);
+    expect(letterSpaced.encodeText('fi').toString()).toHaveLength(2 + 2 * 4);
+  });
+
   test.each([
     ['invalid font data', 'BrokenFont', 'Unknown font format'],
     ['a missing font name', 'NoSuchFont', 'Font "NoSuchFont" is not found'],
