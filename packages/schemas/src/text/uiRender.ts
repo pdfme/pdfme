@@ -30,8 +30,8 @@ import {
   getFontKitFont,
   getBrowserVerticalFontAdjustments,
   isFirefox,
-  splitTextToSize,
   wrapTextToSize,
+  wrapTextToSizeWithSourceRanges,
   widthOfTextAtSize,
 } from './helper.js';
 import { getLineAlignment, splitGraphemes, type WrapLine } from './wrap.js';
@@ -47,6 +47,23 @@ import {
 import { isEditable } from '../utils.js';
 import { getTextLineRange } from '../splitRange.js';
 import { getBoxContentArea, getBoxInsets, hasBoxDimension } from '../box.js';
+import { transformRichTextRuns, transformTextCase } from './textTransform.js';
+
+export const readEditableText = (element: HTMLDivElement) => {
+  const textTransform = element.style.textTransform;
+  element.style.textTransform = 'none';
+  let text: string;
+  try {
+    text = element.innerText;
+  } finally {
+    element.style.textTransform = textTransform;
+  }
+  if (text.endsWith('\n')) {
+    // contenteditable adds the final newline when reading with innerText
+    text = text.slice(0, -1);
+  }
+  return text;
+};
 
 const replaceUnsupportedChars = (text: string, fontKitFont: FontKitFont): string => {
   const charSupportCache: { [char: string]: boolean } = {};
@@ -102,14 +119,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     enableInlineMarkdown || isReadOnlySplitInlineMarkdownFormChunk;
   const editable = isEditable(mode, schema) && !isReadOnlySplitInlineMarkdownFormChunk;
   const usePlaceholder = editable && placeholder && !value;
-  const getText = (element: HTMLDivElement) => {
-    let text = element.innerText;
-    if (text.endsWith('\n')) {
-      // contenteditable adds additional newline char retrieved with innerText
-      text = text.slice(0, -1);
-    }
-    return text;
-  };
+  const getText = readEditableText;
   const font = options?.font || getDefaultFont();
   const fontKitFont = await getFontKitFont(
     schema.fontName,
@@ -117,7 +127,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
     _cache as Map<string, import('fontkit').Font>,
   );
   const enableDynamicFontSize = shouldUseDynamicFontSize(schema, basePdf);
-  const displayValue = enableInlineMarkdown ? stripInlineMarkdown(value) : value;
+  const displayValue = transformTextCase(
+    enableInlineMarkdown ? stripInlineMarkdown(value) : value,
+    schema.textTransform,
+  );
   const dynamicRichTextFontSize =
     enableInlineMarkdown && enableDynamicFontSize
       ? await calculateDynamicRichTextFontSize({
@@ -132,7 +145,10 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
       ? calculateDynamicFontSize({
           textSchema: schema,
           fontKitFont,
-          value: usePlaceholder ? (placeholder as string) : displayValue,
+          value: transformTextCase(
+            usePlaceholder ? (placeholder as string) : displayValue,
+            schema.textTransform,
+          ),
         })
       : (schema.fontSize ?? DEFAULT_FONT_SIZE);
   const useComputedWrapLines = !editable;
@@ -176,6 +192,7 @@ export const uiRender = async (arg: UIRenderProps<TextSchema>) => {
           fontSize: dynamicRichTextFontSize ?? resolvedPlainFontSize,
           fontKitFont,
           boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+          textTransform: schema.textTransform,
         }),
         getTextLineRange(schema),
       ),
@@ -266,7 +283,7 @@ const renderInlineMarkdownReadOnly = async (arg: {
   const alignment = schema.alignment ?? DEFAULT_ALIGNMENT;
   const boxWidthInPt = mm2pt(getBoxContentArea(schema).width);
   const runs = await resolveRichTextRuns({
-    runs: parseInlineMarkdown(value),
+    runs: transformRichTextRuns(parseInlineMarkdown(value), schema.textTransform),
     schema,
     font,
     _cache,
@@ -460,16 +477,17 @@ const getRangedPlainTextValue = (arg: {
   if (!lineRange) return value;
 
   const lines = applyTextLineRange(
-    splitTextToSize({
+    wrapTextToSizeWithSourceRanges({
       value,
       characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
       fontSize,
       fontKitFont,
       boxWidthInPt: mm2pt(getBoxContentArea(schema).width),
+      textTransform: schema.textTransform,
     }),
     lineRange,
   );
-  return plainTextLinesToValue(lines);
+  return plainTextLinesToValue(lines.map((line) => value.slice(line.sourceStart, line.sourceEnd)));
 };
 
 export const buildStyledTextContainer = (
@@ -572,6 +590,9 @@ export const buildStyledTextContainer = (
     paddingTop: `${topAdjustment}px`,
     backgroundColor: 'transparent',
     textDecoration: textDecorations.join(' '),
+    ...(editable && schema.textTransform && schema.textTransform !== 'none'
+      ? { textTransform: schema.textTransform }
+      : {}),
     // Browsers include the final letter-spacing in editable text wrapping, unlike PDF rendering.
     ...(editable && characterSpacing > 0 ? { width: `calc(100% + ${characterSpacing}pt)` } : {}),
     ...(isTopAligned ? { height: '100%' } : {}),

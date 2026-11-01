@@ -154,12 +154,13 @@ const mergeBreaks = (
     .sort((left, right) => left.position - right.position);
 };
 
-const getAtoms = (text: string): WrapAtom[] => {
+const getAtoms = (text: string, protectedBoundaries: ReadonlySet<number>): WrapAtom[] => {
   const breaks = mergeBreaks(collectUax14Breaks(text), collectSaDictionaryBreaks(text));
   const atoms: WrapAtom[] = [];
   let previous = 0;
   for (const item of breaks) {
     if (item.position <= previous) continue;
+    if (protectedBoundaries.has(item.position)) continue;
     atoms.push({
       text: text.slice(previous, item.position),
       required: item.required,
@@ -170,6 +171,31 @@ const getAtoms = (text: string): WrapAtom[] => {
     atoms.push({ text: text.slice(previous), required: true });
   }
   return atoms;
+};
+
+const splitGraphemesAtProtectedBoundaries = (
+  text: string,
+  start: number,
+  end: number,
+  protectedBoundaries: ReadonlySet<number>,
+) => {
+  const graphemes = splitGraphemes(text.slice(start, end));
+  const groups: { text: string; start: number; end: number }[] = [];
+  let groupStart = start;
+  let position = start;
+
+  for (const grapheme of graphemes) {
+    position += grapheme.length;
+    if (protectedBoundaries.has(position)) continue;
+    groups.push({ text: text.slice(groupStart, position), start: groupStart, end: position });
+    groupStart = position;
+  }
+
+  if (groupStart < end) {
+    groups.push({ text: text.slice(groupStart, end), start: groupStart, end });
+  }
+
+  return groups;
 };
 
 const trimEndIndex = (source: string, start: number, end: number): number => {
@@ -197,23 +223,21 @@ const splitOverflowByGraphemeRange = (
   end: number,
   measure: (from: number, to: number) => number,
   maxWidth: number,
+  protectedBoundaries: ReadonlySet<number>,
 ): { start: number; end: number }[] => {
-  const graphemes = splitGraphemes(source.slice(start, end));
+  const graphemes = splitGraphemesAtProtectedBoundaries(source, start, end, protectedBoundaries);
   if (graphemes.length === 0) return [{ start, end }];
 
   const pieces: { start: number; end: number }[] = [];
   let pieceStart = start;
-  let position = start;
   for (const grapheme of graphemes) {
-    const next = position + grapheme.length;
-    if (position !== pieceStart && measure(pieceStart, next) > maxWidth) {
-      pieces.push({ start: pieceStart, end: position });
-      pieceStart = position;
+    if (grapheme.start !== pieceStart && measure(pieceStart, grapheme.end) > maxWidth) {
+      pieces.push({ start: pieceStart, end: grapheme.start });
+      pieceStart = grapheme.start;
     }
-    position = next;
   }
-  if (position > pieceStart || pieces.length === 0) {
-    pieces.push({ start: pieceStart, end: position });
+  if (end > pieceStart || pieces.length === 0) {
+    pieces.push({ start: pieceStart, end });
   }
   return pieces;
 };
@@ -232,6 +256,7 @@ const wrapParagraphRanges = (
   source: string,
   measureRaw: (start: number, end: number) => number,
   maxWidth: number,
+  protectedBoundaries: ReadonlySet<number>,
 ): LineRange[] => {
   if (source === '') {
     return [{ start: 0, end: 0, hardBreak: true }];
@@ -281,12 +306,16 @@ const wrapParagraphRanges = (
   const appendOverflow = (start: number, end: number) => {
     let position = start;
     if (hasCurrent) {
-      const graphemes = splitGraphemes(source.slice(start, end));
+      const graphemes = splitGraphemesAtProtectedBoundaries(
+        source,
+        start,
+        end,
+        protectedBoundaries,
+      );
       let takenEnd = start;
       for (const grapheme of graphemes) {
-        const next = takenEnd + grapheme.length;
-        if (measure(currentStart, next) > maxWidth) break;
-        takenEnd = next;
+        if (measure(currentStart, grapheme.end) > maxWidth) break;
+        takenEnd = grapheme.end;
       }
       if (takenEnd > start) {
         currentEnd = takenEnd;
@@ -299,7 +328,14 @@ const wrapParagraphRanges = (
 
     if (position >= end) return;
 
-    const pieces = splitOverflowByGraphemeRange(source, position, end, measure, maxWidth);
+    const pieces = splitOverflowByGraphemeRange(
+      source,
+      position,
+      end,
+      measure,
+      maxWidth,
+      protectedBoundaries,
+    );
     for (let index = 0; index < pieces.length - 1; index += 1) {
       const piece = pieces[index];
       if (!piece) continue;
@@ -333,7 +369,7 @@ const wrapParagraphRanges = (
   };
 
   let cursor = 0;
-  for (const atom of getAtoms(source)) {
+  for (const atom of getAtoms(source, protectedBoundaries)) {
     const atomStart = cursor;
     const atomEnd = cursor + atom.text.length;
     cursor = atomEnd;
@@ -425,7 +461,10 @@ const lineWidthFromSpans = <T>(spans: StyledLayoutSpan<T>[], characterSpacing: n
 export const layoutStyledRuns = <T>(
   runs: StyledRunInput<T>[],
   maxWidth: number,
-  options?: { characterSpacing?: number },
+  options?: {
+    characterSpacing?: number;
+    protectedBoundaries?: ReadonlySet<number>;
+  },
 ): StyledLayoutLine<T>[] => {
   const characterSpacing = options?.characterSpacing ?? 0;
   const runRanges: RunRange<T>[] = [];
@@ -436,15 +475,38 @@ export const layoutStyledRuns = <T>(
   }
   const fullText = runs.map((run) => run.text).join('');
   const lines: StyledLayoutLine<T>[] = [];
+  const protectedBoundaryOffsets = [...(options?.protectedBoundaries ?? [])].sort(
+    (left, right) => left - right,
+  );
+  let protectedBoundaryIndex = 0;
 
   for (const paragraph of splitParagraphsWithOffsets(fullText)) {
     const raw = fullText.slice(paragraph.start, paragraph.end);
     const source = raw.trimEnd();
     const origin = paragraph.start;
+    const protectedBoundaries = new Set<number>();
+    while (
+      protectedBoundaryIndex < protectedBoundaryOffsets.length &&
+      protectedBoundaryOffsets[protectedBoundaryIndex]! <= origin
+    ) {
+      protectedBoundaryIndex += 1;
+    }
+    while (
+      protectedBoundaryIndex < protectedBoundaryOffsets.length &&
+      protectedBoundaryOffsets[protectedBoundaryIndex]! < paragraph.end
+    ) {
+      const boundary = protectedBoundaryOffsets[protectedBoundaryIndex]!;
+      const localBoundary = boundary - origin;
+      if (localBoundary > 0 && localBoundary < source.length) {
+        protectedBoundaries.add(localBoundary);
+      }
+      protectedBoundaryIndex += 1;
+    }
     const ranges = wrapParagraphRanges(
       source,
       (start, end) => measureStyledSlice(runRanges, origin + start, origin + end, characterSpacing),
       maxWidth,
+      protectedBoundaries,
     );
     for (const range of ranges) {
       const spans = sliceStyledSpans(runRanges, origin + range.start, origin + range.end);
@@ -494,8 +556,13 @@ export const alignLayoutLines = <T>(
     return { ...line, x, extraLetterSpacing };
   });
 
-export const wrapText = (value: string, measure: MeasureTextWidth, maxWidth: number): WrapLine[] =>
-  layoutStyledRuns([{ text: value, measure, style: undefined }], maxWidth).map((line) => ({
+export const wrapText = (
+  value: string,
+  measure: MeasureTextWidth,
+  maxWidth: number,
+  options?: { protectedBoundaries?: ReadonlySet<number> },
+): WrapLine[] =>
+  layoutStyledRuns([{ text: value, measure, style: undefined }], maxWidth, options).map((line) => ({
     text: line.text,
     hardBreak: line.hardBreak,
   }));

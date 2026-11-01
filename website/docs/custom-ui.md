@@ -104,3 +104,22 @@ designer.updateOptions({
 `leftSidebarWidth` and `rightSidebarWidth` (Designer only) set the widths of the left plugin sidebar and the right property panel sidebar in pixels. They accept positive numbers and default to 45px and 400px respectively.
 
 Note: very small widths clip the plugin buttons and the property panel.
+
+## Text Case in the Designer
+
+Select a **Text** field and click the last icon in the **Format** controls in the right property panel to cycle through **Original → UPPERCASE → lowercase → Original**. Hover over the icon to see the current setting.
+
+The setting is saved on the field as `textTransform`:
+
+```ts
+import type { TextSchema } from '@pdfme/schemas/types';
+
+const textField: TextSchema = {
+  ...existingTextField,
+  textTransform: 'uppercase', // 'none' | 'uppercase' | 'lowercase'
+};
+```
+
+Omitting `textTransform` or setting it to `'none'` preserves the original case, so existing templates remain unchanged.
+
+Text case is a presentation setting, not an input-data transformation. It applies in the Designer, Form, Viewer, and generated PDFs without changing the source text or input values. Text wrapping and dynamic font sizing account for the displayed case. For inline Markdown, only the displayed text changes case; formatting and link destinations are preserved.

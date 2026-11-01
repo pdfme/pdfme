@@ -6,6 +6,7 @@ import {
   TextAlignJustifyIcon,
   TextStrikethroughIcon,
   TextUnderlineIcon,
+  TextCaseIcon,
   TextVerticalAlignBottomIcon,
   TextVerticalAlignMiddleIcon,
   TextVerticalAlignTopIcon,
@@ -23,6 +24,7 @@ import {
 export enum Formatter {
   STRIKETHROUGH = 'strikethrough',
   UNDERLINE = 'underline',
+  TEXT_TRANSFORM = 'textTransform',
   ALIGNMENT = 'alignment',
   VERTICAL_ALIGNMENT = 'verticalAlignment',
 }
@@ -40,9 +42,20 @@ interface GroupButtonString {
   value: string;
 }
 
-type GroupButton = GroupButtonBoolean | GroupButtonString;
+interface GroupButtonCycle {
+  key: Formatter;
+  icon: string;
+  type: 'cycle';
+  values: string[];
+  labels: string[];
+}
 
-export function getExtraFormatterSchema(i18n: (key: string) => string): {
+type GroupButton = GroupButtonBoolean | GroupButtonString | GroupButtonCycle;
+
+export function getExtraFormatterSchema(
+  i18n: (key: string) => string,
+  enableTextTransform = true,
+): {
   title: string;
   widget: string;
   buttons: GroupButton[];
@@ -73,6 +86,21 @@ export function getExtraFormatterSchema(i18n: (key: string) => string): {
       type: 'select',
       value: VERTICAL_ALIGN_BOTTOM,
     },
+    ...(enableTextTransform
+      ? [
+          {
+            key: Formatter.TEXT_TRANSFORM,
+            icon: TextCaseIcon,
+            type: 'cycle' as const,
+            values: ['none', 'uppercase', 'lowercase'],
+            labels: [
+              i18n('schemas.text.textTransformNone'),
+              i18n('schemas.text.textTransformUppercase'),
+              i18n('schemas.text.textTransformLowercase'),
+            ],
+          },
+        ]
+      : []),
   ];
   return {
     title: i18n('schemas.text.format'),

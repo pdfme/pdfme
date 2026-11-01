@@ -7,12 +7,15 @@ import {
   ArrowUpToLine,
   ArrowDownToLine,
   AlignJustify,
+  CaseUpper,
 } from 'lucide';
 import { createSvgStr } from '../../utils.js';
 
 export const TextStrikethroughIcon = createSvgStr(Strikethrough);
 
 export const TextUnderlineIcon = createSvgStr(Underline);
+
+export const TextCaseIcon = createSvgStr(CaseUpper);
 
 export const TextAlignLeftIcon = createSvgStr(AlignLeft);
 

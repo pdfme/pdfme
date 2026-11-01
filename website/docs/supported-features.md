@@ -46,6 +46,7 @@ Exceptions:
   - Padding
   - Underline
   - Strikethrough
+  - Text Case: Original, UPPERCASE, or lowercase, applied to rendered text without changing input data
 - Font-related
   - TrueType fonts (TTF & TTC)
   - OpenType fonts with PostScript or TrueType outlines (TTF, OTF, & OTC)

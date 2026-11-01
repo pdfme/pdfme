@@ -2,8 +2,10 @@ import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { BLANK_PDF, type PropPanelWidgetProps, type SchemaForUI } from '@pdfme/common';
 import ButtonGroupWidget from '../../src/components/Designer/RightSidebar/DetailView/ButtonGroupWidget';
+import { I18nContext } from '../../src/contexts';
 
-const icon = '<svg xmlns="http://www.w3.org/2000/svg"><path stroke="currentColor" d="M1 1h10" /></svg>';
+const icon =
+  '<svg xmlns="http://www.w3.org/2000/svg"><path stroke="currentColor" d="M1 1h10" /></svg>';
 
 beforeAll(() => {
   Object.defineProperty(window, 'matchMedia', {
@@ -75,5 +77,56 @@ describe('ButtonGroupWidget', () => {
       { key: 'underline', value: true, schemaId: 'field-1' },
       { key: 'underline', value: true, schemaId: 'field-2' },
     ]);
+  });
+
+  it('cycles the text case setting and exposes its current state accessibly', () => {
+    const schemas = [schema('field-1', false), schema('field-2', false)];
+    const changeSchemas = vi.fn();
+    const props = {
+      activeElements: schemas.map(({ id }) => element(id)),
+      activeSchema: schemas[0],
+      basePdf: BLANK_PDF,
+      changeSchemas,
+      options: {},
+      rootElement: document.createElement('div'),
+      schema: {
+        buttons: [
+          {
+            key: 'textTransform',
+            icon,
+            type: 'cycle',
+            values: ['none', 'uppercase', 'lowercase'],
+            labels: ['Original', 'UPPERCASE', 'lowercase'],
+          },
+        ],
+      },
+      schemas,
+      theme: {
+        colorPrimary: '#1677ff',
+        colorPrimaryBg: '#e6f4ff',
+        colorWhite: '#ffffff',
+      },
+    } as React.ComponentProps<typeof ButtonGroupWidget>;
+    const { container, rerender } = render(<ButtonGroupWidget {...props} />);
+    const button = container.querySelector('button')!;
+
+    expect(button.getAttribute('aria-label')).toBe('Text Case: Original');
+    fireEvent.click(button);
+
+    expect(changeSchemas).toHaveBeenCalledWith([
+      { key: 'textTransform', value: 'uppercase', schemaId: 'field-1' },
+      { key: 'textTransform', value: 'uppercase', schemaId: 'field-2' },
+    ]);
+
+    rerender(
+      <I18nContext.Provider
+        value={(key) => (key === 'schemas.text.textTransform' ? 'Casse du texte' : key)}
+      >
+        <ButtonGroupWidget {...props} />
+      </I18nContext.Provider>,
+    );
+    expect(container.querySelector('button')?.getAttribute('aria-label')).toBe(
+      'Casse du texte: Original',
+    );
   });
 });
