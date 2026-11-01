@@ -3,6 +3,9 @@ const formState: Record<string, unknown> = {};
 type FormWatch = Record<string, (...args: unknown[]) => void>;
 
 let formWatch: FormWatch | undefined;
+let formRenderProps: Record<string, unknown> = {};
+
+export const getFormRenderProps = () => formRenderProps;
 
 export const useForm = () => ({
   resetFields: () => {
@@ -22,7 +25,9 @@ export const emitFormWatch = (patch: Record<string, unknown>) => {
   formWatch?.['#']?.(formState, patch);
 };
 
-const FormRender = ({ watch }: { watch?: FormWatch }) => {
+const FormRender = (props: { watch?: FormWatch; [key: string]: unknown }) => {
+  const { watch } = props;
+  formRenderProps = props;
   formWatch = watch;
   return null;
 };

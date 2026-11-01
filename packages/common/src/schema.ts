@@ -56,6 +56,13 @@ export const Dict = z.object({
   'validation.hexColor': z.string(),
   'validation.dateTimeFormat': z.string(),
   'validation.outOfBounds': z.string(),
+  'validation.form.default': z.string(),
+  'validation.form.required': z.string(),
+  'validation.form.whitespace': z.string(),
+  'validation.form.number.len': z.string(),
+  'validation.form.number.min': z.string(),
+  'validation.form.number.max': z.string(),
+  'validation.form.number.range': z.string(),
 
   // -----------------used in schemas-----------------
   'schemas.color': z.string(),

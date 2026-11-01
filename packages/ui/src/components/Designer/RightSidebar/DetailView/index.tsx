@@ -540,6 +540,17 @@ const DetailView = (props: DetailViewProps) => {
           schema={propPanelSchema as unknown as FormRenderSchema}
           widgets={widgets}
           watch={{ '#': handleWatch }}
+          validateMessages={{
+            default: typedI18n('validation.form.default'),
+            required: typedI18n('validation.form.required'),
+            whitespace: typedI18n('validation.form.whitespace'),
+            number: {
+              len: typedI18n('validation.form.number.len'),
+              min: typedI18n('validation.form.number.min'),
+              max: typedI18n('validation.form.number.max'),
+              range: typedI18n('validation.form.number.range'),
+            },
+          }}
           locale="en-US"
         />
       </SidebarBody>
