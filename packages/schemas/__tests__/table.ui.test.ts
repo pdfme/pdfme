@@ -499,3 +499,60 @@ describe('table image cells', () => {
     );
   });
 });
+
+describe('table text selection', () => {
+  test.each(['head', 'body'] as const)(
+    'keeps the active %s cell and its selection on repeated clicks',
+    async (section) => {
+      const { rootElement } = await renderImageTable({
+        mode: 'designer',
+        schema: getSchema(),
+        value: tableValue,
+      });
+      document.body.appendChild(rootElement);
+      try {
+        const cellIndex = section === 'head' ? 0 : 3;
+        const cells = () =>
+          [...rootElement.children].filter(
+            (element) => (element as HTMLElement).style.cursor === 'text',
+          );
+        const initialCell = cells()[cellIndex] as HTMLElement;
+        initialCell.click();
+        await vi.waitFor(() => expect(cells()[cellIndex]).not.toBe(initialCell));
+        const cell = cells()[cellIndex] as HTMLElement;
+        await vi.waitFor(() => {
+          expect([...cell.querySelectorAll('div')].some(isEditor)).toBe(true);
+        });
+        const editor = [...cell.querySelectorAll('div')].find(isEditor)!;
+        // jsdom does not turn innerText assignments into DOM text nodes.
+        editor.textContent = section === 'head' ? 'Name' : 'Alice';
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        const text = editor.firstChild!;
+        const selection = window.getSelection()!;
+
+        for (const end of [1, 3]) {
+          const range = document.createRange();
+          range.setStart(text, 1);
+          range.setEnd(text, end);
+          selection.removeAllRanges();
+          selection.addRange(range);
+          editor.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: end }));
+          // Allow the asynchronous table layout and text editor mount to finish.
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          expect(cells()[cellIndex]).toBe(cell);
+          expect(selection.anchorNode).toBe(text);
+          expect(selection.anchorOffset).toBe(1);
+          expect(selection.focusOffset).toBe(end);
+        }
+
+        // The same row/column in the other section must still activate a new editor.
+        const otherIndex = section === 'head' ? 3 : 0;
+        (cells()[otherIndex] as HTMLElement).click();
+        await vi.waitFor(() => expect(cells()[cellIndex]).not.toBe(cell));
+      } finally {
+        window.getSelection()?.removeAllRanges();
+        rootElement.remove();
+      }
+    },
+  );
+});

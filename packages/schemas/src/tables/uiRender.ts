@@ -282,6 +282,12 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
     newPosition: { rowIndex: number; colIndex: number },
     editingPosition: { rowIndex: number; colIndex: number },
   ) => {
+    if (
+      editingPosition.rowIndex === newPosition.rowIndex &&
+      editingPosition.colIndex === newPosition.colIndex
+    ) {
+      return;
+    }
     resetEditingPosition();
     editingPosition.rowIndex = newPosition.rowIndex;
     editingPosition.colIndex = newPosition.colIndex;
