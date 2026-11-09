@@ -1150,6 +1150,16 @@ const renderTable = (
       ...normalizeCellStyle(props.bodyStyles),
     },
     columnStyles: props.columnStyles ?? {},
+    ...(props.rowStyles
+      ? {
+          rowStyles: Object.fromEntries(
+            Object.entries(props.rowStyles).map(([index, style]) => [
+              index,
+              normalizeCellStyle(style),
+            ]),
+          ),
+        }
+      : {}),
   };
 
   if (!readOnly) ctx.inputs[name] = value;

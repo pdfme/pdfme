@@ -207,6 +207,23 @@ Click a body cell in an image column. In the Designer, and in the Form when the 
 
 Cells you are not editing stay as a picture, with no button and no file input. Header cells stay text. A read-only Form table and the Viewer do the same: the picture only, and the cursor is the default arrow. An editable image cell uses a pointer cursor.
 
+## Row styles
+
+`rowStyles` styles individual body rows, for example to highlight urgent lines or bold a totals row. It's keyed by the row's 0-based index in the table's rows, and each entry takes any of the cell style properties (`fontName`, `fontColor`, `backgroundColor`, `borderWidth`, `padding` and so on):
+
+```json
+{
+  "rowStyles": {
+    "2": { "fontColor": "#d00000" },
+    "5": { "backgroundColor": "#fff4cc" }
+  }
+}
+```
+
+A row style applies over Body Style, the alternate background color and Column Style. Rows without an entry are unchanged, and header rows are never affected. Indices always count from the first row of the whole table, so a styled row keeps its style when the table breaks across pages, and the header still repeats there when `repeatHead` is on.
+
+Row styles are set in the template (usually generated from data, as in JSX); the Designer has no control for them. Older pdfme versions ignore `rowStyles`.
+
 ## About Table Settings
 
 Using the Designer, you can easily set the number of columns and rows in a table. You can also freely configure the table's style.

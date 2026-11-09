@@ -323,6 +323,8 @@ export type TableProps = CommonProps & {
   headStyles?: CellStyle;
   bodyStyles?: CellStyle & { alternateBackgroundColor?: string };
   columnStyles?: TableSchema['columnStyles'];
+  /** Styles for individual body rows, keyed by the row's index in `rows` (from 0). */
+  rowStyles?: Record<number, CellStyle>;
 };
 
 export type PageBreakProps = Record<string, unknown>;

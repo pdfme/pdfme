@@ -3,6 +3,7 @@ import type { Schema } from '@pdfme/common';
 import { describe, expect, test } from 'vitest';
 import { remapColumnStylesOnRemove } from '../src/tables/helper.js';
 import { createSingleTable } from '../src/tables/tableHelper.js';
+import { createTableBodySplitRange } from '../src/splitRange.js';
 import type { TableSchema } from '../src/tables/types.js';
 
 const basePdf = {
@@ -156,6 +157,67 @@ describe('createSingleTable style merge', () => {
     expect(styled.body[0].cells[1].styles.verticalAlignment).toBe(
       base.body[0].cells[1].styles.verticalAlignment,
     );
+  });
+});
+
+describe('createSingleTable rowStyles', () => {
+  const body = [
+    ['Alice', '1'],
+    ['Bob', '2'],
+    ['Carol', '3'],
+    ['Dave', '4'],
+  ];
+
+  test('styles only the rows it names, over body, alternate and column styles', async () => {
+    const schema = getPartialTableSchema();
+    schema.bodyStyles.fontName = 'Body';
+    schema.columnStyles = { alignment: { 1: 'right' } };
+    schema.rowStyles = {
+      0: { backgroundColor: '#ffeeee' },
+      2: { fontColor: '#d00000', fontName: 'Bold', alignment: 'center' },
+    };
+
+    const table = await createTable(schema, body);
+    const [row0, row1, row2, row3] = table.body;
+
+    // Row 0 is an alternate row, but its own background wins.
+    expect(row0.cells[0].styles.backgroundColor).toBe('#ffeeee');
+    // Row 2's colour, font and alignment apply to every cell, over the column's alignment.
+    for (const cell of Object.values(row2.cells)) {
+      expect(cell.styles.textColor).toBe('#d00000');
+      expect(cell.styles.fontName).toBe('Bold');
+      expect(cell.styles.alignment).toBe('center');
+    }
+    // Rows without an entry are untouched.
+    for (const row of [row1, row3]) {
+      expect(row.cells[0].styles.textColor).toBe('#000000');
+      expect(row.cells[0].styles.fontName).toBe('Body');
+      expect(row.cells[1].styles.alignment).toBe('right');
+    }
+    expect(table.head[0].cells[0].styles.textColor).toBe('#ffffff');
+    expectFiniteGeometry(table);
+  });
+
+  test('keeps each style on its row when the table is split across pages', async () => {
+    const schema = getPartialTableSchema();
+    schema.rowStyles = { 1: { fontColor: '#0000ff' }, 3: { fontColor: '#d00000' } };
+    // The second page of a split table: rows 2 and 3 of the whole table.
+    const segment = { ...schema, __splitRange: createTableBodySplitRange(2, 4) } as TableSchema;
+
+    const table = await createTable(segment, body.slice(2, 4));
+
+    expect(table.body[0].cells[0].styles.textColor).toBe('#000000');
+    expect(table.body[1].cells[0].styles.textColor).toBe('#d00000');
+  });
+
+  test('a larger font in a row style makes that row taller', async () => {
+    const schema = getPartialTableSchema();
+    const plain = await createTable(schema, body);
+    schema.rowStyles = { 1: { fontSize: 20 } };
+    const styled = await createTable(schema, body);
+
+    expect(styled.body[1].height).toBeGreaterThan(plain.body[1].height);
+    expect(styled.body[0].height).toBe(plain.body[0].height);
   });
 });
 
