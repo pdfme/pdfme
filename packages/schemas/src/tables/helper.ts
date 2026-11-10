@@ -214,3 +214,18 @@ export const remapColumnStylesOnRemove = (
   }
   return next as TableSchema['columnStyles'];
 };
+
+// rowStyles is keyed by the row's index in the whole table. Removing a row drops
+// its style and moves later styles up by one, so each stays on its row.
+export const remapRowStylesOnRemove = (
+  rowStyles: TableSchema['rowStyles'] | null | undefined,
+  removedIndex: number,
+): NonNullable<TableSchema['rowStyles']> => {
+  const next: NonNullable<TableSchema['rowStyles']> = {};
+  for (const [key, style] of Object.entries(rowStyles ?? {})) {
+    const index = Number(key);
+    if (!Number.isInteger(index) || index === removedIndex) continue;
+    next[index > removedIndex ? index - 1 : index] = style;
+  }
+  return next;
+};

@@ -109,6 +109,69 @@ describe('table column removal', () => {
   });
 });
 
+describe('table row removal', () => {
+  const threeRows = JSON.stringify([
+    ['Alice', 'New York', 'Designer'],
+    ['Bob', 'Paris', 'Illustrator'],
+    ['Carol', 'Tokyo', 'Writer'],
+  ]);
+  const withoutAlice = JSON.stringify([
+    ['Bob', 'Paris', 'Illustrator'],
+    ['Carol', 'Tokyo', 'Writer'],
+  ]);
+  const red = { fontColor: '#d00000' };
+
+  const removeFirstRow = async (
+    mode: 'designer' | 'form',
+    rowStyles?: TableSchema['rowStyles'],
+  ) => {
+    const rootElement = document.createElement('div');
+    const onChange = vi.fn<(change: unknown) => void>();
+    const schema = { ...getSchema(), content: threeRows, ...(rowStyles ? { rowStyles } : {}) };
+    await uiRender({
+      value: threeRows,
+      schema,
+      rootElement,
+      mode,
+      onChange,
+      basePdf,
+      options: { font: getDefaultFont() },
+      theme: { colorPrimary: '#1677ff' },
+      i18n: (key: string) => key,
+      scale: 1,
+      _cache: new Map(),
+    });
+    const removeButtons = rootElement.querySelectorAll<HTMLButtonElement>(
+      'button[aria-label="Remove row"]',
+    );
+    expect(removeButtons).toHaveLength(3);
+    onChange.mockClear();
+    removeButtons[0].click();
+    return onChange.mock.calls.map(([change]) => change);
+  };
+
+  test('in the Designer, row styles move with their rows', async () => {
+    // Bob (row 1) is red; removing Alice keeps the red on Bob, now row 0.
+    const changes = await removeFirstRow('designer', { 1: red });
+    expect(changes).toEqual([
+      [
+        { key: 'content', value: withoutAlice },
+        { key: 'rowStyles', value: { 0: red } },
+      ],
+    ]);
+  });
+
+  test('in the Designer, a table without row styles changes only its content', async () => {
+    const changes = await removeFirstRow('designer');
+    expect(changes).toEqual([{ key: 'content', value: withoutAlice }]);
+  });
+
+  test('in a form, only the input changes: row styles belong to the template', async () => {
+    const changes = await removeFirstRow('form', { 1: red });
+    expect(changes).toEqual([{ key: 'content', value: withoutAlice }]);
+  });
+});
+
 const getImageSchema = (): TableSchema => {
   const schema = getSchema();
   schema.columnStyles = {

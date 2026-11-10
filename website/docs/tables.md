@@ -222,7 +222,7 @@ Cells you are not editing stay as a picture, with no button and no file input. H
 
 A row style applies over Body Style, the alternate background color and Column Style. Rows without an entry are unchanged, and header rows are never affected. Indices always count from the first row of the whole table, so a styled row keeps its style when the table breaks across pages, and the header still repeats there when `repeatHead` is on.
 
-Row styles are set in the template (usually generated from data, as in JSX); the Designer has no control for them. Older pdfme versions ignore `rowStyles`.
+Row styles are set in the template (usually generated from data, as in JSX); the Designer has no control for them. Removing a row in the Designer moves the styles of the rows after it up with them, as removing a column does for Column Style. Removing a row in a Form changes only the input, so row styles stay at their indices there. Older pdfme versions ignore `rowStyles`.
 
 ## About Table Settings
 

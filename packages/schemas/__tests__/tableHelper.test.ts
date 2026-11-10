@@ -1,7 +1,7 @@
 import { getDefaultFont } from '@pdfme/common';
 import type { Schema } from '@pdfme/common';
 import { describe, expect, test } from 'vitest';
-import { remapColumnStylesOnRemove } from '../src/tables/helper.js';
+import { remapColumnStylesOnRemove, remapRowStylesOnRemove } from '../src/tables/helper.js';
 import { createSingleTable } from '../src/tables/tableHelper.js';
 import { createTableBodySplitRange } from '../src/splitRange.js';
 import type { TableSchema } from '../src/tables/types.js';
@@ -353,5 +353,35 @@ describe('remapColumnStylesOnRemove', () => {
   test('treats missing columnStyles as an empty object', () => {
     expect(remapColumnStylesOnRemove(undefined, 0)).toEqual({});
     expect(remapColumnStylesOnRemove(null, 1)).toEqual({});
+  });
+});
+
+describe('remapRowStylesOnRemove', () => {
+  const red = { fontColor: '#d00000' };
+  const blue = { fontColor: '#0000ff' };
+  const bold = { fontName: 'Bold' };
+
+  test("drops the removed row's style and moves later styles up by one", () => {
+    expect(remapRowStylesOnRemove({ 0: red, 2: blue, 5: bold }, 2)).toEqual({ 0: red, 4: bold });
+  });
+
+  test('moves every later style when a row without a style is removed', () => {
+    // Rows A, B, C with B red: removing A keeps the red on B, now row 0.
+    expect(remapRowStylesOnRemove({ 1: red }, 0)).toEqual({ 0: red });
+  });
+
+  test('leaves styles before the removed row where they are', () => {
+    expect(remapRowStylesOnRemove({ 0: red, 1: blue }, 3)).toEqual({ 0: red, 1: blue });
+  });
+
+  test('does not change the input', () => {
+    const rowStyles = { 1: red, 2: blue };
+    remapRowStylesOnRemove(rowStyles, 1);
+    expect(rowStyles).toEqual({ 1: red, 2: blue });
+  });
+
+  test('treats missing rowStyles as an empty object', () => {
+    expect(remapRowStylesOnRemove(undefined, 0)).toEqual({});
+    expect(remapRowStylesOnRemove(null, 1)).toEqual({});
   });
 });

@@ -2,7 +2,12 @@ import type { UIRenderProps, Mode } from '@pdfme/common';
 import type { TableSchema, CellStyle, Styles } from './types.js';
 import { px2mm, ZOOM } from '@pdfme/common';
 import { createSingleTable } from './tableHelper.js';
-import { getBody, getBodyWithSchemaRange, remapColumnStylesOnRemove } from './helper.js';
+import {
+  getBody,
+  getBodyWithSchemaRange,
+  remapColumnStylesOnRemove,
+  remapRowStylesOnRemove,
+} from './helper.js';
 import cell from './cell.js';
 import {
   clearImagePickerRequest,
@@ -334,8 +339,19 @@ export const uiRender = async (arg: UIRenderProps<TableSchema>) => {
         text: '-',
         ariaLabel: 'Remove row',
         onClick: () => {
-          const newTableBody = body.filter((_, j) => j !== i + (bodyRange?.start ?? 0));
-          if (onChange) onChange({ key: 'content', value: JSON.stringify(newTableBody) });
+          if (!onChange) return;
+          const removedIndex = i + (bodyRange?.start ?? 0);
+          const content = JSON.stringify(body.filter((_, j) => j !== removedIndex));
+          // In the Designer, row styles move with their rows, as column styles do when a
+          // column is removed. Form mode changes only the input, so styles keep their indexes.
+          if (mode === 'designer' && schema.rowStyles) {
+            onChange([
+              { key: 'content', value: content },
+              { key: 'rowStyles', value: remapRowStylesOnRemove(schema.rowStyles, removedIndex) },
+            ]);
+          } else {
+            onChange({ key: 'content', value: content });
+          }
         },
       });
       return removeRowButton;
