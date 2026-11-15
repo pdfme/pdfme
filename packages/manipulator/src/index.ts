@@ -177,8 +177,7 @@ const move = async (
   const page = pdfDoc.getPage(from);
   pdfDoc.removePage(from);
 
-  const adjustedTo = from < to ? to - 1 : to;
-  pdfDoc.insertPage(adjustedTo, page);
+  pdfDoc.insertPage(to, page);
 
   return pdfDoc.save();
 };
