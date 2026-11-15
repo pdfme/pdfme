@@ -30,6 +30,21 @@ const validateCheckDigit = (input: string, checkDigitPos: number) => {
 
   return passCheckDigit;
 };
+const expandUpceToUpca = (input: string): string => {
+  const digits = input.slice(1, 7);
+  const lastDigit = digits[5];
+  let body: string;
+  if (lastDigit === '0' || lastDigit === '1' || lastDigit === '2') {
+    body = `0${digits.slice(0, 2)}${lastDigit}0000${digits.slice(2, 5)}`;
+  } else if (lastDigit === '3') {
+    body = `0${digits.slice(0, 3)}00000${digits.slice(3, 5)}`;
+  } else if (lastDigit === '4') {
+    body = `0${digits.slice(0, 4)}00000${digits[4]}`;
+  } else {
+    body = `0${digits.slice(0, 5)}0000${lastDigit}`;
+  }
+  return `${body}${input.slice(7)}`;
+};
 export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
   if (!input) return false;
 
@@ -93,7 +108,9 @@ export const validateBarcodeInput = (type: BarcodeTypes, input: string) => {
     // The first digit (number system character) must be 0.
     // Either 7 digits (without check digit) or 8 digits (with check digit).
     const regexp = /^0(\d{6}$|\d{7}$)/;
-    return regexp.test(input) && validateCheckDigit(input, 8);
+    return (
+      regexp.test(input) && (input.length !== 8 || validateCheckDigit(expandUpceToUpca(input), 12))
+    );
   }
   if (type === 'gs1datamatrix') {
     let ret = false;
