@@ -231,7 +231,7 @@ describe('validateBarcodeInput test', () => {
     const valid4 = '01114124';
     const valid5 = '01101120';
     const valid6 = '04252614'; // d6=1 -> UPC-A 042100005264
-    const valid7 = '00333831'; // d6=3 -> UPC-A 003338000001
+    const valid7 = '00333831'; // d6=3 -> UPC-A 003300000381
     const valid8 = '01234048'; // d6=4 -> UPC-A 012340000008
     const valid9 = '01234565'; // d6=6 -> UPC-A 012345000065
     const blank = '';
