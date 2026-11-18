@@ -142,5 +142,13 @@
   "homepage.support.heading": {
     "message": "pdfmeをサポートする",
     "description": "Support section heading"
+  },
+  "homepage.sponsors.heading": {
+    "message": "スポンサー",
+    "description": "Sponsors section heading"
+  },
+  "homepage.sponsors.description": {
+    "message": "pdfmeは以下のスポンサーの皆様にご支援いただいています。ありがとうございます！",
+    "description": "Sponsors section description"
   }
 }

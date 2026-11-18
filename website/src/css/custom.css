@@ -25,3 +25,10 @@
 .card__footer .button--block {
   white-space: normal;
 }
+
+/* Sponsor logos must not be recolored, so dark mode gets a light section background instead. */
+[data-theme='dark'] .sponsors-section {
+  background-color: #f5f6f7;
+  color: #1c1e21;
+  border-radius: var(--ifm-global-radius);
+}

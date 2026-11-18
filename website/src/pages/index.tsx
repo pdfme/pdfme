@@ -303,6 +303,26 @@ export default function Home() {
               </div>
             </div>
 
+            <div className="margin-vert--lg padding-vert--md sponsors-section">
+              <h3>
+                {translate({
+                  id: "homepage.sponsors.heading",
+                  message: "Sponsors"
+                })}
+              </h3>
+              <p>
+                {translate({
+                  id: "homepage.sponsors.description",
+                  message: "pdfme is supported by these sponsors. Thank you!"
+                })}
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                <a href="https://www.datadoghq.com/" target="_blank" rel="noopener noreferrer" style={{ margin: '20px' }}>
+                  <img src="/img/datadog-logo.svg" alt="Datadog" width={140} height={140} />
+                </a>
+              </div>
+            </div>
+
             <div className="margin-vert--lg">
               <h3>
                 {translate({
