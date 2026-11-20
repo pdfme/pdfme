@@ -112,6 +112,10 @@ Designer.
 Missing or invalid weights default to `1`, so pass one weight per column when the exact ratio
 matters. Earlier beta builds used `widths`; use `columnWeights` going forward.
 
+`Table` also takes `rowStyles`, keyed by the row's index in `rows`, to style rows from the data:
+`rowStyles={{ 3: { fontColor: '#d00000' } }}`. With `repeatHead`, the header repeats on every page
+the table runs onto, and each row keeps its style. See [Row styles](./tables.md#row-styles).
+
 ## JSX Playground Beta
 
 The playground accepts a function body, not a full module:

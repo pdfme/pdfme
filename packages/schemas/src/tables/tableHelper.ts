@@ -25,7 +25,13 @@ import { Cell, Column, Row, Table } from './classes.js';
 import { createBoxDimension } from '../box.js';
 import { getTableBodyRange } from '../splitRange.js';
 
-type StyleProp = 'styles' | 'headStyles' | 'bodyStyles' | 'alternateRowStyles' | 'columnStyles';
+type StyleProp =
+  | 'styles'
+  | 'headStyles'
+  | 'bodyStyles'
+  | 'alternateRowStyles'
+  | 'columnStyles'
+  | 'rowStyles';
 
 interface CreateTableArgs {
   schema: Schema;
@@ -50,6 +56,9 @@ interface UserOptions {
   alternateRowStyles?: Partial<Styles>;
   columnStyles?: {
     [key: string]: Partial<Styles>;
+  };
+  rowStyles?: {
+    [rowIndex: string]: Partial<Styles>;
   };
 }
 
@@ -131,10 +140,13 @@ function cellStyles(
 
   const colStyles = styles.columnStyles[column.index] || {};
 
-  const rowStyles =
+  const alternateStyles =
     sectionName === 'body' && rowIndex % 2 === 0
       ? Object.assign({}, styles.alternateRowStyles)
       : {};
+
+  // An override for this one row is the most specific style, so it applies last.
+  const rowStyle = sectionName === 'body' ? styles.rowStyles[rowIndex] || {} : {};
 
   const defaultStyle = {
     fontName: fallbackFontName,
@@ -151,10 +163,10 @@ function cellStyles(
     minCellHeight: 0,
     minCellWidth: 0,
   };
-  return Object.assign(defaultStyle, otherStyles, rowStyles, colStyles) as Styles;
+  return Object.assign(defaultStyle, otherStyles, alternateStyles, colStyles, rowStyle) as Styles;
 }
 
-function mapCellStyle(style: CellStyle): Partial<Styles> {
+function mapCellStyle(style: Partial<CellStyle>): Partial<Styles> {
   const mapping: Partial<Styles> = {
     fontName: style.fontName,
     alignment: style.alignment,
@@ -239,8 +251,22 @@ function getTableOptions(
     bodyStyles: mapCellStyle(schema.bodyStyles),
     alternateRowStyles: { backgroundColor: schema.bodyStyles.alternateBackgroundColor },
     columnStyles,
+    rowStyles: getRowStyles(schema),
     margin: { top: 0, right: 0, left: schema.position.x, bottom: 0 },
   };
+}
+
+// rowStyles is keyed by the row's index in the whole table; a split segment's body starts part
+// way through, so its keys are moved to count from the segment's first row.
+function getRowStyles(schema: TableSchema): { [rowIndex: string]: Partial<Styles> } {
+  if (!schema.rowStyles) return {};
+  const { start } = getTableBodyRange(schema) || { start: 0 };
+  const result: { [rowIndex: string]: Partial<Styles> } = {};
+  for (const [key, style] of Object.entries(schema.rowStyles)) {
+    const index = Number(key) - start;
+    if (Number.isInteger(index) && index >= 0 && style) result[index] = mapCellStyle(style);
+  }
+  return result;
 }
 
 function parseStyles(cInput: UserOptions) {
@@ -250,11 +276,11 @@ function parseStyles(cInput: UserOptions) {
     bodyStyles: {},
     alternateRowStyles: {},
     columnStyles: {},
+    rowStyles: {},
   };
   for (const prop of Object.keys(styleOptions) as StyleProp[]) {
-    if (prop === 'columnStyles') {
-      const current = cInput[prop];
-      styleOptions.columnStyles = Object.assign({}, current);
+    if (prop === 'columnStyles' || prop === 'rowStyles') {
+      styleOptions[prop] = Object.assign({}, cInput[prop]);
     } else {
       const allOptions = [cInput];
       const styles = allOptions.map((opts) => opts[prop] || {});

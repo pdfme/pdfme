@@ -703,6 +703,39 @@ describe('@pdfme/jsx renderToTemplate', () => {
     expect(table?.headWidthPercentages).toEqual([29.230769230769234, 70.76923076923077]);
   });
 
+  it('passes Table rowStyles through, keyed by row, with box sides resolved', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table
+          head={['Item', 'Qty']}
+          rows={[
+            ['Soap', 1],
+            ['Bath bomb', 2],
+          ]}
+          repeatHead
+          rowStyles={{ 1: { fontColor: '#d00000', borderWidth: 0.5 } }}
+        />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    expect(table?.repeatHead).toBe(true);
+    expect(table?.rowStyles).toEqual({
+      1: { fontColor: '#d00000', borderWidth: { top: 0.5, right: 0.5, bottom: 0.5, left: 0.5 } },
+    });
+  });
+
+  it('leaves rowStyles off a Table that has none', async () => {
+    const result = await renderToTemplate(
+      <Page>
+        <Table head={['A']} rows={[['1']]} />
+      </Page>,
+    );
+
+    const [table] = result.template.schemas[0] ?? [];
+    expect(table).not.toHaveProperty('rowStyles');
+  });
+
   it('defaults missing or invalid Table columnWeights to 1', async () => {
     const result = await renderToTemplate(
       <Page>

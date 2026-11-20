@@ -55,6 +55,13 @@ export type TableSchema = Schema & {
     imageHeightMode?: { [colIndex: number]: TableImageHeightMode };
     imageHeight?: { [colIndex: number]: number };
   };
+  /**
+   * Style overrides for individual body rows, keyed by the row's 0-based index in the table's
+   * rows (e.g. `{ 3: { fontColor: '#d00000' } }`). Each applies over `bodyStyles`, the alternate
+   * row background and `columnStyles`. Indices count from the first row of the whole table, so a
+   * row keeps its style when the table is split across pages.
+   */
+  rowStyles?: { [rowIndex: number]: Partial<CellStyle> };
 };
 
 export interface Styles {
@@ -107,6 +114,7 @@ export interface StylesProps {
   bodyStyles: Partial<Styles>;
   alternateRowStyles: Partial<Styles>;
   columnStyles: { [key: string]: Partial<Styles> };
+  rowStyles: { [rowIndex: string]: Partial<Styles> };
 }
 
 export type Section = 'head' | 'body';
