@@ -499,3 +499,42 @@ describe('table image cells', () => {
     );
   });
 });
+
+describe('table text cells in designer', () => {
+  test('a blurred cell does not take the focus back when the table rerenders', async () => {
+    const { rootElement, rerender } = await renderImageTable({
+      mode: 'designer',
+      schema: getSchema(),
+      value: tableValue,
+    });
+    document.body.appendChild(rootElement);
+    const panelInput = document.createElement('input');
+    document.body.appendChild(panelInput);
+
+    try {
+      // Children are the head cells, then the body cells row by row: index 6 is
+      // the first cell of the second body row.
+      const bodyCell = () => rootElement.children[6] as HTMLDivElement;
+      const cellHasFocus = () =>
+        document.activeElement instanceof HTMLElement &&
+        isEditor(document.activeElement) &&
+        bodyCell().contains(document.activeElement);
+
+      bodyCell().click();
+      await vi.waitFor(() => {
+        expect(cellHasFocus()).toBe(true);
+      });
+
+      // Editing a properties panel field moves the focus out of the cell, and the
+      // change rerenders the table.
+      panelInput.focus();
+      await rerender();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      expect(document.activeElement).toBe(panelInput);
+    } finally {
+      rootElement.remove();
+      panelInput.remove();
+    }
+  });
+});
