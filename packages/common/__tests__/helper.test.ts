@@ -71,6 +71,29 @@ describe('sidebar width options', () => {
   });
 });
 
+describe('guides options', () => {
+  it('accepts omitted guides and valid guides options', () => {
+    expect(() => checkUIOptions({})).not.toThrow();
+    expect(() => checkUIOptions({ guides: {} })).not.toThrow();
+    expect(() =>
+      checkUIOptions({ guides: { precision: 1, snapToPageCenter: true, showPosition: true } }),
+    ).not.toThrow();
+  });
+
+  it.each([0, 1, 2])('accepts precision %s', (precision) => {
+    expect(() => checkUIOptions({ guides: { precision } })).not.toThrow();
+  });
+
+  it.each([-1, 3, 0.5, NaN, Infinity, '1'])('rejects invalid precision %s', (precision) => {
+    expect(() => checkUIOptions({ guides: { precision } })).toThrow();
+  });
+
+  it('rejects non-boolean flags', () => {
+    expect(() => checkUIOptions({ guides: { snapToPageCenter: 'yes' } })).toThrow();
+    expect(() => checkUIOptions({ guides: { showPosition: 1 } })).toThrow();
+  });
+});
+
 describe('mm2pt test', () => {
   it('converts millimeters to points', () => {
     expect(mm2pt(1)).toEqual(2.8346);

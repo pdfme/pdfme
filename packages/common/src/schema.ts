@@ -295,6 +295,13 @@ export const UIOptions = CommonOptions.extend({
   leftSidebarWidth: z.number().positive().finite().optional(),
   rightSidebarWidth: z.number().positive().finite().optional(),
   zoomLevel: z.number().optional(),
+  guides: z
+    .object({
+      precision: z.number().int().min(0).max(2).optional(),
+      snapToPageCenter: z.boolean().optional(),
+      showPosition: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 const HTMLElementSchema: z.ZodSchema<HTMLElement> = z.any().refine((v) => v instanceof HTMLElement);
