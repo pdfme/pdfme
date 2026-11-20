@@ -4,7 +4,6 @@ updates:
     directories:
       - "/"
       - "/packages/*"
-      - "/playground"
       - "/website"
     schedule:
       interval: "monthly"
@@ -20,6 +19,31 @@ updates:
       # property panel; patch updates still come through.
       - dependency-name: "form-render"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+  - package-ecosystem: "npm"
+    directory: "/playground"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 20
+    labels:
+      - "dependencies"
+      - "npm"
+    ignore:
+      # The playground pins vite-plus and aliases vite (devDependencies and
+      # overrides) to the same @voidzero-dev/vite-plus-core version. Dependabot
+      # does not update npm: aliases, so a vite-plus-only bump breaks `vp`
+      # (#1706). Bump all three together manually.
+      - dependency-name: "vite-plus"
+      - dependency-name: "vite"
+      - dependency-name: "@voidzero-dev/vite-plus-core"
     groups:
       minor-and-patch:
         patterns:
