@@ -28,8 +28,9 @@ import {
   setupUIMock,
 } from '../assets/helper';
 import { text, image, multiVariableText, table, barcodes } from '@pdfme/schemas';
-import { emitFormWatch, useForm } from 'form-render';
+import { emitFormWatch, getFormRenderProps, useForm } from 'form-render';
 import * as uiHelper from '../../src/helper';
+import AppContextProvider from '../../src/components/AppContextProvider';
 
 const plugins = { text, image };
 const mvtPlugins = { text, image, multiVariableText };
@@ -78,6 +79,51 @@ const waitForDesignerFields = async (container: HTMLElement) => {
     );
   });
 };
+
+test('property panel validation messages use the selected language and label overrides', async () => {
+  setupUIMock();
+  const options = {
+    lang: 'fr' as const,
+    labels: {
+      'validation.form.number.min': 'La valeur doit être supérieure à ${min}',
+    },
+  };
+  const { container } = render(
+    <AppContextProvider
+      lang="fr"
+      font={getDefaultFont()}
+      plugins={pluginRegistry(plugins)}
+      options={options}
+    >
+      <Designer
+        template={getSampleTemplate()}
+        onSaveTemplate={console.log}
+        onChangeTemplate={console.log}
+        size={{ width: 1200, height: 1200 }}
+        onPageCursorChange={() => undefined}
+      />
+    </AppContextProvider>,
+  );
+
+  await waitFor(() => {
+    expect(container.getElementsByClassName(SELECTABLE_CLASSNAME).length).toBeGreaterThan(0);
+  });
+  const schema = container.querySelector(`.${SELECTABLE_CLASSNAME}`) as HTMLDivElement;
+  fireEvent.mouseDown(schema);
+  fireEvent.mouseUp(schema);
+
+  await waitFor(() => {
+    expect(container.querySelector(`.${DESIGNER_CLASSNAME}detail-view`)).toBeInTheDocument();
+  });
+
+  expect(getFormRenderProps().validateMessages).toMatchObject({
+    required: "'${label}' est obligatoire",
+    number: {
+      min: 'La valeur doit être supérieure à ${min}',
+      max: "'${label}' ne peut pas être supérieur à ${max}",
+    },
+  });
+});
 
 afterEach(() => {
   restoreClientSizeMock?.();
@@ -457,54 +503,56 @@ test.each([
   { viewportWidth: 1200, leftWidth: 100, rightWidth: 450, initiallyOpen: true },
   { viewportWidth: 600, leftWidth: 100, rightWidth: 450, initiallyOpen: false },
   { viewportWidth: 320, leftWidth: 400, rightWidth: 450, initiallyOpen: false },
-])('Designer respects custom sidebar widths at $viewportWidth px', async ({
-  viewportWidth,
-  leftWidth,
-  rightWidth,
-  initiallyOpen,
-}) => {
-  setupUIMock();
-  const { container } = render(
-    <I18nContext.Provider value={i18n}>
-      <FontContext.Provider value={getDefaultFont()}>
-        <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
-          <OptionsContext.Provider
-            value={{ leftSidebarWidth: leftWidth, rightSidebarWidth: rightWidth }}
-          >
-            <Designer
-              template={getSampleTemplate()}
-              onSaveTemplate={vi.fn()}
-              onChangeTemplate={vi.fn()}
-              size={{ width: viewportWidth, height: 1200 }}
-              onPageCursorChange={vi.fn()}
-            />
-          </OptionsContext.Provider>
-        </PluginsRegistry.Provider>
-      </FontContext.Provider>
-    </I18nContext.Provider>,
-  );
-  const leftSidebar = container.querySelector(`.${DESIGNER_CLASSNAME}left-sidebar`) as HTMLElement;
-  const rightSidebar = container.querySelector(`.${DESIGNER_CLASSNAME}right-sidebar`) as HTMLElement;
-  const canvas = container.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLElement;
-  const canvasContainer = canvas.parentElement!;
-
-  expect(leftSidebar.style.width).toBe(`${leftWidth}px`);
-  expect(canvasContainer.style.marginLeft).toBe(`${leftWidth}px`);
-  expect(canvasContainer.style.width).toBe(`${Math.max(viewportWidth - leftWidth, 0)}px`);
-
-  const expectLayout = (open: boolean) => {
-    expect(rightSidebar.style.width).toBe(`${open ? rightWidth : 0}px`);
-    expect(canvas.style.marginRight).toBe(`${open ? rightWidth : 0}px`);
-    expect(canvas.style.width).toBe(
-      `${Math.max(viewportWidth - leftWidth - (open ? rightWidth : 0), 0)}px`,
+])(
+  'Designer respects custom sidebar widths at $viewportWidth px',
+  async ({ viewportWidth, leftWidth, rightWidth, initiallyOpen }) => {
+    setupUIMock();
+    const { container } = render(
+      <I18nContext.Provider value={i18n}>
+        <FontContext.Provider value={getDefaultFont()}>
+          <PluginsRegistry.Provider value={pluginRegistry(plugins)}>
+            <OptionsContext.Provider
+              value={{ leftSidebarWidth: leftWidth, rightSidebarWidth: rightWidth }}
+            >
+              <Designer
+                template={getSampleTemplate()}
+                onSaveTemplate={vi.fn()}
+                onChangeTemplate={vi.fn()}
+                size={{ width: viewportWidth, height: 1200 }}
+                onPageCursorChange={vi.fn()}
+              />
+            </OptionsContext.Provider>
+          </PluginsRegistry.Provider>
+        </FontContext.Provider>
+      </I18nContext.Provider>,
     );
-  };
-  await waitFor(() => expectLayout(initiallyOpen));
-  fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
-  await waitFor(() => expectLayout(!initiallyOpen));
-  fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
-  await waitFor(() => expectLayout(initiallyOpen));
-});
+    const leftSidebar = container.querySelector(
+      `.${DESIGNER_CLASSNAME}left-sidebar`,
+    ) as HTMLElement;
+    const rightSidebar = container.querySelector(
+      `.${DESIGNER_CLASSNAME}right-sidebar`,
+    ) as HTMLElement;
+    const canvas = container.querySelector(`.${DESIGNER_CLASSNAME}canvas`) as HTMLElement;
+    const canvasContainer = canvas.parentElement!;
+
+    expect(leftSidebar.style.width).toBe(`${leftWidth}px`);
+    expect(canvasContainer.style.marginLeft).toBe(`${leftWidth}px`);
+    expect(canvasContainer.style.width).toBe(`${Math.max(viewportWidth - leftWidth, 0)}px`);
+
+    const expectLayout = (open: boolean) => {
+      expect(rightSidebar.style.width).toBe(`${open ? rightWidth : 0}px`);
+      expect(canvas.style.marginRight).toBe(`${open ? rightWidth : 0}px`);
+      expect(canvas.style.width).toBe(
+        `${Math.max(viewportWidth - leftWidth - (open ? rightWidth : 0), 0)}px`,
+      );
+    };
+    await waitFor(() => expectLayout(initiallyOpen));
+    fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+    await waitFor(() => expectLayout(!initiallyOpen));
+    fireEvent.click(container.querySelector(`.${DESIGNER_CLASSNAME}sidebar-toggle`)!);
+    await waitFor(() => expectLayout(initiallyOpen));
+  },
+);
 
 test('Designer renders staticSchema multiVariableText without throwing', async () => {
   setupUIMock();

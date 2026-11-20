@@ -35,4 +35,12 @@ describe('i18n dictionaries', () => {
     expect(zhTW.close).not.toBe(zh.close);
     expect(zhTW.fieldName).not.toBe(zh.fieldName);
   });
+
+  test.each(supportedLangs)('provides form validation messages for %s', (lang) => {
+    const dict = getDict(lang);
+
+    expect(dict['validation.form.required']).toEqual(expect.any(String));
+    expect(dict['validation.form.number.min']).toContain('${min}');
+    expect(dict['validation.form.number.max']).toContain('${max}');
+  });
 });

@@ -31,11 +31,6 @@ new Designer({
 
 ## UI Language and Labels
 
-:::note
-The label customization feature is not yet implemented.
-[Custom Label for UI #107](https://github.com/pdfme/pdfme/issues/107)
-:::
-
 To change the language, modify `lang` in `options`. (The default for `lang` is `en`.)
 Currently, `'en', 'zh', 'zh-TW', 'ja', 'ko', 'ar', 'th', 'tr', 'pl', 'it', 'de', 'es', 'fr'` are supported.
 To support additional languages, create an issue or send a pull request.
@@ -44,6 +39,7 @@ To use custom labels instead of the provided ones, change `labels` in `options`.
 For supported labels, refer to [this i18n.ts](https://github.com/pdfme/pdfme/blob/main/packages/ui/src/i18n.ts).
 
 pdfme first loads `lang` from `options`, then reads and overrides from `options`' `labels`.
+The `validation.form.*` labels customize validation messages in the Designer property panel.
 
 ```ts
 new Designer({
@@ -53,6 +49,7 @@ new Designer({
     lang: 'ja',
     labels: {
       fieldsList: '入力項目一覧ビュー', // override the label for the edit button
+      'validation.form.number.min': "'${label}' must be at least ${min}",
       youCanCreateYourOwnLabel: '独自のラベルを作成できます', // add a new label for the custom plugin
     },
   },
