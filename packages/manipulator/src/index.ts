@@ -149,7 +149,7 @@ const rotate = async (
     if (page) {
       page.setRotation({
         type: RotationTypes.Degrees,
-        angle: normalizedDegrees % 360,
+        angle: (page.getRotation().angle + normalizedDegrees) % 360,
       });
     }
   });
