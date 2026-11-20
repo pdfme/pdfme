@@ -26,7 +26,7 @@
     "@pdfme/schemas": "file:../packages/schemas",
     "@pdfme/ui": "file:../packages/ui",
     "@sentry/react": "^11.13.0",
-    "lucide-react": "^0.475.0",
+    "lucide-react": "^1.73.0",
     "monaco-editor": "^0.57.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
