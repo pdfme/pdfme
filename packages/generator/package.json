@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@pdfme/pdf-lib": "*",
-    "fontkit": "^2.0.2"
+    "fontkit": "^3.0.0"
   },
   "devDependencies": {
     "@pdfme/common": "*",
