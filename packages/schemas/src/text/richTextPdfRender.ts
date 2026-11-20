@@ -39,8 +39,15 @@ const getRunWidth = (run: RichTextLineRun, fontSize: number, characterSpacing: n
   getSyntheticItalicWidth(run, fontSize) +
   (run.code ? CODE_HORIZONTAL_PADDING * 2 : 0);
 
-const getPdfFontFromObj = (run: RichTextLineRun, pdfFontObj: Record<string, PDFFont>) => {
-  const pdfFont = pdfFontObj[run.fontName];
+const getPdfFontKey = (fontName: string, characterSpacing: number) =>
+  `${fontName}\0${characterSpacing === 0 ? '' : 'letter-spaced'}`;
+
+const getPdfFontFromObj = (
+  run: RichTextLineRun,
+  characterSpacing: number,
+  pdfFontObj: Record<string, PDFFont>,
+) => {
+  const pdfFont = pdfFontObj[getPdfFontKey(run.fontName, characterSpacing)];
   if (!pdfFont) {
     throw new Error(`[@pdfme/schemas] Missing embedded font "${run.fontName}".`);
   }
@@ -48,12 +55,16 @@ const getPdfFontFromObj = (run: RichTextLineRun, pdfFontObj: Record<string, PDFF
 };
 
 const embedFontsForRuns = async (
-  runs: RichTextLineRun[],
-  embedPdfFont: (fontName: string) => Promise<PDFFont>,
+  runs: { fontName: string; characterSpacing: number }[],
+  embedPdfFont: (fontName: string, characterSpacing: number) => Promise<PDFFont>,
 ) => {
-  const fontNames = Array.from(new Set(runs.map((run) => run.fontName)));
+  const uniqueRuns = new Map(
+    runs.map((run) => [getPdfFontKey(run.fontName, run.characterSpacing), run] as const),
+  );
   const pdfFonts = await Promise.all(
-    fontNames.map(async (fontName) => [fontName, await embedPdfFont(fontName)] as const),
+    Array.from(uniqueRuns, async ([key, { fontName, characterSpacing }]) => {
+      return [key, await embedPdfFont(fontName, characterSpacing)] as const;
+    }),
   );
   return Object.fromEntries(pdfFonts);
 };
@@ -255,7 +266,7 @@ export const renderInlineMarkdownText = async (arg: {
   value: string;
   schema: TextSchema;
   font: Font;
-  embedPdfFont: (fontName: string) => Promise<PDFFont>;
+  embedPdfFont: (fontName: string, characterSpacing: number) => Promise<PDFFont>;
   fontKitFont: FontKitFont;
   pdfDoc: PDFRenderProps<TextSchema>['pdfDoc'];
   page: PDFRenderProps<TextSchema>['page'];
@@ -314,9 +325,26 @@ export const renderInlineMarkdownText = async (arg: {
     boxWidthInPt: width,
   });
   const lineRange = getTextLineRange(schema);
-  const lines = applyTextLineRange(allLines, lineRange);
+  const lines = applyTextLineRange(allLines, lineRange).map((line) => {
+    const alignmentMetrics = getLineAlignment(
+      {
+        text: line.runs.map((run) => run.text).join(''),
+        width: line.width,
+        hardBreak: line.hardBreak,
+      },
+      width,
+      alignment,
+    );
+    return {
+      ...line,
+      alignmentMetrics,
+      spacing: characterSpacing + alignmentMetrics.extraLetterSpacing,
+    };
+  });
   const pdfFontObj = await embedFontsForRuns(
-    lines.flatMap((line) => line.runs),
+    lines.flatMap((line) =>
+      line.runs.map((run) => ({ fontName: run.fontName, characterSpacing: line.spacing })),
+    ),
     embedPdfFont,
   );
 
@@ -341,17 +369,8 @@ export const renderInlineMarkdownText = async (arg: {
   lines.forEach((line, rowIndex) => {
     if (line.runs.length === 0) return;
 
-    const alignmentMetrics = getLineAlignment(
-      {
-        text: line.runs.map((run) => run.text).join(''),
-        width: line.width,
-        hardBreak: line.hardBreak,
-      },
-      width,
-      alignment,
-    );
+    const { alignmentMetrics, spacing } = line;
     const textWidth = alignmentMetrics.usedWidth;
-    const spacing = characterSpacing + alignmentMetrics.extraLetterSpacing;
     const xLine = x + alignmentMetrics.x;
 
     const yLine = y + height - yOffset - lineHeight * fontSize * rowIndex;
@@ -391,7 +410,7 @@ export const renderInlineMarkdownText = async (arg: {
 
     line.runs.reduce((currentX, run, runIndex) => {
       const runWidth = getRunWidth(run, fontSize, spacing);
-      const pdfFont = getPdfFontFromObj(run, pdfFontObj);
+      const pdfFont = getPdfFontFromObj(run, spacing, pdfFontObj);
       drawRun({
         page,
         pdfLib,

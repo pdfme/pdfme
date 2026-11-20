@@ -112,6 +112,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
         font,
         fontName,
         _cache,
+        characterSpacing: schema.characterSpacing ?? DEFAULT_CHARACTER_SPACING,
       });
   const fontKitFont = await getFontKitFont(
     schema.fontName,
@@ -148,7 +149,8 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       value,
       schema,
       font,
-      embedPdfFont: (fontName) => embedAndGetFont({ pdfDoc, font, fontName, _cache }),
+      embedPdfFont: (fontName, characterSpacing) =>
+        embedAndGetFont({ pdfDoc, font, fontName, _cache, characterSpacing }),
       fontKitFont,
       pdfDoc,
       page,
@@ -175,7 +177,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
   if (!pdfFontValuePromise) {
     throw new Error('[@pdfme/schemas] Failed to prepare PDF font for text rendering.');
   }
-  const pdfFontValue = await pdfFontValuePromise;
+  await pdfFontValuePromise;
 
   const firstLineTextHeight = heightOfFontAtSize(fontKitFont, fontSize);
   const descent = getFontDescentInPt(fontKitFont, fontSize);
@@ -210,7 +212,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
     }
   }
 
-  lines.forEach((line, rowIndex) => {
+  for (const [rowIndex, line] of lines.entries()) {
     const trimmed = line.text;
     const textWidth = needsTextWidth
       ? widthOfTextAtSize(trimmed, fontKitFont, fontSize, characterSpacing)
@@ -263,9 +265,15 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       yLine = rotatedPoint.y;
     }
 
-    page.pushOperators(
-      pdfLib.setCharacterSpacing(characterSpacing + alignmentMetrics.extraLetterSpacing),
-    );
+    const lineSpacing = characterSpacing + alignmentMetrics.extraLetterSpacing;
+    const pdfFontValue = await embedAndGetFont({
+      pdfDoc,
+      font,
+      fontName,
+      _cache,
+      characterSpacing: lineSpacing,
+    });
+    page.pushOperators(pdfLib.setCharacterSpacing(lineSpacing));
 
     page.drawText(drawText, {
       x: xLine,
@@ -277,7 +285,7 @@ export const pdfRender = async (arg: PDFRenderProps<TextSchema>) => {
       font: pdfFontValue,
       opacity: textOpacity,
     });
-  });
+  }
 };
 
 const drawTextBoxDecoration = (arg: {
