@@ -3,7 +3,7 @@
 import type { Font as FontKitFont } from 'fontkit';
 import type { Font } from '@pdfme/common';
 import { CODE_HORIZONTAL_PADDING } from '../src/text/constants.js';
-import { uiRender } from '../src/text/uiRender.js';
+import { readEditableText, uiRender } from '../src/text/uiRender.js';
 import type { TextSchema } from '../src/text/types.js';
 
 const createMockFont = (hasGlyphForCodePoint: (codePoint: number) => boolean) =>
@@ -41,6 +41,15 @@ const getTextSchema = (): TextSchema => ({
 });
 
 describe('text inline markdown UI rendering', () => {
+  it('reads editable source text with case formatting temporarily disabled', () => {
+    const textBlock = document.createElement('div');
+    textBlock.style.textTransform = 'uppercase';
+    textBlock.innerText = 'Hello\nworld';
+
+    expect(readEditableText(textBlock)).toBe('Hello\nworld');
+    expect(textBlock.style.textTransform).toBe('uppercase');
+  });
+
   it('checks unsupported characters against each resolved variant font', async () => {
     const starCodePoint = '★'.codePointAt(0) ?? 0;
     const rootElement = document.createElement('div');
@@ -100,6 +109,61 @@ describe('text inline markdown UI rendering', () => {
     expect(link.target).toBe('_blank');
     expect(link.rel).toBe('noopener noreferrer');
     expect(link.style.textDecoration).toContain('underline');
+  });
+
+  it('transforms displayed inline markdown while preserving link destinations', async () => {
+    const rootElement = document.createElement('div');
+    const schema = { ...getTextSchema(), textTransform: 'uppercase' };
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Visit [pdfme](https://pdfme.com).',
+      schema,
+      rootElement,
+      mode: 'viewer',
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const link = rootElement.querySelector('a') as HTMLAnchorElement;
+    expect(rootElement.textContent).toBe('VISIT PDFME.');
+    expect(link.textContent).toBe('PDFME');
+    expect(link.href).toBe('https://pdfme.com/');
+  });
+
+  it('shows transformed editable text without changing its source value', async () => {
+    const rootElement = document.createElement('div');
+    const schema = { ...getTextSchema(), readOnly: false, textTransform: 'uppercase' };
+    const onChange = vi.fn<(change: { key: string; value: string }) => void>();
+    const font = {
+      Base: { data: new Uint8Array(), fallback: true },
+    } as Font;
+    const cache = new Map<string | number, unknown>([
+      ['getFontKitFont-Base', createMockFont(() => true)],
+    ]);
+
+    await uiRender({
+      value: 'Hello',
+      schema,
+      rootElement,
+      mode: 'form',
+      onChange,
+      options: { font },
+      _cache: cache,
+      theme: { colorPrimary: '#1677ff' },
+    } as Parameters<typeof uiRender>[0]);
+
+    const textBlock = rootElement.querySelector(`#text-${schema.id}`) as HTMLDivElement;
+    expect(textBlock.innerText).toBe('Hello');
+    expect(textBlock.style.textTransform).toBe('uppercase');
+    textBlock.dispatchEvent(new FocusEvent('blur'));
+    expect(onChange).toHaveBeenCalledWith({ key: 'content', value: 'Hello' });
   });
 
   it('renders internal inline markdown links as same-document anchors', async () => {
