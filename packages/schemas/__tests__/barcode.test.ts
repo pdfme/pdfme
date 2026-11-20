@@ -227,23 +227,33 @@ describe('validateBarcodeInput test', () => {
 
     const valid1 = '0111111';
     const valid2 = '01111118';
-    const valid3 = '01111125';
-    const valid4 = '01114126';
-    const valid5 = '01101126';
+    const valid3 = '01111127';
+    const valid4 = '01114124';
+    const valid5 = '01101120';
+    const valid6 = '04252614'; // d6=1 -> UPC-A 042100005264
+    const valid7 = '00333831'; // d6=3 -> UPC-A 003300000381
+    const valid8 = '01234048'; // d6=4 -> UPC-A 012340000008
+    const valid9 = '01234565'; // d6=6 -> UPC-A 012345000065
     const blank = '';
     expect(validateBarcodeInput(type, valid1)).toEqual(true);
     expect(validateBarcodeInput(type, valid2)).toEqual(true);
     expect(validateBarcodeInput(type, valid3)).toEqual(true);
     expect(validateBarcodeInput(type, valid4)).toEqual(true);
     expect(validateBarcodeInput(type, valid5)).toEqual(true);
+    expect(validateBarcodeInput(type, valid6)).toEqual(true);
+    expect(validateBarcodeInput(type, valid7)).toEqual(true);
+    expect(validateBarcodeInput(type, valid8)).toEqual(true);
+    expect(validateBarcodeInput(type, valid9)).toEqual(true);
     const invalid1 = '1111111';
     const invalid2 = '011111111';
-    const invalid3 = '01111128';
-    const invalid4 = '01114125';
+    const invalid3 = '01111125';
+    const invalid4 = '01114126';
+    const invalid5 = '00333832';
     expect(validateBarcodeInput(type, invalid1)).toEqual(false);
     expect(validateBarcodeInput(type, invalid2)).toEqual(false);
     expect(validateBarcodeInput(type, invalid3)).toEqual(false);
     expect(validateBarcodeInput(type, invalid4)).toEqual(false);
+    expect(validateBarcodeInput(type, invalid5)).toEqual(false);
     expect(validateBarcodeInput(type, blank)).toEqual(false);
   });
   test('gs1datamatrix', () => {
