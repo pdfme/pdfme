@@ -215,11 +215,10 @@ const renderRowUi = (args: {
 
       void cellUiRender({
         ...arg,
-        stopEditing: () => {
-          if (arg.mode === 'form') {
-            resetEditingPosition();
-          }
-        },
+        // Clear the editing position in the designer too. Otherwise the next
+        // rerender (for example after a properties panel change) renders this cell in
+        // designer mode again, and the text editor takes the focus back.
+        stopEditing: resetEditingPosition,
         mode,
         onChange: (v) => {
           if (!arg.onChange) return;
