@@ -10,6 +10,12 @@ const catUnicornJpg = fs.readFileSync('./assets/images/cat_riding_unicorn.jpg');
 const minionsLaughing = fs.readFileSync('./assets/images/minions_laughing.jpg');
 const cmykJpg = fs.readFileSync('./assets/images/cmyk_colorspace.jpg');
 
+const asOffsetView = (bytes: Uint8Array, offset = 16) => {
+  const backing = new Uint8Array(bytes.length + offset);
+  backing.set(bytes, offset);
+  return backing.subarray(offset);
+};
+
 describe(`JpegEmbedder`, () => {
   it(`can be constructed with JpegEmbedder.for(...)`, async () => {
     const embedder = await JpegEmbedder.for(catUnicornJpg);
@@ -63,5 +69,17 @@ describe(`JpegEmbedder`, () => {
     expect(embedder.height).toBe(333);
     expect(embedder.width).toBe(500);
     expect(embedder.colorSpace).toBe('DeviceCMYK');
+  });
+
+  it(`can extract properties from a Uint8Array view with a non-zero byteOffset`, async () => {
+    const view = asOffsetView(catUnicornJpg);
+    expect(view.byteOffset).toBe(16);
+
+    const embedder = await JpegEmbedder.for(view);
+
+    expect(embedder.bitsPerComponent).toBe(8);
+    expect(embedder.height).toBe(1080);
+    expect(embedder.width).toBe(1920);
+    expect(embedder.colorSpace).toBe('DeviceRGB');
   });
 });

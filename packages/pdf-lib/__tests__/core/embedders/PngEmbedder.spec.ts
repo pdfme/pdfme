@@ -10,6 +10,12 @@ const greyscalePng = fs.readFileSync('./assets/images/greyscale_bird.png');
 const rgbaPng = fs.readFileSync('./assets/images/minions_banana_alpha.png');
 const rgbPng = fs.readFileSync('./assets/images/minions_banana_no_alpha.png');
 
+const asOffsetView = (bytes: Uint8Array, offset = 16) => {
+  const backing = new Uint8Array(bytes.length + offset);
+  backing.set(bytes, offset);
+  return backing.subarray(offset);
+};
+
 describe(`PngEmbedder`, () => {
   it(`can be constructed with PngEmbedder.for(...)`, async () => {
     const embedder = await PngEmbedder.for(greyscalePng);
@@ -78,6 +84,18 @@ describe(`PngEmbedder`, () => {
 
   it(`can extract properties of RGB PNG images`, async () => {
     const embedder = await PngEmbedder.for(rgbPng);
+
+    expect(embedder.bitsPerComponent).toBe(8);
+    expect(embedder.height).toBe(640);
+    expect(embedder.width).toBe(960);
+    expect(embedder.colorSpace).toBe('DeviceRGB');
+  });
+
+  it(`can extract properties from a Uint8Array view with a non-zero byteOffset`, async () => {
+    const view = asOffsetView(rgbaPng);
+    expect(view.byteOffset).toBe(16);
+
+    const embedder = await PngEmbedder.for(view);
 
     expect(embedder.bitsPerComponent).toBe(8);
     expect(embedder.height).toBe(640);

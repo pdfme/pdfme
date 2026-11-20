@@ -30,6 +30,16 @@ const resolveUPNG = (value: unknown): UPNGApi => {
 
 const UPNG = resolveUPNG(UPNGModule);
 
+// UPNG.decode reads the whole ArrayBuffer from offset 0, so a view with a
+// non-zero byteOffset (e.g. a pooled Node Buffer) must be narrowed first.
+const toStandaloneArrayBuffer = (bytes: Uint8Array): ArrayBuffer => {
+  const { buffer, byteOffset, byteLength } = bytes;
+  if (byteOffset === 0 && byteLength === buffer.byteLength) {
+    return buffer as ArrayBuffer;
+  }
+  return buffer.slice(byteOffset, byteOffset + byteLength) as ArrayBuffer;
+};
+
 const getImageType = (ctype: number) => {
   if (ctype === 0) return PngType.Greyscale;
   if (ctype === 2) return PngType.Truecolour;
@@ -78,7 +88,7 @@ export class PNG {
   readonly bitsPerComponent: number;
 
   private constructor(pngData: Uint8Array) {
-    const upng = UPNG.decode(pngData.buffer as ArrayBuffer);
+    const upng = UPNG.decode(toStandaloneArrayBuffer(pngData));
     const frames = UPNG.toRGBA8(upng);
 
     if (frames.length > 1) throw new Error(`Animated PNGs are not supported`);
