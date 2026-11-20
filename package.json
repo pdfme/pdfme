@@ -60,11 +60,11 @@
     "lodash-es": "^4.18.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "rimraf": "^6.1.3",
+    "rimraf": "^6.1.4",
     "typescript": "^7.0.2",
-    "vite": "^8.3.5",
-    "vite-plus": "^1.4.0",
-    "vitest": "^5.0.5",
+    "vite": "^8.3.8",
+    "vite-plus": "^1.7.0",
+    "vitest": "^5.1.0",
     "vitest-image-snapshot": "^0.6.52"
   },
   "overrides": {
