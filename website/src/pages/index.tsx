@@ -318,7 +318,8 @@ export default function Home() {
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
                 <a href="https://www.datadoghq.com/" target="_blank" rel="noopener noreferrer" style={{ margin: '20px' }}>
-                  <img src="/img/datadog-logo.svg" alt="Datadog" width={140} height={140} />
+                  <img className="sponsor-logo--light" src="/img/datadog-logo.svg" alt="Datadog" width={140} height={140} />
+                  <img className="sponsor-logo--dark" src="/img/datadog-logo-white.svg" alt="Datadog" width={140} height={140} />
                 </a>
               </div>
             </div>

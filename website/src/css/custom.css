@@ -26,9 +26,12 @@
   white-space: normal;
 }
 
-/* Sponsor logos must not be recolored, so dark mode gets a light section background instead. */
-[data-theme='dark'] .sponsors-section {
-  background-color: #f5f6f7;
-  color: #1c1e21;
-  border-radius: var(--ifm-global-radius);
+/* Sponsor logos must not be recolored; switch to the sponsor's official dark-background variant instead. */
+.sponsor-logo--dark,
+[data-theme='dark'] .sponsor-logo--light {
+  display: none;
+}
+
+[data-theme='dark'] .sponsor-logo--dark {
+  display: inline;
 }
