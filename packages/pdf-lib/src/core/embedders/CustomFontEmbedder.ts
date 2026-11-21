@@ -27,7 +27,7 @@ type ParsedFont = { byteOffset: number; byteLength: number; fingerprint: Uint8Ar
 /** fontkit's Font keeps the glyphs it has created (with their code points) in `_glyphs`. */
 type GlyphCache = { _glyphs: Record<number, Glyph> };
 
-const parsedFonts = new WeakMap<Fontkit['create'], WeakMap<ArrayBufferLike, ParsedFont[]>>();
+const parsedFonts = new WeakMap<Fontkit, WeakMap<ArrayBufferLike, ParsedFont[]>>();
 
 const sameBytes = (a: Uint8Array, b: Uint8Array) =>
   a.length === b.length && a.every((byte, idx) => byte === b[idx]);
@@ -42,7 +42,7 @@ const createView = (font: Font) => {
 };
 
 /**
- * Parses font bytes once per fontkit and byte range, and returns a new view of the parsed font on
+ * Parses font bytes once per fontkit provider and byte range, and returns a new view of the parsed font on
  * every call. Views share the directory and decoded tables (as fontkit's own `getVariation` does),
  * but each has its own glyphs, layout engine and cmap processor: a glyph keeps the code points it
  * was first created for, which go into the ToUnicode map, so sharing glyphs would let one
@@ -54,10 +54,10 @@ const createView = (font: Font) => {
  * uses; not meant to be called by applications.
  */
 export const parseFont = (fontkit: Fontkit, fontData: Uint8Array): Font => {
-  let fontsByBuffer = parsedFonts.get(fontkit.create);
+  let fontsByBuffer = parsedFonts.get(fontkit);
   if (!fontsByBuffer) {
     fontsByBuffer = new WeakMap();
-    parsedFonts.set(fontkit.create, fontsByBuffer);
+    parsedFonts.set(fontkit, fontsByBuffer);
   }
   let fonts = fontsByBuffer.get(fontData.buffer);
   if (!fonts) {
