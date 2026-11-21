@@ -78,6 +78,37 @@ describe(`CustomFontEmbedder`, () => {
       expect(counting.create).toHaveBeenCalledTimes(2);
     });
 
+    it(`keeps providers that share a create method apart (regression)`, () => {
+      // `create` is called as `fontkit.create(bytes)`, so a provider whose shared method reads
+      // `this` must not be served another provider's parse of the same bytes.
+      class Provider {
+        calls = 0;
+        constructor(readonly width: number) {}
+        create(_bytes: Uint8Array) {
+          this.calls++;
+          return {
+            _glyphs: {},
+            unitsPerEm: 1000,
+            layout: () => ({ glyphs: [{ id: 1, advanceWidth: this.width }] }),
+          };
+        }
+      }
+      const widthOf = (provider: Provider, bytes: Uint8Array) =>
+        (parseFont(provider as never, bytes).layout('A') as never as { glyphs: { advanceWidth: number }[] })
+          .glyphs[0].advanceWidth;
+
+      const bytes = new Uint8Array([1, 2, 3]);
+      const a = new Provider(500);
+      const b = new Provider(900);
+      expect(a.create).toBe(b.create);
+      expect(widthOf(a, bytes)).toBe(500);
+      expect(widthOf(b, bytes)).toBe(900);
+      expect([a.calls, b.calls]).toEqual([1, 1]);
+      // each provider still parses the same bytes only once
+      expect(widthOf(b, bytes)).toBe(900);
+      expect(b.calls).toBe(1);
+    });
+
     it(`finds bytes again when each call wraps the same ArrayBuffer anew`, () => {
       const { buffer } = new Uint8Array(ubuntuFont);
       const first = parseFont(fontkit, new Uint8Array(buffer));
